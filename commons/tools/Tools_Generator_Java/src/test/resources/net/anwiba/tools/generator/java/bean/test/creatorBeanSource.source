@@ -1,0 +1,75 @@
+-----------------------------------net.anwiba.test.Bean.java-----------------------------------
+
+package net.anwiba.test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
+import net.anwiba.commons.utilities.string.StringUtilities;
+
+public class Bean {
+
+    private String type = "Bean";
+    private final static HashMap<String, Class> _classes = new HashMap<String, Class>();
+
+    public String getType() {
+        return this.type;
+    }
+
+    public static Bean create(String type) {
+        if (StringUtilities.isNullOrTrimmedEmpty(type)) {
+            return new Bean();
+        }
+        Class<? extends Bean> clazz = _createClass(type);
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        clazz = _createClass(type.toLowerCase());
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        String className = MessageFormat.format("{0}{1}", type, "Bean");
+        clazz = _createClass(className);
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        className = MessageFormat.format("{0}{1}", type.toLowerCase(), "Bean");
+        clazz = _createClass(className);
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        return new Bean();
+    }
+
+    private static Bean _createBean(Class<? extends Bean> clazz) {
+        try {
+            ReflectionConstructorInvoker<Bean> invoker = new ReflectionConstructorInvoker<Bean>(clazz);
+            return invoker.invoke();
+        } catch (InvocationTargetException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private static synchronized Class<? extends Bean> _createClass(String type) {
+        if (_classes.containsKey(type)) {
+            return ((Class<? extends Bean> ) _classes.get(type));
+        }
+        try {
+            String packageName = Bean.class.getPackage().getName();
+            String typeName = StringUtilities.setFirstTrimedCharacterToUpperCase(type);
+            String className = MessageFormat.format("{0}.{1}", packageName, typeName);
+            Class<?> clazz = Class.forName(className);
+            if (!Bean.class.isAssignableFrom(clazz)) {
+                _classes.put(type, null);
+                return null;
+            }
+            _classes.put(type, clazz);
+            return ((Class<? extends Bean> ) clazz);
+        } catch (ClassNotFoundException exception) {
+            _classes.put(type, null);
+            return null;
+        }
+    }
+
+}

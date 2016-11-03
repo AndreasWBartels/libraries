@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>Commons_Reflaction</name>
+  <artifactId>anwiba-commons-reflaction</artifactId>
+  <parent>
+    <groupId>net.anwiba.commons</groupId>
+    <artifactId>anwiba-commons-maven-core</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <projectNameTemplate>Commons_Reflaction</projectNameTemplate>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

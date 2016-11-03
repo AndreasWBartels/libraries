@@ -1,0 +1,7 @@
+{
+  @JssdNotNullable
+  "envelope" : <envelope>  null,
+  "geometry" : <Object>  null,
+  @JssdProperties
+  "attributes" : <entity>  null
+}

@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>Commons_Utilities</name>
+  <artifactId>anwiba-commons-utilities</artifactId>
+  <parent>
+    <groupId>net.anwiba.commons</groupId>
+    <artifactId>anwiba-commons-maven-core</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-ensure</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-resource</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <projectNameTemplate>Commons_Utilities</projectNameTemplate>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

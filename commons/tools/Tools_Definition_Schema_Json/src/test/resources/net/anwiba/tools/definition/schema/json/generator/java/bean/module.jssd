@@ -1,0 +1,13 @@
+[
+  @JssdName(value="Coordinate")
+  {
+    @JssdImmutable
+    "type" : <String> "Coordinate",
+    "values" : <double[]> null
+  },
+  @JssdName(value="CoordinateSequence")
+  {
+    "type" : <String> "CoordinateSequence",
+    "coordinates" : <Coordinate[]> null
+  }
+]

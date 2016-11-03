@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>Commons_Core</name>
+  <artifactId>anwiba-commons-core</artifactId>
+  <parent>
+    <groupId>net.anwiba.commons</groupId>
+    <artifactId>anwiba-commons-maven-core</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-ensure</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-lang</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-logging</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-reflaction</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-resource</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-utilities</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <projectNameTemplate>Commons_Core</projectNameTemplate>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <configuration>
+          <!-- put your configurations here -->
+          <createSourcesJar>true</createSourcesJar>
+          <shadeSourcesContent>true</shadeSourcesContent>
+          <shadeTestJar>true</shadeTestJar>
+          <useBaseVersion>true</useBaseVersion>
+          <artifactSet>
+            <excludes>
+              <exclude>commons-logging:commons-logging</exclude>
+              <exclude>log4j:log4j:jar:</exclude>
+            </excludes>
+          </artifactSet>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>

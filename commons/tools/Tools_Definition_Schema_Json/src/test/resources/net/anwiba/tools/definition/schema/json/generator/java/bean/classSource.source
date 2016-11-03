@@ -1,0 +1,34 @@
+-----------------------------------net.anwiba.generated.test.bean.MemberClass.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class MemberClass {
+
+    @JsonProperty("class")
+    private String _class = null;
+    @JsonProperty("flag")
+    private boolean flag = false;
+
+    @JsonProperty("class")
+    public void setClass(final String _class) {
+        this._class = _class;
+    }
+
+    @JsonProperty("class")
+    public String getCLASS() {
+        return this._class;
+    }
+
+    @JsonProperty("flag")
+    public void setFlag(final boolean flag) {
+        this.flag = flag;
+    }
+
+    @JsonProperty("flag")
+    public boolean isFlag() {
+        return this.flag;
+    }
+
+}

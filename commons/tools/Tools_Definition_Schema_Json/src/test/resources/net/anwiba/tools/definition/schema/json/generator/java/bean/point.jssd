@@ -1,0 +1,10 @@
+@JssdExtends(type="geometry")
+{
+  @JssdImmutable
+  "type" : <String> "Point",
+  "x" : <double> 0,
+  "y" : <double> 0,
+  "d" : <int[]> [1,2,3],
+  "e" : <Double> 0,
+  "f" : <Double[]> [0,1,2]
+}

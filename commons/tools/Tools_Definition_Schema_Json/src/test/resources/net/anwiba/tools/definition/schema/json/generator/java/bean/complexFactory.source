@@ -1,0 +1,24 @@
+-----------------------------------net.anwiba.generated.test.bean.Factory.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.anwiba.tools.generator.java.json.bean.test.ComplexFactory;
+
+public class Factory {
+
+
+    @JsonCreator
+    public static Factory create(
+        @JacksonInject("factory")
+        ComplexFactory factory,
+        @JsonProperty("type")
+        String type,
+        @JsonProperty("id")
+        int id) {
+        return factory.create(type, id);
+    }
+
+}

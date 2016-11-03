@@ -1,0 +1,8 @@
+@JssdPrimitivesEnabled
+{
+  @JssdNotNullable
+  "code" : <int> null,
+  @JssdNotNullable
+  "message" : <String> null,
+  "details" : <String[]> null
+}

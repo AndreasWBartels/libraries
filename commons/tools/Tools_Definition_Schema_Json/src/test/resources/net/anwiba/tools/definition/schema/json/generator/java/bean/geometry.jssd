@@ -1,0 +1,5 @@
+{
+  @JssdImmutable
+  "type" : <String> "Geometry",
+  "spatialReference" : <spatialReference> null
+}

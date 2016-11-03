@@ -1,0 +1,82 @@
+-----------------------------------net.anwiba.generated.test.bean.Factory.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
+import net.anwiba.commons.utilities.string.StringUtilities;
+
+public class Factory {
+
+    @JsonProperty("class")
+    private String _class = "Factory";
+    private final static HashMap<java.lang.String, Class> _classes = new HashMap<java.lang.String, Class>();
+
+    @JsonProperty("class")
+    public String getCLASS() {
+        return this._class;
+    }
+
+    @JsonCreator
+    public static Factory create(
+        @JsonProperty("class")
+        java.lang.String _class) {
+        if (StringUtilities.isNullOrTrimmedEmpty(_class)) {
+            return new Factory();
+        }
+        Class<? extends Factory> clazz = _createClass(_class);
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        clazz = _createClass(_class.toLowerCase());
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        java.lang.String className = MessageFormat.format("{0}{1}", _class, "Factory");
+        clazz = _createClass(className);
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        className = MessageFormat.format("{0}{1}", _class.toLowerCase(), "Factory");
+        clazz = _createClass(className);
+        if (clazz!= null) {
+            return _createBean(clazz);
+        }
+        return new Factory();
+    }
+
+    private static Factory _createBean(Class<? extends Factory> clazz) {
+        try {
+            ReflectionConstructorInvoker<Factory> invoker = new ReflectionConstructorInvoker<Factory>(clazz);
+            return invoker.invoke();
+        } catch (InvocationTargetException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private static synchronized Class<? extends Factory> _createClass(java.lang.String type) {
+        if (_classes.containsKey(type)) {
+            return ((Class<? extends Factory> ) _classes.get(type));
+        }
+        try {
+            java.lang.String packageName = Factory.class.getPackage().getName();
+            java.lang.String typeName = StringUtilities.setFirstTrimedCharacterToUpperCase(type);
+            java.lang.String className = MessageFormat.format("{0}.{1}", packageName, typeName);
+            Class<?> clazz = Class.forName(className);
+            if (!Factory.class.isAssignableFrom(clazz)) {
+                _classes.put(type, null);
+                return null;
+            }
+            _classes.put(type, clazz);
+            return ((Class<? extends Factory> ) clazz);
+        } catch (ClassNotFoundException exception) {
+            _classes.put(type, null);
+            return null;
+        }
+    }
+
+}

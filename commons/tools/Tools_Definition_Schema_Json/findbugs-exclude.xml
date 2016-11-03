@@ -1,0 +1,8 @@
+<FindBugsFilter>
+  <Match>
+    <Match>
+      <Package name="net.anwiba.tools.definition.schema.json.gramma" />
+      <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,MS_PKGPROTECT,RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE,SF_SWITCH_NO_DEFAULT,SF_SWITCH_NO_DEFAULT,SIC_INNER_SHOULD_BE_STATIC" />
+    </Match>
+  </Match>
+</FindBugsFilter>

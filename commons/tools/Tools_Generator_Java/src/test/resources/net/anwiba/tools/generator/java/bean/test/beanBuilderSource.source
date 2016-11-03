@@ -1,0 +1,70 @@
+-----------------------------------net.anwiba.test.Bean.java-----------------------------------
+
+package net.anwiba.test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import net.anwiba.commons.utilities.provider.INamedValueProvider;
+
+public class Bean
+    implements INamedValueProvider<Object, RuntimeException>
+{
+
+    private String type = "Bean";
+    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+
+    public final Bean(final Map<String, Object> properties) {
+        this.properties.putAll(properties);
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public Map<String, Object> getProperties() {
+        return this.properties;
+    }
+
+    @Override
+    public Iterable<String> getNames() {
+        return this.properties.keySet();
+    }
+
+    @Override
+    public Object getValue(final String name) {
+        if (name == null) {
+            return null;
+        }
+        return this.properties.get(name);
+    }
+
+}
+-----------------------------------net.anwiba.test.BeanBuilder.java-----------------------------------
+
+package net.anwiba.test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BeanBuilder {
+
+    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+
+    public final BeanBuilder() {
+    }
+
+    public BeanBuilder setProperties(final Map<String, Object> properties) {
+        if (properties == null) {
+            this.properties.clear();
+            return this;
+        }
+        this.properties.clear();
+        this.properties.putAll(properties);
+        return this;
+    }
+
+    public Bean build() {
+        return new Bean(properties);
+    }
+
+}

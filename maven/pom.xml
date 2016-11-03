@@ -1,0 +1,752 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.anwiba</groupId>
+  <artifactId>anwiba-maven-default</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0.0</version>
+  <url>https://github.com/AndreasWBartels</url>
+  <inceptionYear>2007</inceptionYear>
+
+  <organization>
+    <name>Andreas W. Bartels</name>
+    <url>http://www.anwiba.net/</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>andreas</id>
+      <name>Andreas W. Bartels</name>
+      <email>bartels@sanwiba.de</email>
+      <organization>anwiba</organization>
+      <roles>
+        <role>Project Manager</role>
+        <role>Software Architect</role>
+        <role>Developer</role>
+        <role>Tester</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Andreas W. Bartels</name>
+    </contributor>
+  </contributors>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>${org.apache.maven.site.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-descriptor</id>
+            <goals>
+              <goal>attach-descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>findbugs-maven-plugin</artifactId>
+              <version>${org.apache.maven.site.plugin.version}</version>
+              <configuration>
+                <findbugsXmlOutput>true</findbugsXmlOutput>
+                <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+                <xmlOutput>true</xmlOutput>
+                <xmlOutputDirectory>target/site</xmlOutputDirectory>
+              </configuration>
+            </plugin>
+          </reportPlugins>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${org.apache.maven.source.version}</version>
+        <inherited>true</inherited>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${org.apache.maven.compiler.version}</version>
+        <configuration>
+          <compilerId>jdt</compilerId>
+          <source>${compile.source.version}</source>
+          <target>${compile.target.version}</target>
+          <maxmem>512</maxmem>
+          <meminitial>64</meminitial>
+          <encoding>UTF-8</encoding>
+          <showDeprecation>true</showDeprecation>
+          <showWarnings>true</showWarnings>
+        </configuration>
+        <dependencies>
+
+          <dependency>
+            <groupId>org.sonatype.tycho</groupId>
+            <artifactId>tycho-compiler-jdt</artifactId>
+            <version>${org.sonatype.tycho.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.sonatype.tycho</groupId>
+                <artifactId>org.eclipse.jdt.core</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+
+          <dependency>
+            <groupId>org.eclipse.jdt.core.compiler</groupId>
+            <artifactId>ecj</artifactId>
+            <version>${org.eclipse.jdt.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>${org.apache.maven.resources.version}</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${org.apache.maven.surefire.version}</version>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*Demo.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/Test.java</exclude>
+            <exclude>**/Demo.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <downloadSources>true</downloadSources>
+          <downloadJavadocs>true</downloadJavadocs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jarsigner-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${org.apache.maven.dependency.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jarsigner-plugin</artifactId>
+          <version>${org.apache.maven.jarsigner.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${org.apache.maven.jar.version}</version>
+          <configuration>
+            <archive>
+              <addMavenDescriptor/>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addClasspath>true</addClasspath>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-maven-plugin</artifactId>
+          <version>${org.antlr4.version}</version>
+          <executions>
+            <execution>
+              <id>antlr</id>
+              <goals>
+                <goal>antlr4</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr3-maven-plugin</artifactId>
+          <version>${org.antlr.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>antlr</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.9</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.5</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.8</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jvnet.jaxb2.maven2</groupId>
+          <artifactId>maven-jaxb2-plugin</artifactId>
+          <version>${org.jvnet.jaxb2.maven2.version}</version>
+          <executions>
+            <execution>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>generate</goal>
+              </goals>
+              <configuration>
+                <schemaDirectory>src/main/schema</schemaDirectory>
+                <generateDirectory>target/generated/java</generateDirectory>
+                <source>${compile.source.version}</source>
+                <target>${compile.target.version}</target>
+                <episode>false</episode>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>3.4</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>2.4.3</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>1.9</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>com.github.jai-imageio</groupId>
+        <artifactId>jai-imageio-core</artifactId>
+        <version>1.3.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.jai-imageio</groupId>
+        <artifactId>jai-imageio-jpeg2000</artifactId>
+        <version>1.3.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>${org.apache.maven.project.info.reports.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>${org.apache.ant.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
+        <version>${org.hamcrest.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-library</artifactId>
+        <version>${org.hamcrest.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.jdemo</groupId>
+        <artifactId>jdemo-core</artifactId>
+        <version>${de.jdemo.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${org.mockito.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-all</artifactId>
+        <version>${org.mockito.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${org.assertj.core.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${apache.commons.codec.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>${apache.commons.httpclient.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${org.apache.httpcomponents.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.5</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>2.5</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>${apache.commons.logging.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${org.bouncycastle.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>dom4j</groupId>
+        <artifactId>dom4j</artifactId>
+        <version>${dom4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy</artifactId>
+        <version>${groovy.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-console</artifactId>
+        <version>${groovy.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>${org.antlr4.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr-runtime</artifactId>
+        <version>${org.antlr.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.codemodel</groupId>
+        <artifactId>codemodel</artifactId>
+        <version>${com.sun.codemodel.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${com.fasterxml.jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${com.fasterxml.jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${com.fasterxml.jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-build-api</artifactId>
+        <version>${org.sonatype.plexus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-plugin-api</artifactId>
+        <version>${org.apache.maven.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-project</artifactId>
+        <version>${org.apache.maven.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>${org.apache.derby.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven.plugin-tools</groupId>
+        <artifactId>maven-plugin-annotations</artifactId>
+        <version>3.4</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>${com.sun.xml.bind.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-core</artifactId>
+        <version>${com.sun.xml.bind.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sun.media</groupId>
+        <artifactId>jai-codec</artifactId>
+        <version>${javax.media.jai.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.media</groupId>
+        <artifactId>jai_core</artifactId>
+        <version>${javax.media.jai.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.xerial</groupId>
+        <artifactId>sqlite-spatialite-jdbc</artifactId>
+        <version>${org.xerial.sqlite.spatialite.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.xerial</groupId>
+        <artifactId>sqlite-jdbc4</artifactId>
+        <version>${org.xerial.sqlite.jdbc4.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc5</artifactId>
+        <version>${com.oracle.database.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc6</artifactId>
+        <version>${com.oracle.database.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>oracle.spatial</groupId>
+        <artifactId>sdoapi</artifactId>
+        <version>${oracle.spatial.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.postgis</groupId>
+        <artifactId>postgis-jdbc</artifactId>
+        <version>${net.postgis.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.esri</groupId>
+        <artifactId>jsde_sdk</artifactId>
+        <version>${com.esri.sde.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.esri</groupId>
+        <artifactId>jsde_sdkres</artifactId>
+        <version>${com.esri.sde.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.esri</groupId>
+        <artifactId>jpe_sdk</artifactId>
+        <version>${com.esri.sde.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jaxen</groupId>
+        <artifactId>jaxen</artifactId>
+        <version>${jaxen.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jvnet.hudson.main</groupId>
+        <artifactId>hudson-cli</artifactId>
+        <version>${org.jvnet.hudson.main.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>xml-apis</groupId>
+        <artifactId>xml-apis</artifactId>
+        <version>${xml-apis.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.hsr</groupId>
+        <artifactId>geohash</artifactId>
+        <version>${ch.hsr.geohash.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.sap.db</groupId>
+        <artifactId>ngdbc</artifactId>
+        <version>1.94.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-imaging</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.khelekore</groupId>
+        <artifactId>prtree</artifactId>
+        <version>1.7.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>9.2.8.v20150217</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.ehcache</groupId>
+        <artifactId>ehcache</artifactId>
+        <version>3.1.3</version>
+      </dependency>
+    </dependencies>
+
+  </dependencyManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <net.anwiba.version>1.0.0</net.anwiba.version>
+    <net.anwiba.commons.version>1.0.0</net.anwiba.commons.version>
+
+    <compile.source.version>1.8</compile.source.version>
+    <compile.target.version>1.8</compile.target.version>
+
+    <apache.commons.logging.version>1.2</apache.commons.logging.version>
+    <apache.commons.codec.version>1.9</apache.commons.codec.version>
+    <apache.commons.httpclient.version>3.1</apache.commons.httpclient.version>
+    <ch.hsr.geohash.version>1.0.10</ch.hsr.geohash.version>
+
+    <com.fasterxml.jackson.version>2.7.2</com.fasterxml.jackson.version>
+
+    <com.sun.codemodel.version>2.6</com.sun.codemodel.version>
+    <com.sun.xml.bind.version>2.2.7</com.sun.xml.bind.version>
+    <com.oracle.database.version>12.1.0.2</com.oracle.database.version>
+    <com.esri.sde.version>9.3.2</com.esri.sde.version>
+    <de.jdemo.version>1.6.0</de.jdemo.version>
+    <dom4j.version>1.6.1</dom4j.version>
+    <groovy.version>2.4.5</groovy.version>
+    <javax.media.jai.version>1.1.3</javax.media.jai.version>
+    <jaxen.version>1.1.4</jaxen.version>
+    <junit.version>4.12</junit.version>
+    <log4j.version>1.2.17</log4j.version>
+    <oracle.spatial.version>12.1.0.1b</oracle.spatial.version>
+    <org.antlr.version>3.5.2</org.antlr.version>
+    <org.antlr4.version>4.5.1-1</org.antlr4.version>
+    <org.apache.ant.version>1.8.4</org.apache.ant.version>
+    <org.apache.httpcomponents.version>4.5.2</org.apache.httpcomponents.version>
+    <org.apache.derby.version>10.12.1.1</org.apache.derby.version>
+    <org.apache.maven.version>2.0</org.apache.maven.version>
+    <org.apache.maven.compiler.version>2.3.2</org.apache.maven.compiler.version>
+    <org.apache.maven.dependency.version>2.10</org.apache.maven.dependency.version>
+    <org.apache.maven.jar.version>2.4</org.apache.maven.jar.version>
+    <org.apache.maven.jarsigner.version>1.4</org.apache.maven.jarsigner.version>
+    <org.apache.maven.project.info.reports.version>2.6</org.apache.maven.project.info.reports.version>
+    <org.apache.maven.resources.version>2.6</org.apache.maven.resources.version>
+    <org.apache.maven.surefire.version>2.13</org.apache.maven.surefire.version>
+    <org.apache.maven.source.version>2.1.2</org.apache.maven.source.version>
+    <org.apache.maven.site.plugin.version>3.3</org.apache.maven.site.plugin.version>
+    <org.assertj.core.version>1.6.1</org.assertj.core.version>
+    <org.bouncycastle.version>1.54</org.bouncycastle.version>
+    <org.codehaus.jackson.version>1.9.11</org.codehaus.jackson.version>
+    <org.codehaus.mojo.findbugs.maven.plugin>2.5.2</org.codehaus.mojo.findbugs.maven.plugin>
+    <org.eclipse.jdt.version>4.5</org.eclipse.jdt.version>
+    <org.hamcrest.version>1.3</org.hamcrest.version>
+    <org.jfrog.maven.annomojo.version>1.3.1</org.jfrog.maven.annomojo.version>
+    <org.jvnet.jaxb2.maven2.version>0.9.1</org.jvnet.jaxb2.maven2.version>
+    <org.jvnet.hudson.main.version>2.2.1</org.jvnet.hudson.main.version>
+    <org.mockito.version>1.9.5</org.mockito.version>
+    <net.postgis.version>2.2.0</net.postgis.version>
+    <org.sonatype.plexus.version>0.0.7</org.sonatype.plexus.version>
+    <org.sonatype.tycho.version>0.11.1</org.sonatype.tycho.version>
+    <org.xerial.sqlite.version>3.8.4.3</org.xerial.sqlite.version>
+    <org.xerial.sqlite.spatialite.version>3.8.0</org.xerial.sqlite.spatialite.version>
+    <org.xerial.sqlite.jdbc4.version>3.8.2</org.xerial.sqlite.jdbc4.version>
+    <postgresql.version>9.1-901.jdbc4</postgresql.version>
+    <xml-apis.version>1.3.04</xml-apis.version>
+  </properties>
+
+  <scm>
+    <connection>scm:git:git://github.com/AndreasWBartels/libraries.git</connection>
+    <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
+    <url>http://github.com/AndreasWBartels/libraries/tree/master</url>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+</project>

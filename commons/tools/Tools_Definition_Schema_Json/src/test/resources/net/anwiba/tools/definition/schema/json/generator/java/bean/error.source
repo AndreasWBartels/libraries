@@ -1,0 +1,50 @@
+-----------------------------------net.anwiba.generated.test.bean.Error.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.anwiba.commons.ensure.Conditions;
+import net.anwiba.commons.ensure.Ensure;
+
+public class Error {
+
+    @JsonProperty("code")
+    private int code = 0;
+    @JsonProperty("message")
+    private String message = null;
+    @JsonProperty("details")
+    private String[] details = null;
+
+    @JsonProperty("code")
+    public void setCode(final int code) {
+        Ensure.ensureThatArgument(code, Conditions.notNull());
+        this.code = code;
+    }
+
+    @JsonProperty("code")
+    public int getCode() {
+        return this.code;
+    }
+
+    @JsonProperty("message")
+    public void setMessage(final String message) {
+        Ensure.ensureThatArgument(message, Conditions.notNull());
+        this.message = message;
+    }
+
+    @JsonProperty("message")
+    public String getMessage() {
+        return this.message;
+    }
+
+    @JsonProperty("details")
+    public void setDetails(final String[] details) {
+        this.details = details;
+    }
+
+    @JsonProperty("details")
+    public String[] getDetails() {
+        return this.details;
+    }
+
+}

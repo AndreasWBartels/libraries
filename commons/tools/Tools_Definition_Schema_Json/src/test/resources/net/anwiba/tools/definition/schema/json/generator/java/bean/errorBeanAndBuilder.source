@@ -1,0 +1,76 @@
+-----------------------------------net.anwiba.generated.test.bean.Error.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.anwiba.commons.ensure.Conditions;
+import net.anwiba.commons.ensure.Ensure;
+
+public class Error {
+
+    @JsonProperty("code")
+    private int code = 0;
+    @JsonProperty("message")
+    private String message = null;
+    @JsonProperty("details")
+    private String[] details = null;
+
+    public final Error(final int code, final String message, final String[] details) {
+        Ensure.ensureThatArgument(code, Conditions.notNull());
+        this.code = code;
+        Ensure.ensureThatArgument(message, Conditions.notNull());
+        this.message = message;
+        this.details = details;
+    }
+
+    @JsonProperty("code")
+    public int getCode() {
+        return this.code;
+    }
+
+    @JsonProperty("message")
+    public String getMessage() {
+        return this.message;
+    }
+
+    @JsonProperty("details")
+    public String[] getDetails() {
+        return this.details;
+    }
+
+}
+-----------------------------------net.anwiba.generated.test.bean.ErrorBuilder.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.anwiba.commons.ensure.Conditions;
+import net.anwiba.commons.ensure.Ensure;
+
+public class ErrorBuilder {
+
+    @JsonProperty("code")
+    private int code = 0;
+    @JsonProperty("message")
+    private String message = null;
+    @JsonProperty("details")
+    private String[] details = null;
+
+    public final ErrorBuilder(final int code, final String message) {
+        Ensure.ensureThatArgument(code, Conditions.notNull());
+        this.code = code;
+        Ensure.ensureThatArgument(message, Conditions.notNull());
+        this.message = message;
+    }
+
+    @JsonProperty("details")
+    public ErrorBuilder setDetails(final String[] details) {
+        this.details = details;
+        return this;
+    }
+
+    public Error build() {
+        return new Error(code, message, details);
+    }
+
+}

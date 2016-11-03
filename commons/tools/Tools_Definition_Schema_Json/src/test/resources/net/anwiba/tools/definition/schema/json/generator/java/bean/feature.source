@@ -1,0 +1,141 @@
+-----------------------------------net.anwiba.generated.test.bean.Envelope.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Envelope {
+
+    @JsonProperty("xmin")
+    private Double xmin = null;
+    @JsonProperty("ymin")
+    private Double ymin = null;
+    @JsonProperty("xmax")
+    private Double xmax = null;
+    @JsonProperty("ymax")
+    private Double ymax = null;
+    @JsonProperty("spatialReference")
+    private SpatialReference spatialReference = null;
+
+    @JsonProperty("xmin")
+    public void setXmin(final Double xmin) {
+        this.xmin = xmin;
+    }
+
+    @JsonProperty("xmin")
+    public Double getXmin() {
+        return this.xmin;
+    }
+
+    @JsonProperty("ymin")
+    public void setYmin(final Double ymin) {
+        this.ymin = ymin;
+    }
+
+    @JsonProperty("ymin")
+    public Double getYmin() {
+        return this.ymin;
+    }
+
+    @JsonProperty("xmax")
+    public void setXmax(final Double xmax) {
+        this.xmax = xmax;
+    }
+
+    @JsonProperty("xmax")
+    public Double getXmax() {
+        return this.xmax;
+    }
+
+    @JsonProperty("ymax")
+    public void setYmax(final Double ymax) {
+        this.ymax = ymax;
+    }
+
+    @JsonProperty("ymax")
+    public Double getYmax() {
+        return this.ymax;
+    }
+
+    @JsonProperty("spatialReference")
+    public void setSpatialReference(final SpatialReference spatialReference) {
+        this.spatialReference = spatialReference;
+    }
+
+    @JsonProperty("spatialReference")
+    public SpatialReference getSpatialReference() {
+        return this.spatialReference;
+    }
+
+}
+-----------------------------------net.anwiba.generated.test.bean.Feature.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.anwiba.commons.ensure.Conditions;
+import net.anwiba.commons.ensure.Ensure;
+
+public class Feature {
+
+    @JsonProperty("envelope")
+    private Envelope envelope = null;
+    @JsonProperty("geometry")
+    private Object geometry = null;
+    @JsonProperty("attributes")
+    private final Map<String, net.anwiba.generated.test.bean.Entity> attributes = new LinkedHashMap<String, net.anwiba.generated.test.bean.Entity>();
+
+    @JsonProperty("envelope")
+    public void setEnvelope(final Envelope envelope) {
+        Ensure.ensureThatArgument(envelope, Conditions.notNull());
+        this.envelope = envelope;
+    }
+
+    @JsonProperty("envelope")
+    public Envelope getEnvelope() {
+        return this.envelope;
+    }
+
+    @JsonProperty("geometry")
+    public void setGeometry(final Object geometry) {
+        this.geometry = geometry;
+    }
+
+    @JsonProperty("geometry")
+    public Object getGeometry() {
+        return this.geometry;
+    }
+
+    public void setAttributes(final String name, final net.anwiba.generated.test.bean.Entity value) {
+        Ensure.ensureThatArgument(name, Conditions.notNull());
+        this.attributes.put(name, value);
+    }
+
+    @JsonProperty("attributes")
+    public void setAttributes(final Map<String, net.anwiba.generated.test.bean.Entity> attributes) {
+        if (attributes == null) {
+            this.attributes.clear();
+            return ;
+        }
+        this.attributes.clear();
+        this.attributes.putAll(attributes);
+    }
+
+    public net.anwiba.generated.test.bean.Entity getAttributes(final String name) {
+        if (name == null) {
+            return null;
+        }
+        return this.attributes.get(name);
+    }
+
+    @JsonProperty("attributes")
+    public Map<String, net.anwiba.generated.test.bean.Entity> getAttributes() {
+        if (this.attributes.isEmpty()) {
+            return null;
+        }
+        return this.attributes;
+    }
+
+}

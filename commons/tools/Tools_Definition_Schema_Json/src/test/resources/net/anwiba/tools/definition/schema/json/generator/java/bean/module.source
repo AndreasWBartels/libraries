@@ -1,0 +1,63 @@
+-----------------------------------net.anwiba.generated.test.bean.Coordinate.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Coordinate {
+
+    @JsonProperty("type")
+    private String type = "Coordinate";
+    @JsonProperty("values")
+    private double[] values = null;
+
+    @JsonProperty("type")
+    public String getType() {
+        return this.type;
+    }
+
+    @JsonProperty("values")
+    public void setValues(final double[] values) {
+        this.values = values;
+    }
+
+    @JsonProperty("values")
+    public double[] getValues() {
+        return this.values;
+    }
+
+}
+-----------------------------------net.anwiba.generated.test.bean.CoordinateSequence.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class CoordinateSequence {
+
+    @JsonProperty("type")
+    private String type = "CoordinateSequence";
+    @JsonProperty("coordinates")
+    private Coordinate[] coordinates = null;
+
+    @JsonProperty("type")
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    @JsonProperty("type")
+    public String getType() {
+        return this.type;
+    }
+
+    @JsonProperty("coordinates")
+    public void setCoordinates(final Coordinate[] coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    @JsonProperty("coordinates")
+    public Coordinate[] getCoordinates() {
+        return this.coordinates;
+    }
+
+}

@@ -1,0 +1,5 @@
+@JssdFactory(argument="class")
+{
+  @JssdImmutable
+  "class" : <String> "Factory"
+}

@@ -1,0 +1,3 @@
+@JssdFactory(type="delegation", factory="factory:net.anwiba.tools.generator.java.json.bean.test.ComplexFactory",arguments="type:java.lang.String,id:int")
+{
+}

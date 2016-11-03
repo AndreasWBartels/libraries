@@ -1,0 +1,66 @@
+-----------------------------------net.anwiba.test.Bean.java-----------------------------------
+
+package net.anwiba.test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Bean {
+
+    private String name = null;
+    private String type = "Bean";
+    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+
+    public final Bean(final String name, final Map<String, Object> properties) {
+        this.name = name;
+        this.properties.putAll(properties);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public Map<String, Object> getProperties() {
+        return this.properties;
+    }
+
+}
+-----------------------------------net.anwiba.test.BeanBuilder.java-----------------------------------
+
+package net.anwiba.test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class BeanBuilder {
+
+    private String name = null;
+    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+
+    public final BeanBuilder() {
+    }
+
+    public BeanBuilder setName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    public BeanBuilder setProperties(final Map<String, Object> properties) {
+        if (properties == null) {
+            this.properties.clear();
+            return this;
+        }
+        this.properties.clear();
+        this.properties.putAll(properties);
+        return this;
+    }
+
+    public Bean build() {
+        return new Bean(name, properties);
+    }
+
+}
