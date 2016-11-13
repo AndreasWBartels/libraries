@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -23,8 +23,6 @@ package net.anwiba.tools.generator.java.bean.factory;
 
 import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.*;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.Type;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -32,6 +30,9 @@ import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
+
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.Type;
 
 public class MemberFactory extends AbstractSourceFactory {
 
@@ -48,6 +49,7 @@ public class MemberFactory extends AbstractSourceFactory {
       final Type type,
       final String name,
       final Object value,
+      final boolean isImutable,
       final boolean isNullable,
       final boolean isPrimitivesEnabled,
       final boolean isArrayNullable,
@@ -58,7 +60,7 @@ public class MemberFactory extends AbstractSourceFactory {
         ? mapMember(instance, clazz, fieldName, type.generics())
         : isInstanceOfList(clazz) //
             ? listMember(instance, clazz, fieldName, type.generics(), isNullable, isCollectionNullable)
-            : objectMember(instance, clazz, fieldName, value, isArrayNullable);
+            : objectMember(instance, clazz, fieldName, value, isImutable, isArrayNullable);
     annotate(field, annotation);
     return field;
   }
@@ -74,9 +76,9 @@ public class MemberFactory extends AbstractSourceFactory {
     if (isNullable && isCollectionNullable) {
       return field;
     }
-    final JType type = withoutGenerics(clazz.fullName()).startsWith(JAVA_UTIL_LIST) ? _type(
-        JAVA_UTIL_ARRAYLIST,
-        generics) : clazz;
+    final JType type = withoutGenerics(clazz.fullName()).startsWith(JAVA_UTIL_LIST)
+        ? _type(JAVA_UTIL_ARRAYLIST, generics)
+        : clazz;
     field.init(JExpr._new(type));
     return field;
   }
@@ -86,8 +88,11 @@ public class MemberFactory extends AbstractSourceFactory {
       final JType clazz,
       final String name,
       final Object value,
+      final boolean isImutable,
       final boolean isArrayNullable) {
-    final JFieldVar field = instance.field(JMod.PRIVATE, clazz, name);
+    final JFieldVar field = isImutable
+        ? instance.field(JMod.FINAL | JMod.PRIVATE, clazz, name)
+        : instance.field(JMod.PRIVATE, clazz, name);
     adjust(this.codeModel, field, value, isArrayNullable);
     return field;
   }
@@ -102,14 +107,18 @@ public class MemberFactory extends AbstractSourceFactory {
   }
 
   public JFieldVar mapMember(final JFieldVar field, final JType clazz, final String[] generics) {
-    final JType type = withoutGenerics(clazz.fullName()).startsWith(JAVA_UTIL_MAP) ? _type(
-        JAVA_UTIL_LINKHASHMAP,
-        generics) : clazz;
+    final JType type = withoutGenerics(clazz.fullName()).startsWith(JAVA_UTIL_MAP)
+        ? _type(JAVA_UTIL_LINKHASHMAP, generics)
+        : clazz;
     field.init(JExpr._new(type));
     return field;
   }
 
-  public JFieldVar mapMember(final JDefinedClass instance, final JType clazz, final String name, final String[] generics) {
+  public JFieldVar mapMember(
+      final JDefinedClass instance,
+      final JType clazz,
+      final String name,
+      final String[] generics) {
     final JFieldVar field = instance.field(JMod.FINAL | JMod.PRIVATE, clazz, name);
     return mapMember(field, clazz, generics);
   }

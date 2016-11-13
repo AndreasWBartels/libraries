@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MemberClass {
 
-    @JsonProperty("class")
     private String _class = null;
-    @JsonProperty("flag")
     private boolean flag = false;
 
     @JsonProperty("class")

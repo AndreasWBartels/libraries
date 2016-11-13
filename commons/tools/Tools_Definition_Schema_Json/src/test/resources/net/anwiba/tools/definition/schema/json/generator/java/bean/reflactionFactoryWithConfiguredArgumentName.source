@@ -12,8 +12,7 @@ import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class Factory {
 
-    @JsonProperty("class")
-    private String _class = "Factory";
+    private final String _class = "Factory";
     private final static HashMap<java.lang.String, Class> _classes = new HashMap<java.lang.String, Class>();
 
     @JsonProperty("class")

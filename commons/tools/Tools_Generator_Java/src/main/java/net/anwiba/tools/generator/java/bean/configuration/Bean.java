@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -41,24 +41,27 @@ public class Bean {
   private final Creator creator;
   private final boolean equalsEnabled;
   private final boolean primitivesEnabled;
+  private final boolean isBuilderEnabled;
 
   Bean(
-    final String comment,
-    final String name,
-    final String extend,
-    final List<Annotation> annotationConfigurations,
-    final boolean mutable,
-    final boolean arrayNullable,
-    final boolean collectionNullable,
-    final List<Member> members,
-    final List<NamedValueProvider> namedValueProviders,
-    final Creator creator,
-    final boolean isEqualsEnabled,
-    final boolean primitivesEnabled) {
+      final String comment,
+      final String name,
+      final String extend,
+      final List<Annotation> annotationConfigurations,
+      final boolean mutable,
+      final boolean isBuilderEnabled,
+      final boolean arrayNullable,
+      final boolean collectionNullable,
+      final List<Member> members,
+      final List<NamedValueProvider> namedValueProviders,
+      final Creator creator,
+      final boolean isEqualsEnabled,
+      final boolean primitivesEnabled) {
     this.comment = comment;
     this.name = name;
     this.extend = extend;
     this.mutable = mutable;
+    this.isBuilderEnabled = isBuilderEnabled;
     this.arrayNullable = arrayNullable;
     this.collectionNullable = collectionNullable;
     this.creator = creator;
@@ -90,8 +93,12 @@ public class Bean {
     return this.mutable;
   }
 
+  public boolean isBuilderEnabled() {
+    return this.isBuilderEnabled;
+  }
+
   public Member member(final String name) {
-    if (name.startsWith("_")) { //$NON-NLS-1$
+    if (name.startsWith("_") && this.membersByName.containsKey(name.substring(1, name.length()))) { //$NON-NLS-1$
       return this.membersByName.get(name.substring(1, name.length()));
     }
     return this.membersByName.get(name);

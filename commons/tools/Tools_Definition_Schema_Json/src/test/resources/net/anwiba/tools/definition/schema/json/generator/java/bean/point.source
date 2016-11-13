@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Geometry {
 
-    @JsonProperty("type")
-    private String type = "Geometry";
-    @JsonProperty("spatialReference")
+    private final String type = "Geometry";
     private SpatialReference spatialReference = null;
+
+    @JsonProperty("type")
+    public void setType(final String type) {
+    }
 
     @JsonProperty("type")
     public String getType() {
@@ -37,18 +39,16 @@ public class Point
     extends Geometry
 {
 
-    @JsonProperty("type")
-    private String type = "Point";
-    @JsonProperty("x")
+    private final String type = "Point";
     private java.lang.Double x = java.lang.Double.valueOf(0.0D);
-    @JsonProperty("y")
     private java.lang.Double y = java.lang.Double.valueOf(0.0D);
-    @JsonProperty("d")
     private int[] d = new int[] { 1, 2, 3 };
-    @JsonProperty("e")
     private Double e = java.lang.Double.valueOf(0.0D);
-    @JsonProperty("f")
     private Double[] f = new Double[] {java.lang.Double.valueOf(0.0D), java.lang.Double.valueOf(1.0D), java.lang.Double.valueOf(2.0D)};
+
+    @JsonProperty("type")
+    public void setType(final String type) {
+    }
 
     @JsonProperty("type")
     public String getType() {
@@ -115,9 +115,7 @@ import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public class SpatialReference {
 
-    @JsonProperty("wkid")
     private Integer wkid = null;
-    @JsonProperty("wkt")
     private String wkt = null;
 
     @JsonProperty("wkid")

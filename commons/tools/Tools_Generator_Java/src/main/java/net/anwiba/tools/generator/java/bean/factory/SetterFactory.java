@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -25,9 +25,6 @@ import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilitie
 
 import java.util.List;
 
-import net.anwiba.commons.lang.functional.IAcceptor;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -37,6 +34,9 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
+
+import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
 
 public class SetterFactory extends AbstractSourceFactory {
 
@@ -53,19 +53,21 @@ public class SetterFactory extends AbstractSourceFactory {
       final JDefinedClass instance,
       final JFieldVar field,
       final String name,
+      final boolean isImutable,
       final boolean isNullable,
       final List<Annotation> annotations,
       final JType nameType,
       final String nameVar,
       final JType valueType,
       final String value) {
-    mapSetter(instance, field, name, isNullable, annotations, nameType, nameVar, valueType, value);
+    mapSetter(instance, field, name, isImutable, isNullable, annotations, nameType, nameVar, valueType, value);
   }
 
   private JVar mapSetter(
       final JDefinedClass instance,
       final JFieldVar field,
       final String name,
+      final boolean isImutable,
       final boolean isNullable,
       final List<Annotation> annotationConfigurations,
       final JType nameVariableType,
@@ -74,6 +76,9 @@ public class SetterFactory extends AbstractSourceFactory {
       final String valueVariableName) {
     final JMethod method = instance.method(JMod.PUBLIC, _void(), name);
     annotate(method, annotationConfigurations);
+    if (isImutable) {
+      return SourceFactoryUtilities.addParameter(method, field);
+    }
     if (isNullable) {
       return addMapParameter(
           method,
@@ -105,6 +110,7 @@ public class SetterFactory extends AbstractSourceFactory {
       final boolean returnInstance,
       final JFieldVar field,
       final String name,
+      final boolean isImutable,
       final boolean isNullable,
       final boolean isArrayNullable,
       final boolean isCollectionNullable,
@@ -115,6 +121,7 @@ public class SetterFactory extends AbstractSourceFactory {
         method,
         returnInstance ? JExpr._this() : null,
         field,
+        isImutable,
         isNullable,
         isArrayNullable,
         isCollectionNullable);
@@ -124,13 +131,17 @@ public class SetterFactory extends AbstractSourceFactory {
     return variable;
   }
 
-  public JVar addParameter(
+  private JVar addParameter(
       final JMethod method,
       final JExpression returnValue,
       final JFieldVar field,
+      final boolean isImutable,
       final boolean isNullable,
       final boolean isArrayNullable,
       final boolean isCollectionNullable) {
+    if (isImutable) {
+      return SourceFactoryUtilities.addParameter(method, field);
+    }
     if (isInstanceOfMap(field.type())) {
       return mapSetter(method, returnValue, field, isNullable);
     }

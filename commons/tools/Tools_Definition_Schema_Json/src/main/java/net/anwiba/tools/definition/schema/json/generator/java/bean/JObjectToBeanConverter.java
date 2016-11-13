@@ -15,8 +15,10 @@ import static net.anwiba.tools.generator.java.bean.configuration.Builders.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.anwiba.commons.resource.utilities.StringUtilities;
@@ -53,11 +55,13 @@ public class JObjectToBeanConverter {
   private static final String VALUE = "value";
   private static final String _UNKNOWN_MEMBERS = "_unknownMembers";
 
+  private static final String JSSD_PROPERTIES = "JssdProperties";
   private static final String JSSD_NO_PROPERTY = "JssdNoProperty";
   private static final String JSSD_IMMUTABLE = "JssdImmutable";
   private static final String JSSD_ARRAYS_NOT_NULLABLE = "JssdArraysNotNullable";
   private static final String JSSD_NOT_NULLABLE = "JssdNotNullable";
   private static final String JSSD_FACTORY = "JssdFactory";
+  private static final String JSSD_BUILDER = "JssdBuilder";
   private static final String JSSD_NAMED_VALUE_PROVIDER = "JssdNamedValueProvider";
   private static final String JSSD_UNKNOWN_MEMBER = "JssdUnknownMember";
   private static final String JSSD_PRIMITIVES_ENABLED = "JssdPrimitivesEnabled";
@@ -99,12 +103,13 @@ public class JObjectToBeanConverter {
     final BeanBuilder builder = bean(getClassName(jssdAnnotations, JSSD_NAME, VALUE, name));
     builder.extend(getClassName(jssdAnnotations, JSSD_EXTENDS, TYPE, null));
     builder.setMutable(!this.isBuilderBeanPatternEnabled);
+    builder.setEnableBuilder(jssdAnnotations.containsKey(JSSD_BUILDER));
     builder.setArrayNullable(!jssdAnnotations.containsKey(JSSD_ARRAYS_NOT_NULLABLE));
     builder.setCollectionNullable(!jssdAnnotations.containsKey(JSSD_ARRAYS_NOT_NULLABLE));
     builder.setEqualsEnabled(jssdAnnotations.containsKey(JSSD_EQUALS));
     builder.setPrimitivesEnabled(jssdAnnotations.containsKey(JSSD_PRIMITIVES_ENABLED));
     builder.comment(this.comment);
-    addMembers(object, builder);
+    addMembers(object, builder, getFactoryMembers(jssdAnnotations.get(JSSD_FACTORY)));
     if (jssdAnnotations.containsKey(JSSD_UNKNOWN_MEMBER)) {
       addUnknownMembersMethod(builder, jssdAnnotations);
     }
@@ -113,6 +118,37 @@ public class JObjectToBeanConverter {
     }
     addClassAnnotations(object, builder);
     return builder.build();
+  }
+
+  private Set<String> getFactoryMembers(final JAnnotation annotation) {
+    if (annotation == null) {
+      return new HashSet<>();
+    }
+    if (annotation.hasParameters()) {
+      if (annotation.parameter(ARGUMENT) != null) {
+        return new HashSet<>(Arrays.asList(getTypeName(annotation.parameter(ARGUMENT).value().toString())));
+      }
+      if (annotation.parameter(ARGUMENTS) != null) {
+        return new HashSet<>(getTypeNames(annotation.parameter(ARGUMENTS).value().toString()));
+      }
+    }
+    return new HashSet<>(Arrays.asList(TYPE));
+  }
+
+  private List<String> getTypeNames(final String types) {
+    final StringTokenizer tokenizer = new StringTokenizer(types, ",");
+    final ArrayList<String> typeNames = new ArrayList<>();
+    while (tokenizer.hasMoreTokens()) {
+      typeNames.add(getTypeName(tokenizer.nextToken()));
+    }
+    return typeNames;
+  }
+
+  private String getTypeName(final String type) {
+    if (type.indexOf(':') == -1) {
+      return type;
+    }
+    return StringUtilities.getStringAfterLastChar(type, ':').trim();
   }
 
   private void addClassAnnotations(final JObject object, final BeanBuilder builder) {
@@ -130,6 +166,7 @@ public class JObjectToBeanConverter {
         _UNKNOWN_MEMBERS);
     properties.getterName("get").getterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_ANY_GETTER).build());
     properties.setterName("set").setterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_ANY_SETTER).build());
+    properties.isImutable(false);
     properties.isNullable(true);
     properties.setImplementsNamedValueProvider(jssdAnnotations.containsKey(JSSD_NAMED_VALUE_PROVIDER));
     properties.namesGetterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE).build());
@@ -138,8 +175,8 @@ public class JObjectToBeanConverter {
 
   private void addFactoryMethode(final BeanBuilder builder, final Map<String, JAnnotation> jssdAnnotations) {
     final JAnnotation annotation = jssdAnnotations.get(JSSD_FACTORY);
-    final CreatorBuilder createMethodeBuilder = creator(CREATE).annotation(
-        annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_CREATOR).build());
+    final CreatorBuilder createMethodeBuilder = creator(CREATE)
+        .annotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_CREATOR).build());
     final JParameter typeParameter = annotation.parameter(TYPE);
     if (!annotation.hasParameters() || (typeParameter == null || typeParameter.value().equals(REFLECTION))) {
       final String anotationName = getAnnotationName(annotation.parameter(SOURCE));
@@ -147,17 +184,18 @@ public class JObjectToBeanConverter {
       if (argumentParameter == null) {
         builder.creator(createMethodeBuilder.addArgument(argument(JAVA_LANG_STRING, TYPE, anotationName)).build());
       } else {
-        builder.creator(createMethodeBuilder.addArgument(
-            argument(JAVA_LANG_STRING, argumentParameter.value().toString(), anotationName)).build());
+        builder.creator(
+            createMethodeBuilder
+                .addArgument(argument(JAVA_LANG_STRING, argumentParameter.value().toString(), anotationName))
+                .build());
       }
     } else if (typeParameter.value().equals(DELEGATION)) {
       final JParameter factoryParameter = annotation.parameter(FACTORY);
       if (factoryParameter == null) {
         throw new IllegalArgumentException("missing factory parameter in JssdFactory annotation");
       }
-      createMethodeBuilder.setFactory(argument(
-          factoryParameter.value().toString(),
-          ORG_CODEHAUS_JACKSON_MAP_ANNOTATE_JACKSON_INJECT));
+      createMethodeBuilder
+          .setFactory(argument(factoryParameter.value().toString(), ORG_CODEHAUS_JACKSON_MAP_ANNOTATE_JACKSON_INJECT));
       final JParameter argumentsParameter = annotation.parameter(ARGUMENTS);
       if (argumentsParameter != null) {
         final List<Argument> arguments = arguments(
@@ -197,8 +235,10 @@ public class JObjectToBeanConverter {
   }
 
   private Argument argument(final String type, final String name, final String anotationName) {
-    return new Argument(type(type).build(), SourceFactoryUtilities.createFieldName(name), Arrays.asList(annotation(
-        anotationName).parameter(VALUE, name).build()));
+    return new Argument(
+        type(type).build(),
+        SourceFactoryUtilities.createFieldName(name),
+        Arrays.asList(annotation(anotationName).parameter(VALUE, name).build()));
   }
 
   public String getClassName(
@@ -218,18 +258,19 @@ public class JObjectToBeanConverter {
     return defaultValue == null ? null : this.beanNameConverter.convert(defaultValue);
   }
 
-  public void addMembers(final JObject object, final BeanBuilder builder) {
+  public void addMembers(final JObject object, final BeanBuilder builder, final Set<String> factoryMembers) {
     for (final String fieldname : object.names()) {
       final JField field = object.field(fieldname);
-      final Map<String, JAnnotation> jssdAnnotations = this.annotationHandler.extractJssdAnnotations(field
-          .annotations());
-      if (jssdAnnotations.containsKey("JssdProperties")) {
-        final PropertiesBuilder properties = properties(type(this.beanNameConverter.convert(field.type().name()))
-            .build(), field.name());
-        final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY).parameter(
-            VALUE,
-            field.name()).build();
-        properties.annotation(jsonPropertyAnnotation);
+      final Map<String, JAnnotation> jssdAnnotations = this.annotationHandler
+          .extractJssdAnnotations(field.annotations());
+      if (jssdAnnotations.containsKey(JSSD_PROPERTIES)) {
+        final PropertiesBuilder properties = properties(
+            type(this.beanNameConverter.convert(field.type().name())).build(),
+            field.name());
+        final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY)
+            .parameter(VALUE, field.name())
+            .build();
+        //properties.annotation(jsonPropertyAnnotation);
         properties.getterAnnotation(jsonPropertyAnnotation);
         properties.setterAnnotation(jsonPropertyAnnotation);
         properties.isNullable(true);
@@ -239,11 +280,14 @@ public class JObjectToBeanConverter {
         builder.properties(properties.build());
         continue;
       }
-      builder.member(convert(jssdAnnotations, field));
+      builder.member(convert(jssdAnnotations, field, factoryMembers));
     }
   }
 
-  public Member convert(final Map<String, JAnnotation> jssdAnnotations, final JField field) {
+  public Member convert(
+      final Map<String, JAnnotation> jssdAnnotations,
+      final JField field,
+      final Set<String> factoryMembers) {
     final JType type = field.type();
     final TypeBuilder typeBuilder = type(this.beanNameConverter.convert(type.name()));
     typeBuilder.dimension(type.dimension());
@@ -252,15 +296,16 @@ public class JObjectToBeanConverter {
     }
     final MemberBuilder builder = member(typeBuilder.build(), field.name());
     if (!jssdAnnotations.containsKey(JSSD_NO_PROPERTY)) {
-      final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY).parameter(
-          VALUE,
-          field.name()).build();
-      builder.annotation(jsonPropertyAnnotation);
+      final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY)
+          .parameter(VALUE, field.name())
+          .build();
+      //builder.annotation(jsonPropertyAnnotation);
       builder.getterAnnotation(jsonPropertyAnnotation);
       builder.setterAnnotation(jsonPropertyAnnotation);
     }
     builder.isNullable(!(jssdAnnotations.containsKey(JSSD_NOT_NULLABLE)));
-    builder.isSetterEnabled(!(jssdAnnotations.containsKey(JSSD_IMMUTABLE)));
+    builder.isImutable((jssdAnnotations.containsKey(JSSD_IMMUTABLE)));
+    builder.isSetterEnabled(!factoryMembers.contains(field.name()));
     adjustValue(builder, type, field.value());
     for (final JAnnotation annotation : field.annotations()) {
       if (this.annotationHandler.isJssdAnnotation(annotation)) {

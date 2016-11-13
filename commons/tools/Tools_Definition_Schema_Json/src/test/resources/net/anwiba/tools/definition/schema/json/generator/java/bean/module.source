@@ -6,10 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Coordinate {
 
-    @JsonProperty("type")
-    private String type = "Coordinate";
-    @JsonProperty("values")
+    private final String type = "Coordinate";
     private double[] values = null;
+
+    @JsonProperty("type")
+    public void setType(final String type) {
+    }
 
     @JsonProperty("type")
     public String getType() {
@@ -35,9 +37,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CoordinateSequence {
 
-    @JsonProperty("type")
     private String type = "CoordinateSequence";
-    @JsonProperty("coordinates")
     private Coordinate[] coordinates = null;
 
     @JsonProperty("type")

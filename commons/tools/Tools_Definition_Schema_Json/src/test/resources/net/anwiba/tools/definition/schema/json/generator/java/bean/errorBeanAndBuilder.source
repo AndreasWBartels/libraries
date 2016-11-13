@@ -8,11 +8,8 @@ import net.anwiba.commons.ensure.Ensure;
 
 public class Error {
 
-    @JsonProperty("code")
     private int code = 0;
-    @JsonProperty("message")
     private String message = null;
-    @JsonProperty("details")
     private String[] details = null;
 
     public final Error(final int code, final String message, final String[] details) {
@@ -49,11 +46,8 @@ import net.anwiba.commons.ensure.Ensure;
 
 public class ErrorBuilder {
 
-    @JsonProperty("code")
     private int code = 0;
-    @JsonProperty("message")
     private String message = null;
-    @JsonProperty("details")
     private String[] details = null;
 
     public final ErrorBuilder(final int code, final String message) {

@@ -25,6 +25,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.sun.codemodel.CodeWriter;
+import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.writer.FileCodeWriter;
+import com.sun.codemodel.writer.SingleStreamCodeWriter;
+
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.tools.generator.java.bean.configuration.Bean;
 import net.anwiba.tools.generator.java.bean.factory.BeanBuilderFactory;
@@ -32,17 +37,19 @@ import net.anwiba.tools.generator.java.bean.factory.BeanFactory;
 import net.anwiba.tools.generator.java.bean.factory.EnsurePredicateFactory;
 import net.anwiba.tools.generator.java.bean.writer.SourceCodeWriter;
 
-import com.sun.codemodel.CodeWriter;
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.writer.FileCodeWriter;
-import com.sun.codemodel.writer.SingleStreamCodeWriter;
-
 public class BeanGenerator {
 
   final JCodeModel codeModel = new JCodeModel();
   final EnsurePredicateFactory ensurePredicateFactory = new EnsurePredicateFactory(this.codeModel);
   final BeanFactory beanFactory = new BeanFactory(this.codeModel, this.ensurePredicateFactory);
   final BeanBuilderFactory beanBuilderFactory = new BeanBuilderFactory(this.codeModel, this.ensurePredicateFactory);
+
+  public class ClosableSourceCodeWriter extends SourceCodeWriter implements AutoCloseable {
+
+    public ClosableSourceCodeWriter(final File target, final String comment) throws IOException {
+      super(target, comment);
+    }
+  }
 
   public void generate(final OutputStream ouputStream) throws IOException {
     this.codeModel.build(new SingleStreamCodeWriter(ouputStream));
@@ -52,18 +59,14 @@ public class BeanGenerator {
     if (!targetFolder.exists()) {
       targetFolder.mkdirs();
     }
-    final CodeWriter src = new SourceCodeWriter(targetFolder, comment);
-    final CodeWriter res = new FileCodeWriter(targetFolder);
-    // if(status!=null) {
-    // src = new ProgressCodeWriter(src, System.out );
-    // res = new ProgressCodeWriter(res, System.out );
-    // }
-    this.codeModel.build(src, res);
+    final CodeWriter sourceCodeWriter = new SourceCodeWriter(targetFolder, comment);
+    final CodeWriter fileCodeWriter = new FileCodeWriter(targetFolder);
+    this.codeModel.build(sourceCodeWriter, fileCodeWriter);
   }
 
   public void add(final Bean configuration) throws CreationException {
     this.beanFactory.create(configuration);
-    if (!configuration.isMutable()) {
+    if (!configuration.isMutable() || configuration.isBuilderEnabled()) {
       this.beanBuilderFactory.create(configuration);
     }
   }

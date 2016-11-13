@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -27,10 +27,6 @@ import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
 
 import java.text.MessageFormat;
 
-import net.anwiba.commons.lang.functional.IAcceptor;
-import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.lang.functional.IProcedure;
-
 import com.sun.codemodel.JArray;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JExpr;
@@ -41,6 +37,10 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
+
+import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IProcedure;
 
 @SuppressWarnings("nls")
 public class SourceFactoryUtilities {
@@ -226,6 +226,13 @@ public class SourceFactoryUtilities {
     }
     method.body().add(JExpr.refthis(field.name()).invoke("putAll").arg(param)); //$NON-NLS-1$
     return param;
+  }
+
+  public static JVar addParameter(final JMethod method, final JFieldVar field) {
+    if (method == null || field == null) {
+      return null;
+    }
+    return method.param(JMod.FINAL, field.type(), field.name());
   }
 
   @SafeVarargs
@@ -486,9 +493,10 @@ public class SourceFactoryUtilities {
     if (value != null) {
       final C[] values = clazz.cast(value);
       for (final C i : values) {
-        newArray.add((field.type().isArray() ? field.type().elementType().isPrimitive() : field.type().isPrimitive())
-            ? valueConverter.convert(i)
-            : codeModel.ref(className).staticInvoke("valueOf").arg(valueConverter.convert(i)));
+        newArray.add(
+            (field.type().isArray() ? field.type().elementType().isPrimitive() : field.type().isPrimitive())
+                ? valueConverter.convert(i)
+                : codeModel.ref(className).staticInvoke("valueOf").arg(valueConverter.convert(i)));
       }
     }
     field.init(newArray);

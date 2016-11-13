@@ -6,15 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Envelope {
 
-    @JsonProperty("xmin")
     private Double xmin = null;
-    @JsonProperty("ymin")
     private Double ymin = null;
-    @JsonProperty("xmax")
     private Double xmax = null;
-    @JsonProperty("ymax")
     private Double ymax = null;
-    @JsonProperty("spatialReference")
     private SpatialReference spatialReference = null;
 
     @JsonProperty("xmin")
@@ -80,12 +75,23 @@ import net.anwiba.commons.ensure.Ensure;
 
 public class Feature {
 
-    @JsonProperty("envelope")
     private Envelope envelope = null;
-    @JsonProperty("geometry")
     private Object geometry = null;
-    @JsonProperty("attributes")
     private final Map<String, net.anwiba.generated.test.bean.Entity> attributes = new LinkedHashMap<String, net.anwiba.generated.test.bean.Entity>();
+
+    public final Feature() {
+    }
+
+    public final Feature(final Envelope envelope, final Object geometry, final Map<String, net.anwiba.generated.test.bean.Entity> attributes) {
+        Ensure.ensureThatArgument(envelope, Conditions.notNull());
+        this.envelope = envelope;
+        this.geometry = geometry;
+        if (attributes == null) {
+            this.attributes.clear();
+            return ;
+        }
+        this.attributes.putAll(attributes);
+    }
 
     @JsonProperty("envelope")
     public void setEnvelope(final Envelope envelope) {
@@ -136,6 +142,49 @@ public class Feature {
             return null;
         }
         return this.attributes;
+    }
+
+}
+-----------------------------------net.anwiba.generated.test.bean.FeatureBuilder.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import net.anwiba.commons.ensure.Conditions;
+import net.anwiba.commons.ensure.Ensure;
+
+public class FeatureBuilder {
+
+    private Envelope envelope = null;
+    private Object geometry = null;
+    private final Map<String, net.anwiba.generated.test.bean.Entity> attributes = new LinkedHashMap<String, net.anwiba.generated.test.bean.Entity>();
+
+    public final FeatureBuilder(final Envelope envelope) {
+        Ensure.ensureThatArgument(envelope, Conditions.notNull());
+        this.envelope = envelope;
+    }
+
+    @JsonProperty("geometry")
+    public FeatureBuilder setGeometry(final Object geometry) {
+        this.geometry = geometry;
+        return this;
+    }
+
+    @JsonProperty("attributes")
+    public FeatureBuilder setAttributes(final Map<String, net.anwiba.generated.test.bean.Entity> attributes) {
+        if (attributes == null) {
+            this.attributes.clear();
+            return this;
+        }
+        this.attributes.clear();
+        this.attributes.putAll(attributes);
+        return this;
+    }
+
+    public Feature build() {
+        return new Feature(envelope, geometry, attributes);
     }
 
 }

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,13 +21,13 @@
  */
 package net.anwiba.tools.generator.java.bean.configuration;
 
-import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.commons.utilities.ArrayUtilities;
-import net.anwiba.commons.utilities.string.StringUtilities;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.commons.utilities.ArrayUtilities;
+import net.anwiba.commons.utilities.string.StringUtilities;
 
 @SuppressWarnings("nls")
 public class MemberBuilder {
@@ -44,6 +44,7 @@ public class MemberBuilder {
   private final List<Annotation> getterAnnotations = new ArrayList<>();
   private boolean isMultiValue = false;
   private final boolean isSingleValue = true;
+  private boolean isImutable = false;
 
   MemberBuilder(final Type type, final String name) {
     this.type = type;
@@ -53,18 +54,28 @@ public class MemberBuilder {
   public Member build() {
     final HashMap<String, List<Annotation>> map = new HashMap<>();
     map.put(this.name, this.setterArgumentAnnotations);
-    final Setter setter =
-        new Setter(
-            createSetterName(this.name),
-            this.isSetterEnabled,
-            this.isSingleValue,
-            this.isMultiValue,
-            this.setterAnnotations,
-            new Argument(this.type, this.name, this.setterArgumentAnnotations),
-            map);
-    final Getter getter =
-        new Getter(createGetterName(this.type, this.name), this.isGetterEnabled, false, this.getterAnnotations);
-    return new Member(this.type, this.name, this.value, this.isNullable, this.annotations, setter, getter);
+    final Setter setter = new Setter(
+        createSetterName(this.name),
+        this.isSetterEnabled,
+        this.isSingleValue,
+        this.isMultiValue,
+        this.setterAnnotations,
+        new Argument(this.type, this.name, this.setterArgumentAnnotations),
+        map);
+    final Getter getter = new Getter(
+        createGetterName(this.type, this.name),
+        this.isGetterEnabled,
+        false,
+        this.getterAnnotations);
+    return new Member(
+        this.type,
+        this.name,
+        this.value,
+        this.isNullable,
+        this.isImutable,
+        this.annotations,
+        setter,
+        getter);
   }
 
   public MemberBuilder value(final String value) {
@@ -177,6 +188,16 @@ public class MemberBuilder {
     return this;
   }
 
+  public MemberBuilder setterArgumentAnnotation(final Annotation annotation) {
+    this.setterArgumentAnnotations.add(annotation);
+    return this;
+  }
+
+  public MemberBuilder isImutable(final boolean isImutable) {
+    this.isImutable = isImutable;
+    return this;
+  }
+
   public MemberBuilder annotation(final Annotation annotations) {
     if (annotations == null) {
       return this;
@@ -228,14 +249,6 @@ public class MemberBuilder {
     builder.append(name.substring(0, 1).toUpperCase());
     builder.append(name.substring(1, name.length()));
     return builder.toString();
-  }
-
-  public void setterArgumentAnnotation(final Annotation annotation) {
-    this.setterArgumentAnnotations.add(annotation);
-  }
-
-  public boolean isSingleValue() {
-    return this.isSingleValue;
   }
 
 }

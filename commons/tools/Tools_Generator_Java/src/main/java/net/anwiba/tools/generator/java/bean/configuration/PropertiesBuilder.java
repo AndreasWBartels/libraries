@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -45,6 +45,7 @@ public class PropertiesBuilder {
   private final List<Annotation> namesGetterAnnotations = new ArrayList<>();
   private final String namesGetterMethodName = GET_NAMES;
   private final String valueGetterMethodName = GET_VALUE;
+  private boolean isImutable = false;
 
   PropertiesBuilder(final Type type, final String name) {
     this.type = type;
@@ -52,27 +53,28 @@ public class PropertiesBuilder {
   }
 
   public Properties build() {
-    final Setter setter =
-        new Setter(
-            this.setterName == null
-                ? MemberBuilder.createSetterName(this.name)
-                : this.setterName,
-            this.isSetterEnabled,
-            this.singleValueEnabled,
-            true,
-            this.setterAnnotations,
-            new Argument(this.type, this.name, new ArrayList<Annotation>()),
-            new HashMap<String, List<Annotation>>());
+    final Setter setter = new Setter(
+        this.setterName == null ? MemberBuilder.createSetterName(this.name) : this.setterName,
+        this.isSetterEnabled,
+        this.singleValueEnabled,
+        true,
+        this.setterAnnotations,
+        new Argument(this.type, this.name, new ArrayList<Annotation>()),
+        new HashMap<String, List<Annotation>>());
     final String getterName = this.getterName == null
         ? MemberBuilder.createGetterName(this.type, this.name)
         : this.getterName;
-    final Getter getter =
-        new Getter(getterName, this.isGetterEnabled, this.namedValueGetterEnabled, this.getterAnnotations);
+    final Getter getter = new Getter(
+        getterName,
+        this.isGetterEnabled,
+        this.namedValueGetterEnabled,
+        this.getterAnnotations);
     return new Properties(
         this.type,
         this.name,
         setter,
         getter,
+        this.isImutable,
         this.isNullable,
         this.implementsNamedValueProvider,
         this.annotations,
@@ -89,6 +91,11 @@ public class PropertiesBuilder {
 
   public PropertiesBuilder isNullable(final boolean isNullable) {
     this.isNullable = isNullable;
+    return this;
+  }
+
+  public PropertiesBuilder isImutable(final boolean isImutable) {
+    this.isImutable = isImutable;
     return this;
   }
 

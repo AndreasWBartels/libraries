@@ -12,7 +12,7 @@ import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class Factory {
 
-    private String type = "Factory";
+    private final String type = "Factory";
     private final static HashMap<java.lang.String, Class> _classes = new HashMap<java.lang.String, Class>();
 
     public String getType() {

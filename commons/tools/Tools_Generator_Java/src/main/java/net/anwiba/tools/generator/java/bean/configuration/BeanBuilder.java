@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,10 +21,10 @@
  */
 package net.anwiba.tools.generator.java.bean.configuration;
 
-import net.anwiba.commons.utilities.collection.IterableUtilities;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.anwiba.commons.utilities.collection.IterableUtilities;
 
 public class BeanBuilder {
 
@@ -41,6 +41,7 @@ public class BeanBuilder {
   private String comment;
   private Creator creator;
   private boolean isEqualsEnabled = false;
+  private boolean isEnableBuilder = false;
 
   BeanBuilder(final String name) {
     this.name = name;
@@ -63,15 +64,16 @@ public class BeanBuilder {
 
   public Bean build() {
     if (this.properties != null) {
-      member(new Member(Builders.type( //
-          java.util.Map.class.getName(),//
-          java.lang.String.class.getName(),//
+      member(new Member(
+      Builders.type( //
+          java.util.Map.class.getName(), //
+          java.lang.String.class.getName(), //
           this.properties.type().name()//
-          )
-          .build(), //
+      ).build(), //
           this.properties.name(), //
           null, //
           this.properties.isNullable(), //
+          this.properties.isImutable(), //
           IterableUtilities.asList(this.properties.annotations()), //
           this.properties.getSetterConfiguration(), //
           this.properties.getGetterConfiguration()//
@@ -86,6 +88,7 @@ public class BeanBuilder {
         this.extend,
         this.annotations,
         this.isMutable,
+        this.isEnableBuilder,
         this.isArrayNullable,
         this.isCollectionNullable,
         this.members,
@@ -101,6 +104,10 @@ public class BeanBuilder {
 
   public void setMutable(final boolean isMutable) {
     this.isMutable = isMutable;
+  }
+
+  public void setEnableBuilder(final boolean isEnableBuilder) {
+    this.isEnableBuilder = isEnableBuilder;
   }
 
   public void extend(final String extend) {
