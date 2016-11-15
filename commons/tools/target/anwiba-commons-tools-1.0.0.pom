@@ -1,30 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-
-  <name>anwiba commons advanced</name>
-  <description>anwiba commons advanced libraries project</description>
-  <url>https://github.com/AndreasWBartels/libraries/tree/master/commons/advanced</url>
-
-  <groupId>net.anwiba.commons</groupId>
-  <artifactId>anwiba-commons-maven-advanced</artifactId>
+  <groupId>net.anwiba.commons.tools</groupId>
+  <artifactId>anwiba-commons-tools</artifactId>
   <packaging>pom</packaging>
-
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-default</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <scm>
-    <connection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</connection>
-    <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
-    <url>https://github.com/AndreasWBartels/libraries/tree/master/commons/advanced</url>
-   </scm>
-
   <modules>
-    <module>Commons_Advanced</module>
-    <module>Commons_Json</module>
+    <module>Tools_Generator_Java</module>
+    <module>Tools_Definition_Schema_Json</module>
   </modules>
 
   <build>
@@ -36,7 +25,7 @@
           <licenseName>lgpl_v2_1</licenseName>
           <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
           <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
-          <projectName>anwiba commons advanced</projectName>
+          <projectName>anwiba commons tools</projectName>
           <roots>
             <root>src/main/java</root>
             <root>src/test/java</root>

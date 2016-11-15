@@ -1,20 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <name>anwiba commons project</name>
-  <description>anwiba commons libraries project</description>
-  <url>https://github.com/AndreasWBartels/libraries/tree/master/commons</url>
-
   <organization>
     <name>Andreas Bartels</name>
     <url>http://www.anwiba.net/</url>
   </organization>
-
-  <scm>
-    <connection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</connection>
-    <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
-    <url>https://github.com/AndreasWBartels/libraries/tree/master/commons</url>
-  </scm>
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.anwiba.commons</groupId>
