@@ -1,6 +1,6 @@
 # libraries
 
-This Repository contains the base libraries and tools for JGISShell
+This Repository contains libraries and tools developed for JGISShell
 
 ## Author
 JGISShell was created by [Andreas W. Bartels](https://github.com/AndreasWBartels).
