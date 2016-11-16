@@ -17,7 +17,7 @@
     <connection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</connection>
     <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
     <url>https://github.com/AndreasWBartels/libraries/tree/master/commons/advanced/Commons_Advanced</url>
-   </scm>
+  </scm>
 
   <dependencies>
     <dependency>
@@ -62,6 +62,31 @@
 
   <build>
     <plugins>
+
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>javadoc-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <!-- switch on dependency-driven aggregation -->
+              <includeDependencySources>true</includeDependencySources>
+
+              <dependencySourceExcludes>
+                <dependencySourceExclude>com.fasterxml.jackson.core:*</dependencySourceExclude>
+                <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
+                <dependencySourceExclude>log4j:*</dependencySourceExclude>
+
+              </dependencySourceExcludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>

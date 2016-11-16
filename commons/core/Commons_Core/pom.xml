@@ -99,6 +99,29 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>javadoc-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <!-- switch on dependency-driven aggregation -->
+              <includeDependencySources>true</includeDependencySources>
+
+              <dependencySourceExcludes>
+                <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
+                <dependencySourceExclude>log4j:*</dependencySourceExclude>
+
+              </dependencySourceExcludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
