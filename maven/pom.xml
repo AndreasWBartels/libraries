@@ -9,7 +9,7 @@
   <groupId>net.anwiba</groupId>
   <artifactId>anwiba-maven-default</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <inceptionYear>2007</inceptionYear>
 
   <scm>
@@ -34,7 +34,7 @@
     <developer>
       <id>andreas</id>
       <name>Andreas W. Bartels</name>
-      <email>bartels@sanwiba.de</email>
+      <email>bartels@anwiba.de</email>
       <organization>anwiba</organization>
     </developer>
   </developers>
@@ -576,13 +576,15 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
-        <version>${org.apache.maven.version}</version>
+        <version>3.3.9</version>
+<!--         <version>${org.apache.maven.version}</version> -->
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-project</artifactId>
-        <version>${org.apache.maven.version}</version>
+        <version>2.2.1</version>
+<!--         <version>${org.apache.maven.version}</version> -->
       </dependency>
 
       <dependency>
@@ -594,7 +596,7 @@
       <dependency>
         <groupId>org.apache.maven.plugin-tools</groupId>
         <artifactId>maven-plugin-annotations</artifactId>
-        <version>3.4</version>
+        <version>3.5</version>
         <scope>provided</scope>
       </dependency>
 
@@ -747,8 +749,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <net.anwiba.version>1.0.0</net.anwiba.version>
-    <net.anwiba.commons.version>1.0.0</net.anwiba.commons.version>
+    <net.anwiba.version>1.0.1</net.anwiba.version>
+    <net.anwiba.commons.version>1.0.1</net.anwiba.commons.version>
 
     <compile.source.version>1.8</compile.source.version>
     <compile.target.version>1.8</compile.target.version>
@@ -758,7 +760,7 @@
     <apache.commons.httpclient.version>3.1</apache.commons.httpclient.version>
     <ch.hsr.geohash.version>1.0.10</ch.hsr.geohash.version>
 
-    <com.fasterxml.jackson.version>2.7.2</com.fasterxml.jackson.version>
+    <com.fasterxml.jackson.version>2.8.5</com.fasterxml.jackson.version>
 
     <com.sun.codemodel.version>2.6</com.sun.codemodel.version>
     <com.sun.xml.bind.version>2.2.7</com.sun.xml.bind.version>
@@ -773,8 +775,8 @@
     <log4j.version>1.2.17</log4j.version>
     <oracle.spatial.version>12.1.0.1b</oracle.spatial.version>
     <org.antlr.version>3.5.2</org.antlr.version>
-    <org.antlr4.version>4.5.1-1</org.antlr4.version>
-    <org.apache.ant.version>1.8.4</org.apache.ant.version>
+    <org.antlr4.version>4.5.3</org.antlr4.version>
+    <org.apache.ant.version>1.9.7</org.apache.ant.version>
     <org.apache.httpcomponents.version>4.5.2</org.apache.httpcomponents.version>
     <org.apache.derby.version>10.12.1.1</org.apache.derby.version>
     <org.apache.maven.version>2.0</org.apache.maven.version>

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -52,7 +52,8 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
   @SuppressWarnings("nls")
   public <T> T create(final IInjectingFactory<T> factory) throws CreationException {
     final Method[] methods = factory.getClass().getMethods();
-    final List<Method> createMethods = Stream.of(methods) //
+    final List<Method> createMethods = Stream
+        .of(methods) //
         .filter(m -> "create".equals(m.getName()))
         .filter(m -> m.getAnnotation(Injection.class) != null)
         .collect(Collectors.toList());
@@ -133,6 +134,7 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
     throw new IllegalArgumentException();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> void inject(final T object) throws InjectionException {
     final Class<T> clazz = (Class<T>) object.getClass();

@@ -6,14 +6,13 @@
   <description>anwiba commons advanced libraries project</description>
   <url>https://github.com/AndreasWBartels/libraries/tree/master/commons/advanced</url>
 
-  <groupId>net.anwiba.commons</groupId>
   <artifactId>anwiba-commons-maven-advanced</artifactId>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-default</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
   </parent>
 
   <scm>

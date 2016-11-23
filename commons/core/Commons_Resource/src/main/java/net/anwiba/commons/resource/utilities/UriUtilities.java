@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -48,10 +48,14 @@ public class UriUtilities {
 
   public static URI changeUriExtension(final URI base, final String descriptionFile, final String dataFile) {
     try {
-      return new URI(base.getScheme(), base.getUserInfo(), base.getHost(), base.getPort(), createDataFilePath(
-          base.getPath(),
-          descriptionFile,
-          dataFile), base.getQuery(), base.getFragment());
+      return new URI(
+          base.getScheme(),
+          base.getUserInfo(),
+          base.getHost(),
+          base.getPort(),
+          createDataFilePath(base.getPath(), descriptionFile, dataFile),
+          base.getQuery(),
+          base.getFragment());
     } catch (final URISyntaxException exception) {
       throw new RuntimeException("Unreachable code reached"); //$NON-NLS-1$
     }
@@ -219,7 +223,11 @@ public class UriUtilities {
   }
 
   public static boolean isChild(final String path) {
-    return !(path == null || path.trim().length() == 0 || path.trim().startsWith("/") || path.trim().startsWith("\\") || path.contains(":"));//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    return !(path == null
+        || path.trim().length() == 0
+        || path.trim().startsWith("/") //$NON-NLS-1$
+        || path.trim().startsWith("\\") //$NON-NLS-1$
+        || path.contains(":"));//$NON-NLS-1$
   }
 
   public static URI setPath(final URI base, final String path) {
@@ -346,19 +354,9 @@ public class UriUtilities {
 
   private static void forceClose(final URLConnection urlConnection) {
     if (urlConnection != null) {
-      InputStream in = null;
-      try {
-        in = urlConnection.getInputStream();
+      try (InputStream in = urlConnection.getInputStream()) {
       } catch (final Exception e) {
         // nothing to do
-      } finally {
-        if (in != null) {
-          try {
-            in.close();
-          } catch (final IOException e) {
-            // nothing to do
-          }
-        }
       }
     }
   }
