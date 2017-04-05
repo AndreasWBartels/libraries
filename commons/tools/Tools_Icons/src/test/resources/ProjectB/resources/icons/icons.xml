@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<icons>
+  <class name="GuiIcons" package="net.anwiba.gui.icon"/>
+  <folder name="mate-themes-master">
+    <sizes>
+      <small size="16" path="16x16"/>
+      <medium size="22" path="22x22"/>
+      <large size="32" path="32x32"/>
+    </sizes>
+    <icon name="ACTION_UNAVAILABLE" image="actions/action-unavailable.png"/>
+  </folder>
+  <folder name="foo">
+    <sizes>
+      <small size="16" path="small"/>
+      <medium size="22" path="medium"/>
+      <large size="32" path="large"/>
+    </sizes>
+    <icon name="FOO_ICON" image="foo.png"/>
+  </folder>
+  <icon name="WARNING_ICON" ref="DIALOG_WARNING" >
+    <class package="org.gnome.look.icon" name="ContrastHightIcons"/>
+  </icon>
+  <icon name="CANCEL_ICON" image="cancel.png"/>
+  <icon name="EXIT_ICON" image="exit.png"/>
+  <icon name="RELOAD_ICON" image="reload.png"/>
+  <icon name="STOP_ICON" image="stop.png"/>
+</icons>

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -28,9 +28,9 @@ import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.anwiba.commons.reflection.annotation.Injection;
-
 import org.junit.Test;
+
+import net.anwiba.commons.reflection.annotation.Injection;
 
 public class ValueProviderBuilderTest {
 
@@ -46,6 +46,30 @@ public class ValueProviderBuilderTest {
 
     @Injection
     private final Iterable<IFoo> foos = null;
+
+    @Override
+    public Iterable<IFoo> getFoos() {
+      return this.foos;
+    }
+
+    @Override
+    public IBar getBar() {
+      return this.bar;
+    }
+
+  };
+
+  public static class Woww implements IWow {
+
+    private final IBar bar;
+
+    private final Iterable<IFoo> foos;
+
+    public Woww(final IBar bar, final Iterable<IFoo> foos) {
+      this.bar = bar;
+      this.foos = foos;
+
+    }
 
     @Override
     public Iterable<IFoo> getFoos() {
@@ -145,6 +169,7 @@ public class ValueProviderBuilderTest {
     builder.add(IFoo.class, FooB.class);
     builder.add(IFoo.class, FooC.class);
     builder.link(IFoo.class, IFoos.class);
+    builder.set(Woww.class, Woww.class);
     final IReflectionValueProvider provider = builder.build();
     final Collection<IFoo> foos = provider.getAll(IFoo.class);
     assertThat(foos.size(), equalTo(3));
@@ -164,5 +189,13 @@ public class ValueProviderBuilderTest {
     final AtomicInteger wowFooCounter = new AtomicInteger();
     wow.getFoos().forEach(f -> wowFooCounter.incrementAndGet());
     assertThat(wowFooCounter.get(), equalTo(3));
+
+    final IWow woww = provider.get(Woww.class);
+    assertThat(woww, notNullValue());
+    assertThat(woww.getBar(), notNullValue());
+    assertThat(woww.getBar(), sameInstance(bar));
+    final AtomicInteger wowwFooCounter = new AtomicInteger();
+    woww.getFoos().forEach(f -> wowwFooCounter.incrementAndGet());
+    assertThat(wowwFooCounter.get(), equalTo(3));
   }
 }

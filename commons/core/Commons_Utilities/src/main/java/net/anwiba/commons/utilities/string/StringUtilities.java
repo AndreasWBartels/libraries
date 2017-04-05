@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -54,7 +54,7 @@ public class StringUtilities {
     final char decimalSeparator = decimalFormatSymbols.getDecimalSeparator();
     final String ungrouped = "[+-]?[0-9]+[" + decimalSeparator + "]?[0-9]*([eE][-+]?[0-9]+)?"; //$NON-NLS-1$//$NON-NLS-2$
     final String grouped = "[+-]?[0-9]{1,3}+(" + groupingSeparator + "[0-9]{3}+)*[" + decimalSeparator + "]?[0-9]*"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-    final String patternString = ungrouped + "|" + grouped;
+    final String patternString = ungrouped + "|" + grouped; //$NON-NLS-1$
     final Pattern p = Pattern.compile(patternString);
     final Matcher m = p.matcher(text.trim());
     if (m.matches()) {
@@ -131,7 +131,7 @@ public class StringUtilities {
   private static String convertToVariable(final String string) {
     final StringBuilder builder = new StringBuilder();
     final char[] charArray = string.toCharArray();
-    if (Character.isDigit(charArray[0])) {
+    if (!(Character.isUpperCase(charArray[0]) || Character.isLowerCase(charArray[0]))) {
       builder.append("C"); //$NON-NLS-1$
     }
     for (final char c : charArray) {
@@ -142,6 +142,8 @@ public class StringUtilities {
         case '-':
         case '?':
         case '\\':
+        case '[':
+        case ']':
         case '{':
         case '}':
         case '(':
@@ -167,6 +169,8 @@ public class StringUtilities {
         case '+':
         case '?':
         case '\\':
+        case '[':
+        case ']':
         case '{':
         case '}':
         case '(':

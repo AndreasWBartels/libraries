@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -32,18 +32,17 @@ public class ObjectUtilities {
   }
 
   public static boolean equals(final Object org, final Object other) {
-    if (org == null) {
-      return other == null;
-    } else if (org == other) {
+    if (org == other) {
       return true;
+    } else if (org == null) {
+      return other == null;
     } else {
-      final boolean equals = org.equals(other);
-      return equals;
+      return org.equals(other);
     }
   }
 
   public static boolean equals(final byte[] is, final byte[] bs) {
-    if (is == null && bs == null) {
+    if (is == bs) {
       return true;
     }
     if (is == null || bs == null || is.length != bs.length) {

@@ -25,12 +25,18 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import net.anwiba.commons.lang.functional.ICloseable;
+import net.anwiba.commons.lang.stream.IStream;
+import net.anwiba.commons.lang.stream.Streams;
 
 public interface IClosableIterator<T, E extends Exception> extends ICloseable<E>, Iterable<T> {
 
   boolean hasNext() throws E;
 
   T next() throws E;
+
+  default IStream<T, E> stream() {
+    return Streams.create(this);
+  }
 
   @Override
   default Iterator<T> iterator() {

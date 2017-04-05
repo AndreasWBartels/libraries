@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<icons>
+  <class name="GuiIcons" package="net.anwiba.commons.swing.icon"/>
+
+  <icon name="ADVANCED_SEARCH_ICON" ref="SYSTEM_SEARCH">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="CHECK_GEOMETRY" ref="EMBLEM_DEFAULT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="CROSS_ICON" ref="LIST_ADD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="COLORIZE_ICON" ref="GTK_SELECT_COLOR">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="CONTENTS_ICON" ref="EMBLEM_DOCUMENTS">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DISABLED_CANCEL_ICON" ref="GTK_CANCLE_DISABLE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="FILE_DATABASE_ICON" ref="FILE_DATABASE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DATABASE_ADD_ICON" ref="DATABASE_ADD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DATABASE_MINUS_ICON" ref="DATABASE_MINUS">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="GLOBE_ICON" ref="MAPS">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="GROOVY_CONSOLE_ICON" ref="TERMINAL">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MEASURE_ICON" ref="DOCUMENT_PAGE_SETUP">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MENU_ICON" ref="OPEN_MENU">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MISC_ICON" ref="MATE_APPLICATION_GENERIC">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="PRESENCE_UNKNOWN_ICON" ref="GHEX">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="TASKBAR_ICON" ref="OPEN_MENU">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="PROPERTIES_ICON" ref="DOCUMENT_PROPERTIES">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="TABLE_ICON" ref="VIEW_LIST_TEXT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="TREE_DIALOG_ICON" ref="GTK_INDEX">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="VIEW_IN_LOCATOR_ICON" ref="DISPLAY_CAPPLET">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <ICON NAME="MAPS" REF="MAPS">
+    <CLASS NAME="CONTRASTHIGHTICONS" PACKAGE="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </ICON>
+
+<!--   <icon name="LOCATOR_ICON" ref="DUMMY"> -->
+<!--     <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/> -->
+<!--   </icon> -->
+
+  <icon name="SELECTED_ROWS_ICON" ref="EDIT_SELECT_ALL">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="HELP_ICON" ref="HELP_CONTENTS">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="HELP_FAQ" ref="HELP_FAQ">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DATE_ICON" ref="X_OFFICE_CALENDAR">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="NUMBER_ICON" image="number.png" />
+  <icon name="ENUM_ICON" ref="NUMBER_ICON" />
+
+  <icon name="GEOMETRY_ICON" ref="MARK_LOCATION">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+
+  <icon name="TEXT_ICON" ref="TEXT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="TIME_ICON" ref="APPOINTMENT_TIME">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="EMPTY_ICON" image="empty.png" />
+
+  <icon name="DECORATOR_ADD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ADD_ICON" ref="ADD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MINUS_ICON" ref="MINUS">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="FILTER_ICON" ref="VIEW_FILTER">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="STOP_ICON" ref="PROCESS_STOP">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="NEXT_ICON" ref="GO_NEXT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="PREVIOUS_ICON" ref="GO_PREVIOUS">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DOWN_ICON" ref="GO_DOWN">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="UP_ICON" ref="GO_UP">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+
+  <icon name="NEW_ICON" ref="DOCUMENT_NEW">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="OPEN_ICON" ref="DOCUMENT_OPEN">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="CLOSE_ICON" ref="DOCUMENT_CLOSE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="EXIT_ICON" ref="APPLICATION_EXIT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MEDIA_SEEK_BACKWARD_ICON" ref="MEDIA_SEEK_BACKWARD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MEDIA_SEEK_FORWARD_ICON" ref="MEDIA_SEEK_FORWARD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MEDIA_SKIP_BACKWARD_ICON" ref="MEDIA_SKIP_BACKWARD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MEDIA_SKIP_FORWARD_ICON" ref="MEDIA_SKIP_FORWARD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="EDIT_ICON" ref="DOCUMENT_EDIT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="EDIT_CLEAR_ICON" ref="EDIT_CLEAR">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DELETE_ALL_ICON" ref="LIST_REMOVE_ALL">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="COPY_ICON" ref="EDIT_COPY">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DELETE_ICON" ref="EDIT_DELETE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="RELOAD_ICON" ref="VIEW_REFRESH">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="EDIT_CLEAR_LOCATIONBAR_ICON" ref="EDIT_CLEAR">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="REMOVE_ICON" ref="EDIT_DELETE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="SAVE_ICON" ref="DOCUMENT_SAVE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="SEARCH_ICON" ref="FIND_LOCATION">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="EXECUTE_ICON" ref="SYSTEM_RUN">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DB_ICON" ref="SERVER_DATABASE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="FOLDER_ICON" ref="FOLDER_OPEN">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="FOLDER_REMOTE_ICON" ref="FOLDER_REMOTE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="HARDDISK_ICON" ref="DRIVE_HARDDISK">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="SERVER_ICON" ref="NETWORK_SERVER">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="SERVICE_ICON" ref="SERVICES">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="OK_ICON" ref="DIALOG_OK">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="CANCEL_ICON" ref="DIALOG_CANCEL">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ERROR_ICON" ref="DIALOG_ERROR">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="INFORMATION_ICON" ref="DIALOG_INFORMATION">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="QUERY_ICON" ref="DIALOG_QUESTION">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="WARNING_ICON" ref="DIALOG_WARNING">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="APPLICATION_EXIT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="BOOKMARKS" >
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="BOOKMARKS_ADD" ref="BOOKMARK_ADD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="CERTIFICATE_SERVER">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DOCUMENT_CLOSE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="EDIT_CLEAR_LIST">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="FORMAT_TEXT_BOLD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="FORMAT_TEXT_ITALIC">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="HELP_ABOUT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="LIST_ADD">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="LIST_REMOVE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="NEWS_SUBSCRIBE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MAIL_SEND">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="FILTER_DECORATION" ref="VIEW_FILTER">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ERROR_DECORATION" ref="DIALOG_ERROR">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="WARNING_DECORATION" ref="DIALOG_WARNING">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="DUMMY" ref="DUMMY">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ZOOM_ICON" ref="SYSTEM_SEARCH">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MOVE_ICON" ref="SMC">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ZOOM_OUT_ICON" ref="ZOOM_OUT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+  <icon name="ZOOM_IN_ICON" ref="ZOOM_IN">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ZOOM_WORLD_TO_FIT_ICON" ref="ZOOM_FIT_BEST">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ZOOM_TO_MAP_WORLD_ICON" ref="ZOOM_ORIGINAL">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ZOOM_TO_FIT_ICON" ref="ZOOM_FIT_BEST">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="UNDO_ZOOM_ICON" ref="ZOOM_UNDO">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="REDO_ZOOM_ICON" ref="ZOOM_REDO">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MOVE_AND_ZOOM_ICON" ref="ZOOM_AND_MOVE">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="PROJECTION_ICON" ref="GTK_CONVERT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="SELECT_ICON" ref="GTK_SELECT">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+  <icon name="REDO_ICON" ref="EDIT_REDO">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="UNDO_ICON" ref="EDIT_UNDO">
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="MAPS_ICON" ref="MAPS" >
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+  <icon name="DETAIL_MAPS_ICON" ref="WINDOW_CAPPLET" >
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="ELEVATION_PROFILE_ICON" ref="UTILITIES_SYSTEM_MONITOR"  >
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+  <icon name="PREFERENCES_SYSTEM_WINDOWS" ref="PREFERENCES_SYSTEM_WINDOWS"  >
+    <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
+  </icon>
+
+  <icon name="RASTER_MAP_ICON" image="rastermap.png" />
+
+  <icon name="SCALE_RANGE_ICON" image="out_of_scale_range.png" />
+  <icon name="SCALE_ICON" image="scale.png" />
+
+  <icon name="WORKING_ICON" image="empty.png" />
+
+  <icon name="M" image="decorator_m.png" decorator="true"/>
+  <icon name="Z" image="decorator_z.png" decorator="true"/>
+
+</icons>

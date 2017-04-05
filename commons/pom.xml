@@ -3,7 +3,7 @@
 
   <name>anwiba commons project</name>
   <description>anwiba commons libraries project</description>
-  <url>https://github.com/AndreasWBartels/libraries/tree/master/commons</url>
+  <url>${scm.url.net.anwiba.master}/commons</url>
 
   <organization>
     <name>Andreas Bartels</name>
@@ -11,9 +11,9 @@
   </organization>
 
   <scm>
-    <connection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</connection>
-    <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
-    <url>https://github.com/AndreasWBartels/libraries/tree/master/commons</url>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/commons</url>
   </scm>
 
   <modelVersion>4.0.0</modelVersion>
@@ -23,12 +23,13 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.24</version>
   </parent>
 
   <modules>
     <module>core</module>
-    <module>advanced</module>
     <module>tools</module>
+    <module>advanced</module>
+    <module>swing</module>
   </modules>
 </project>

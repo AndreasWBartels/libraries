@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -23,10 +23,10 @@
 package net.anwiba.commons.lang.optional;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.ISupplier;
 import net.anwiba.commons.lang.object.ObjectUtilities;
-import net.anwiba.commons.lang.stream.IConsumer;
-import net.anwiba.commons.lang.stream.ISupplier;
 
 public class Optional<T, E extends Exception> implements IOptional<T, E> {
 
@@ -38,8 +38,20 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
     this.value = value;
   }
 
+  public static <T> IOptional<T, RuntimeException> of(final T value) {
+    return create(i -> i != null, value);
+  }
+
+  public static <T> IOptional<T, RuntimeException> of(final IAcceptor<T> acceptor, final T value) {
+    return create(acceptor, value);
+  }
+
   public static <T, E extends Exception> IOptional<T, E> create(final T value) {
-    return new Optional<>(i -> i != null, value);
+    return create(i -> i != null, value);
+  }
+
+  public static <T, E extends Exception> IOptional<T, E> create(final IAcceptor<T> acceptor, final T value) {
+    return new Optional<>(acceptor, value);
   }
 
   @Override
@@ -58,7 +70,8 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
     return create(null);
   }
 
-  private boolean isAccepted() {
+  @Override
+  public boolean isAccepted() {
     return this.acceptor.accept(this.value);
   }
 
@@ -71,10 +84,19 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
   }
 
   @Override
-  public <O> void consum(final IConsumer<T, E> consumer) throws E {
+  public IOptional<T, E> consum(final IConsumer<T, E> consumer) throws E {
     if (isAccepted()) {
       consumer.consume(this.value);
     }
+    return this;
+  }
+
+  @Override
+  public IOptional<T, E> or(final IConsumer<T, E> consumer) throws E {
+    if (!isAccepted()) {
+      consumer.consume(this.value);
+    }
+    return this;
   }
 
   @Override

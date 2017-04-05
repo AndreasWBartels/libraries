@@ -23,6 +23,8 @@
 package net.anwiba.commons.lang.stream;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.lang.functional.IIterable;
+import net.anwiba.commons.lang.functional.IIterator;
 
 public final class FilteredJavaUtilIterableIterable<T, E extends Exception> implements IIterable<T, E> {
 

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+  targetNamespace="http://graphml.graphdrawing.org/xmlns"
+  xmlns:graphml="http://graphml.graphdrawing.org/xmlns"
+  elementFormDefault="qualified"
+>
+  <xsd:annotation>
+    <xsd:appinfo>
+      <jaxb:schemaBindings>
+        <jaxb:package name="net.anwiba.tools.simple.graphml.generated" />
+      </jaxb:schemaBindings>
+    </xsd:appinfo>
+  </xsd:annotation>
+
+  <xsd:element name="graphml">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class name="GraphMl" />
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="key" type="graphml:KeyType" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element name="graph" type="graphml:GraphType" minOccurs="1" maxOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="KeyType" mixed="true">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class name="Key" />
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="for" type="xsd:string" />
+    <xsd:attribute name="attr.name" type="xsd:string" />
+    <xsd:attribute name="attr.type" type="xsd:string" />
+    <xsd:attribute name="yfiles.type" type="xsd:string" />
+  </xsd:complexType>
+  <xsd:complexType name="DataType" mixed="true">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class name="Data" />
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:any></xsd:any>
+    </xsd:sequence>
+    <xsd:attribute name="key" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="GraphType">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class name="Graph" />
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="node" type="graphml:NodeType" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="edge" type="graphml:EdgeType" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="edgedefault" type="xsd:string" />
+  </xsd:complexType>
+  <xsd:complexType name="NodeType">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class name="Node" />
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="data" type="graphml:DataType" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="graph" type="graphml:GraphType" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:string" />
+  </xsd:complexType>
+  <xsd:complexType name="EdgeType">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class name="Edge" />
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="data" type="graphml:DataType" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+    <xsd:attribute name="source" type="xsd:string" />
+    <xsd:attribute name="target" type="xsd:string" />
+  </xsd:complexType>
+</xsd:schema>

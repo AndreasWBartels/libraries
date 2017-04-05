@@ -4,18 +4,18 @@
 
   <name>anwiba maven parent</name>
   <description>anwiba tool and libraries maven parent project</description>
-  <url>https://github.com/AndreasWBartels/libraries/tree/master/maven/</url>
+  <url>${scm.url.net.anwiba.master}/maven/</url>
 
   <groupId>net.anwiba</groupId>
   <artifactId>anwiba-maven-default</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1</version>
+  <version>1.0.24</version>
   <inceptionYear>2007</inceptionYear>
 
   <scm>
-    <connection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</connection>
-    <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
-    <url>https://github.com/AndreasWBartels/libraries/tree/master/maven</url>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/maven</url>
    </scm>
 
   <licenses>
@@ -749,8 +749,12 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <net.anwiba.version>1.0.1</net.anwiba.version>
-    <net.anwiba.commons.version>1.0.1</net.anwiba.commons.version>
+
+    <net.anwiba.version>1.0.24</net.anwiba.version>
+    <url.net.anwiba>https://github.com/AndreasWBartels</url.net.anwiba>
+    <net.anwiba.commons.version>1.0.24</net.anwiba.commons.version>
+    <scm.url.net.anwiba.base>scm:git:ssh://github.com:AndreasWBartels</scm.url.net.anwiba.base>
+    <scm.url.net.anwiba.master>${url.net.anwiba}/libraries/tree/master</scm.url.net.anwiba.master>
 
     <compile.source.version>1.8</compile.source.version>
     <compile.target.version>1.8</compile.target.version>
@@ -796,7 +800,7 @@
     <org.eclipse.jdt.version>4.5</org.eclipse.jdt.version>
     <org.hamcrest.version>1.3</org.hamcrest.version>
     <org.jfrog.maven.annomojo.version>1.3.1</org.jfrog.maven.annomojo.version>
-    <org.jvnet.jaxb2.maven2.version>0.9.1</org.jvnet.jaxb2.maven2.version>
+    <org.jvnet.jaxb2.maven2.version>0.13.1</org.jvnet.jaxb2.maven2.version>
     <org.jvnet.hudson.main.version>2.2.1</org.jvnet.hudson.main.version>
     <org.mockito.version>1.9.5</org.mockito.version>
     <net.postgis.version>2.2.0</net.postgis.version>

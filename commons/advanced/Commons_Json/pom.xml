@@ -1,22 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Commons Json</name>
+  <name>commons json</name>
   <description>anwiba commons json io project</description>
-  <url>https://github.com/AndreasWBartels/libraries</url>
+  <url>${url.net.anwiba}/libraries</url>
 
   <artifactId>anwiba-commons-json</artifactId>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-advanced</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.24</version>
   </parent>
 
   <scm>
-    <connection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</connection>
-    <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
-    <url>https://github.com/AndreasWBartels/libraries/tree/master/commons/advanced/Commons_Json</url>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/commons/advanced/Commons_Json</url>
    </scm>
 
   <dependencies>
@@ -89,7 +89,7 @@
       <plugin>
         <groupId>net.anwiba.commons.tools</groupId>
         <artifactId>anwiba-tools-definition-schema-json</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.24</version>
         <executions>
           <execution>
             <id>generate</id>
@@ -126,13 +126,6 @@
               </configuration>
             </plugin>
           </reportPlugins>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <projectNameTemplate>Commons_Json</projectNameTemplate>
         </configuration>
       </plugin>
     </plugins>

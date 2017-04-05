@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -33,7 +33,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
@@ -118,7 +122,8 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public OutputStream visitMemoryResource(final MemoryResourceReference memoryResourceReference) throws IOException {
+      public OutputStream visitMemoryResource(final MemoryResourceReference memoryResourceReference)
+          throws IOException {
         throw new IOException("not yet supported for InMemoryResources resources"); //$NON-NLS-1$
       }
     });
@@ -350,7 +355,11 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
 
   @Override
   public boolean canDelete(final IResourceReference resourceReference) {
-    return canWrite(resourceReference);
+    try {
+      return ifFile(resourceReference).convert(input -> canDelete(input)).getOr(Boolean.FALSE).booleanValue();
+    } catch (final IOException exception) {
+      return false;
+    }
   }
 
   @SuppressWarnings("nls")
@@ -359,9 +368,47 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     if (resourceReference == null) {
       throw new IllegalArgumentException();
     }
-    final File file = ifFile(resourceReference).getOrThrow(
-        () -> new IOException("not yet supported for '" + toString(resourceReference) + "' resources"));
+    final File file = ifFile(resourceReference)
+        .getOrThrow(() -> new IOException("not yet supported for '" + toString(resourceReference) + "' resources"));
+    if (!canDelete(file)) {
+      throw new IOException("insufficient privileges");
+    }
+    final Path directory = file.toPath();
+    if (file.isDirectory()) {
+      Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attributes) throws IOException {
+          Files.delete(file);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(final Path folder, final IOException exception) throws IOException {
+          if (exception != null) {
+            throw exception;
+          }
+          Files.delete(folder);
+          return FileVisitResult.CONTINUE;
+        }
+      });
+      return;
+    }
     Files.deleteIfExists(file.toPath());
+  }
+
+  private boolean canDelete(final File file) {
+    if (!file.canWrite()) {
+      return false;
+    }
+    if (file.isDirectory()) {
+      final File[] files = java.util.Optional.ofNullable(file.listFiles()).orElseGet(() -> new File[0]);
+      for (final File child : files) {
+        if (!canDelete(child)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   protected IOptional<File, IOException> ifFile(final IResourceReference resourceReference) throws IOException {

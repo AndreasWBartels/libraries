@@ -21,7 +21,6 @@
  */
 package net.anwiba.commons.reflection;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -41,6 +40,7 @@ import net.anwiba.commons.reflection.annotation.Nullable;
 
 public class ReflectionValueInjector implements IReflectionValueInjector {
 
+  final private InjectableElementGetter injectableElementGetter = new InjectableElementGetter();
   private final PrivilegedActionInvoker<Void> invoker = new PrivilegedActionInvoker<>(System.getSecurityManager());
   private final IReflectionValueProvider values;
 
@@ -89,7 +89,7 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
   @Override
   public <T> T create(final Class<T> clazz) throws CreationException {
     try {
-      final Constructor<T> constructor = getConstructor(clazz);
+      final Constructor<T> constructor = this.injectableElementGetter.getConstructor(clazz);
       final ReflectionConstructorInvoker<T> constructorInvoker = new ReflectionConstructorInvoker<>(
           clazz,
           constructor.getParameterTypes());
@@ -114,24 +114,6 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
       result.add(getValue(parameter));
     }
     return result.toArray(new Object[result.size()]);
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> Constructor<T> getConstructor(final Class<T> clazz) {
-    final Constructor<?>[] constructors = clazz.getConstructors();
-    if (constructors.length != 1) {
-      for (final Constructor<?> constructor : constructors) {
-        if (constructor.getParameterCount() == 0) {
-          return (Constructor<T>) constructor;
-        }
-      }
-      throw new IllegalArgumentException();
-    }
-    final Constructor<?> constructor = constructors[0];
-    if (constructor.getParameterCount() == 0 || injectable(constructor)) {
-      return (Constructor<T>) constructor;
-    }
-    throw new IllegalArgumentException();
   }
 
   @Override
@@ -159,23 +141,15 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
   }
 
   private <T> void setValue(final Field field, final T object) throws InvocationTargetException {
-    if (!injectable(field)) {
+    if (!this.injectableElementGetter.injectable(field)) {
       return;
     }
     final Object value = getValue(field);
     this.invoker.invoke(new PrivilegedFieldSetterAction(object, field.getName(), value));
   }
 
-  private boolean injectable(final AccessibleObject object) {
-    final Injection annotation = object.getAnnotation(Injection.class);
-    return annotation != null && annotation.value();
-  }
-
   private Object getValue(final Field field) {
     final Class<?> clazz = field.getType();
-    if (this.values.contains(clazz)) {
-      return this.values.get(clazz);
-    }
     if (clazz.isAssignableFrom(Iterable.class)) {
       final Class<?> genericType = getIterableType(field);
       final Collection<?> value = this.values.getAll(genericType);
@@ -183,6 +157,9 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
         return value;
       }
       return new ArrayList<>();
+    }
+    if (this.values.contains(clazz)) {
+      return this.values.get(clazz);
     }
     final Nullable nullable = field.getAnnotation(Nullable.class);
     if (nullable != null && nullable.value()) {

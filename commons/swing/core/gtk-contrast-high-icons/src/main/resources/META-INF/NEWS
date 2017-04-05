@@ -1,0 +1,382 @@
+3.22.1 (GTK 3.22)
+
+3.22.0 (GTK 3.22)
+
+3.20.9 (GTK 3.20)
+
+    Translations update
+    GTK+-3.20 most themes: add support for OSD mediakeys windows
+    GTK+-3.20 TOK themes: kill a unwanted border on nemo desktop window
+    GTK+-3.20 TOK themes: use same colors for text selection in atril if window isn't focused
+    GTK+-3.20 BlackMATE: fix broken text selection in atril
+    GTK+-3 TOK themes: fix hover fg color in combobox menu
+    GTK+-3.20 most themes: use node 'paper' for GtkPrintUnixDialog
+    GTK+-3.20 most themes: fix text selection in atril
+    GTK+-3.20 BlackMATE: Fix "paper" widget in print dialogs
+    GTK+-3.20 submarine themes: fixes for atril toolbar, caja and mate-keyboard-properties
+    GTK+-3.20 Menta themes: fix wrong bg color of notebook in wifi password dialog, nm-applet
+    GTK+-3.20 TOK themes: fix wrong bg color of notebook in wifi password dialog, nm-applet
+    GTK+-3.20 Submarine themes: fix wrong bg color of notebook in wifi password dialog, nm-applet
+    GTK+-3.20 BlackMATE: fix wrong bg color of notebook in wifi password dialog, nm-applet
+    GTK+-3.20 BlackMATE: consistant panel menus
+    GTK+-3.20 BlackMATE: fix panel right-click menu size
+    Menta themes metacity: increase border size
+    Menta themes metacity: adjust buttons for frame_geometry normal
+    GTK+-3.20 BlackMATE: fix Firefox scrollbar sliders
+
+3.20.8 (GTK 3.20)
+
+    GTK+-3.20 TOK themes: adjust nemo pathbar
+    GTK+-3.20 TOK themes: fix GtkScale API breakage with stable gtk+
+    BlackMATE: support new MSD OSD style class
+    GTK+-3.20 most themes: fix bg color of scrolledwindow junction in nemo treeview
+    HighContrast metacity: fix color of of buttons
+    GTK+-3.20 Submarine themes: fix pathbar in nemo
+    GTK+-3.20 GreenLaguna: adjust OSD spinbutton
+    GTK+-3.20 GreenLaguna: fix GtkScale API breakage with stable gtk+
+    GTK+-3.20 Submarine themes: adjust spinbuttons and OSD spinbuttons in colorchooser
+    GTK+-3.20 Submarine themeses: fix GtkScale API breakage with stable gtk+
+    GTK+-3-20 Green-Submarine: darken menuitem arrow hover color
+    GTK+-3-20 Green-Submarine: some color correction for panel applets
+    GTK+-3.20 Submarine themes: fix hover fg color of panel menubar
+    GTK+-3.20 BlackMate: a few adjustments for caja + clean up of mate-applications
+    - caja combobox views
+    - sidebar scrollbar button
+    - drop old selectors from nautilus
+    - drop non ported stuff
+    - use right selectors for na-tray applet
+    GTK+-3.20 Menta themes: increase font-weight for panel menubar
+    GTK+-3.20 Menta themes: fix nemo pathbar
+    GTK+-3.20 Menta themes: reduce height of treeviews
+    GTK+-3.20 Menta themes: fix GtkScale API breakage with stable gtk+
+    GTK+-3 BlueMenta: add missing scale_trough_border color definition
+    Menta themes metacity: fix button geometry for all windows
+    BlackMATE :use a text shadow on mate-panel
+    GTK+-3.20 Submarine themes: use a text-shadow for mate-panel
+    GTK+-3.20 Submarine themes: add icon-shadow to GtkExpander and shadows for image and label of clock-applet
+    GTK+-3.20 Menta themes: fix tooltips for WM decoration and firefox
+    GTK+-3.20 Menta themes: improve GtkCalendar and GtkExpander
+    GTK+-3.20 Submarine themes: improve GtkCalendar and use a transparent bg for clock applet
+    GTK+-3.20 GreenLaguna: improve settings for GtkCalendar and GtkExpander
+    GTK+-3.20 TOK themes: improve GtkCalendar settings
+    GTK+-3.20 Submarine and Grenlaguna themes: fix node for vte-terminal
+    Gtk+-3.20 most themes: fix some menu separators
+    GTK+-3.20 GreenLaguna: add setting for better controling icon size in na-tray-applet
+    GTK+-3.20 menta themes: add setting for better controling icon size in na-tray-applet
+    GTK+-3.20 submarine themes: fix settings for na-tray-applet
+
+3.20.7 (GTK 3.20)
+
+    Translations update
+    GTK+-3.20 all themes: add settings for yumex-dnf
+    GTK+-3.20 BlackMATE: fix wrong stackswitcher node
+    GTK+-3.20 Submarine themes: fix scrollbar bg in firefox websites
+    GTK+-3.20 BlackMATE: add simple support for spinbuttons and OSD spinbuttons
+    GTK+-3.20 BlackMATE: some more corrections for 3.20
+    GTK+-3.20 BlackMate: adjust list row syntax for 3.20
+    GTK+-3.20 BlackMATE: fix OSD settings
+    GTK+-3.20 Blackmate: fix headerbar and .titlebar
+    GTK+-3.20 GreenLaguna: fix fg color of firefox tooltips
+    GTK+-3.20 GreenLaguna: style meld and buttons in infobar
+    GTK+-3.20 GreenLaguna: adjust button_gradient_color_b color
+    GTK+-3.20 Submarine themes: adjust hover fg color in primary-toolbars
+    GTK+-3.20 Green-Submarine: style meld preferences
+    GTK+-3.20 Submarine themes: style meld preferences
+    GTK+-3.20 Menta themes: style meld
+    GTK+-3.20 Submarine themes: more styling for meld
+    GTK+-3.20 Submarine themes: add settings for meld + button bg adjustments
+    GTK+-3.20 some themes: style UI tab of mate-appearance-properties
+    GTK+-3.20 TOK themes: adjust menu arrows
+    GTK+-3.20 GreenLaguna: edited makefile
+    GTK+-3.20 GreenLaguna: adjust check and radio buttons for menus
+    GTK+-3.20 Submarine themes: adjust check and radio buttons
+    GTk+-3.20 Submarine themes: adjust scrollbars for firefox
+    GTk+-3.20 GreenLaguna: adjust scrollbars for firefox
+    GTK+-3.20 Submarine themes: adjust scrollbars for firefox
+    GTK+-3.20 Menta themes: adjust scrollbars for firefox
+    GreenLaguna metacity: remove borders from max window
+    Submarine themes metacity: remove borders from max window
+    BlackMATE metacity: remove borders from max window
+    Menta themes: add metacity-theme-2.xml file
+    GTK+-3.20 TOK themes: make preview windows in wnckpager more visible
+    GTK+-3.20 GreenLaguna: make preview windows in wnckpager more visible
+    GTK+-3.20 Menta themes: make preview windows in wnckpager more visible
+    GTK+-3.20 TOK themes: style printdialog
+    GTK+-3.20 GreenLaguna: style printdialog
+    GTK+-3.20 Menta themes: style printdialog
+    GTK+-3.20 Submarine themes: style printdialog notebook + fix fg color of combobox cellview
+    GTK+-3.20 BlackMate: apply window-control theme to gedit
+
+3.20.6 (GTK 3.20)
+
+- GTK+-3.20 BlackMATE: adjust tooltips
+- GTK+-3.20 TOK themes: adjust tooltips
+- GTK+-3.20 ContrastHighInverse: adjust tooltips
+- GTK+-3.20 GreenLaguna: re-work tooltips
+- GTK+-3.20 submarine themes: re-work tooltip settings, fixes firefox tooltips
+- GTK+-3.20 TOK themes: adjustments for headerbars, placesidebar and placesview
+- GTK+-3.20 Submarine themes: adjust headerbars
+- GTK+-3.20 Menta themes: adjust headerbar settings for gedit
+- GTK+-3.20 BlackMate: Fix Gedit headerbar buttons
+- GTK+-3.20 BlackMate: fix incorrect headerbar selector
+- GTK+-3.20 BlackMate: more Firefox fixes
+- GTK+-3.20 BlackMate: Fix check and radio buttons in Firefox GTK3 website content
+- GTK+-3.20 TOK themes: fix check and radio buttons for firefox
+- GTK+-3.20 GreenLaguna: fix check and radio boxes for firefox
+- GTK+-3.20 BlackMate: fix check and radio boxes in firefox
+- GTK+-3.20 Menta themes: fix for check and radio boxes in firefox
+- GTK+-3.20 BlackMate: use origin border-radius for trough and progress
+- GTK+-3.20 BlackMate: don't set insensitive colors as a general setting
+- GTK+-3.20 BlackMate little adjustement for scrollbars
+- GTK+-3.20 BlackMate: re-work menus
+- GTK+-3.20 BlackMate: fix some general parameter
+- GTK+-3.20 BlackMate: use a padding for menubar menuitem from mate-panel
+- GTK+-3.20 BlackMate: fix fg color of text selection in firefox
+- GTK+-3.20 Submarine themes: more adjustments for gtk+-3.20
+- GTK+-3.20 Menta themes: more adjustments for gtk+-3.20
+- GTK+-3.20 TOK themes: rework menus and fix issue with arrows on firefox menus
+- GTK+-3.20 GreenLaguna: use the LSD effect on popover arrows
+- GTK+-3.20 GreenLaguna: some button size correction
+- Enable build of GreenLaguna again
+- Menta themes: improve metacity-3.xml version
+- GTK+-3.20 GreenLaguna: port to gtk+-3.20
+- GTK+-3.20 TOK themes: style nemo-preferences dialog
+- GTK+-3.20 TOK themes: add stack-switcher support
+- GTK+-3.20 TOK themes: some corrections for scrolledwindow and primary-toolbar button
+- GTK+-3.20 BlackMATE: Correct bg of active treeview cells
+- GTK+-3.20 BlackMATE: match stacksidebar to placessidebar
+- GTK+-3.20 TOK themes: some improvements for filechooser dialog window
+- GTK+-3.18 TOK themes: fix button jummping in spinbuttons of color selection
+- GTK+-3.20 TOK themes: remove the scrollbar color from scrolledwindow
+- GTK+-3.20 all themes: fix text selection in firefox
+
+3.20.5 (GTK 3.20)
+
+- add new languages an sync with transiflex
+- GTK+-3.20 TOK themes: adjust linked buttons for rhythmbox and nemo
+- GTK+-3.20 TOK themes: OSD and inline-bar fixes for parole and gnome-weather
+- GTK+-3.20 Menta themes: correct some fg colors in gnome-weather-pages
+- GTK+-3.20 Menta themes: fix fg color of flat buttons in rhythmbox
+- Fix Changelog generation
+- GTK+-3.20 BlackMate: style lock-screen
+- GTK+-3-20 traditional themes: style lock-screen
+- GTK+-3.20 TOK themes: adjust linked buttons for rhythmbox and nemo
+- GTK+-3.20 TOK themes: OSD and inline-bar fixes for parole and gnome-weather
+- GTK+-3.20 Menta themes: correct some fg colors in gnome-weather-pages
+- GTK+-3.20 Menta themes: fix fg color of flat buttons in rhythmbox
+- Gtk+-3.20 ContrastHighInverse: fix notebook bg color of the look-screen
+- GTK+-3.20 Menta themes: style mate-screensaver lock-screen
+- GTK+-3.20 submarine themes: style mate-screensaver lock-screen
+- GTK+-3.20 submarine themes: fix jumping buttons in parole-mediaplayer inline-toolbar
+- GTK+-3.20 submarine themes: adjust OSD, gnome-weather, rhythmbox
+  and cleanup gnome-applications
+- GTK+-3.20 submarine themes: fix button color in meld toolbar + toolbar cleanup
+- GTK+-3.20 Menta themes: reduce border-radius of panel buttons
+- GTK+-3.20 BlackMate: Fix non-composited CSD windows
+- GTK+-3.20 BlackMate: adjust window-controls settings
+- GTK+-3.20 BlackMate: use Mate logo as spinner animation
+- GTK+-3.20 Submarine themes: simplify linked path-bar
+- GTK 3.20 BlackMate: correct for recent mate-panel changes
+- ship a HighContrast metacity-theme-1.xml
+- drop ContrastHigh theme, gtk+ ship that already
+
+
+3.20.4 (GTK 3.20)
+
+- GTK+-3.20 Menta themes: add styling for mate-mixer GUI
+- GTK+-3.20 Menta themes: reduce size of menubars and menuitems
+- GTK+-3.20 Menta themes: reduce size of reduce size of actionbar
+- GTK+-3.20 Menta themes: fix buttons in rhythmbox
+- GTK+-3.20 Menta themes: adjust GtkColorScale
+- GTK3.20 Menta themes: simplify combobox and caja settings
+- GTK3.20 Menta themes: reduce height of sidbar treeview
+- GTK3.20: Menta themes: adjust treeviews
+- GTK+-3.20 Menta themes: fix combobox, spinbutton and switch in list rows
+  this make elements in cinnamon-setting visible
+- GTK+-3.20 Menta themes: file-browser pathbar adjustments + increase size of rows + clean up
+- GTK+-3.20 Menta themes: adjust notebooks settings
+- GTK+-3.20 branch: make GreanLaguna optional (not default)
+- GTK+-3.20 high contrast themes: finished port to 3.20
+- GTK3-3.20 traditional themes: button state cleanup + fix size of nemos buttons
+- GTK+-3.20 traditional themes: adjust GtkScale and GtkColorScale
+- GTK+-3.20 traditional themes: adjust width of scrollbars
+- GTK+-3.20 traditional themes: adjust comboboxes
+- GTK+-3.20 traditional themes: fix treeview header button
+- GTK+-3.20 traditional themes: fix jumping pathbar buttons
+- GTK+-3.20 Submarine themes: improve nemo pathbar settings
+- GTK+-3.20 Submarine themes: adjustements for nemo and cinnamon-settings
+- GTK+-3.20 Submarine themes: adjust GtkColorScale
+- GTK+-3.20 Submarine themes: adjust combobox, rows, treeviews,
+  inline-toolbar and nautilus pathbar
+- GTK+-3.20 Submarine themes: adjust caja and pluma
+- GTK+-3.20 Submarine themes: adjust notebooks
+- GTk+-3.20 most themes: fix text bg of credits in GtkAbout windows
+- GTK+-3.20 all themes:update wnckpager to follow latest mate-panel changes
+
+3.20.3 (GTK 3.20)
+
+- GTK3: fix Scrollbars, Spinbutton and Notebooks in Menta themes,
+- Submarine themes and Traditional themes.
+- more improvements
+- language update
+
+3.20.2 (GTK 3.20)
+
+- port Menta to gtk+-3.20
+- port TraditionalOK to gtk+-3.20
+- port TraditionalGreen to gtk+-3.20
+- more adjustments for Blue-Submarine for gtk+-3.20
+- sync Green-Submarine with Blue-Submarine
+
+3.20.1 (GTK 3.20)
+
+- port Blue-Submarine to gtk+-3.20
+
+3.20.0 (GTK 3.20)
+
+- port BlueMenta to gtk+-3.20
+- port BlackMATE to gtk+-3.20
+- port GreenSubmarine to gtk+-3.20
+
+1.12.2 (GTK 3.18)
+
+- GTK3 GreenLaguna: fix padding osd-toolbar volume button
+- GTK3 submarine themes: fix padding osd-toolbar volume button
+- Gtk+-3.14/16 submarine themes: fix padding of .app-notification .button:hover
+- GTK3 BlackMate: fix padding osd-toolbar volume button
+- GTK3 BlackMate: fix padding of .app-notification .button:hover
+- GTK3 submarine themes: re-work caja styling
+- GTK3 BlackMate: adjust notebook tabs
+- GTK3 GreenLaguna: adjust notebook tabs
+- GTK3 submarine themes: reduce hight of notebook tabs
+- GTK3 submarine themes: adjust notebook tabs in pluma text area
+- GTK3 submarine themes: change border color in GtkNotebook
+- GTK3: submarine themes: fix padding for GtkToggleButton.button:hover
+- GTK3 black-mate, green-laguna: button size fix for gnome-mplayer
+- GTK3: submarine themes: adjustments for some media players + vitual-manager
+- Gtk+-3.18 menta themes: improve previous GtkFileChooser pathbar commit
+- Gtk3 menta themes: adjust nemo toolbar again
+- Gtk+-3.18 most themes: workaround for broken first/last-child logic with
+  linked buttons in GtkFileChooser pathbar
+- GTK3 Menta themes: use a border-image for nemo statusbar buttons
+- GTK3 Menta themes: reduce vertical size of nemo primary toolbar
+- Gtk+-3.18 most themes: workaround for broken first/last-child logic with
+  linked buttons in pathbar with gtk+-3.18
+- GTK3: Menta themes: fix mate-panel separator background
+- GTK3: BlackMATE, GreenLaguna: fix Nautilus desktop window background transparency
+
+1.12.1 (GTK 3.18)
+
+- add emerald themes for Submarine themes
+- add emerald theme for BlueMenta/Menta
+- GTK3 all themes: adjust mate-panel-applet-slider style class
+- Gtk3 most themes: adjust panel to follow latest changes in mate-panel
+- some more improvements, see git log
+
+1.12.0 (GTK 3.18)
+
+- GTK3 all themes: style volume/brightness applet slider
+
+1.11.1 (GTK 3.18)
+- GTK+-3.18 most themes: fix bg of GtkGrid in GtkAboutDialog
+- Gtk+-3.18 all themes: fix sidebar list-rows in GtkFileChooserWidget
+- Gtk+-3.18 green-submarine theme: fix some typos
+
+1.11.0 (GTK 3.18)
+- more adjustments for gtk+-3.18
+- GTK3 submarine themes: add styling for gnome-weather
+- GTK3 Submarine themes: adjust osd toolbar
+- GTK3 Submarine themes: adjust popover scales
+- GTK3 Submarine themes: style background of emblem page in properties-dialog
+- GTK3 Submarine themes: re-work cleanup button state logic
+- Gtk+-3.18 submarine themes: adjust osd
+- Gtk3 Contrast High themes: support real OSD
+- GTK3 ContrastHigh themes: adjust GtkScale and GtkProgressbar
+- GTK3: ContrastHigh themes: style dconf-editor
+
+1.10.5 (GTK 3.18)
+- more adjustments for gtk+-3.18
+  * list-rows
+  * osd-scale popup
+- all gtk3
+  * fix padding-area of icons in na-tray
+  * full transparent panel for BlackMate and GreenLaguna
+  * improvements for all themes
+  * details see git log
+
+1.10.4 (GTK 3.18)
+- first adjustments for gtk+-3.18
+  * adjust sidebar in GtkFileChooser dialog
+  * style popover suggested-action button
+- all gtk3
+  * adjust link_color and add styling for hyperlinks
+  * all themes: style bg of toolbar editor
+  * style dialog windows
+  * add new style classes settings for ContrastHigh themes
+  * restore progressbars for traditional themes
+  * improvements for traditional themes
+  * BlackMATE: re-work caja styling a bit
+  * improvements for BlackMATE theme
+  * improvements for Greenlaguna theme
+  * submarine themes: don't use dark colors for math calculators
+  * improvements for submarine themes
+  * improvements for menta themes
+- for more details see git log!
+
+1.10.3 (GTK 3.16)
+  * fix some metacity themes
+  * improve traditional themes (gk3)
+
+1.10.2
+  * add Blue-Submarine and Green-Submarine themes
+  * style parole mediaplayer (gtk3 version)
+
+1.10.1
+  * improvements for menta themes GTK+-3.16
+  * re-work of GreenLaguna GTK3
+  * improvements for traditional themes GTK+-3.16
+  * improvements for BlackMate GTK+-3.16
+  * more styling for mate GTK3 applications
+  * add a whitlist for window-controls menu-close button for csd apps
+  * use mate logo for spinner animation
+
+1.10.0
+  * adjustments for GTK3-3.16
+  * a lot of improvements for mate GTK3 applications
+  * disable usage of symbolic icons
+  * use regular icons for window controls
+  * disable spinner animation to avoid high cpu load
+  * enable window shadows for csd applications
+  * re-work of GreenLaguna
+  * re-work of ContrastHigh themes
+  * many more adjustments....
+
+1.9.3
+  * TraditionalOKTest is installable with normal configure flags
+  * add transition effect to buttons and menuitems for Menta themes GTK3
+  * add transition effect to buttons and menuitems for BlackMate and GreenLaguna GTK3
+  * add support for CSD applications in BlackMate and GreenLaguna
+  * improve handling of CSD applications in other themes
+  * add support for popovers in GreenLaguna, BlackMate, ContrastHigh and ContrastHighInverse themes
+  * improve popovers support in Traditional themes
+  * serveral other improvements
+
+1.9.2
+  * add ContrastHighInververse GTK3 part
+  * more adjustments for GTK3-3.14 in main themes
+  * several improvements in BlackMate, GreenLaguna and Shiny themes GTK2
+
+1.9.1
+  * bump version to reflect GTK3 suported version
+  * add GTK3-3.14 support for all major themes
+  * add GTK3 part to Shiny 
+
+1.9.0
+  * BlueMenta: Add GTK 3.12 support
+  * Menta: Add GTK 3.12 support
+  * BlackMATE: Add GTK 3.12 support
+  * GreenLaguna: Add GTK 3.12 support
+
+1.8.0
+  * Import Crux Metacity theme and rename it to Quid
+  * Add BlueMenta theme

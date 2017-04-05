@@ -4,7 +4,7 @@
 
   <name>anwiba commons core</name>
   <description>anwiba commons core libraries project</description>
-  <url>https://github.com/AndreasWBartels/libraries/tree/master/commons/core</url>
+  <url>${scm.url.net.anwiba.master}/commons/core</url>
 
   <artifactId>anwiba-commons-maven-core</artifactId>
   <packaging>pom</packaging>
@@ -12,13 +12,13 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-default</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.24</version>
   </parent>
 
   <scm>
-    <connection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</connection>
-    <developerConnection>scm:git:ssh://github.com:AndreasWBartels/libraries.git</developerConnection>
-    <url>https://github.com/AndreasWBartels/libraries/tree/master/commons/core</url>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/commons/core</url>
   </scm>
 
   <modules>

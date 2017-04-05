@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>eclipse libraries</name>
+  <description>eclipse jar libraries bundle plugin</description>
+  <url>${url.net.anwiba}/libraries/wiki/Eclipse</url>
+
+  <artifactId>net.anwiba.eclipse.libraries</artifactId>
+  <packaging>eclipse-plugin</packaging>
+
+  <parent>
+    <groupId>net.anwiba.eclipse</groupId>
+    <artifactId>anwiba-eclipse-maven-default</artifactId>
+    <version>1.0.24</version>
+  </parent>
+
+  <scm>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/eclipse/Eclipse_Libraries</url>
+  </scm>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <!-- <artifactItem> -->
+                <!-- <groupId>com.sun.xml.bind</groupId> -->
+                <!-- <artifactId>jaxb-impl</artifactId> -->
+                <!-- <version>2.2.7</version> -->
+                <!-- <type>jar</type> -->
+                <!-- <destFileName>jaxb-impl-2.2.7.jar</destFileName> -->
+                <!-- </artifactItem> -->
+                <!-- <artifactItem> -->
+                <!-- <groupId>com.sun.xml.bind</groupId> -->
+                <!-- <artifactId>jaxb-core</artifactId> -->
+                <!-- <version>2.2.7</version> -->
+                <!-- <type>jar</type> -->
+                <!-- <destFileName>jaxb-core-2.2.7.jar</destFileName> -->
+                <!-- </artifactItem> -->
+                <!-- <artifactItem> -->
+                <!-- <groupId>com.sun.xml.bind</groupId> -->
+                <!-- <artifactId>jaxb-api</artifactId> -->
+                <!-- <version>2.2.7</version> -->
+                <!-- <type>jar</type> -->
+                <!-- <destFileName>jaxb-api-2.2.7.jar</destFileName> -->
+                <!-- </artifactItem> -->
+                <artifactItem>
+                  <groupId>commons-logging</groupId>
+                  <artifactId>commons-logging</artifactId>
+                  <version>1.2</version>
+                  <type>jar</type>
+                  <destFileName>commons-logging-1.2.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-ensure</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-ensure-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-lang</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-lang-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-logging</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-logging-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-message</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-message-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-model</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-model-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-process</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-process-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-reflaction</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-reflaction-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-resource</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-resource-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons</groupId>
+                  <artifactId>anwiba-commons-utilities</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-commons-utilities-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons.tools</groupId>
+                  <artifactId>anwiba-tools-graphml</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-tools-graphml-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>lib</directory>
+              <includes>
+                <include>*.jar</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

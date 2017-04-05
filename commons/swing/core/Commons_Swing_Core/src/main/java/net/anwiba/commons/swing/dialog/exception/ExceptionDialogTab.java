@@ -1,0 +1,68 @@
+/*
+ * #%L
+ * anwiba commons swing
+ * %%
+ * Copyright (C) 2007 - 2016 Andreas Bartels
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+package net.anwiba.commons.swing.dialog.exception;
+
+import net.anwiba.commons.message.ExceptionMessage;
+import net.anwiba.commons.swing.dialog.DialogMessages;
+import net.anwiba.commons.swing.dialog.tabbed.AbstractDialogTab;
+import net.anwiba.commons.swing.icon.GuiIcons;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+public class ExceptionDialogTab extends AbstractDialogTab {
+
+  public ExceptionDialogTab(final Throwable e) {
+    this(new ExceptionMessage(e.getClass().getName(), e.getMessage(), e));
+  }
+
+  public ExceptionDialogTab(final ExceptionMessage message) {
+    super(DialogMessages.ERROR, message, GuiIcons.EMPTY_ICON.getLargeIcon());
+    final JTextArea textArea = new JTextArea();
+    textArea.setEditable(false);
+    textArea.setLineWrap(false);
+    textArea.setRows(15);
+    textArea.setColumns(25);
+    final StringWriter stringWriter = new StringWriter();
+    message.getThrowable().printStackTrace(new PrintWriter(stringWriter));
+    textArea.append(stringWriter.getBuffer().toString());
+    setComponent(new JScrollPane(textArea));
+  }
+
+  @Override
+  public void checkFieldValues() {
+    // nothing to do
+  }
+
+  @Override
+  public boolean apply() {
+    return true;
+  }
+
+  @Override
+  public void updateView() {
+    // nothing to do
+  }
+}

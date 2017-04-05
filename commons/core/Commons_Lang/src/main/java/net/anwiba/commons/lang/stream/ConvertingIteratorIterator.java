@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IIterator;
 
 public final class ConvertingIteratorIterator<I, O, E extends Exception> implements IIterator<O, E> {
 
@@ -47,11 +48,9 @@ public final class ConvertingIteratorIterator<I, O, E extends Exception> impleme
   public boolean hasNext() throws E {
     while (this.iterator.hasNext()) {
       final I i = this.iterator.next();
-      if (!this.acceptor.accept(i)) {
-        continue;
+      if (this.acceptor.accept(i) && (this.item = this.converter.convert(i)) != null) {
+        return true;
       }
-      this.item = this.converter.convert(i);
-      return true;
     }
     return false;
   }

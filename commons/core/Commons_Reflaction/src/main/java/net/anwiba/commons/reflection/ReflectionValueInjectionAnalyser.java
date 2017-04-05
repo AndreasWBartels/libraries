@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,7 +21,6 @@
  */
 package net.anwiba.commons.reflection;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -38,11 +37,15 @@ import net.anwiba.commons.reflection.annotation.Nullable;
 
 public class ReflectionValueInjectionAnalyser implements IReflectionValueInjectionAnalyser {
 
+  final private InjectableElementGetter injectableElementGetter = new InjectableElementGetter();
+
+  @SuppressWarnings("unchecked")
   @Override
   public <T> IInjektionAnalyserResult analyse(final IInjectingFactory<T> factory) {
-    final String createMethodName = "create";
+    final String createMethodName = "create"; //$NON-NLS-1$
     final Method[] methods = factory.getClass().getMethods();
-    final List<Method> createMethods = Stream.of(methods) //
+    final List<Method> createMethods = Stream
+        .of(methods) //
         .filter(m -> createMethodName.equals(m.getName()))
         .filter(m -> m.getAnnotation(Injection.class) != null)
         .collect(Collectors.toList());
@@ -65,23 +68,21 @@ public class ReflectionValueInjectionAnalyser implements IReflectionValueInjecti
   @Override
   public <T> IInjektionAnalyserResult analyse(final Class<T> clazz) {
     final Field[] fieldArray = clazz.getDeclaredFields();
-    final Constructor<T> constructor = getConstructor(clazz);
+    final Constructor<T> constructor = this.injectableElementGetter.getConstructor(clazz);
     final List<IInjektionAnalyserValueResult> results = new ArrayList<>();
-    if (injectable(constructor)) {
-      for (final Parameter parameter : constructor.getParameters()) {
-        results.add(analyse(parameter));
-      }
+    for (final Parameter parameter : constructor.getParameters()) {
+      results.add(analyse(parameter));
     }
     for (final Field field : fieldArray) {
-      final IInjektionAnalyserValueResult result = analyse(field);
-      if (result == null) {
+      if (!this.injectableElementGetter.injectable(field)) {
         continue;
       }
-      results.add(result);
+      results.add(analyse(field));
     }
     return InjektionAnalyserResult.create(clazz, results);
   }
 
+  @SuppressWarnings("rawtypes")
   private IInjektionAnalyserValueResult analyse(final Parameter parameter) {
     final boolean isNullable = isNullable(parameter);
     final Class type = getType(parameter);
@@ -93,10 +94,8 @@ public class ReflectionValueInjectionAnalyser implements IReflectionValueInjecti
     return new InjektionAnalyserValueResult(type, isNullable, isIterable);
   }
 
+  @SuppressWarnings("rawtypes")
   private IInjektionAnalyserValueResult analyse(final Field field) {
-    if (!injectable(field)) {
-      return null;
-    }
     final boolean isNullable = isNullable(field);
     final Class type = getType(field);
     final boolean isIterable = isIterable(type);
@@ -113,39 +112,19 @@ public class ReflectionValueInjectionAnalyser implements IReflectionValueInjecti
     return isNullable;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private boolean isIterable(final Class type) {
     return type.isAssignableFrom(Iterable.class);
   }
 
+  @SuppressWarnings("rawtypes")
   private Class getType(final Parameter parameter) {
     return parameter.getType();
   }
 
+  @SuppressWarnings("rawtypes")
   private Class getType(final Field field) {
     return field.getType();
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> Constructor<T> getConstructor(final Class<T> clazz) {
-    final Constructor<?>[] constructors = clazz.getConstructors();
-    if (constructors.length != 1) {
-      for (final Constructor<?> constructor : constructors) {
-        if (constructor.getParameterCount() == 0) {
-          return (Constructor<T>) constructor;
-        }
-      }
-      throw new IllegalArgumentException();
-    }
-    final Constructor<?> constructor = constructors[0];
-    if (constructor.getParameterCount() == 0 || injectable(constructor)) {
-      return (Constructor<T>) constructor;
-    }
-    throw new IllegalArgumentException();
-  }
-
-  private boolean injectable(final AccessibleObject object) {
-    final Injection annotation = object.getAnnotation(Injection.class);
-    return annotation != null && annotation.value();
   }
 
   private boolean isNullable(final Field field) {

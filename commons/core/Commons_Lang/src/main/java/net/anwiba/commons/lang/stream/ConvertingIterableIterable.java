@@ -24,6 +24,8 @@ package net.anwiba.commons.lang.stream;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IIterable;
+import net.anwiba.commons.lang.functional.IIterator;
 
 public final class ConvertingIterableIterable<I, O, E extends Exception> implements IIterable<O, E> {
 

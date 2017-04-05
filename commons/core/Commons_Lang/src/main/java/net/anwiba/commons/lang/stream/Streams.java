@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -24,7 +24,25 @@ package net.anwiba.commons.lang.stream;
 
 import java.util.Arrays;
 
+import net.anwiba.commons.lang.functional.IIterable;
+
 public class Streams {
+
+  public static <T> IStream<T, RuntimeException> of(final IIterable<T, RuntimeException> input) {
+    return new SequencedStream<>(new FilteringIterableIterable<>(input, i -> i != null));
+  }
+
+  public static <T> IStream<T, RuntimeException> of(final Iterable<T> input) {
+    return new SequencedStream<>(new FilteredJavaUtilIterableIterable<>(input, i -> i != null));
+  }
+
+  public static <T> IStream<T, RuntimeException> of(final T[] input) {
+    return create(Arrays.asList(input));
+  }
+
+  public static <T, E extends Exception> IStream<T, E> create(final IIterable<T, E> input) {
+    return new SequencedStream<>(new FilteringIterableIterable<>(input, i -> i != null));
+  }
 
   public static <T, E extends Exception> IStream<T, E> create(final Iterable<T> input) {
     return new SequencedStream<>(new FilteredJavaUtilIterableIterable<>(input, i -> i != null));
