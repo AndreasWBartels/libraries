@@ -3,7 +3,7 @@
 This Repository contains libraries and tools developed for JGISShell
 
 ## Author
-JGISShell was created by [Andreas W. Bartels](https://github.com/AndreasWBartels).
+[Andreas W. Bartels](https://github.com/AndreasWBartels).
 
 ## License
 
