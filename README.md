@@ -1,6 +1,6 @@
 # anwiba tools and libraries
 
-This Repository contains libraries and tools developed for JGISShell
+This Repository contains libraries and tools developed for [JGISShell](https://github.com/AndreasWBartels/JGISShell)
 
 ## Author
 [Andreas W. Bartels](https://github.com/AndreasWBartels).
