@@ -7,11 +7,11 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
 
 ## Tools
 
-### [JSSD](https://github.com/AndreasWBartels/libraries/wiki/JSSD)
-### [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
-### [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
-#### [Eclipse Swing Icons Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Swing-Icons-Plugins)
-#### [Eclipse Project Dependencies Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Project-Dependencies-Plugins)
+* [JSSD](https://github.com/AndreasWBartels/libraries/wiki/JSSD)
+* [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
+* [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
+  * [Eclipse Swing Icons Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Swing-Icons-Plugins)
+  * [Eclipse Project Dependencies Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Project-Dependencies-Plugins)
 
 ## License
 
