@@ -38,34 +38,39 @@ public class GuiIconsClassWriterTest {
     final StringWriter stringWriter = new StringWriter();
     final Class iconClass = getIconClass();
     final Class targetClass = getTargetClass();
-    try (GuiIconsClassWriter classWriter = new GuiIconsClassWriter(stringWriter, iconClass, targetClass, new IOutput() {
+    try (GuiIconsClassWriter classWriter = new GuiIconsClassWriter(
+        stringWriter,
+        iconClass,
+        targetClass,
+        "// Copyright (c) ${year} by Andreas W. Bartels (bartels@anwiba.net)\n", //$NON-NLS-1$
+        new IOutput() {
 
-      @Override
-      public void warn(final String message) {
-        System.err.println(message);
-      }
+          @Override
+          public void warn(final String message) {
+            System.err.println(message);
+          }
 
-      @Override
-      public void info(final String message) {
-        System.out.println(message);
-      }
+          @Override
+          public void info(final String message) {
+            System.out.println(message);
+          }
 
-      @Override
-      public void error(final String message) {
-        System.err.println(message);
-      }
+          @Override
+          public void error(final String message) {
+            System.err.println(message);
+          }
 
-      @Override
-      public void error(String message, Throwable throwable) {
-        System.err.println(message);
-        throwable.printStackTrace(System.err);
-      }
-    })) {
+          @Override
+          public void error(String message, Throwable throwable) {
+            System.err.println(message);
+            throwable.printStackTrace(System.err);
+          }
+        })) {
       final HashMap<String, String> folders = new HashMap<>();
       folders.put("misc", "MISC"); //$NON-NLS-1$//$NON-NLS-2$
       classWriter.write(folders, getConfiguration(targetClass));
-      assertThat(stringWriter.toString(), equalTo(getClassText()));
     }
+    assertThat(stringWriter.toString(), equalTo(getClassText()));
   }
 
   private Class getTargetClass() {

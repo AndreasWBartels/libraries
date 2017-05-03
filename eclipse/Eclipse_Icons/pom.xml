@@ -12,7 +12,7 @@
   <parent>
     <groupId>net.anwiba.eclipse</groupId>
     <artifactId>anwiba-eclipse-maven-default</artifactId>
-    <version>1.0.24</version>
+    <version>1.0.25</version>
   </parent>
 
   <scm>
@@ -22,11 +22,19 @@
   </scm>
 
   <dependencies>
+
+    <dependency>
+      <groupId>net.anwiba.eclipse</groupId>
+      <artifactId>net.anwiba.eclipse.libraries</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>net.anwiba.eclipse</groupId>
       <artifactId>net.anwiba.eclipse.commons</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -43,76 +51,6 @@
             </goals>
             <configuration>
               <artifactItems>
-                <artifactItem>
-                  <groupId>commons-logging</groupId>
-                  <artifactId>commons-logging</artifactId>
-                  <version>1.2</version>
-                  <type>jar</type>
-                  <destFileName>commons-logging-1.2.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-ensure</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-ensure-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-lang</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-lang-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-logging</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-logging-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-message</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-message-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-model</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-model-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-process</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-process-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-reflaction</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-reflaction-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-resource</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-resource-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-utilities</artifactId>
-                  <version>${net.anwiba.commons.version}</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-utilities-${net.anwiba.commons.version}.jar</destFileName>
-                </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons.tools</groupId>
                   <artifactId>anwiba-tools-icons</artifactId>

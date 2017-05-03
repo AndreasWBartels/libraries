@@ -4,12 +4,12 @@
 
   <groupId>net.anwiba.commons.swing.icons</groupId>
   <artifactId>org.oxygen.oxygen-icons</artifactId>
-  <!-- <version>4.13.0</version> -->
+  <version>4.13.0-${net.anwiba.commons.version}</version>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-swing-core</artifactId>
-    <version>1.0.24</version>
+    <version>1.0.25</version>
   </parent>
 
   <scm>

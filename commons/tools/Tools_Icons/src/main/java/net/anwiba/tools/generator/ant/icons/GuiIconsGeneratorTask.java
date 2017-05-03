@@ -19,6 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
+
 import net.anwiba.tools.icons.configuration.GuiIconConfigurationsReader;
 import net.anwiba.tools.icons.configuration.IImageExistsValidator;
 import net.anwiba.tools.icons.configuration.IOutput;
@@ -27,10 +31,6 @@ import net.anwiba.tools.icons.configuration.IconResource;
 import net.anwiba.tools.icons.configuration.ImageExistsValidator;
 import net.anwiba.tools.icons.configuration.generated.Class;
 import net.anwiba.tools.icons.generator.GuiIconsClassWriter;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.Task;
 
 @SuppressWarnings("nls")
 public class GuiIconsGeneratorTask extends Task {
@@ -161,7 +161,12 @@ public class GuiIconsGeneratorTask extends Task {
       }
       try (FileWriter fileWriter = new FileWriter(targetFile)) {
         this.output.info(MessageFormat.format("write file: {0}", targetFile.getCanonicalPath())); //$NON-NLS-1$
-        try (GuiIconsClassWriter writer = new GuiIconsClassWriter(fileWriter, this.iconClass, targetClazz, this.output)) {
+        try (GuiIconsClassWriter writer = new GuiIconsClassWriter(
+            fileWriter,
+            this.iconClass,
+            targetClazz,
+            "// Copyright (c) ${year} by Andreas W. Bartels (bartels@anwiba.net)\n", //$NON-NLS-1$
+            this.output)) {
           final Map<String, IconResource> iconConfigurations = reader.getIconConfigurations();
           final Map<String, String> folders = reader.getFolders();
           writer.write(folders, iconConfigurations);

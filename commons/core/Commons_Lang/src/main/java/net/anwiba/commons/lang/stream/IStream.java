@@ -24,6 +24,7 @@ package net.anwiba.commons.lang.stream;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
@@ -55,5 +56,7 @@ public interface IStream<T, E extends Exception> {
   public <O> IOptional<O, E> foreach(O inital, IAccumulator<T, O, E> accumulator) throws E;
 
   public void foreach(IConsumer<T, E> consumer) throws E;
+
+  public <O> O[] asArray(IntFunction<O[]> factory) throws E;
 
 }

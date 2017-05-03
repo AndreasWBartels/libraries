@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -203,6 +203,36 @@ public class ClassLoaderUtilities {
     return getFirstFile(uri, readMeFileNames);
   }
 
+  private static Set<String> authorsNames = new HashSet<>();
+  static {
+    authorsNames.add("META-INF/AUTHORS.txt"); //$NON-NLS-1$
+    authorsNames.add("META-INF/AUTHORS"); //$NON-NLS-1$
+    authorsNames.add("AUTHORS.txt"); //$NON-NLS-1$
+    authorsNames.add("AUTHORS"); //$NON-NLS-1$
+  }
+
+  public static String getAuthors(final URI uri) {
+    if (uri == null) {
+      return null;
+    }
+    return getFirstFile(uri, authorsNames);
+  }
+
+  private static Set<String> newsNames = new HashSet<>();
+  static {
+    newsNames.add("META-INF/NEWS.txt"); //$NON-NLS-1$
+    newsNames.add("META-INF/NEWS"); //$NON-NLS-1$
+    newsNames.add("NEWS.txt"); //$NON-NLS-1$
+    newsNames.add("NEWS"); //$NON-NLS-1$
+  }
+
+  public static String getNews(final URI uri) {
+    if (uri == null) {
+      return null;
+    }
+    return getFirstFile(uri, newsNames);
+  }
+
   private static String getFirstFile(final URI uri, final Set<String> fileNames) {
     try (JarInputStream jarInputStream = new JarInputStream(uri.toURL().openStream())) {
       try {
@@ -270,8 +300,9 @@ public class ClassLoaderUtilities {
         final URI uri = URI.create(string);
         if (!uri.isAbsolute()) {
           try {
-            final File file = new File(parent == null
-                ? new File(System.getProperty("user.dir")) : new File(new URI(parent)), string); //$NON-NLS-1$
+            final File file = new File(
+                parent == null ? new File(System.getProperty("user.dir")) : new File(new URI(parent)), //$NON-NLS-1$
+                string);
             logger.log(ILevel.DEBUG, "add none absolute file: " + file.getCanonicalFile().toURI()); //$NON-NLS-1$
             uris.add(file.getCanonicalFile().toURI());
           } catch (final IOException exception) {
@@ -409,4 +440,5 @@ public class ClassLoaderUtilities {
   public static File getFile(final String name) {
     return getFile(name, null);
   }
+
 }

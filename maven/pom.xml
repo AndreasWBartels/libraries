@@ -9,7 +9,7 @@
   <groupId>net.anwiba</groupId>
   <artifactId>anwiba-maven-default</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.24</version>
+  <version>1.0.25</version>
   <inceptionYear>2007</inceptionYear>
 
   <scm>
@@ -129,6 +129,7 @@
           <maxmem>512</maxmem>
           <meminitial>64</meminitial>
           <encoding>UTF-8</encoding>
+          <compilerArgument>-Xlint:all,hiding,-unnecessary</compilerArgument>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
         </configuration>
@@ -452,11 +453,11 @@
         <version>${org.mockito.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>${org.mockito.version}</version>
-      </dependency>
+<!--       <dependency> -->
+<!--         <groupId>org.mockito</groupId> -->
+<!--         <artifactId>mockito-all</artifactId> -->
+<!--         <version>${org.mockito.version}</version> -->
+<!--       </dependency> -->
 
       <dependency>
         <groupId>org.assertj</groupId>
@@ -470,11 +471,11 @@
         <version>${apache.commons.codec.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>commons-httpclient</groupId>
-        <artifactId>commons-httpclient</artifactId>
-        <version>${apache.commons.httpclient.version}</version>
-      </dependency>
+      <!-- <dependency> -->
+      <!-- <groupId>commons-httpclient</groupId> -->
+      <!-- <artifactId>commons-httpclient</artifactId> -->
+      <!-- <version>${apache.commons.httpclient.version}</version> -->
+      <!-- </dependency> -->
 
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -501,6 +502,12 @@
       </dependency>
 
       <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.6</version>
+      </dependency>
+
+      <dependency>
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>${apache.commons.logging.version}</version>
@@ -513,7 +520,7 @@
       </dependency>
 
       <dependency>
-        <groupId>dom4j</groupId>
+        <groupId>org.dom4j</groupId>
         <artifactId>dom4j</artifactId>
         <version>${dom4j.version}</version>
       </dependency>
@@ -528,6 +535,18 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-console</artifactId>
+        <version>${groovy.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-json</artifactId>
+        <version>${groovy.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-sql</artifactId>
         <version>${groovy.version}</version>
       </dependency>
 
@@ -565,6 +584,31 @@
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${com.fasterxml.jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-xml</artifactId>
+        <version>${com.fasterxml.jackson.version}</version>
+      </dependency>
+
+      <!-- <dependency> -->
+      <!-- <groupId>com.fasterxml.jackson.module</groupId> -->
+      <!-- <artifactId>jackson-module-jsonSchema</artifactId> -->
+      <!-- <version>${com.fasterxml.jackson.version}</version> -->
+      <!-- </dependency> -->
+
+      <dependency>
+        <groupId>javax.xml.stream</groupId>
+        <artifactId>stax-api</artifactId>
+        <version>1.0-2</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.kjetland</groupId>
+        <artifactId>mbknor-jackson-jsonschema_2.12</artifactId>
+        <version>1.0.15</version>
       </dependency>
 
       <dependency>
@@ -661,7 +705,7 @@
       </dependency>
 
       <dependency>
-        <groupId>postgresql</groupId>
+        <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgresql.version}</version>
       </dependency>
@@ -735,13 +779,19 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
-        <version>9.2.8.v20150217</version>
+        <version>9.4.4.v20170414</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.healthmarketscience.jackcess</groupId>
+        <artifactId>jackcess</artifactId>
+        <version>2.1.6</version>
       </dependency>
 
       <dependency>
         <groupId>org.ehcache</groupId>
         <artifactId>ehcache</artifactId>
-        <version>3.1.3</version>
+        <version>3.3.1</version>
       </dependency>
     </dependencies>
 
@@ -750,9 +800,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <net.anwiba.version>1.0.24</net.anwiba.version>
+    <net.anwiba.version>1.0.25</net.anwiba.version>
     <url.net.anwiba>https://github.com/AndreasWBartels</url.net.anwiba>
-    <net.anwiba.commons.version>1.0.24</net.anwiba.commons.version>
+    <net.anwiba.commons.version>1.0.25</net.anwiba.commons.version>
     <scm.url.net.anwiba.base>scm:git:ssh://github.com:AndreasWBartels</scm.url.net.anwiba.base>
     <scm.url.net.anwiba.master>${url.net.anwiba}/libraries/tree/master</scm.url.net.anwiba.master>
 
@@ -760,30 +810,33 @@
     <compile.target.version>1.8</compile.target.version>
 
     <apache.commons.logging.version>1.2</apache.commons.logging.version>
-    <apache.commons.codec.version>1.9</apache.commons.codec.version>
+    <apache.commons.codec.version>1.10</apache.commons.codec.version>
     <apache.commons.httpclient.version>3.1</apache.commons.httpclient.version>
-    <ch.hsr.geohash.version>1.0.10</ch.hsr.geohash.version>
+    <ch.hsr.geohash.version>1.3.0</ch.hsr.geohash.version>
 
-    <com.fasterxml.jackson.version>2.8.5</com.fasterxml.jackson.version>
+    <com.fasterxml.jackson.version>2.8.8</com.fasterxml.jackson.version>
 
     <com.sun.codemodel.version>2.6</com.sun.codemodel.version>
-    <com.sun.xml.bind.version>2.2.7</com.sun.xml.bind.version>
+    <com.sun.xml.bind.version>2.2.11</com.sun.xml.bind.version>
     <com.oracle.database.version>12.1.0.2</com.oracle.database.version>
     <com.esri.sde.version>9.3.2</com.esri.sde.version>
     <de.jdemo.version>1.6.0</de.jdemo.version>
-    <dom4j.version>1.6.1</dom4j.version>
-    <groovy.version>2.4.5</groovy.version>
+    <dom4j.version>2.0.0</dom4j.version>
+    <groovy.version>2.4.10</groovy.version>
     <javax.media.jai.version>1.1.3</javax.media.jai.version>
-    <jaxen.version>1.1.4</jaxen.version>
+    <jaxen.version>1.1.6</jaxen.version>
     <junit.version>4.12</junit.version>
     <log4j.version>1.2.17</log4j.version>
     <oracle.spatial.version>12.1.0.1b</oracle.spatial.version>
     <org.antlr.version>3.5.2</org.antlr.version>
-    <org.antlr4.version>4.5.3</org.antlr4.version>
+    <org.antlr4.version>4.7</org.antlr4.version>
     <org.apache.ant.version>1.9.7</org.apache.ant.version>
-    <org.apache.httpcomponents.version>4.5.2</org.apache.httpcomponents.version>
+    <org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
     <org.apache.derby.version>10.12.1.1</org.apache.derby.version>
     <org.apache.maven.version>2.0</org.apache.maven.version>
+    <org.apache.maven.annotation.version>3.5</org.apache.maven.annotation.version>
+    <org.apache.maven.plugin.version>3.3.9</org.apache.maven.plugin.version>
+    <org.apache.maven.project.version>2.2.1</org.apache.maven.project.version>
     <org.apache.maven.compiler.version>2.3.2</org.apache.maven.compiler.version>
     <org.apache.maven.dependency.version>2.10</org.apache.maven.dependency.version>
     <org.apache.maven.jar.version>2.4</org.apache.maven.jar.version>
@@ -793,8 +846,8 @@
     <org.apache.maven.surefire.version>2.13</org.apache.maven.surefire.version>
     <org.apache.maven.source.version>2.1.2</org.apache.maven.source.version>
     <org.apache.maven.site.plugin.version>3.3</org.apache.maven.site.plugin.version>
-    <org.assertj.core.version>1.6.1</org.assertj.core.version>
-    <org.bouncycastle.version>1.54</org.bouncycastle.version>
+    <org.assertj.core.version>3.6.2</org.assertj.core.version>
+    <org.bouncycastle.version>1.56</org.bouncycastle.version>
     <org.codehaus.jackson.version>1.9.11</org.codehaus.jackson.version>
     <org.codehaus.mojo.findbugs.maven.plugin>2.5.2</org.codehaus.mojo.findbugs.maven.plugin>
     <org.eclipse.jdt.version>4.5</org.eclipse.jdt.version>
@@ -802,16 +855,16 @@
     <org.jfrog.maven.annomojo.version>1.3.1</org.jfrog.maven.annomojo.version>
     <org.jvnet.jaxb2.maven2.version>0.13.1</org.jvnet.jaxb2.maven2.version>
     <org.jvnet.hudson.main.version>2.2.1</org.jvnet.hudson.main.version>
-    <org.mockito.version>1.9.5</org.mockito.version>
-    <net.postgis.version>2.2.0</net.postgis.version>
+    <org.mockito.version>2.7.22</org.mockito.version>
+    <net.postgis.version>2.2.1</net.postgis.version>
     <org.sonatype.plexus.version>0.0.7</org.sonatype.plexus.version>
     <org.sonatype.tycho.version>0.11.1</org.sonatype.tycho.version>
     <org.xerial.sqlite.version>3.8.4.3</org.xerial.sqlite.version>
     <!-- <org.xerial.sqlite.spatialite.version>3.8.0-RC1</org.xerial.sqlite.spatialite.version> -->
     <org.xerial.sqlite.spatialite.version>3.8.0</org.xerial.sqlite.spatialite.version>
     <org.xerial.sqlite.jdbc4.version>3.8.2</org.xerial.sqlite.jdbc4.version>
-    <postgresql.version>9.1-901.jdbc4</postgresql.version>
-    <xml-apis.version>1.3.04</xml-apis.version>
+    <postgresql.version>9.4.1212</postgresql.version>
+    <xml-apis.version>2.0.2</xml-apis.version>
   </properties>
 
   <repositories>

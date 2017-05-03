@@ -8,16 +8,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/main/java/"/>
 	<classpathentry kind="src" path="src/main/resources/"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-ensure-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-lang-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-logging-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-message-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-model-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-process-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-reflaction-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-resource-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-utilities-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-tools-icons-1.0.24.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/anwiba-tools-icons-1.0.25.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

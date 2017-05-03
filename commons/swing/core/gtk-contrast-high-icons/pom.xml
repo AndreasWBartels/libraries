@@ -5,12 +5,12 @@
 
   <groupId>net.anwiba.commons.swing.icons</groupId>
   <artifactId>org.gnome.gtk-contrast-high-icons</artifactId>
-  <!-- <version>3.22.1</version> -->
+  <version>3.22.1-${net.anwiba.commons.version}</version>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-swing-core</artifactId>
-    <version>1.0.24</version>
+    <version>1.0.25</version>
   </parent>
 
   <scm>

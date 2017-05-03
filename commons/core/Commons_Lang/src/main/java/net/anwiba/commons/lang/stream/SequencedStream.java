@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.IntFunction;
 
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
@@ -107,6 +108,12 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   @Override
   public <O> IOptional<O, E> foreach(final O identity, final IAccumulator<T, O, E> adder) throws E {
     return Optional.create(this.iterable.foreach(identity, adder));
+  }
+
+  @Override
+  public <O> O[] asArray(final IntFunction<O[]> factory) throws E {
+    final List<O> list = asList();
+    return list.toArray(factory.apply(list.size()));
   }
 
 }

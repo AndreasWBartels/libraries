@@ -18,14 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.anwiba.tools.icons.configuration.GuiIconConfigurationsReader;
-import net.anwiba.tools.icons.configuration.IImageExistsValidator;
-import net.anwiba.tools.icons.configuration.IOutput;
-import net.anwiba.tools.icons.configuration.IconResource;
-import net.anwiba.tools.icons.configuration.ImageExistsValidator;
-import net.anwiba.tools.icons.configuration.generated.Class;
-import net.anwiba.tools.icons.generator.GuiIconsClassWriter;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -34,6 +26,15 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
+
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.tools.icons.configuration.GuiIconConfigurationsReader;
+import net.anwiba.tools.icons.configuration.IImageExistsValidator;
+import net.anwiba.tools.icons.configuration.IOutput;
+import net.anwiba.tools.icons.configuration.IconResource;
+import net.anwiba.tools.icons.configuration.ImageExistsValidator;
+import net.anwiba.tools.icons.configuration.generated.Class;
+import net.anwiba.tools.icons.generator.GuiIconsClassWriter;
 
 @SuppressWarnings("nls")
 @Mojo(name = "generate")
@@ -50,6 +51,9 @@ public class GuiIconsGeneratorMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "net.anwiba.commons.swing.icon.GuiIcon")
   private String iconClass;
+
+  @Parameter(defaultValue = "")
+  private String comment;
 
   @Component
   private BuildContext buildContext;
@@ -72,6 +76,11 @@ public class GuiIconsGeneratorMojo extends AbstractMojo {
       return;
     }
     this.sourceFile = getFile(source);
+  }
+
+  public void setComment(final String comment) {
+    Ensure.ensureArgumentNotNull(comment);
+    this.comment = comment;
   }
 
   public void setOutputDirectory(final String outputDirectory) throws IOException {
@@ -160,6 +169,7 @@ public class GuiIconsGeneratorMojo extends AbstractMojo {
       reader.add(this.sourceFile);
       final Class targetClazz = reader.getClazz();
       getLog().info("class:   " + targetClazz.getName());
+      getLog().info("comment: " + this.comment);
       final File targetFile = createTargetFile(targetClazz);
       if (!targetFile.exists()) {
         getLog().info(MessageFormat.format("create file: {0}", targetFile.getCanonicalPath())); //$NON-NLS-1$
@@ -168,16 +178,19 @@ public class GuiIconsGeneratorMojo extends AbstractMojo {
       getLog().info(MessageFormat.format("create class: {0}", this.iconClass));
       targetFile.createNewFile();
       try (FileWriter fileWriter = new FileWriter(targetFile)) {
-        try (GuiIconsClassWriter writer = new GuiIconsClassWriter(fileWriter, getClass(this.iconClass == null
-            ? "net.anwiba.commons.swing.icon.GuiIcon"
-            : this.iconClass), targetClazz, output)) {
+        try (GuiIconsClassWriter writer = new GuiIconsClassWriter(
+            fileWriter,
+            getClass(this.iconClass == null ? "net.anwiba.commons.swing.icon.GuiIcon" : this.iconClass),
+            targetClazz,
+            this.comment,
+            output)) {
           final Map<String, IconResource> iconConfigurations = reader.getIconConfigurations();
           final Map<String, String> folders = reader.getFolders();
           writer.write(folders, iconConfigurations);
         }
       }
     } catch (final Exception exception) {
-      getLog().warn(exception);
+      getLog().error(exception);
       throw new MojoExecutionException("Internal exception", exception); //$NON-NLS-1$
     }
   }
@@ -212,13 +225,16 @@ public class GuiIconsGeneratorMojo extends AbstractMojo {
     return absoluteClassName.substring(0, index);
   }
 
-  private File createTargetFile(final Class targetClazz) {
+  private File createTargetFile(final Class targetClazz) throws IOException {
     final String fileName = getFileName(targetClazz);
     if (fileName == null) {
       throw new IllegalArgumentException("no file target");
     }
     if (this.outputDirectory == null) {
-      return new File(new File(getBasePath(), "target/generated/java"), fileName);
+      this.outputDirectory = getFile("target/generated/java");
+    }
+    if (!(this.outputDirectory.exists() || this.outputDirectory.mkdirs())) {
+      throw new IllegalStateException("missing output directory"); //$NON-NLS-1$
     }
     return new File(this.outputDirectory, fileName);
   }

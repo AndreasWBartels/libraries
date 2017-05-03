@@ -51,6 +51,7 @@ import java.util.Map;
 
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
@@ -164,6 +165,16 @@ public final class ListRunner implements IRunnableWithProgress {
         items.add(type);
       }
       return items;
+    } else if (element instanceof IClassFile) {
+      final IClassFile classFile = (IClassFile) element;
+      final org.eclipse.jdt.core.IType eclipseType = classFile.findPrimaryType();
+      if (eclipseType != null) {
+        final String qualifiedName = eclipseType.getFullyQualifiedName();
+        final String root = classFile.getPath().toString();
+        final IType type = workspace.getTypes().get(MessageFormat.format("{0}.{1}", root, qualifiedName)); //$NON-NLS-1$
+        return Arrays.asList(type);
+      }
+      return new ArrayList<>();
     } else if (element instanceof IPackageFragmentRoot) {
       final IPackageFragmentRoot packageFragment = (IPackageFragmentRoot) element;
       final String elementName = packageFragment.getPath().toString();
