@@ -1,0 +1,14 @@
+<MultiPoint>
+  <type>MultiPoint</type>
+  <crs/>
+  <coordinates>
+    <coordinates>
+      <coordinates>100.0</coordinates>
+      <coordinates>0.0</coordinates>
+    </coordinates>
+    <coordinates>
+      <coordinates>101.0</coordinates>
+      <coordinates>1.0</coordinates>
+    </coordinates>
+  </coordinates>
+</MultiPoint>

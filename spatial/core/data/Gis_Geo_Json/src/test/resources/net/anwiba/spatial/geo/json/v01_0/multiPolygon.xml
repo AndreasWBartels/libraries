@@ -1,0 +1,36 @@
+<MultiPolygon>
+  <type>MultiPolygon</type>
+  <crs/>
+  <coordinates>
+    <coordinates>102.0</coordinates>
+    <coordinates>2.0</coordinates>
+    <coordinates>103.0</coordinates>
+    <coordinates>2.0</coordinates>
+    <coordinates>103.0</coordinates>
+    <coordinates>3.0</coordinates>
+    <coordinates>102.0</coordinates>
+    <coordinates>3.0</coordinates>
+    <coordinates>102.0</coordinates>
+    <coordinates>2.0</coordinates>
+    <coordinates>100.0</coordinates>
+    <coordinates>0.0</coordinates>
+    <coordinates>101.0</coordinates>
+    <coordinates>0.0</coordinates>
+    <coordinates>101.0</coordinates>
+    <coordinates>1.0</coordinates>
+    <coordinates>100.0</coordinates>
+    <coordinates>1.0</coordinates>
+    <coordinates>100.0</coordinates>
+    <coordinates>0.0</coordinates>
+    <coordinates>100.2</coordinates>
+    <coordinates>0.2</coordinates>
+    <coordinates>100.8</coordinates>
+    <coordinates>0.2</coordinates>
+    <coordinates>100.8</coordinates>
+    <coordinates>0.8</coordinates>
+    <coordinates>100.2</coordinates>
+    <coordinates>0.8</coordinates>
+    <coordinates>100.2</coordinates>
+    <coordinates>0.2</coordinates>
+  </coordinates>
+</MultiPolygon>
