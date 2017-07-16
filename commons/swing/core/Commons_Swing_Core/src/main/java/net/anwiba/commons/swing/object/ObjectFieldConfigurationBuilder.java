@@ -26,7 +26,7 @@ import net.anwiba.commons.lang.object.ObjectContainer;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.object.ObjectFieldConfiguration.ObjectToStringConverter;
 import net.anwiba.commons.swing.object.ObjectFieldConfiguration.StringToObjectConverter;
-import net.anwiba.commons.utilities.validation.AllwaysValidValidator;
+import net.anwiba.commons.utilities.validation.AllwaysValidStringValidator;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 
 public class ObjectFieldConfigurationBuilder
@@ -38,7 +38,7 @@ public class ObjectFieldConfigurationBuilder
   }
 
   private ObjectFieldConfigurationBuilder(final IObjectContainer<Object> broker) {
-    super(new AllwaysValidValidator(), new StringToObjectConverter(broker), new ObjectToStringConverter(broker));
+    super(new AllwaysValidStringValidator(), new StringToObjectConverter(broker), new ObjectToStringConverter(broker));
     setEditable(false);
     setValidStateModel(new ObjectModel<>(IValidationResult.valid()));
   }

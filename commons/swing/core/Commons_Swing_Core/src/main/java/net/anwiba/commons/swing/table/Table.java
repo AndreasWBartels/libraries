@@ -22,22 +22,36 @@
 package net.anwiba.commons.swing.table;
 
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
 import net.anwiba.commons.swing.utilities.JTableUtilities;
+import net.anwiba.commons.utilities.string.IStringSubstituter;
 
 public class Table extends JTable {
   private static final long serialVersionUID = 1L;
+  private final IStringSubstituter substituter;
 
   public Table(final TableModel tableModel) {
+    this(tableModel, null);
+  }
+
+  public Table(final TableModel tableModel, final IStringSubstituter substituter) {
     super(tableModel);
+    this.substituter = substituter;
   }
 
   @Override
   public String getToolTipText(final MouseEvent event) {
-    final String value = JTableUtilities.getToolTipText(this, event);
+    final String string = getCellContentAsString(this, event);
+    final String toolTipString = Optional.ofNullable(this.substituter).map(s -> s.substitute(string)).orElse(string);
+    return toolTipString;
+  }
+
+  private String getCellContentAsString(final Table table, final MouseEvent event) {
+    final String value = JTableUtilities.getToolTipText(table, event);
     if (value == null) {
       return super.getToolTipText(event);
     }

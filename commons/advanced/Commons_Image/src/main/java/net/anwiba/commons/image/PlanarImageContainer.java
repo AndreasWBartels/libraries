@@ -26,8 +26,12 @@ import java.awt.image.BufferedImage;
 
 import javax.media.jai.PlanarImage;
 
+import net.anwiba.commons.logging.ILevel;
+
 public class PlanarImageContainer extends AbstractRenderedImageContainer {
 
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(PlanarImageContainer.class);
   final PlanarImage image;
 
   public PlanarImageContainer(final PlanarImage image) {
@@ -37,7 +41,12 @@ public class PlanarImageContainer extends AbstractRenderedImageContainer {
 
   @Override
   public BufferedImage asBufferImage() {
-    return this.image.getAsBufferedImage();
+    try {
+      return this.image.getAsBufferedImage();
+    } catch (final RuntimeException exception) {
+      logger.log(ILevel.WARNING, exception.getMessage(), exception);
+      return null;
+    }
   }
 
   @Override

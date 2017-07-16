@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.object;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,17 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
       final IValidator<String> validator,
       final IConverter<String, T, RuntimeException> toObjectConverter,
       final IConverter<T, String, RuntimeException> toStringConverter) {
-    this(model, validStateModel, validator, toObjectConverter, toStringConverter, null, true, 10, new ArrayList<>());
+    this(
+        model,
+        validStateModel,
+        validator,
+        toObjectConverter,
+        toStringConverter,
+        null,
+        true,
+        10,
+        new ArrayList<>(),
+        null);
   }
 
   public DefaultObjectFieldConfiguration(
@@ -60,7 +71,8 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
         null,
         isEditable,
         10,
-        new ArrayList<>());
+        new ArrayList<>(),
+        null);
   }
 
   public DefaultObjectFieldConfiguration(
@@ -72,8 +84,9 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
       final IToolTipFactory toolTipFactory,
       final boolean isEditable,
       final int columns,
-      final List<IActionFactory<T>> actionFactorys) {
-    super(model, validStateModel, toolTipFactory, isEditable, columns, actionFactorys);
+      final List<IActionFactory<T>> actionFactorys,
+      final Color backgroundColor) {
+    super(model, validStateModel, toolTipFactory, isEditable, columns, actionFactorys, backgroundColor);
     this.validator = validator;
     this.toObjectConverter = toObjectConverter;
     this.toStringConverter = toStringConverter;

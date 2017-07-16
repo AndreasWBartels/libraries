@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.lang.functional;
 
+@FunctionalInterface
 public interface IInterruptableClosure<O, E extends Exception> {
 
   O execute() throws E, InterruptedException;

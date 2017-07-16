@@ -32,4 +32,5 @@ public class DoubleObjectFieldConfigurationBuilder
   public DoubleObjectFieldConfigurationBuilder() {
     super(new DoubleStringValidator(), new StringToDoubleConverter(), new DoubleToStringConverter());
   }
+
 }

@@ -132,6 +132,7 @@ public class ArrayUtilities {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> T[] copy(final T[] array) {
     return copy((Class<T>) array.getClass().getComponentType(), array);
   }
@@ -251,6 +252,7 @@ public class ArrayUtilities {
     return target;
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> T[] filter(final T[] array, final IAcceptor<T> validator) {
     return filter((Class<T>) array.getClass().getComponentType(), array, validator);
   }
@@ -389,6 +391,7 @@ public class ArrayUtilities {
     return toArray((Class<T>) values.getClass().getComponentType(), list);
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> T[] create(final Class<T> clazz, final int size) {
     return (T[]) Array.newInstance(clazz, size);
   }

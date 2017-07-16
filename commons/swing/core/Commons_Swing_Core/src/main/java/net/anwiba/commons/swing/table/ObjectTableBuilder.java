@@ -25,6 +25,8 @@ package net.anwiba.commons.swing.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ListSelectionModel;
+
 import net.anwiba.commons.swing.table.action.ITableActionFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 
@@ -107,5 +109,10 @@ public class ObjectTableBuilder<T> {
   public ObjectListTable<T> build() {
     final IObjectListTableConfiguration<T> configuration = this.builder.build();
     return new ObjectListTable<>(configuration, this.values);
+  }
+
+  public ObjectTableBuilder<T> setSingleSelectionMode() {
+    this.builder.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    return this;
   }
 }

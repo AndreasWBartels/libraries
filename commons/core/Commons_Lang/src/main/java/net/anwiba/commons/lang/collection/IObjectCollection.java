@@ -23,9 +23,13 @@ package net.anwiba.commons.lang.collection;
 
 import java.util.stream.Stream;
 
-public interface IObjectCollection<T> extends Iterable<T> {
+public interface IObjectCollection<T> extends IObjectIterable<T> {
 
   public int size();
 
   public Stream<T> stream();
+
+  IObjectIterable<T> values();
+
+  boolean isEmpty();
 }

@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.anwiba.commons.lang.collection.IObjectIterable;
+import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.utilities.ArrayUtilities;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 import net.anwiba.commons.utilities.interval.IntegerInterval;
@@ -40,7 +42,7 @@ import net.anwiba.commons.utilities.interval.IntegerInterval;
 public abstract class AbstractObjectListModel<T> extends AbstractListChangedNotifier<T> implements IObjectListModel<T> {
 
   private final Object semaphor = new Object();
-  private final Map<T, Set<Integer>> indexByobjectMap = new HashMap<>();
+  private final Map<T, Set<Integer>> indexByObjectMap = new HashMap<>();
   private final List<T> objects = new ArrayList<>();
 
   public AbstractObjectListModel(final List<T> objects) {
@@ -49,12 +51,12 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
   }
 
   private void refreshIndex() {
-    this.indexByobjectMap.clear();
+    this.indexByObjectMap.clear();
     for (int i = 0; i < size(); i++) {
-      if (!this.indexByobjectMap.containsKey(get(i))) {
-        this.indexByobjectMap.put(get(i), new HashSet<Integer>());
+      if (!this.indexByObjectMap.containsKey(get(i))) {
+        this.indexByObjectMap.put(get(i), new HashSet<Integer>());
       }
-      this.indexByobjectMap.get(get(i)).add(Integer.valueOf(i));
+      this.indexByObjectMap.get(get(i)).add(Integer.valueOf(i));
     }
   }
 
@@ -76,22 +78,18 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
     final List<T> oldObjects = new ArrayList<>();
     synchronized (this.semaphor) {
       oldObjects.addAll(IterableUtilities.asList(this.objects));
-      this.indexByobjectMap.clear();
+      this.indexByObjectMap.clear();
       this.objects.clear();
       for (final T object : objects) {
-        if (!this.indexByobjectMap.containsKey(object)) {
-          this.indexByobjectMap.put(object, new HashSet<Integer>());
-        }
-        final Integer index = Integer.valueOf(this.getObjects().size());
-        this.indexByobjectMap.get(object).add(index);
         this.objects.add(object);
       }
+      refreshIndex();
     }
     fireObjectsChanged(oldObjects, objects);
   }
 
   @Override
-  public void set(final int index, final T object) {
+  public T set(final int index, final T object) {
     final AtomicReference<T> oldObjectReference = new AtomicReference<>();
     synchronized (this.semaphor) {
       if (!(index < size())) {
@@ -104,6 +102,7 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
         Arrays.asList(Integer.valueOf(index)),
         Arrays.asList(oldObjectReference.get()),
         Arrays.asList(object));
+    return oldObjectReference.get();
   }
 
   @SuppressWarnings("unchecked")
@@ -119,13 +118,9 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
     synchronized (this.semaphor) {
       oldNumberOfRows.set(size());
       for (final T object : objects) {
-        if (!this.indexByobjectMap.containsKey(object)) {
-          this.indexByobjectMap.put(object, new HashSet<Integer>());
-        }
-        final Integer index = Integer.valueOf(this.getObjects().size());
-        this.indexByobjectMap.get(object).add(index);
         this.objects.add(object);
       }
+      refreshIndex();
       newNumberOfRows.set(size());
     }
     fireObjectsAdded(new IntegerInterval(oldNumberOfRows.get(), newNumberOfRows.get() - 1), objects);
@@ -136,7 +131,7 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
     synchronized (this.semaphor) {
       final Set<Integer> indexes = new HashSet<>();
       for (final T object : objects) {
-        final Set<Integer> objectIndexes = this.indexByobjectMap.get(object);
+        final Set<Integer> objectIndexes = this.indexByObjectMap.get(object);
         indexes.addAll(objectIndexes);
       }
       return ArrayUtilities.primitives(indexes.toArray(new Integer[indexes.size()]));
@@ -172,10 +167,6 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
         final T object = get(index);
         final T removedObject = this.objects.remove(index);
         if (removedObject != null) {
-          //          final Set<Integer> indizes = this.indexByobjectMap.get(removedObject);
-          //          if (indizes.remove(Integer.valueOf(index)) && indizes.isEmpty()) {
-          //            this.indexByobjectMap.remove(object);
-          //          }
           removedObjects.add(object);
         }
       }
@@ -194,15 +185,15 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
       oldNumberOfRows.set(size());
       oldObjectsReference.set(values());
       this.objects.clear();
-      this.indexByobjectMap.clear();
+      this.indexByObjectMap.clear();
     }
     fireObjectsRemoved(new IntegerInterval(0, oldNumberOfRows.get() - 1), oldObjectsReference.get());
   }
 
   @Override
-  public final Iterable<T> values() {
+  public final IObjectIterable<T> values() {
     synchronized (this.semaphor) {
-      return Collections.unmodifiableList(IterableUtilities.asList(this.objects));
+      return new ObjectList<>(Collections.unmodifiableList(IterableUtilities.asList(this.objects)));
     }
   }
 
@@ -232,9 +223,5 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
       }
       return this.objects.get(index);
     }
-  }
-
-  private List<T> getObjects() {
-    return this.objects;
   }
 }

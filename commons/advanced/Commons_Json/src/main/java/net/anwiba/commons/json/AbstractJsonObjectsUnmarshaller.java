@@ -35,7 +35,7 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
 
   private final ObjectMapper mapper = new ObjectMapper();
   private final Class<R> errorResponseClass;
-  private final IJsonObjectMapperExceptionFactory<R, E> exceptionFactory;
+  private final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory;
   private final Class<T> clazz;
   @SuppressWarnings("rawtypes")
   private final Map<Class, Object> injectionValues = new HashMap<>();
@@ -44,7 +44,7 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
       final Class<T> clazz,
       final Class<R> errorResponseClass,
       @SuppressWarnings("rawtypes") final Map<Class, Object> injectionValues,
-      final IJsonObjectMapperExceptionFactory<R, E> exceptionFactory) {
+      final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory) {
     this.clazz = clazz;
     this.errorResponseClass = errorResponseClass;
     this.injectionValues.putAll(injectionValues);

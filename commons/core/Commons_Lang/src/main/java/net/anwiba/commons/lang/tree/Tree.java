@@ -21,8 +21,8 @@
  */
 package net.anwiba.commons.lang.tree;
 
+import net.anwiba.commons.lang.collection.IObjectIteratorFactory;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
-import net.anwiba.commons.lang.object.IObjectIteratorFactory;
 import net.anwiba.commons.lang.tree.distance.IObjectDistanceCalculator;
 import net.anwiba.commons.lang.tree.iterator.BreadthFirstSearchValueIteratorFactory;
 import net.anwiba.commons.lang.tree.iterator.DeepFirstSearchValueIteratorFactory;

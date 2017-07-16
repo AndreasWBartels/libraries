@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.model;
 
+import net.anwiba.commons.lang.primativ.IBooleanReceiver;
+
 public interface IBooleanModel extends IBooleanReceiver, IBooleanDistributor {
   // nothing to do
 }

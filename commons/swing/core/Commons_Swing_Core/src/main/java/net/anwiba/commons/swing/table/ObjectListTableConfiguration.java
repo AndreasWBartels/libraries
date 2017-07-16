@@ -21,28 +21,30 @@
  */
 package net.anwiba.commons.swing.table;
 
+import java.util.List;
+
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.utilities.collection.ListUtilities;
 
-import java.util.List;
-
-public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T> implements
+public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
+    implements
     IObjectListTableConfiguration<T> {
 
   private List<IColumnValueProvider<T>> columnValueProviders;
   private List<IColumnValueAdaptor<T>> columnValueAdaptors;
   private final IColumToStringConverter columnToStringConverter;
+  private IColumnClassProvider columnClassProvider;
 
   public ObjectListTableConfiguration(
-    final IColumToStringConverter columnToStringConverter,
-    final int selectionMode,
-    final int preferredVisibleRowCount,
-    final List<IObjectListColumnConfiguration<T>> columnConfigurations,
-    final IMouseListenerFactory<T> mouseListenerFactory,
-    final IKeyListenerFactory<T> keyListenerFactory,
-    final ITableActionConfiguration<T> actionConfiguration) {
+      final IColumToStringConverter columnToStringConverter,
+      final int selectionMode,
+      final int preferredVisibleRowCount,
+      final List<IObjectListColumnConfiguration<T>> columnConfigurations,
+      final IMouseListenerFactory<T> mouseListenerFactory,
+      final IKeyListenerFactory<T> keyListenerFactory,
+      final ITableActionConfiguration<T> actionConfiguration) {
     super(
         selectionMode,
         preferredVisibleRowCount,
@@ -51,28 +53,37 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
         keyListenerFactory,
         actionConfiguration);
     this.columnToStringConverter = columnToStringConverter;
-    this.columnValueProviders =
-        ListUtilities.convert(
-            columnConfigurations,
-            new IConverter<IObjectListColumnConfiguration<T>, IColumnValueProvider<T>, RuntimeException>() {
+    this.columnValueProviders = ListUtilities.convert(
+        columnConfigurations,
+        new IConverter<IObjectListColumnConfiguration<T>, IColumnValueProvider<T>, RuntimeException>() {
 
-              @Override
-              public IColumnValueProvider<T> convert(final IObjectListColumnConfiguration<T> input)
-                  throws RuntimeException {
-                return input.getColumnValueProvider();
-              }
-            });
-    this.columnValueAdaptors =
-        ListUtilities.convert(
-            columnConfigurations,
-            new IConverter<IObjectListColumnConfiguration<T>, IColumnValueAdaptor<T>, RuntimeException>() {
+          @Override
+          public IColumnValueProvider<T> convert(final IObjectListColumnConfiguration<T> input)
+              throws RuntimeException {
+            return input.getColumnValueProvider();
+          }
+        });
+    this.columnValueAdaptors = ListUtilities.convert(
+        columnConfigurations,
+        new IConverter<IObjectListColumnConfiguration<T>, IColumnValueAdaptor<T>, RuntimeException>() {
 
-              @Override
-              public IColumnValueAdaptor<T> convert(final IObjectListColumnConfiguration<T> input)
-                  throws RuntimeException {
-                return input.getColumnValueAdaptor();
-              }
-            });
+          @Override
+          public IColumnValueAdaptor<T> convert(final IObjectListColumnConfiguration<T> input) throws RuntimeException {
+            return input.getColumnValueAdaptor();
+          }
+        });
+
+    this.columnClassProvider = new IColumnClassProvider() {
+
+      @Override
+      public Class<?> getClass(final int columnIndex) {
+        final IObjectListColumnConfiguration<T> configuration = columnConfigurations.get(columnIndex);
+        if (configuration == null) {
+          return Object.class;
+        }
+        return configuration.getColumnClass();
+      }
+    };
   }
 
   @Override
@@ -93,5 +104,10 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
   @Override
   public IColumToStringConverter getRowFilterToStringConverter() {
     return this.columnToStringConverter;
+  }
+
+  @Override
+  public IColumnClassProvider getColumnClassProvider() {
+    return this.columnClassProvider;
   }
 }

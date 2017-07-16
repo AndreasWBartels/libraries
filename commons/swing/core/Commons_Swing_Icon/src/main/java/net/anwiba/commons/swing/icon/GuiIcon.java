@@ -25,7 +25,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
@@ -34,6 +36,7 @@ import javax.swing.ImageIcon;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.resource.utilities.IoUtilities;
 import net.anwiba.commons.resource.utilities.UriUtilities;
 import net.anwiba.commons.utilities.lang.ClassLoaderUtilities;
 
@@ -56,6 +59,7 @@ public class GuiIcon implements IGuiIcon {
     this.isDecorator = isDecorator;
   }
 
+  @Override
   public boolean isDecorator() {
     return this.isDecorator;
   }
@@ -77,31 +81,32 @@ public class GuiIcon implements IGuiIcon {
 
   private ImageIcon getIcon(final String name, final int size) {
     final URL resource = getClass().getClassLoader().getResource(name);
-    if (resource == null) {
-      final URI[] uris = ClassLoaderUtilities.getClassPathUris(getClass().getClassLoader());
-      for (final URI uri : uris) {
-        if (UriUtilities.isFileUri(uri)) {
-          final File file = new File(new File(uri), name);
-          if (file.canRead()) {
-            try {
-              return new ImageIcon(file.toURL());
-            } catch (final MalformedURLException exception) {
-              // nothing to do
-            }
+    if (resource != null) {
+      return new ImageIcon(resource);
+    }
+    final URI[] uris = ClassLoaderUtilities.getClassPathUris(getClass().getClassLoader());
+    for (final URI uri : uris) {
+      if (UriUtilities.isFileUri(uri)) {
+        final File file = new File(new File(uri), name);
+        if (file.canRead()) {
+          try (InputStream inputStream = new FileInputStream(file)) {
+            final byte[] array = IoUtilities.toByteArray(inputStream);
+            return new ImageIcon(array);
+          } catch (final IOException exception) {
+            // nothing to do
           }
         }
       }
-      logger.log(ILevel.FATAL, "Cannot find image resource: " + name); //$NON-NLS-1$
-      final BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-      final Graphics2D graphic = (Graphics2D) image.getGraphics();
-      try {
-        graphic.setBackground(Color.RED);
-        return new ImageIcon(image);
-      } finally {
-        graphic.dispose();
-      }
     }
-    return new ImageIcon(resource);
+    logger.log(ILevel.FATAL, "Cannot find image resource: " + name); //$NON-NLS-1$
+    final BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+    final Graphics2D graphic = (Graphics2D) image.getGraphics();
+    try {
+      graphic.setBackground(Color.RED);
+      return new ImageIcon(image);
+    } finally {
+      graphic.dispose();
+    }
   }
 
   @Override

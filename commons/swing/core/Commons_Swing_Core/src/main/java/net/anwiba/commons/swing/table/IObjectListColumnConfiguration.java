@@ -27,4 +27,6 @@ public interface IObjectListColumnConfiguration<T> extends IColumnConfiguration 
 
   IColumnValueAdaptor<T> getColumnValueAdaptor();
 
+  Class<?> getColumnClass();
+
 }

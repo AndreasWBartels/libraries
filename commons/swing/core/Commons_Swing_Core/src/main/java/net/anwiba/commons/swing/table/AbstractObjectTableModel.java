@@ -33,6 +33,8 @@ import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
+import net.anwiba.commons.lang.collection.IObjectIterable;
+import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.utilities.ArrayUtilities;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
@@ -43,10 +45,17 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   private static final long serialVersionUID = -9054338041837561007L;
   private final Map<T, Set<Integer>> indexByobjectMap = new HashMap<>();
   private final List<T> objects = new ArrayList<>();
+  private final IColumnClassProvider columnClassProvider;
 
-  public AbstractObjectTableModel(final List<T> objects) {
+  public AbstractObjectTableModel(final List<T> objects, final IColumnClassProvider columnClassProvider) {
+    this.columnClassProvider = columnClassProvider;
     this.objects.addAll(objects);
     refreshIndex();
+  }
+
+  @Override
+  public Class<?> getColumnClass(final int columnIndex) {
+    return this.columnClassProvider.getClass(columnIndex);
   }
 
   @Override
@@ -112,7 +121,7 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   }
 
   @Override
-  public synchronized void set(final int index, final T object) {
+  public synchronized T set(final int index, final T object) {
     if (!(index < getRowCount())) {
       throw new IllegalArgumentException("index out of bounds"); //$NON-NLS-1$
     }
@@ -124,6 +133,7 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
     // fireTableDataChanged();
     fireTableRowsUpdated(index, index);
     fireObjectsUpdated(Arrays.asList(Integer.valueOf(index)), Arrays.asList(oldObject), Arrays.asList(object));
+    return oldObject;
   }
 
   @Override
@@ -183,8 +193,8 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   }
 
   @Override
-  public synchronized Iterable<T> values() {
-    return Collections.unmodifiableList(IterableUtilities.asList(this.objects));
+  public final IObjectIterable<T> values() {
+    return new ObjectList<>(Collections.unmodifiableList(IterableUtilities.asList(this.objects)));
   }
 
   @Override

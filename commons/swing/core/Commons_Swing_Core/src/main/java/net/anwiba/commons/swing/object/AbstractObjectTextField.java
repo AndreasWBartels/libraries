@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -31,7 +31,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Collection;
-import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -48,10 +47,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
-import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
 import net.anwiba.commons.model.IChangeableObjectListener;
@@ -63,7 +60,7 @@ import net.anwiba.commons.utilities.validation.IValidator;
 
 public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> {
 
-  private static ILogger logger = Logging.getLogger(AbstractObjectTextField.class.getName());
+  static ILogger logger = Logging.getLogger(AbstractObjectTextField.class.getName());
 
   @SuppressWarnings("serial")
   public static final class TextField<T> extends JTextField {
@@ -140,8 +137,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
   private final IConverter<String, T, RuntimeException> toObjectConverter;
   private final IConverter<T, String, RuntimeException> toStringConverter;
   private final IActionNotifier actionNotifier;
-  private boolean isDocumentListenerEnabled = true;
-  private boolean isDocumentUpdateEnabled = true;
+  private FieldValueController<T> controller;
 
   public AbstractObjectTextField(final IObjectFieldConfiguration<T> configuration) {
     this.model = configuration.getModel();
@@ -153,6 +149,9 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
     final TextField<T> field = new TextField<>(document, configuration, this.validStateModel);
     this.textField = field;
     final Collection<IActionFactory<T>> actionFactorys = configuration.getActionFactorys();
+    if (configuration.getBackgroundColor() != null) {
+      this.textField.setBackground(configuration.getBackgroundColor());
+    }
     if (actionFactorys.isEmpty()) {
       this.component = field;
     } else {
@@ -216,35 +215,38 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
         field.addActionListener(listener);
       }
     };
+
+    final FieldValueController<T> valuesController = new FieldValueController<>(
+        document,
+        this.model,
+        () -> this.textField.isEditable(),
+        this.toObjectConverter,
+        this.toStringConverter,
+        this.validStateModel,
+        this.validator);
+    this.controller = valuesController;
     document.addDocumentListener(new DocumentListener() {
 
-      private void documentChanged(final PlainDocument document) {
-        if (AbstractObjectTextField.this.isDocumentListenerEnabled) {
-          try {
-            AbstractObjectTextField.this.isDocumentUpdateEnabled = false;
-            updateModel(document);
-          } finally {
-            AbstractObjectTextField.this.isDocumentUpdateEnabled = true;
-          }
-        }
+      private void documentChanged() {
+        valuesController.documentChanged();
       }
 
       @Override
       public void removeUpdate(final DocumentEvent e) {
         //        logger.log(ILevel.DEBUG, "document changed"); //$NON-NLS-1$
-        documentChanged(document);
+        documentChanged();
       }
 
       @Override
       public void insertUpdate(final DocumentEvent e) {
         //        logger.log(ILevel.DEBUG, "document changed"); //$NON-NLS-1$
-        documentChanged(document);
+        documentChanged();
       }
 
       @Override
       public void changedUpdate(final DocumentEvent e) {
         //        logger.log(ILevel.DEBUG, "document changed"); //$NON-NLS-1$
-        documentChanged(document);
+        documentChanged();
       }
     });
     this.model.addChangeListener(new IChangeableObjectListener() {
@@ -252,7 +254,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
       @Override
       public void objectChanged() {
         //        logger.log(ILevel.DEBUG, "document changed"); //$NON-NLS-1$
-        updateFieldText(document);
+        AbstractObjectTextField.this.controller.modelChanged();
       }
     });
     this.textField.addKeyListener(new KeyListener() {
@@ -260,7 +262,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
       @Override
       public void keyTyped(final KeyEvent event) {
         if (event.getKeyChar() == 0x1b) {
-          updateFieldText(document);
+          valuesController.modelChanged();
         }
       }
 
@@ -278,7 +280,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
 
       @Override
       public void focusLost(final FocusEvent e) {
-        format(document);
+        valuesController.format();
       }
 
       @Override
@@ -286,7 +288,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
         // nothing to do
       }
     });
-    updateFieldText(document);
+    valuesController.modelChanged();
     this.validStateModel.set(this.validator.validate(getText()));
   }
 
@@ -304,58 +306,9 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
     return this.component;
   }
 
-  private String getText(final PlainDocument document) {
-    try {
-      return document.getText(0, document.getLength());
-    } catch (final BadLocationException exception) {
-      return ""; //$NON-NLS-1$
-    }
-  }
-
   @Override
   public IObjectDistributor<IValidationResult> getValidationResultDistributor() {
     return this.validStateModel;
-  }
-
-  protected synchronized void updateModel(final PlainDocument document) {
-    final String text = getText(document);
-    try {
-      final IValidationResult validationResult = this.validator.validate(text);
-      if (validationResult.isValid()) {
-        this.model.set(this.toObjectConverter.convert(text));
-        this.validStateModel.set(validationResult);
-        return;
-      }
-      this.validStateModel.set(validationResult);
-    } catch (final Exception exception) {
-      final String message = exception.getMessage() == null
-          ? "Unsupported input '" + text + "'" //$NON-NLS-1$//$NON-NLS-2$
-          : "Unsupported input, '" + text + "'" + exception.getMessage(); //$NON-NLS-1$ //$NON-NLS-2$
-      logger.log(ILevel.ERROR, message, exception);
-      this.validStateModel.set(IValidationResult.inValid(message));
-    }
-  }
-
-  protected synchronized void updateFieldText(final PlainDocument document) {
-    final String text = getText(document);
-    final T value = this.model.get();
-    if (value == null && (text == null || text.length() == 0)) {
-      return;
-    }
-    if (!this.textField.isEditable()) {
-      final String textValue = this.toStringConverter.convert(value);
-      setText(document, textValue);
-      return;
-    }
-    final IValidationResult validationResult = this.validator.validate(text);
-    if (text != null
-        && text.length() != 0
-        && validationResult.isValid()
-        && Objects.equals(this.toObjectConverter.convert(text), value)) {
-      return;
-    }
-    final String textValue = this.toStringConverter.convert(value);
-    setText(document, textValue);
   }
 
   @Override
@@ -365,28 +318,12 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
 
   @Override
   public void setText(final String text) {
-    setText(this.textField.getDocument(), text);
+    this.controller.setText(text);
   }
 
   @Override
   public String getText() {
-    return getText(this.textField.getDocument());
-  }
-
-  private synchronized void setText(final PlainDocument document, final String textValue) {
-    try {
-      if (this.isDocumentUpdateEnabled) {
-        try {
-          this.isDocumentListenerEnabled = false;
-          document.remove(0, document.getLength());
-        } finally {
-          this.isDocumentListenerEnabled = true;
-        }
-        document.insertString(0, textValue, null);
-      }
-    } catch (final BadLocationException exception) {
-      throw new UnreachableCodeReachedException(exception);
-    }
+    return this.controller.getText();
   }
 
   public IActionNotifier getActionNotifier() {
@@ -395,16 +332,6 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
 
   public void selectAll() {
     this.textField.selectAll();
-  }
-
-  void format(final PlainDocument document) {
-    if (this.validStateModel.get().isValid()) {
-      final String formatedText = this.toStringConverter.convert(this.model.get());
-      if (getText().equals(formatedText)) {
-        return;
-      }
-      setText(document, formatedText);
-    }
   }
 
   public IColorReciever getColorReciever() {

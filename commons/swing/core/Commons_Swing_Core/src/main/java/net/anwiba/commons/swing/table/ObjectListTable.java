@@ -43,10 +43,14 @@ public class ObjectListTable<T> extends ObjectTable<T> {
   private final IObjectListTableConfiguration<T> configuration;
 
   public ObjectListTable(final IObjectListTableConfiguration<T> configuration, final List<T> list) {
-    super(configuration, new FilterableObjectTableModel<>(new ObjectListTableModel<>(
-        list,
-        configuration.getColumnValueProviders(),
-        configuration.getColumnValueAdaptors())));
+    super(
+        configuration,
+        new FilterableObjectTableModel<>(
+            new ObjectListTableModel<>(
+                list,
+                configuration.getColumnValueProviders(),
+                configuration.getColumnValueAdaptors(),
+                configuration.getColumnClassProvider())));
     this.configuration = configuration;
     final FilterableObjectTableModel<T> tableModel = (FilterableObjectTableModel<T>) getTableModel();
     final IObjectModel<IRowFilter> rowFilterModel = new ObjectModel<>();
@@ -75,8 +79,8 @@ public class ObjectListTable<T> extends ObjectTable<T> {
   @Override
   public JComponent getComponent() {
     if (this.configuration.isFilterable()) {
-      final StringField stringField = new StringField(new StringObjectFieldConfigurationBuilder().addClearAction(
-          "clear filter").build());
+      final StringField stringField = new StringField(
+          new StringObjectFieldConfigurationBuilder().addClearAction("clear filter").build());
       final IObjectModel<String> model = stringField.getModel();
       final IObjectModel<IRowFilter> rowFilterModel = getRowFilterModel();
       final IColumToStringConverter filterToStringConverter = this.configuration.getRowFilterToStringConverter();

@@ -21,9 +21,12 @@
  */
 package net.anwiba.commons.lang.collection;
 
-public interface IMutableObjectCollection<T> extends IObjectCollection<T> {
+public interface IMutableObjectCollection<T> extends IObjectCollectionReceiver<T>, IObjectCollection<T> {
 
-  @SuppressWarnings("unchecked")
-  public void add(T... object);
+  void remove(@SuppressWarnings("unchecked") T... objects);
+
+  void remove(Iterable<T> objects);
+
+  void removeAll();
 
 }

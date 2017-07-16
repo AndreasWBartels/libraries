@@ -109,8 +109,13 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
   };
 
   public ListChooserDialog(final Window owner, final String title, final IChooserDialogConfiguration<T> configuration) {
-    super(owner, title, IMessageConstants.EMPTY_MESSAGE, GuiIcons.EMPTY_ICON.getLargeIcon(), configuration
-        .getDialogType(), true);
+    super(
+        owner,
+        title,
+        IMessageConstants.EMPTY_MESSAGE,
+        GuiIcons.EMPTY_ICON.getLargeIcon(),
+        configuration.getDialogType(),
+        true);
     this.valueModel.set(configuration.getPresetValue());
     createGui(configuration);
     locate();
@@ -182,12 +187,14 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
     }
     final ITryTask tryTask = tryTaskFactory.create(this.valueModel.get());
     try {
-      ProgressDialog.show(this, Message.create("try"), tryTask); //$NON-NLS-1$
+      ProgressDialog.show(this, "try", Message.create("try"), tryTask); //$NON-NLS-1$
       if (tryTask.isSuccessful()) {
         setMessage(Message.create(this.chooserPanel.getMessage().getText(), "successful")); //$NON-NLS-1$
         return true;
       }
-      setMessage(Message.create(this.chooserPanel.getMessage().getText(), "The connection attempt failed.", //$NON-NLS-1$
+      setMessage(Message.create(
+          this.chooserPanel.getMessage().getText(),
+          "The connection attempt failed.", //$NON-NLS-1$
           MessageType.ERROR));
       setOkEnabled(false);
       return false;
@@ -196,10 +203,11 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
     } catch (final InvocationTargetException exception) {
       setOkEnabled(false);
       final Throwable targetException = exception.getTargetException();
-      setMessage(new ExceptionMessage(
-          this.chooserPanel.getMessage().getText(),
-          targetException.getLocalizedMessage(),
-          targetException));
+      setMessage(
+          new ExceptionMessage(
+              this.chooserPanel.getMessage().getText(),
+              targetException.getLocalizedMessage(),
+              targetException));
       return false;
     }
   }

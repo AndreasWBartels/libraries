@@ -22,8 +22,6 @@
 
 package net.anwiba.commons.lang.collection;
 
-public interface IObjectList<T> extends IObjectCollection<T> {
-
-  public T get(int index);
+public interface IObjectList<T> extends IObjectListProvider<T>, IObjectCollection<T> {
 
 }

@@ -25,6 +25,7 @@ package net.anwiba.commons.json;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public class JsonObjectUnmarshallerBuilder<T> {
 
   private final Class<T> clazz;

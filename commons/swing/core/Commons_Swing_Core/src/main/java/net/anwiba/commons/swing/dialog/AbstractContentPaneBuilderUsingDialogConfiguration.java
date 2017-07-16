@@ -54,6 +54,7 @@ public abstract class AbstractContentPaneBuilderUsingDialogConfiguration<T> exte
         message.getText(),
         message,
         icon,
+        null,
         modality,
         dialogType,
         s -> s,

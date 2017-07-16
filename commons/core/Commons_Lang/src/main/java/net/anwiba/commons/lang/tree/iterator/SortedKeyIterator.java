@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.lang.tree.iterator;
 
-import net.anwiba.commons.lang.object.IObjectIterator;
+import net.anwiba.commons.lang.collection.IObjectIterator;
 import net.anwiba.commons.lang.tree.ITreeItem;
 
 public final class SortedKeyIterator<K, V> implements IObjectIterator<K> {
@@ -40,26 +40,15 @@ public final class SortedKeyIterator<K, V> implements IObjectIterator<K> {
   @Override
   public K next() {
     this.item = this.item.getNext();
-    return this.item == null
-        ? null
-        : this.item.getKey();
+    return this.item == null ? null : this.item.getKey();
   }
 
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public boolean hasPrevious() {
     return this.item.getPrevious() != null;
   }
 
-  @Override
   public K previous() {
-    this.item = this.item.getNext();
-    return this.item == null
-        ? null
-        : this.item.getKey();
+    this.item = this.item.getPrevious();
+    return this.item == null ? null : this.item.getKey();
   }
 }

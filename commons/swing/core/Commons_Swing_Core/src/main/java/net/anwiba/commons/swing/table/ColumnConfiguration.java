@@ -26,6 +26,7 @@ import java.util.Comparator;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+@SuppressWarnings("rawtypes")
 public class ColumnConfiguration implements IColumnConfiguration {
   private final int preferredWidth;
   private final TableCellRenderer cellRenderer;
@@ -35,21 +36,21 @@ public class ColumnConfiguration implements IColumnConfiguration {
   private final Comparator comparator;
 
   public ColumnConfiguration(
-    final Object headerValue,
-    final TableCellRenderer cellRenderer,
-    final int preferredWidth,
-    final boolean isSortable,
-    final Comparator comparator) {
+      final Object headerValue,
+      final TableCellRenderer cellRenderer,
+      final int preferredWidth,
+      final boolean isSortable,
+      final Comparator comparator) {
     this(headerValue, cellRenderer, null, preferredWidth, isSortable, comparator);
   }
 
   public ColumnConfiguration(
-    final Object headerValue,
-    final TableCellRenderer cellRenderer,
-    final TableCellEditor cellEditor,
-    final int preferredWidth,
-    final boolean isSortable,
-    final Comparator comparator) {
+      final Object headerValue,
+      final TableCellRenderer cellRenderer,
+      final TableCellEditor cellEditor,
+      final int preferredWidth,
+      final boolean isSortable,
+      final Comparator comparator) {
     this.headerValue = headerValue;
     this.cellRenderer = cellRenderer;
     this.cellEditor = cellEditor;
@@ -83,7 +84,6 @@ public class ColumnConfiguration implements IColumnConfiguration {
     return this.cellEditor;
   }
 
-  @SuppressWarnings("rawtypes")
   @Override
   public Comparator getComparator() {
     return this.comparator;

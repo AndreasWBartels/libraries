@@ -21,23 +21,25 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Dialog.ModalityType;
+import java.awt.Image;
+
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.dialog.pane.IContentPaneBuilder;
 
-import java.awt.Dialog.ModalityType;
-
-public final class ContentPaneBuilderUsingDialogConfiguration extends
+public final class ContentPaneBuilderUsingDialogConfiguration
+    extends
     AbstractContentPaneBuilderUsingDialogConfiguration<Void> {
   private final IContentPaneBuilder contentPaneBuilder;
 
   public ContentPaneBuilderUsingDialogConfiguration(
-    final IPreferences preferences,
-    final IMessage message,
-    final IContentPaneBuilder contentPaneBuilder,
-    final DialogType dialogType) {
+      final IPreferences preferences,
+      final IMessage message,
+      final IContentPaneBuilder contentPaneBuilder,
+      final DialogType dialogType) {
     super(
         preferences,
         true,
@@ -57,5 +59,10 @@ public final class ContentPaneBuilderUsingDialogConfiguration extends
       final DataState dataState,
       final IObjectModel<Void> model) {
     return this.contentPaneBuilder;
+  }
+
+  @Override
+  public Image getImage() {
+    return null;
   }
 }

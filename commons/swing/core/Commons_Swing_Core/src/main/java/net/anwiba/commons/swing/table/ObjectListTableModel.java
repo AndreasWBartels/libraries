@@ -29,10 +29,11 @@ public class ObjectListTableModel<T> extends AbstractObjectTableModel<T> {
   private final List<IColumnValueAdaptor<T>> adaptors;
 
   public ObjectListTableModel(
-    final List<T> objects,
-    final List<IColumnValueProvider<T>> providers,
-    final List<IColumnValueAdaptor<T>> recievers) {
-    super(objects);
+      final List<T> objects,
+      final List<IColumnValueProvider<T>> providers,
+      final List<IColumnValueAdaptor<T>> recievers,
+      final IColumnClassProvider columnClassProvider) {
+    super(objects, columnClassProvider);
     this.providers = providers;
     this.adaptors = recievers;
   }
@@ -59,7 +60,7 @@ public class ObjectListTableModel<T> extends AbstractObjectTableModel<T> {
       return;
     }
     final T object = get(rowIndex);
-    T adapted = this.adaptors.get(columnIndex).adapt(object, aValue);
+    final T adapted = this.adaptors.get(columnIndex).adapt(object, aValue);
     set(rowIndex, adapted);
   }
 

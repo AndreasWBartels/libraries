@@ -23,6 +23,7 @@ package net.anwiba.commons.swing.dialog;
 
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -61,5 +62,7 @@ public interface IDialogConfiguration {
   List<IAdditionalActionFactory> getAdditionalActionFactories();
 
   Dimension getPreferdSize();
+
+  Image getImage();
 
 }

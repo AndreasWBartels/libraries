@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.icon;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
@@ -29,7 +30,28 @@ import java.awt.image.ImageObserver;
 
 import javax.swing.ImageIcon;
 
+import net.anwiba.commons.lang.functional.IAcceptor;
+
 public class GuiIconDecorator {
+
+  private final GuiIconSize size;
+  private ImageIcon icon;
+
+  public GuiIconDecorator(final GuiIconSize size, final ImageIcon icon) {
+    this.size = size;
+    this.icon = icon;
+  }
+
+  public GuiIconDecorator add(final IAcceptor<Void> acceptor, final GuiIcon icon) {
+    if (acceptor.accept(null)) {
+      this.icon = decorate(this.size, this.icon, icon);
+    }
+    return this;
+  }
+
+  public ImageIcon decorate() {
+    return this.icon;
+  }
 
   public static IGuiIcon icon(final GuiIcon icon, final GuiIcon decorationIcon, final DecorationPosition position) {
     return new DecoratedGuiIcon(icon, decorationIcon, position);
@@ -41,6 +63,17 @@ public class GuiIconDecorator {
 
   public static ImageIcon decorate(final GuiIconSize size, final IGuiIcon icon, final IGuiIcon decorationIcon) {
     return decorate(size, DecorationPosition.LowerLeft, icon, decorationIcon);
+  }
+
+  public static ImageIcon decorate(
+      final GuiIconSize size,
+      final DecorationPosition position,
+      final ImageIcon icon,
+      final String extention,
+      final Color fontColor,
+      final Color backGroundColor) {
+    final IGuiIcon decorationIcon = new StringDecorationIcon(backGroundColor, fontColor, extention);
+    return decorate(size, position, icon, decorationIcon);
   }
 
   public static ImageIcon decorate(
@@ -230,19 +263,19 @@ public class GuiIconDecorator {
   private static Point getPosition(final int size, final DecorationPosition position) {
     switch (position) {
       case LowerLeft: {
-        return new Point(0, size - getSize(size, position));
+        return new Point(0, size);
       }
       case LowerRight: {
-        return new Point(size - getSize(size, position), size - getSize(size, position));
+        return new Point(size - getSize(size, position), size);
       }
       case UpperLeft: {
-        return new Point(0, 0);
+        return new Point(0, size - getSize(size, position));
       }
       case UpperRight: {
-        return new Point(size - getSize(size, position), 0);
+        return new Point(size - getSize(size, position), size - getSize(size, position));
       }
       case Fill: {
-        return new Point(0, 0);
+        return new Point(0, size);
       }
     }
     return new Point(0, 0);

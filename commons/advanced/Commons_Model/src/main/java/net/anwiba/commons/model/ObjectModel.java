@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.model;
 
+import net.anwiba.commons.lang.functional.IEqualComperator;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public class ObjectModel<T> extends AbstractObjectChangedNotifier implements IObjectModel<T> {
@@ -28,17 +29,23 @@ public class ObjectModel<T> extends AbstractObjectChangedNotifier implements IOb
   private final Object monitor = new Object();
   private T value;
   private final boolean isNullable;
+  private IEqualComperator<T> comperator;
 
   public ObjectModel() {
     this(null);
   }
 
-  public ObjectModel(final T value) {
-    this(true, value);
+  public ObjectModel(final IEqualComperator<T> comperator, final T value) {
+    this(true, comperator, value);
   }
 
-  public ObjectModel(final boolean isNullable, final T value) {
+  public ObjectModel(final T value) {
+    this(true, (t, o) -> ObjectUtilities.equals(t, o), value);
+  }
+
+  public ObjectModel(final boolean isNullable, final IEqualComperator<T> comperator, final T value) {
     accept(isNullable, value);
+    this.comperator = comperator;
     this.isNullable = isNullable;
     this.value = value;
   }
@@ -54,7 +61,7 @@ public class ObjectModel<T> extends AbstractObjectChangedNotifier implements IOb
   public void set(final T value) {
     accept(this.isNullable, value);
     synchronized (this.monitor) {
-      if (ObjectUtilities.equals(this.value, value)) {
+      if (this.comperator.compare(this.value, value)) {
         return;
       }
       this.value = value;

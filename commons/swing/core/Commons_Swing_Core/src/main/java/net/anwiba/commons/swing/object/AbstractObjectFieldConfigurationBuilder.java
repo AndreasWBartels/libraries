@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.object;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
 import net.anwiba.commons.swing.action.IActionProcedure;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.utilities.validation.AggregatingStringValidator;
+import net.anwiba.commons.utilities.validation.AllwaysValidStringValidator;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 import net.anwiba.commons.utilities.validation.IValidator;
 
@@ -45,7 +48,7 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
 
   private boolean isEditable = true;
   private int columns = 10;
-  private IValidator<String> validator;
+  private final List<IValidator<String>> validators = new ArrayList<>();
   private IConverter<String, T, RuntimeException> toObjectConverter;
   private IConverter<T, String, RuntimeException> toStringConverter;
   private IToolTipFactory toolTipFactory = new IToolTipFactory() {
@@ -64,27 +67,32 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
   private IObjectModel<IValidationResult> validStateModel = new ObjectModel<>(IValidationResult.valid());
   private IObjectModel<T> model = new ObjectModel<>();
   private final List<IActionFactory<T>> actionFactorys = new ArrayList<>();
+  private Color background;
 
   public AbstractObjectFieldConfigurationBuilder(
       final IValidator<String> validator,
       final IConverter<String, T, RuntimeException> toObjectConverter,
       final IConverter<T, String, RuntimeException> toStringConverter) {
-    this.validator = validator;
+    this.validators.add(validator);
     this.toObjectConverter = toObjectConverter;
     this.toStringConverter = toStringConverter;
   }
 
   public IObjectFieldConfiguration<T> build() {
+    final IValidator<String> validator = this.validators.isEmpty()
+        ? new AllwaysValidStringValidator()
+        : this.validators.size() == 1 ? this.validators.get(0) : new AggregatingStringValidator(this.validators);
     return new DefaultObjectFieldConfiguration<>(
         this.model,
         this.validStateModel,
-        this.validator,
+        validator,
         this.toObjectConverter,
         this.toStringConverter,
         this.toolTipFactory,
         this.isEditable,
         this.columns,
-        this.actionFactorys);
+        this.actionFactorys,
+        this.background);
   }
 
   @SuppressWarnings("unchecked")
@@ -107,7 +115,14 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
 
   @SuppressWarnings("unchecked")
   public C setValidator(final IValidator<String> validator) {
-    this.validator = validator;
+    this.validators.clear();;
+    this.validators.add(validator);
+    return (C) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public C addValidator(final IValidator<String> validator) {
+    this.validators.add(validator);
     return (C) this;
   }
 
@@ -138,6 +153,12 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
   @SuppressWarnings("unchecked")
   public C addActionFactory(final IActionFactory<T> actionFactory) {
     this.actionFactorys.add(actionFactory);
+    return (C) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public C setBackgroundColor(final Color background) {
+    this.background = background;
     return (C) this;
   }
 

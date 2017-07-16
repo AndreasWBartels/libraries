@@ -28,6 +28,7 @@ import java.net.URI;
 
 public class UriReader extends InputStreamReader {
 
+  @SuppressWarnings("resource")
   public UriReader(final URI uri) throws MalformedURLException, IOException {
     super(new UriInputStream(uri));
   }

@@ -23,12 +23,15 @@ package net.anwiba.commons.swing.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
+import net.anwiba.commons.lang.collection.IObjectIterable;
+import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.swing.table.filter.NeutralFilter;
 import net.anwiba.commons.utilities.ArrayUtilities;
@@ -160,9 +163,9 @@ public class FilterableObjectTableModel<T> extends AbstractTableModel implements
   }
 
   @Override
-  public void set(final int rowIndex, final T object) {
+  public T set(final int rowIndex, final T object) {
     this.updateFlag = true;
-    this.objectTableModel.set(getMapper().getRowIndex(rowIndex), object);
+    return this.objectTableModel.set(getMapper().getRowIndex(rowIndex), object);
   }
 
   private IRowMapper getMapper() {
@@ -220,7 +223,7 @@ public class FilterableObjectTableModel<T> extends AbstractTableModel implements
   }
 
   @Override
-  public Iterable<T> values() {
+  public IObjectIterable<T> values() {
     final List<T> values = new ArrayList<>();
     synchronized (this.semaphor) {
       final IRowMapper mapper = getMapper();
@@ -231,7 +234,7 @@ public class FilterableObjectTableModel<T> extends AbstractTableModel implements
         values.addAll(this.objectTableModel.get(array));
       }
     }
-    return values;
+    return new ObjectList<>(Collections.unmodifiableList(IterableUtilities.asList(values)));
   }
 
   @Override

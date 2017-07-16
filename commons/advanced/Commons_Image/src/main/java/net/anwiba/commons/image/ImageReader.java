@@ -1,6 +1,6 @@
 /*
  * #%L
- * 
+ * *
  * %%
  * Copyright (C) 2007 - 2016 Andreas W. Bartels (bartels@anwiba.de)
  * %%
@@ -140,13 +140,15 @@ public final class ImageReader {
     return new PlanarImageContainer(createRenderOp(inputStream));
   }
 
+  @SuppressWarnings("resource")
   private RenderedOp createRenderOp(final InputStream inputStream) {
     final MemoryCacheSeekableStream memoryCacheSeekableStream = new MemoryCacheSeekableStream(inputStream);
     return JAI.create("Stream", memoryCacheSeekableStream); //$NON-NLS-1$
 
   }
 
+  @SuppressWarnings("resource")
   public IImageContainer createImageContainer(final File file) throws IOException {
     return new PlanarImageContainer(createRenderOp(new FileInputStream(file)));
   }
-} 
+}

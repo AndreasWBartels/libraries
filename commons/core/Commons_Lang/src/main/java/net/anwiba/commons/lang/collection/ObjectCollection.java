@@ -22,41 +22,16 @@
 package net.anwiba.commons.lang.collection;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
-public class ObjectCollection<T> implements IMutableObjectCollection<T> {
-
-  private final List<T> objects = new ArrayList<>();
+public class ObjectCollection<T> extends AbstractObjectCollection<T> {
 
   public ObjectCollection() {
+    this(new ArrayList<>());
   }
 
   public ObjectCollection(final List<T> objects) {
-    objects.addAll(objects);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void add(final T... factory) {
-    this.objects.addAll(Arrays.asList(factory));
-  }
-
-  @Override
-  public Iterator<T> iterator() {
-    return this.objects.iterator();
-  }
-
-  @Override
-  public int size() {
-    return this.objects.size();
-  }
-
-  @Override
-  public Stream<T> stream() {
-    return this.objects.stream();
+    super(objects);
   }
 
 }

@@ -30,29 +30,64 @@ public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implem
 
   private final IColumnValueProvider<T> columnValueProvider;
   private IColumnValueAdaptor<T> columnValueAdaptor;
+  private Class<?> clazz;
 
   public ObjectListColumnConfiguration(
-    final Object headerValue,
-    final IColumnValueProvider<T> columnValueProvider,
-    final TableCellRenderer cellRenderer,
-    final int preferredWidth,
-    final boolean isSortable,
-    final Comparator<T> comparator) {
+      final Object headerValue,
+      final IColumnValueProvider<T> columnValueProvider,
+      final TableCellRenderer cellRenderer,
+      final int preferredWidth,
+      final Class<?> clazz,
+      final boolean isSortable,
+      @SuppressWarnings("rawtypes") final Comparator comparator) {
+    this(headerValue, columnValueProvider, cellRenderer, null, null, preferredWidth, clazz, isSortable, comparator);
+  }
+
+  public ObjectListColumnConfiguration(
+      final Object headerValue,
+      final IColumnValueProvider<T> columnValueProvider,
+      final TableCellRenderer cellRenderer,
+      final IColumnValueAdaptor<T> columnValueAdaptor,
+      final TableCellEditor cellEditor,
+      final int preferredWidth,
+      final Class<?> clazz,
+      final boolean isSortable,
+      @SuppressWarnings("rawtypes") final Comparator comparator) {
+    super(headerValue, cellRenderer, cellEditor, preferredWidth, isSortable, comparator);
+    this.columnValueProvider = columnValueProvider;
+    this.columnValueAdaptor = columnValueAdaptor;
+    this.clazz = clazz;
+  }
+
+  public ObjectListColumnConfiguration(
+      final Object headerValue,
+      final IColumnValueProvider<T> columnValueProvider,
+      final TableCellRenderer cellRenderer,
+      final int preferredWidth,
+      final boolean isSortable,
+      @SuppressWarnings("rawtypes") final Comparator comparator) {
     this(headerValue, columnValueProvider, cellRenderer, null, null, preferredWidth, isSortable, comparator);
   }
 
   public ObjectListColumnConfiguration(
-    final Object headerValue,
-    final IColumnValueProvider<T> columnValueProvider,
-    final TableCellRenderer cellRenderer,
-    final IColumnValueAdaptor<T> columnValueAdaptor,
-    final TableCellEditor cellEditor,
-    final int preferredWidth,
-    final boolean isSortable,
-    final Comparator<T> comparator) {
-    super(headerValue, cellRenderer, cellEditor, preferredWidth, isSortable, comparator);
-    this.columnValueProvider = columnValueProvider;
-    this.columnValueAdaptor = columnValueAdaptor;
+      final Object headerValue,
+      final IColumnValueProvider<T> columnValueProvider,
+      final TableCellRenderer cellRenderer,
+      final IColumnValueAdaptor<T> columnValueAdaptor,
+      final TableCellEditor cellEditor,
+      final int preferredWidth,
+      final boolean isSortable,
+      @SuppressWarnings("rawtypes") final Comparator comparator) {
+    this(
+        headerValue,
+        columnValueProvider,
+        cellRenderer,
+        columnValueAdaptor,
+        cellEditor,
+        preferredWidth,
+        Object.class,
+        isSortable,
+        comparator);
   }
 
   @Override
@@ -63,6 +98,11 @@ public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implem
   @Override
   public IColumnValueAdaptor<T> getColumnValueAdaptor() {
     return this.columnValueAdaptor;
+  }
+
+  @Override
+  public Class<?> getColumnClass() {
+    return this.clazz;
   }
 
 }

@@ -81,14 +81,15 @@ public class SearchComponent<C, R> implements IComponentProvider {
       final AbstractAction nextAction = new NextAction<>(engine);
       nextAction.setEnabled(false);
 
-      final ObjectModel<String> searchStringModel = new ObjectModel<String>();
+      final ObjectModel<String> searchStringModel = new ObjectModel<>();
       final StringObjectFieldConfigurationBuilder builder = new StringObjectFieldConfigurationBuilder()
           .setToolTipFactory((validationResult, context) -> "feature search condition")
           .setColumns(24)
           .setModel(searchStringModel);
       if (this.advancedSearchActionFactory != null) {
-        builder.addActionFactory((context, document, clearBlock) -> SearchComponent.this.advancedSearchActionFactory
-            .create(searchStringModel, engine));
+        builder.addActionFactory(
+            (context, document, clearBlock) -> SearchComponent.this.advancedSearchActionFactory
+                .create(searchStringModel, engine));
       }
       builder.addClearAction("clear");
       builder.addActionFactory((c, d, b) -> previousAction);

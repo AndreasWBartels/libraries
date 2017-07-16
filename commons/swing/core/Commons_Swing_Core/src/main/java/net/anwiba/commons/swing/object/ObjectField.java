@@ -29,12 +29,14 @@ import net.anwiba.commons.utilities.validation.IValidationResult;
 public class ObjectField extends AbstractObjectTextField<Object> {
 
   public ObjectField() {
-    this(new ObjectFieldConfiguration(
-        new ObjectModel<>(),
-        new ObjectModel<>(IValidationResult.valid()),
-        false,
-        10,
-        new ArrayList<>()));
+    this(
+        new ObjectFieldConfiguration(
+            new ObjectModel<>(),
+            new ObjectModel<>(IValidationResult.valid()),
+            false,
+            10,
+            new ArrayList<>(),
+            null));
   }
 
   public ObjectField(final IObjectFieldConfiguration<Object> objectFieldConfiguration) {

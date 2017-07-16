@@ -35,7 +35,7 @@ public final class Angle {
   }
 
   private Angle(final double value) {
-    this.value = (value / RHO_GON) % TWO_PI;
+    this.value = value;
   }
 
   public static Angle radian(final double x) {

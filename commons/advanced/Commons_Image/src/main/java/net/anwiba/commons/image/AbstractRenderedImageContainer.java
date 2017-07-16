@@ -65,6 +65,18 @@ public abstract class AbstractRenderedImageContainer implements IImageContainer 
     return new PlanarImageContainer(scaledRenderOp);
   }
 
+  //  @Override
+  //  public IImageContainer rotate(float angle) {
+  //    final RenderedOp scaledRenderOp = ImageContainerUtilities.scale(this.image, widthFactor, heightFactor);
+  //    return new PlanarImageContainer(scaledRenderOp);
+  //  }
+  //
+  //  @Override
+  //  public IImageContainer rotate(float x, float y) {
+  //    // TODO_NOW (andreas) Jul 3, 2017: Auto-generated method stub
+  //    return null;
+  //  }
+
   @Override
   public IImageContainer fit(final int width, final int height) {
     final float factor = fitFactor(width, height);

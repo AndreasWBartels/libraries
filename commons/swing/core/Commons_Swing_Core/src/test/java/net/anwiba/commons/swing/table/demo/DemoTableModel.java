@@ -21,14 +21,21 @@
  */
 package net.anwiba.commons.swing.table.demo;
 
-import net.anwiba.commons.swing.table.AbstractObjectTableModel;
-
 import java.util.List;
+
+import net.anwiba.commons.swing.table.AbstractObjectTableModel;
+import net.anwiba.commons.swing.table.IColumnClassProvider;
 
 public class DemoTableModel extends AbstractObjectTableModel<DemoObject> {
 
   public DemoTableModel(final List<DemoObject> objects) {
-    super(objects);
+    super(objects, new IColumnClassProvider() {
+
+      @Override
+      public Class<?> getClass(final int columnIndex) {
+        return Object.class;
+      }
+    });
   }
 
   private static final long serialVersionUID = 1L;

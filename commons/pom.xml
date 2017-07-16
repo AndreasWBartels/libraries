@@ -5,11 +5,6 @@
   <description>anwiba commons libraries project</description>
   <url>${scm.url.net.anwiba.master}/commons</url>
 
-  <organization>
-    <name>Andreas Bartels</name>
-    <url>http://www.anwiba.net/</url>
-  </organization>
-
   <scm>
     <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
     <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
@@ -23,7 +18,7 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.25</version>
+    <version>1.0.48</version>
   </parent>
 
   <modules>
@@ -32,4 +27,31 @@
     <module>advanced</module>
     <module>swing</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <licenseName>lgpl_v2_1</licenseName>
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+          <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
+          <projectName>anwiba commons core</projectName>
+          <roots>
+            <root>src/main/java</root>
+            <root>src/test/java</root>
+          </roots>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

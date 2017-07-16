@@ -16,13 +16,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.antlr.v4.runtime.ANTLRErrorListener;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import net.anwiba.tools.definition.schema.json.gramma.JSSDLexer;
 import net.anwiba.tools.definition.schema.json.gramma.JSSDParser;
-
-import org.antlr.v4.runtime.ANTLRErrorListener;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 public class JSSDParserFactory {
 
@@ -32,7 +32,7 @@ public class JSSDParserFactory {
   }
 
   public JSSDParser create(final Reader reader, final ANTLRErrorListener errorListener) throws IOException {
-    return create(new ANTLRInputStream(reader), errorListener);
+    return create(CharStreams.fromReader(reader), errorListener);
   }
 
   public JSSDParser create(final CharStream stream, final ANTLRErrorListener errorListener) {

@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.object;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +37,7 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
   private final IObjectModel<IValidationResult> validStateModel;
   private final IObjectModel<T> model;
   private final List<IActionFactory<T>> actionFactorys = new ArrayList<>();
+  private final Color backgroundColor;
 
   public AbstractObjectTextFieldConfiguration(
       final IObjectModel<T> model,
@@ -43,13 +45,20 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
       final IToolTipFactory toolTipFactory,
       final boolean isEditable,
       final int columns,
-      final List<IActionFactory<T>> actionFactorys) {
+      final List<IActionFactory<T>> actionFactorys,
+      final Color backgroundColor) {
     this.model = model;
     this.validStateModel = validStateModel;
     this.factory = toolTipFactory;
     this.isEditable = isEditable;
     this.columns = columns;
+    this.backgroundColor = backgroundColor;
     this.actionFactorys.addAll(actionFactorys);
+  }
+
+  @Override
+  public Color getBackgroundColor() {
+    return this.backgroundColor;
   }
 
   @Override

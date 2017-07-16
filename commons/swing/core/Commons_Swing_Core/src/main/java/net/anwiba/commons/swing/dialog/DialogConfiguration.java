@@ -42,6 +42,7 @@ public final class DialogConfiguration extends AbstractDialogConfiguration {
       final String title,
       final IMessage message,
       final IGuiIcon icon,
+      final IGuiIcon image,
       final ModalityType modality,
       final DialogType dialogType,
       final IFunction<String, String, RuntimeException> actionButtonTextFactory,
@@ -56,6 +57,7 @@ public final class DialogConfiguration extends AbstractDialogConfiguration {
         title,
         message,
         icon,
+        image,
         modality,
         dialogType,
         actionButtonTextFactory,
@@ -69,5 +71,4 @@ public final class DialogConfiguration extends AbstractDialogConfiguration {
   public IContentPaneBuilder getContentPaneBuilder() {
     return this.contentPaneBuilder;
   }
-
 }

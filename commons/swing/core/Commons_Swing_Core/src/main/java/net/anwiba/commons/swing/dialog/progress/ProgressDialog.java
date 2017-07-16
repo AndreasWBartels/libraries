@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -122,8 +122,8 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
   private final IProgressMonitor progressMonitor;
   private final JPanel contentPane;
 
-  public ProgressDialog(final Window owner, final IMessage message) {
-    super(owner, message.getText(), message, GuiIcons.INFORMATION_ICON.getLargeIcon(), DialogType.CANCEL);
+  public ProgressDialog(final Window owner, final String title, final IMessage message) {
+    super(owner, title, message, GuiIcons.INFORMATION_ICON.getLargeIcon(), DialogType.CANCEL);
     this.contentPane = new JPanel();
     this.contentPane.setLayout(new FlowLayout(FlowLayout.CENTER));
     this.contentPane.setPreferredSize(new Dimension(20, 40));
@@ -151,9 +151,10 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
   @SuppressWarnings("unchecked")
   public static <O, E extends Exception> O show(
       final Window owner,
+      final String title,
       final IMessage message,
       final IProgressTask<O, E> task) throws E, InterruptedException {
-    final ProgressDialog dialog = new ProgressDialog(owner, message);
+    final ProgressDialog dialog = new ProgressDialog(owner, title, message);
     final IProgressMonitor progressMonitor = dialog.getProgressMonitor();
     final IObjectContainer<Exception> exceptionContainer = new ObjectContainer<>();
     final IObjectContainer<O> resultContainer = new ObjectContainer<>();
@@ -197,5 +198,12 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
           this.contentPane.add(progressBar);
           this.contentPane.revalidate();
         });
+  }
+
+  public static <O, E extends Exception> O show(
+      final Window window,
+      final IMessage message,
+      final IProgressTask<O, E> task) throws E, InterruptedException {
+    return show(window, message.getText(), message, task);
   }
 }

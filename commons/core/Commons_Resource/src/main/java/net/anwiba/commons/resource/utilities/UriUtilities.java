@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -307,16 +307,12 @@ public class UriUtilities {
     if (isFileUri(uri)) {
       return new File(uri).exists();
     }
-    URLConnection connection = null;
     try {
-      connection = converter.convert(uri).openConnection();
-      connection.connect();
+      converter.convert(uri).openConnection().connect();
       return true;
     } catch (final Throwable exception) {
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       return false;
-    } finally {
-      forceClose(connection);
     }
   }
 
@@ -349,15 +345,6 @@ public class UriUtilities {
     } catch (final IOException exception) {
       logger.log(ILevel.WARNING, exception.getLocalizedMessage());
       return -1l;
-    }
-  }
-
-  private static void forceClose(final URLConnection urlConnection) {
-    if (urlConnection != null) {
-      try (InputStream in = urlConnection.getInputStream()) {
-      } catch (final Exception e) {
-        // nothing to do
-      }
     }
   }
 

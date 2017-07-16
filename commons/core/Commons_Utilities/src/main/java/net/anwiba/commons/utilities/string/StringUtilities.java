@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -396,5 +396,34 @@ public class StringUtilities {
       }
     }
     return counter;
+  }
+
+  public static String substitute(final String string, final int maximumNumberOfRows, final int maximumColumnLength) {
+    if (string == null) {
+      return null;
+    }
+    final StringBuilder builder = new StringBuilder();
+    builder.append("<html>"); //$NON-NLS-1$
+    final int stringLength = string.length();
+    final int maximumLength = Math.min(maximumColumnLength * maximumNumberOfRows, stringLength);
+    int endIndex = 0;
+    for (int i = 0; i < maximumNumberOfRows; i++) {
+      final int beginIndex = endIndex;
+      endIndex = (i + 1) * maximumColumnLength;
+      builder.append(string.substring(beginIndex, Math.min(endIndex, stringLength)));
+      if (maximumLength <= endIndex) {
+        if (maximumLength != stringLength) {
+          builder.append("..."); //$NON-NLS-1$
+        }
+        builder.append("</html>"); //$NON-NLS-1$
+        return builder.toString();
+      }
+      builder.append("<br>"); //$NON-NLS-1$
+    }
+    if (maximumLength != stringLength) {
+      builder.append("..."); //$NON-NLS-1$
+    }
+    builder.append("</html>"); //$NON-NLS-1$
+    return builder.toString();
   }
 }

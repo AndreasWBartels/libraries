@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.swing.table;
 
-import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
-
 import java.util.List;
+
+import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 
 public interface IObjectListTableConfiguration<T> extends IObjectTableConfiguration<T> {
 
@@ -34,5 +34,7 @@ public interface IObjectListTableConfiguration<T> extends IObjectTableConfigurat
   public boolean isFilterable();
 
   public IColumToStringConverter getRowFilterToStringConverter();
+
+  public IColumnClassProvider getColumnClassProvider();
 
 }

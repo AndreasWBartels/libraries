@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -49,7 +49,11 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
   }
 
   public IObjectField<O> build() {
-    final AbstractObjectTextField<O> field = create(this.builder.build());
+    final IObjectFieldConfiguration<O> configuration = this.builder.build();
+    final AbstractObjectTextField<O> field = create(configuration);
+    final Color validColor = configuration.getBackgroundColor() == null
+        ? this.VALID_COLOR
+        : configuration.getBackgroundColor();
     final IObjectDistributor<IValidationResult> validationResultDistributor = field.getValidationResultDistributor();
     validationResultDistributor.addChangeListener(new IChangeableObjectListener() {
 
@@ -61,9 +65,7 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
           public void run() {
             final IValidationResult validationResult = validationResultDistributor.get();
             field.getColorReciever().setBackground(
-                validationResult.isValid()
-                    ? AbstractObjectFieldBuilder.this.VALID_COLOR
-                    : AbstractObjectFieldBuilder.this.INVALID_COLOR);
+                validationResult.isValid() ? validColor : AbstractObjectFieldBuilder.this.INVALID_COLOR);
           }
         });
       }
@@ -107,8 +109,13 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
     return (B) this;
   }
 
+  public B addValidator(final IValidator<String> validator) {
+    this.builder.addValidator(validator);
+    return (B) this;
+  }
+
   public B setNotEmptyValidator(final String message) {
-    getConfigurationBuilder().setValidator(new IValidator<String>() {
+    addValidator(new IValidator<String>() {
 
       @Override
       public IValidationResult validate(final String value) {
@@ -138,6 +145,11 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
 
   public B addActionFactory(final IActionFactory<O> tooltip) {
     this.builder.addActionFactory(tooltip);
+    return (B) this;
+  }
+
+  public B setBackgroundColor(final Color background) {
+    this.builder.setBackgroundColor(background);
     return (B) this;
   }
 }

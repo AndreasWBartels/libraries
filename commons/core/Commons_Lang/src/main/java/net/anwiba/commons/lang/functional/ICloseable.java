@@ -21,7 +21,6 @@
  */
 package net.anwiba.commons.lang.functional;
 
-@FunctionalInterface
 public interface ICloseable<E extends Exception> extends AutoCloseable {
 
   @Override

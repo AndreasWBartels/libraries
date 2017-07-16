@@ -57,6 +57,7 @@ public class ConfigurableDialog extends AbstractDialog {
         configuration.getActionButtonTextFactory(),
         configuration.getAdditionalActionFactories(),
         configuration.getModalityType());
+    setIconImage(configuration.getImage());
     this.contentPane = configuration.getContentPaneBuilder().setOwner(owner).build();
     setContentPane(this.contentPane.getComponent());
     this.dataStateModel = this.contentPane.getDataStateModel();

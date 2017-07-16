@@ -70,6 +70,7 @@ public class DialogConfigurationBuilder {
   private boolean isResizeable = true;
   private int dialogCloseKeyEvent = KeyEvent.KEY_LOCATION_UNKNOWN;
   private Dimension preferdSize;
+  private IGuiIcon image;
 
   public DialogConfigurationBuilder setMessage(final IMessage message) {
     this.message = message;
@@ -92,6 +93,11 @@ public class DialogConfigurationBuilder {
 
   public DialogConfigurationBuilder setIcon(final IGuiIcon icon) {
     this.icon = icon;
+    return this;
+  }
+
+  public DialogConfigurationBuilder setDialogIcon(final IGuiIcon image) {
+    this.image = image;
     return this;
   }
 
@@ -130,6 +136,7 @@ public class DialogConfigurationBuilder {
         this.title,
         this.message,
         this.icon,
+        this.image,
         this.modality,
         this.dialogType,
         this.actionButtonTextFactory,

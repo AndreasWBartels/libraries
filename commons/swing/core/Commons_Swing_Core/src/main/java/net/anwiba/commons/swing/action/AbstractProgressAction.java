@@ -21,10 +21,6 @@
  */
 package net.anwiba.commons.swing.action;
 
-import net.anwiba.commons.lang.object.IObjectProvider;
-import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
-import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
-
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -32,14 +28,20 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
+import net.anwiba.commons.lang.object.IObjectProvider;
+import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
+import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
+
 public abstract class AbstractProgressAction extends AbstractAction {
 
   private static final long serialVersionUID = 1L;
   private final IObjectProvider<Window> ownerProvider;
+  private final String title;
 
   public AbstractProgressAction(final IObjectProvider<Window> ownerProvider, final String title, final Icon icon) {
     super(title, icon);
     this.ownerProvider = ownerProvider;
+    this.title = title;
   }
 
   protected Window getOwner() {
@@ -55,7 +57,7 @@ public abstract class AbstractProgressAction extends AbstractAction {
       return;
     }
     try {
-      ProgressDialog.show(getOwner(), configuration.getMessage(), configuration.getProgressTask());
+      ProgressDialog.show(getOwner(), this.title, configuration.getMessage(), configuration.getProgressTask());
     } catch (final InterruptedException exception) {
       // nothing to do
     } catch (final InvocationTargetException exception) {

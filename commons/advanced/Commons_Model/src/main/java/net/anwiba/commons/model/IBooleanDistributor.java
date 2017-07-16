@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.model;
 
+import net.anwiba.commons.lang.primativ.IBooleanProvider;
+
 public interface IBooleanDistributor extends IBooleanProvider, IObjectChangedNotifier {
 
 }

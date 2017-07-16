@@ -21,8 +21,11 @@
  */
 package net.anwiba.commons.swing.action;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.AbstractAction;
 
+import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.utilities.factory.IFactory;
@@ -58,6 +61,11 @@ public class ConfigurableActionBuilder {
 
   public ConfigurableActionBuilder setProcedure(final IActionProcedure procedure) {
     this.configurationBuilder.setProcedure(procedure);
+    return this;
+  }
+
+  public ConfigurableActionBuilder setTask(final IBlock<InvocationTargetException> task) {
+    this.configurationBuilder.setTask(task);
     return this;
   }
 

@@ -23,7 +23,7 @@ package net.anwiba.commons.lang.tree.iterator;
 
 import java.util.LinkedList;
 
-import net.anwiba.commons.lang.object.IObjectIterator;
+import net.anwiba.commons.lang.collection.IObjectIterator;
 import net.anwiba.commons.lang.tree.ITreeItem;
 
 public class BreadthFirstSearchValueIterator<K, V> implements IObjectIterator<V> {
@@ -73,20 +73,4 @@ public class BreadthFirstSearchValueIterator<K, V> implements IObjectIterator<V>
       this.item = null;
     }
   }
-
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean hasPrevious() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public V previous() {
-    throw new UnsupportedOperationException();
-  }
-
 }

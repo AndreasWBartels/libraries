@@ -26,6 +26,7 @@ import java.awt.Window;
 
 import javax.swing.SwingUtilities;
 
+import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.progress.IProgressTask;
 
@@ -33,13 +34,19 @@ public class ProgressDialogLauncher<O, E extends Exception> {
 
   private final MessageBuilder builder = new MessageBuilder();
   private final IProgressTask<O, E> task;
+  private String titel = null;
 
   public ProgressDialogLauncher(final IProgressTask<O, E> task) {
     this.task = task;
   }
 
   public ProgressDialogLauncher<O, E> setTitle(final String titel) {
-    this.builder.setText(titel);
+    this.titel = titel;
+    return this;
+  }
+
+  public ProgressDialogLauncher<O, E> setText(final String text) {
+    this.builder.setText(text);
     return this;
   }
 
@@ -49,7 +56,8 @@ public class ProgressDialogLauncher<O, E extends Exception> {
   }
 
   public O launch(final Window owner) throws E, InterruptedException {
-    return ProgressDialog.show(owner, this.builder.build(), this.task);
+    final IMessage message = this.builder.build();
+    return ProgressDialog.show(owner, this.titel == null ? message.getText() : this.titel, message, this.task);
   }
 
   public O launch(final Component component) throws E, InterruptedException {

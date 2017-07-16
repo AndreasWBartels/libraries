@@ -42,6 +42,10 @@ public interface IImageContainer {
 
   IImageContainer scale(float factor);
 
+  //  IImageContainer rotate(float factor);
+  //
+  //  IImageContainer rotate(float x, float y);
+
   BufferedImage asBufferImage(int x, int y, int w, int h);
 
   BufferedImage asBufferImage(Rectangle rectangle);

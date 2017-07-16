@@ -46,4 +46,5 @@ public class BufferedImageContainer extends AbstractRenderedImageContainer {
   public void dispose() {
     // nothing to do
   }
+
 }

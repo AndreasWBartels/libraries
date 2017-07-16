@@ -21,7 +21,9 @@
  */
 package net.anwiba.commons.utilities.factory;
 
+@FunctionalInterface
 public interface IFactory<I, O, E extends Exception> {
 
   <T extends O> T create(I context) throws E;
+
 }

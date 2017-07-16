@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.utilities.validation;
 
+import net.anwiba.commons.lang.functional.IBlock;
+import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public interface IValidationResult {
@@ -60,6 +62,7 @@ public interface IValidationResult {
       final IValidationResult other = (IValidationResult) obj;
       return this.isValid != other.isValid() && ObjectUtilities.equals(this.message, other.getMessage());
     }
+
   }
 
   public static IValidationResult valid() {
@@ -71,6 +74,18 @@ public interface IValidationResult {
   }
 
   boolean isValid();
+
+  default <E extends Exception> void ifValid(final IBlock<E> block) throws E {
+    if (isValid()) {
+      block.execute();
+    }
+  }
+
+  default <E extends Exception> void otherwise(final IConsumer<String, E> consumer) throws E {
+    if (!isValid()) {
+      consumer.consume(getMessage());
+    }
+  }
 
   String getMessage();
 

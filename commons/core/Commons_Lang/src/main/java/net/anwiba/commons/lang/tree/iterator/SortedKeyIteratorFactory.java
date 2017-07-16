@@ -21,8 +21,8 @@
  */
 package net.anwiba.commons.lang.tree.iterator;
 
-import net.anwiba.commons.lang.object.IObjectIterator;
-import net.anwiba.commons.lang.object.IObjectIteratorFactory;
+import net.anwiba.commons.lang.collection.IObjectIterator;
+import net.anwiba.commons.lang.collection.IObjectIteratorFactory;
 import net.anwiba.commons.lang.tree.ITreeItem;
 
 public class SortedKeyIteratorFactory<K, V> implements IObjectIteratorFactory<ITreeItem<K, V>, K> {

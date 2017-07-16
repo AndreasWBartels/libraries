@@ -36,21 +36,23 @@ import javax.swing.table.TableModel;
 public class JTableUtilities {
 
   public static String getToolTipText(final JTable table, final MouseEvent event) {
-    final Point point = event.getPoint();
+    return getToolTipText(table, event.getPoint());
+  }
+
+  public static String getToolTipText(final JTable table, final Point point) {
     final int rowIndex = getRealRowIndexAtPoint(table, point);
     final int columnIndex = getRealColumnIndexAtPoint(table, point);
     final int columnAtPoint = table.columnAtPoint(point);
     final int rowAtPoint = table.rowAtPoint(point);
     final TableCellRenderer tableCellRenderer = table.getCellRenderer(rowAtPoint, columnAtPoint);
     if (tableCellRenderer instanceof JLabel) {
-      final String value =
-          ((JLabel) tableCellRenderer.getTableCellRendererComponent(
-              table,
-              table.getValueAt(rowAtPoint, columnAtPoint),
-              false,
-              false,
-              rowIndex,
-              columnIndex)).getText();
+      final String value = ((JLabel) tableCellRenderer.getTableCellRendererComponent(
+          table,
+          table.getValueAt(rowAtPoint, columnAtPoint),
+          false,
+          false,
+          rowIndex,
+          columnIndex)).getText();
       if (value == null) {
         return null;
       }

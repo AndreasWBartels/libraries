@@ -49,6 +49,7 @@ public class KeyValueRegistry<K, V> implements IKeyValueRegistry<K, V> {
     return this.map.containsKey(key);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public synchronized V[] getItems(final Comparator<K> comparator, final Class<K> keyClazz, final Class<V> valueClazz) {
     final K[] keys = this.map.keySet().toArray((K[]) Array.newInstance(keyClazz, this.list.size()));

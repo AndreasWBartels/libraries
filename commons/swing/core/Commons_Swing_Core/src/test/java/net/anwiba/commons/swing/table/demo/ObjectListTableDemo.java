@@ -30,6 +30,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.junit.runner.RunWith;
+
+import de.jdemo.annotation.Demo;
+import de.jdemo.extensions.SwingDemoCase;
+import de.jdemo.junit.DemoAsTestRunner;
 import net.anwiba.commons.model.ISelectionListener;
 import net.anwiba.commons.model.SelectionEvent;
 import net.anwiba.commons.swing.table.IColumnObjectFactory;
@@ -46,12 +51,7 @@ import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.ObjectTableCellRenderer;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 
-import org.junit.runner.RunWith;
-
-import de.jdemo.annotation.Demo;
-import de.jdemo.extensions.SwingDemoCase;
-import de.jdemo.junit.DemoAsTestRunner;
-
+@SuppressWarnings("nls")
 @RunWith(DemoAsTestRunner.class)
 public class ObjectListTableDemo extends SwingDemoCase {
 
@@ -71,7 +71,6 @@ public class ObjectListTableDemo extends SwingDemoCase {
     return builder.build();
   }
 
-  @SuppressWarnings("nls")
   public void addColumnDescriptions(
       final ObjectListTableConfigurationBuilder<DemoObject> builder,
       final boolean isSortable) {

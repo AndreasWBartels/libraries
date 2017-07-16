@@ -23,23 +23,41 @@
 package net.anwiba.commons.swing.dialog;
 
 import java.awt.Component;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
+import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IFunction;
+import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.preferences.IPreferences;
+import net.anwiba.commons.swing.dialog.progress.ProgressDialogLauncher;
 import net.anwiba.commons.swing.icon.GuiIcon;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class ConfigurableDialogLauncher {
 
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(ConfigurableDialogLauncher.class);
   private final DialogConfigurationBuilder dialogConfigurationBuilder = new DialogConfigurationBuilder();
+  private final List<IBlock<RuntimeException>> onCloseExecutables = new ArrayList<>();
+  private final List<IProcedure<ConfigurableDialog, RuntimeException>> beforeShowExecutables = new ArrayList<>();
+
+  public ConfigurableDialogLauncher setDialogIcon(final GuiIcon icon) {
+    this.dialogConfigurationBuilder.setDialogIcon(icon);
+    return this;
+  }
 
   public ConfigurableDialogLauncher setIcon(final GuiIcon icon) {
     this.dialogConfigurationBuilder.setIcon(icon);
@@ -61,7 +79,8 @@ public class ConfigurableDialogLauncher {
     return this;
   }
 
-  public ConfigurableDialogLauncher setActionButtonTextFactory(final IFunction<String, String, RuntimeException> factory) {
+  public ConfigurableDialogLauncher setActionButtonTextFactory(
+      final IFunction<String, String, RuntimeException> factory) {
     this.dialogConfigurationBuilder.setActionButtonTextFactory(factory);
     return this;
   }
@@ -125,13 +144,58 @@ public class ConfigurableDialogLauncher {
 
   public IDialogResult launch(final Window owner) {
     final IObjectModel<IDialogResult> model = new ObjectModel<>();
-    GuiUtilities.invokeAndWait(() -> {
-      final IDialogConfiguration configuration = this.dialogConfigurationBuilder.build();
-      final ConfigurableDialog dialog = new ConfigurableDialog(owner, configuration);
-      dialog.setVisible(true);
-      dialog.toFront();
-      model.set(dialog.getResult());
-    });
-    return model.get();
+
+    try {
+      final IDialogConfiguration configuration = ConfigurableDialogLauncher.this.dialogConfigurationBuilder.build();
+      final ConfigurableDialog dialog = new ProgressDialogLauncher<>((progressMonitor, canceler) -> {
+        final ConfigurableDialog configurableDialog = new ConfigurableDialog(owner, configuration);
+        configurableDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        if (ModalityType.MODELESS.equals(configuration.getModalityType())) {
+          configurableDialog.addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosed(final WindowEvent e) {
+              ConfigurableDialogLauncher.this.onCloseExecutables.stream().forEach(b -> b.execute());
+            }
+          });
+        }
+        ConfigurableDialogLauncher.this.beforeShowExecutables.stream().forEach(b -> b.execute(configurableDialog));
+        return configurableDialog;
+      }).setTitle(configuration.getTitle()).setText("Initialize").setDescription("").launch(owner);
+
+      GuiUtilities.invokeAndWait(() -> {
+        dialog.toFront();
+        dialog.setVisible(true);
+        if (!ModalityType.MODELESS.equals(configuration.getModalityType())) {
+          this.onCloseExecutables.stream().forEach(b -> b.execute());
+        }
+        model.set(dialog.getResult());
+      });
+      return model.get();
+    } catch (final InterruptedException exception) {
+      return DialogResult.CANCEL;
+    }
   }
+
+  public ConfigurableDialogLauncher setModelessModality() {
+    this.dialogConfigurationBuilder.setModality(ModalityType.MODELESS);
+    return this;
+  }
+
+  public ConfigurableDialogLauncher addOnCloseExecutable(final IBlock<RuntimeException> executable) {
+    this.onCloseExecutables.add(executable);
+    return this;
+  }
+
+  public ConfigurableDialogLauncher addBeforeShowExecutable(
+      final IProcedure<ConfigurableDialog, RuntimeException> executable) {
+    this.beforeShowExecutables.add(executable);
+    return this;
+  }
+
+  public ConfigurableDialogLauncher setMessagePanelDisabled() {
+    this.dialogConfigurationBuilder.setMessagePanelEnabled(false);
+    return this;
+  }
+
 }

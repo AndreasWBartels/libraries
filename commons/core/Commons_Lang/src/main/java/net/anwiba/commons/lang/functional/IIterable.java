@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -89,11 +89,11 @@ public interface IIterable<O, E extends Exception> {
     }
   }
 
-  default <R> R foreach(final R identity, final IAccumulator<O, R, E> adder) throws E {
+  default <R> R aggregate(final R identity, final IAggregator<R, O, R, E> adder) throws E {
     final IIterator<O, E> iterator = this.iterator();
     R result = identity;
     while (iterator.hasNext()) {
-      result = adder.add(result, iterator.next());
+      result = adder.aggregate(result, iterator.next());
     }
     return result;
   }

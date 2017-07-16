@@ -26,6 +26,54 @@ import java.util.Arrays;
 
 public class Matrix {
 
+  private final double[][] values;
+  private final int n;
+  private final int m;
+
+  static public Matrix matrix(final double[][] values) {
+    return new Matrix(values.length, values.length > 0 ? values[0].length : 0, values);
+  }
+
+  public Matrix(final int n, final int m, final double[][] values) {
+    this.n = n;
+    this.m = m;
+    this.values = values;
+  }
+
+  public int n() {
+    return this.n;
+  }
+
+  public int m() {
+    return this.m;
+  }
+
+  public double[][] values() {
+    return this.values;
+  }
+
+  public Matrix multiply(final double value) {
+    return matrix(multiply(this.n, this.m, value, this.values));
+  }
+
+  public Matrix multiply(final Matrix other) {
+    if (other.m != this.n) {
+      throw new IllegalArgumentException();
+    }
+    return matrix(multiply(this.n, this.m, other.n, this.values, other.values));
+  }
+
+  private void check(final Matrix other) {
+    if (other.m != this.m || other.n != this.n) {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  public Matrix sumate(final Matrix other) {
+    check(other);
+    return matrix(summate(this.n, this.m, this.values, other.values));
+  }
+
   static public double[][] copy(final int n, final int m, final double[][] source) {
     final double[][] result = new double[n][m];
     copy(n, m, source, result);
@@ -111,6 +159,16 @@ public class Matrix {
           sum += matrix[i][k] * other[k][j];
         }
         result[i][j] = sum;
+      }
+    }
+    return result;
+  }
+
+  static public double[][] summate(final int n, final int m, final double[][] matrix, final double[][] other) {
+    final double[][] result = new double[n][m];
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        result[i][j] = matrix[i][j] + other[i][j];
       }
     }
     return result;
@@ -463,6 +521,10 @@ public class Matrix {
       }
     }
     return result;
+  }
+
+  public double get(final int i, final int j) {
+    return this.values[i][j];
   }
 
 }

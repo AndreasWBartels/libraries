@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.object;
 
+import java.awt.Color;
 import java.util.Collection;
 
 import net.anwiba.commons.lang.functional.IConverter;
@@ -47,5 +48,7 @@ public interface IObjectFieldConfiguration<T> {
   IObjectModel<IValidationResult> getValidationResultModel();
 
   Collection<IActionFactory<T>> getActionFactorys();
+
+  Color getBackgroundColor();
 
 }

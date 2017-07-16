@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public final class InjektionAnalyserResult implements IInjektionAnalyserResult {
 
   private final List<IInjektionAnalyserValueResult> results;

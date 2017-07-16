@@ -23,6 +23,7 @@ package net.anwiba.commons.swing.dialog;
 
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
   private final IFunction<String, String, RuntimeException> actionButtonTextFactory;
   private final List<IAdditionalActionFactory> additionalActionFactories = new ArrayList<>();
   private final Dimension preferdSize;
+  private final IGuiIcon image;
 
   public AbstractDialogConfiguration(
       final IPreferences preferences,
@@ -57,6 +59,7 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
       final String title,
       final IMessage message,
       final IGuiIcon icon,
+      final IGuiIcon image,
       final ModalityType modality,
       final DialogType dialogType,
       final IFunction<String, String, RuntimeException> actionButtonTextFactory,
@@ -65,6 +68,7 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
       final List<IAdditionalActionFactory> additionalActionFactories) {
     this.preferdSize = preferdSize;
     this.title = title;
+    this.image = image;
     this.actionButtonTextFactory = actionButtonTextFactory;
     this.dialogCloseKeyEvent = dialogCloseKeyEvent;
     this.additionalActionFactories.addAll(additionalActionFactories);
@@ -140,4 +144,8 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
     return this.actionButtonTextFactory;
   }
 
+  @Override
+  public Image getImage() {
+    return this.image == null ? null : this.image.getSmallIcon().getImage();
+  }
 }

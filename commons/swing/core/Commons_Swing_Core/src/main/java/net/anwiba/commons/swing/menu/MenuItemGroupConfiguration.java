@@ -64,6 +64,7 @@ public class MenuItemGroupConfiguration {
     return this.registry.isEmpty();
   }
 
+  @SuppressWarnings("unchecked")
   public AbstractMenuItemConfiguration<? extends AbstractMenuItemDescription>[] getMenuItemConfiguration() {
     return this.registry.getItems(
         this.comparator,

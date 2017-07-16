@@ -23,6 +23,11 @@ package net.anwiba.commons.swing.dialog.progress.demo;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.junit.runner.RunWith;
+
+import de.jdemo.annotation.Demo;
+import de.jdemo.extensions.SwingDemoCase;
+import de.jdemo.junit.DemoAsTestRunner;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.process.cancel.ICanceler;
@@ -30,23 +35,20 @@ import net.anwiba.commons.progress.AbstractProgressTask;
 import net.anwiba.commons.progress.IProgressMonitor;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
 
-import org.junit.runner.RunWith;
-
-import de.jdemo.annotation.Demo;
-import de.jdemo.extensions.SwingDemoCase;
-import de.jdemo.junit.DemoAsTestRunner;
-
 @RunWith(DemoAsTestRunner.class)
 public class ProgressDialogDemo extends SwingDemoCase {
 
   @Demo
   public void demo() {
-    final ProgressDialog dialog = new ProgressDialog(createJFrame(), Message.create(
-        "Progess Dialog Demo", "", MessageType.DEFAULT)); //$NON-NLS-1$ //$NON-NLS-2$
+    final ProgressDialog dialog = new ProgressDialog(
+        createJFrame(),
+        "Progess Dialog Demo",
+        Message.create("Progess Dialog Demo", "", MessageType.DEFAULT)); //$NON-NLS-1$ //$NON-NLS-2$
     final AbstractProgressTask task = new AbstractProgressTask() {
 
       @Override
-      public void execute(final IProgressMonitor progressMonitor, final ICanceler canceler) throws InterruptedException {
+      public void execute(final IProgressMonitor progressMonitor, final ICanceler canceler)
+          throws InterruptedException {
         int i = 0;
         while (i < 5) {
           canceler.check();

@@ -24,7 +24,7 @@ package net.anwiba.commons.swing.table.action;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-import net.anwiba.commons.model.IBooleanProvider;
+import net.anwiba.commons.lang.primativ.IBooleanProvider;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.table.IObjectTableModel;

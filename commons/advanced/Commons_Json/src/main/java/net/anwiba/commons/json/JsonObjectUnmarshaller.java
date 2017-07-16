@@ -33,8 +33,10 @@ public class JsonObjectUnmarshaller<T> extends AbstractJsonObjectUnmarshaller<T,
     this(clazz, new HashMap<>());
   }
 
-  public JsonObjectUnmarshaller(final Class<T> clazz, final Map<Class, Object> injectionValues) {
-    super(clazz, Void.class, injectionValues, new IJsonObjectMapperExceptionFactory<Void, IOException>() {
+  public JsonObjectUnmarshaller(
+      final Class<T> clazz,
+      @SuppressWarnings("rawtypes") final Map<Class, Object> injectionValues) {
+    super(clazz, Void.class, injectionValues, new IJsonObjectMarshallingExceptionFactory<Void, IOException>() {
 
       @Override
       public IOException create(final Void response) {

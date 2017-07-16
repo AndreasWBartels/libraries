@@ -90,6 +90,7 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
 
       @Override
       public Iterator<TreeNode> iterator() {
+        @SuppressWarnings("unchecked")
         final Enumeration<TreeNode> children = parent.children();
         return new Iterator<TreeNode>() {
 

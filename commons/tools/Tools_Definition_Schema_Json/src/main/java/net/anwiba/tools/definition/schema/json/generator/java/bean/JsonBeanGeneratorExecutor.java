@@ -31,7 +31,11 @@ public class JsonBeanGeneratorExecutor {
   private final File source;
   private final IOutput output;
 
-  public JsonBeanGeneratorExecutor(final File source, final String pakkage, final String comment, final IOutput output) {
+  public JsonBeanGeneratorExecutor(
+      final File source,
+      final String pakkage,
+      final String comment,
+      final IOutput output) {
     this.output = output;
     output.info("source: " + source);
     this.source = source;
@@ -66,9 +70,9 @@ public class JsonBeanGeneratorExecutor {
     }
     final List<Throwable> throwables = new ArrayList<>();
     for (final File file : files) {
-      try {
+      try (final FileInputStream inputStream = new FileInputStream(file);) {
         this.output.info("schema definition: " + file);
-        generator.add(new FileInputStream(file), FileUtilities.getFileWithoutExtension(file).getName());
+        generator.add(inputStream, FileUtilities.getFileWithoutExtension(file).getName());
       } catch (final FileNotFoundException exception) {
         this.output.error("Couldn't find file: " + file, exception);
         throwables.add(exception);

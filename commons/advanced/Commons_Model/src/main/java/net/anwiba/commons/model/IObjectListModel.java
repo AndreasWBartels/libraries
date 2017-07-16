@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.model;
 
-import net.anwiba.commons.lang.object.IObjectListReceiver;
+import net.anwiba.commons.lang.collection.IObjectListReceiver;
 
-public interface IObjectListModel<T> extends IObjectListReceiver<T>, IListObjectsDistributor<T> {
+public interface IObjectListModel<T> extends IObjectListReceiver<T>, IObjectListDistributor<T> {
 
   @SuppressWarnings("unchecked")
   void remove(T... objects);

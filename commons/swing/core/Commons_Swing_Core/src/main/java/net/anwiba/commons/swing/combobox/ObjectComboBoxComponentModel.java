@@ -25,14 +25,10 @@ package net.anwiba.commons.swing.combobox;
 import java.util.List;
 
 import net.anwiba.commons.model.IChangeableObjectListener;
-import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.list.ObjectListComponentModel;
 
-public class ObjectComboBoxComponentModel<T> extends ObjectListComponentModel<T>
-    implements
-    IComboBoxModel<T>,
-    IObjectModel<T> {
+public class ObjectComboBoxComponentModel<T> extends ObjectListComponentModel<T> implements IComboBoxModel<T> {
 
   private final ObjectModel<T> model = new ObjectModel<>();
 

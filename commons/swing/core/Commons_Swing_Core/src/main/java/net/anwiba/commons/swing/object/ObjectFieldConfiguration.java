@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.object;
 
+import java.awt.Color;
 import java.util.List;
 
 import net.anwiba.commons.lang.functional.IConverter;
@@ -29,7 +30,7 @@ import net.anwiba.commons.lang.object.IObjectProvider;
 import net.anwiba.commons.lang.object.IObjectReceiver;
 import net.anwiba.commons.lang.object.ObjectContainer;
 import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.utilities.validation.AllwaysValidValidator;
+import net.anwiba.commons.utilities.validation.AllwaysValidStringValidator;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 import net.anwiba.commons.utilities.validation.IValidator;
 
@@ -78,8 +79,9 @@ public class ObjectFieldConfiguration extends AbstractObjectTextFieldConfigurati
       final IObjectModel<IValidationResult> validStateModel,
       final boolean isEditable,
       final int columns,
-      final List<IActionFactory<Object>> actionFactorys) {
-    super(model, validStateModel, null, isEditable, columns, actionFactorys);
+      final List<IActionFactory<Object>> actionFactorys,
+      final Color backgroundColor) {
+    super(model, validStateModel, null, isEditable, columns, actionFactorys, backgroundColor);
     final IObjectContainer<Object> broker = new ObjectContainer<>();
     this.stringToObjectConverter = new StringToObjectConverter(broker);
     this.objectToStringConverter = new ObjectToStringConverter(broker);
@@ -97,7 +99,7 @@ public class ObjectFieldConfiguration extends AbstractObjectTextFieldConfigurati
 
   @Override
   public IValidator<String> getValidator() {
-    return new AllwaysValidValidator();
+    return new AllwaysValidStringValidator();
   }
 
 }

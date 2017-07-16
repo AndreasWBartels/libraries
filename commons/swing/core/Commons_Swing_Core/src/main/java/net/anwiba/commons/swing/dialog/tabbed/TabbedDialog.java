@@ -21,14 +21,6 @@
  */
 package net.anwiba.commons.swing.dialog.tabbed;
 
-import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.message.IMessageConstants;
-import net.anwiba.commons.swing.dialog.DataState;
-import net.anwiba.commons.swing.dialog.DialogType;
-import net.anwiba.commons.swing.dialog.IDataStateListener;
-import net.anwiba.commons.swing.dialog.MessageDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -41,6 +33,16 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import net.anwiba.commons.lang.functional.IFunction;
+import net.anwiba.commons.message.IMessage;
+import net.anwiba.commons.message.IMessageConstants;
+import net.anwiba.commons.swing.dialog.DataState;
+import net.anwiba.commons.swing.dialog.DialogType;
+import net.anwiba.commons.swing.dialog.IDataStateListener;
+import net.anwiba.commons.swing.dialog.MessageDialog;
+import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.preference.IWindowPreferences;
 
 public class TabbedDialog extends MessageDialog {
 
@@ -59,33 +61,77 @@ public class TabbedDialog extends MessageDialog {
   }
 
   public TabbedDialog(
-    final Window owner,
-    final String title,
-    final IMessage message,
-    final Icon icon,
-    final DialogType dialogType) {
+      final Window owner,
+      final String title,
+      final IMessage message,
+      final Icon icon,
+      final DialogType dialogType) {
     this(owner, title, message, icon, dialogType, true);
   }
 
   public TabbedDialog(
-    final Window owner,
-    final String title,
-    final IMessage message,
-    final Icon icon,
-    final DialogType dialogType,
-    final boolean modal) {
+      final Window owner,
+      final String title,
+      final IMessage message,
+      final Icon icon,
+      final DialogType dialogType,
+      final boolean modal) {
     super(owner, title, message, icon, dialogType, modal);
-    createTabbedView();
+    createTabbedView(i -> new ArrayList<>());
     locate();
   }
 
-  private void createTabbedView() {
+  public TabbedDialog(
+      final Window owner,
+      final IWindowPreferences preferences,
+      final String title,
+      final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
+    this(
+        owner,
+        preferences,
+        title,
+        IMessageConstants.EMPTY_MESSAGE,
+        GuiIcons.EMPTY_ICON.getLargeIcon(),
+        DialogType.CANCEL_APPLY_OK,
+        true,
+        tabsFactory);
+  }
+
+  public TabbedDialog(
+      final Window owner,
+      final IWindowPreferences preferences,
+
+      final String title,
+      final IMessage message,
+      final Icon icon,
+      final DialogType dialogType,
+      final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
+    this(owner, preferences, title, message, icon, dialogType, true, tabsFactory);
+  }
+
+  public TabbedDialog(
+      final Window owner,
+      final IWindowPreferences preferences,
+      final String title,
+      final IMessage message,
+      final Icon icon,
+      final DialogType dialogType,
+      final boolean modal,
+      final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
+    super(owner, preferences, title, message, icon, dialogType, modal);
+    createTabbedView(tabsFactory);
+    locate();
+  }
+
+  private void createTabbedView(final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
     this.tabbedPanel.setMinimumSize(new Dimension(100, 100));
     final JPanel contentPanel = (JPanel) getContentPane();
     contentPanel.setLayout(new BorderLayout());
     contentPanel.add(BorderLayout.CENTER, this.tabbedPanel);
     contentPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-
+    for (final IDialogTab tab : tabsFactory.execute(null)) {
+      addTab(tab);
+    }
     this.tabbedPanel.addChangeListener(new ChangeListener() {
 
       @Override

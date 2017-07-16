@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.lang.functional;
 
+@FunctionalInterface
 public interface IResolver<T> {
 
   T resolve(T value) throws ResolvingException;

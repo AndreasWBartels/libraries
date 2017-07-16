@@ -14,7 +14,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-default</artifactId>
-    <version>1.0.25</version>
+    <version>1.0.48</version>
   </parent>
 
   <scm>
@@ -30,30 +30,4 @@
     <module>Tools_Graphml</module>
   </modules>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <licenseName>lgpl_v2_1</licenseName>
-          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
-          <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
-          <projectName>anwiba commons tools</projectName>
-          <roots>
-            <root>src/main/java</root>
-            <root>src/test/java</root>
-          </roots>
-        </configuration>
-        <executions>
-          <execution>
-            <id>first</id>
-            <goals>
-              <goal>update-file-header</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
