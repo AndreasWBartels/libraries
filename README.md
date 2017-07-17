@@ -8,8 +8,8 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
 ## Tools
 
 * [JSSD](https://github.com/AndreasWBartels/libraries/wiki/JSSD)
- * [GeoJSON](https://github.com/AndreasWBartels/libraries/wiki/GeoJSON)
- * [GPSD-Client](https://github.com/AndreasWBartels/libraries/wiki/GPSD-Client)
+  * [GeoJSON](https://github.com/AndreasWBartels/libraries/wiki/GeoJSON)
+  * [GPSD-Client](https://github.com/AndreasWBartels/libraries/wiki/GPSD-Client)
 * [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
 * [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
   * [Eclipse Swing Icons Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Swing-Icons-Plugins)
