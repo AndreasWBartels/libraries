@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -25,6 +25,9 @@ import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilitie
 
 import java.util.List;
 
+import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JCatchBlock;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -32,6 +35,7 @@ import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 
@@ -55,12 +59,26 @@ public class SetterFactory extends AbstractSourceFactory {
       final String name,
       final boolean isImutable,
       final boolean isNullable,
+      final boolean isInjection,
+      final String injectionAnnotation,
       final List<Annotation> annotations,
       final JType nameType,
       final String nameVar,
       final JType valueType,
       final String value) {
-    mapSetter(instance, field, name, isImutable, isNullable, annotations, nameType, nameVar, valueType, value);
+    mapSetter(
+        instance,
+        field,
+        name,
+        isImutable,
+        isNullable,
+        isInjection,
+        injectionAnnotation,
+        annotations,
+        nameType,
+        nameVar,
+        valueType,
+        value);
   }
 
   private JVar mapSetter(
@@ -69,11 +87,16 @@ public class SetterFactory extends AbstractSourceFactory {
       final String name,
       final boolean isImutable,
       final boolean isNullable,
+      final boolean isInjection,
+      final String injectionAnnotation,
       final List<Annotation> annotationConfigurations,
       final JType nameVariableType,
       final String nameVariableName,
       final JType valueVariableType,
       final String valueVariableName) {
+    if (isInjection) {
+      addInject(instance, injectionAnnotation);
+    }
     final JMethod method = instance.method(JMod.PUBLIC, _void(), name);
     annotate(method, annotationConfigurations);
     if (isImutable) {
@@ -87,6 +110,7 @@ public class SetterFactory extends AbstractSourceFactory {
           nameVariableName,
           valueVariableType,
           valueVariableName,
+          isInjection,
           createEnsureArgumentNotNullClosure(this.ensurePredicateFactory, method, new IAcceptor<JVar>() {
 
             @Override
@@ -102,6 +126,7 @@ public class SetterFactory extends AbstractSourceFactory {
         nameVariableName,
         valueVariableType,
         valueVariableName,
+        isInjection,
         createEnsureArgumentNotNullClosure(this.ensurePredicateFactory, method));
   }
 
@@ -202,4 +227,34 @@ public class SetterFactory extends AbstractSourceFactory {
     }
     return addObjectParameter(method, field, createEnsureArgumentNotNullClosure(this.ensurePredicateFactory, method));
   }
+
+  public JMethod addInject(final JDefinedClass bean, final String injectionAnnotation) {
+    final JMethod method = bean.method(JMod.PRIVATE, _void(), "_inject"); //$NON-NLS-1$
+    final JVar name = method.param(_classByNames(java.lang.String.class.getName()), "name"); //$NON-NLS-1$
+    final JVar value = method.param(_classByNames(java.lang.Object.class.getName()), "value"); //$NON-NLS-1$
+
+    final JClass methodInvokerClass = _class(
+        "net.anwiba.commons.reflection.OptionalReflectionMethodInvoker", //$NON-NLS-1$
+        bean,
+        _classByNames(java.lang.Object.class.getName()));
+    final JTryBlock _try = method.body()._try();
+    final JBlock body = _try.body();
+
+    final JVar methodInvoke = body.decl(
+        methodInvokerClass,
+        "setterInvoker", //$NON-NLS-1$
+        _classByNames("net.anwiba.commons.reflection.OptionalReflectionMethodInvoker") //$NON-NLS-1$
+            .staticInvoke("createSetter") //$NON-NLS-1$
+            .arg(JExpr._this().invoke("getClass")) //$NON-NLS-1$
+            .arg("JsonProperty")
+            .arg("value")
+            .arg(name));
+    body.invoke(methodInvoke, "invoke").arg(JExpr._this()).arg(value); //$NON-NLS-1$
+
+    final JCatchBlock _catch = _try._catch(_classByNames(java.lang.reflect.InvocationTargetException.class.getName()));
+    final JVar exception = _catch.param("exception"); //$NON-NLS-1$
+    _catch.body()._throw(JExpr._new(_classByNames(java.lang.RuntimeException.class.getName())).arg(exception));
+    return method;
+  }
+
 }

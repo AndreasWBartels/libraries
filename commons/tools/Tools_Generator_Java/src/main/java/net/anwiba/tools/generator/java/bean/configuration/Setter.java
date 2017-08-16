@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -29,18 +29,28 @@ public class Setter extends AbstractBeanMethod {
 
   private final boolean isMultiValue;
   private final boolean isSingleValue;
+  private final boolean isInjection;
+  private final String injectionAnnotationName;
 
   public Setter(
-    final String name,
-    final boolean isEnabled,
-    final boolean isSingleValue,
-    final boolean isMultiValue,
-    final List<Annotation> annotations,
-    final Argument argument,
-    final Map<String, List<Annotation>> map) {
+      final String name,
+      final boolean isEnabled,
+      final boolean isSingleValue,
+      final boolean isMultiValue,
+      final boolean isInjection,
+      final String injectionAnnotationName,
+      final List<Annotation> annotations,
+      final Argument argument,
+      final Map<String, List<Annotation>> map) {
     super(name, isEnabled, annotations, Arrays.asList(argument), map);
     this.isSingleValue = isSingleValue;
     this.isMultiValue = isMultiValue;
+    this.isInjection = isInjection;
+    this.injectionAnnotationName = injectionAnnotationName;
+  }
+
+  public boolean isInjection() {
+    return this.isInjection;
   }
 
   public boolean isMultiValue() {
@@ -49,5 +59,9 @@ public class Setter extends AbstractBeanMethod {
 
   public boolean isSingleValue() {
     return this.isSingleValue;
+  }
+
+  public String getInjectionAnnotationName() {
+    return this.injectionAnnotationName;
   }
 }

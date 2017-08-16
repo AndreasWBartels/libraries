@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,16 +21,17 @@
  */
 package net.anwiba.commons.swing.list;
 
-import net.anwiba.commons.model.IChangeableListListener;
-import net.anwiba.commons.utilities.ArrayUtilities;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractListModel;
+
+import net.anwiba.commons.model.IChangeableListListener;
+import net.anwiba.commons.utilities.ArrayUtilities;
 
 public abstract class AbstractObjectListComponentModel<T> extends AbstractListModel<T> implements IListModel<T> {
 
@@ -56,37 +57,61 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
   }
 
   public synchronized void add(@SuppressWarnings("unchecked") final T... objects) {
-    final int rows = getSize();
-    for (int i = 0; i < objects.length; i++) {
-      this.indexByobjectMap.put(objects[i], Integer.valueOf(getSize()));
-      this.objects.add(objects[i]);
+    if (objects.length == 0) {
+      return;
     }
-    fireIntervalAdded(null, rows, rows + objects.length - 1);
+    int rows = 0;
+    synchronized (this) {
+      rows = getSize();
+      for (int i = 0; i < objects.length; i++) {
+        this.indexByobjectMap.put(objects[i], Integer.valueOf(getSize()));
+        this.objects.add(objects[i]);
+      }
+    }
+    fireIntervalAdded(this, rows, rows + objects.length - 1);
     fireObjectAdded(Arrays.asList(objects));
   }
 
   public synchronized void remove(@SuppressWarnings("unchecked") final T... objects) {
-    final int[] indices = getIndicesOf(Arrays.asList(objects));
-    if (indices.length == 0) {
+    if (objects.length == 0) {
       return;
     }
-    Arrays.sort(indices);
+    int[] indices = new int[]{};
+    synchronized (this) {
+      indices = getIndicesOf(Arrays.asList(objects));
+      if (indices.length == 0) {
+        return;
+      }
+      Arrays.sort(indices);
+      for (int i = indices.length - 1; i >= 0; i--) {
+        final int index = indices[i];
+        if (!this.objects.remove(getObject(index))) {
+          indices[i] = -1;
+        }
+      }
+      refreshIndex();
+    }
     for (int i = indices.length - 1; i >= 0; i--) {
       final int index = indices[i];
-      if (this.objects.remove(getObject(index))) {
-        fireIntervalRemoved(null, index, index);
+      if (index != -1) {
+        fireIntervalRemoved(this, index, index);
       }
     }
-    refreshIndex();
   }
 
-  public synchronized void removeAll() {
-    final int rows = getSize();
-    final List<T> objects = new ArrayList<>(this.objects);
-    this.objects.clear();
-    this.indexByobjectMap.clear();
-    fireIntervalRemoved(null, 0, rows - 1);
-    fireObjectRemoved(objects);
+  public void removeAll() {
+    int rows = 0;
+    synchronized (this) {
+      rows = getSize();
+      if (rows == 0) {
+        return;
+      }
+      final List<T> objects = new ArrayList<>(this.objects);
+      this.objects.clear();
+      this.indexByobjectMap.clear();
+    }
+    fireIntervalRemoved(this, 0, rows - 1);
+    fireObjectRemoved(this.objects);
   }
 
   @Override
@@ -115,27 +140,42 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
   private final List<IChangeableListListener<T>> listModelListeners = new ArrayList<>();
 
   @Override
-  public final synchronized void addListModelListener(final IChangeableListListener<T> listener) {
-    this.listModelListeners.add(listener);
+  public final void addListModelListener(final IChangeableListListener<T> listener) {
+    synchronized (this.listModelListeners) {
+      this.listModelListeners.add(listener);
+    }
   }
 
   @Override
-  public final synchronized void removeListModelListener(final IChangeableListListener<T> listener) {
-    this.listModelListeners.remove(listener);
+  public final void removeListModelListener(final IChangeableListListener<T> listener) {
+    synchronized (this.listModelListeners) {
+      this.listModelListeners.remove(listener);
+    }
   }
 
-  protected final synchronized void fireObjectAdded(final Iterable<T> objects) {
-    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>(this.listModelListeners);
+  protected final void fireObjectAdded(final Iterable<T> objects) {
+    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>();
+    synchronized (this.listModelListeners) {
+      currentListModelListeners.addAll(this.listModelListeners);
+    }
     for (final IChangeableListListener<T> listener : currentListModelListeners) {
       listener.objectsAdded(null, objects);
     }
   }
 
-  protected final synchronized void fireObjectRemoved(final Iterable<T> objects) {
-    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>(this.listModelListeners);
+  protected final void fireObjectRemoved(final Iterable<T> objects) {
+    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>();
+    synchronized (this.listModelListeners) {
+      currentListModelListeners.addAll(this.listModelListeners);
+    }
     for (final IChangeableListListener<T> listener : currentListModelListeners) {
       listener.objectsRemoved(null, objects);
     }
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    return this.objects.iterator();
   }
 
 }

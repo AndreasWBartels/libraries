@@ -42,6 +42,13 @@ public class PlanarImageContainer extends AbstractRenderedImageContainer {
   @Override
   public BufferedImage asBufferImage() {
     try {
+      final long size = (long) getWidth() * getHeight();
+      if (size >= Integer.MAX_VALUE) {
+        logger.log(
+            ILevel.WARNING,
+            "image dimensions (width=" + getWidth() + " height=" + getHeight() + ") are too large"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+        return null;
+      }
       return this.image.getAsBufferedImage();
     } catch (final RuntimeException exception) {
       logger.log(ILevel.WARNING, exception.getMessage(), exception);

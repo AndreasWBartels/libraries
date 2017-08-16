@@ -46,7 +46,7 @@ public class NamedValueProviderFactory extends AbstractSourceFactory {
   public void create(final JDefinedClass instance, final NamedValueProvider configuration, final JFieldVar field) {
     final Type type = configuration.getType();
     if (configuration.isInterfaceEnabled()) {
-      instance._implements(_class(NAMED_VALUE_PROVIDER, type.name(), JAVA_LANG_RUNTIME_EXCEPTION));
+      instance._implements(_classByNames(NAMED_VALUE_PROVIDER, type.name(), JAVA_LANG_RUNTIME_EXCEPTION));
     }
     if (configuration.isNameGetterEnabled()) {
       nameGetter(

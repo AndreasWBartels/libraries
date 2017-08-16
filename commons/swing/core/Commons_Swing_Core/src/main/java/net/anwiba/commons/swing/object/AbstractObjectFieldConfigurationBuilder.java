@@ -68,6 +68,7 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
   private IObjectModel<T> model = new ObjectModel<>();
   private final List<IActionFactory<T>> actionFactorys = new ArrayList<>();
   private Color background;
+  private IKeyListenerFactory<T> keyListenerFactory;
 
   public AbstractObjectFieldConfigurationBuilder(
       final IValidator<String> validator,
@@ -92,7 +93,14 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
         this.isEditable,
         this.columns,
         this.actionFactorys,
+        this.keyListenerFactory,
         this.background);
+  }
+
+  @SuppressWarnings("unchecked")
+  public C setKeyListenerFactory(final IKeyListenerFactory<T> keyListenerFactory) {
+    this.keyListenerFactory = keyListenerFactory;
+    return (C) this;
   }
 
   @SuppressWarnings("unchecked")

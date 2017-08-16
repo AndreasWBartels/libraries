@@ -59,6 +59,8 @@ public class MemberBuilder {
         this.isSetterEnabled,
         this.isSingleValue,
         this.isMultiValue,
+        false,
+        null,
         this.setterAnnotations,
         new Argument(this.type, this.name, this.setterArgumentAnnotations),
         map);

@@ -57,7 +57,7 @@ public class EqualsFactory extends AbstractSourceFactory {
     final JMethod method = bean.method(JMod.PUBLIC, this.codeModel.INT, "hashCode");
     method.annotate(java.lang.Override.class);
     final JBlock block = method.body().block();
-    final JClass objectUtilities = _class(net.anwiba.commons.lang.object.ObjectUtilities.class.getName());
+    final JClass objectUtilities = _classByNames(net.anwiba.commons.lang.object.ObjectUtilities.class.getName());
     JInvocation hashCode = objectUtilities.staticInvoke("hashCode");
     for (final JFieldVar field : fields) {
       hashCode = hashCode.arg(JExpr.refthis(field.name()));
@@ -74,7 +74,7 @@ public class EqualsFactory extends AbstractSourceFactory {
     block._if(object._instanceof(bean).not())._then()._return(JExpr.FALSE);
     JExpression result = JExpr.TRUE;
     final JExpression other = block.decl(bean, "other", JExpr.cast(bean, object));
-    final JClass objectUtilities = _class(net.anwiba.commons.lang.object.ObjectUtilities.class.getName());
+    final JClass objectUtilities = _classByNames(net.anwiba.commons.lang.object.ObjectUtilities.class.getName());
     for (final JFieldVar field : fields) {
       result =
           result.cand(objectUtilities.staticInvoke("equals").arg(JExpr.refthis(field.name())).arg(other.ref(field)));

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.0.48
+Bundle-Version: 1.0.52
 Bundle-Vendor: Andreas W. Bartels
 Bundle-Name: GuiIcons
 Bundle-SymbolicName: net.anwiba.eclipse.icons;singleton:=true
@@ -24,4 +24,4 @@ Import-Package: org.eclipse.core.databinding.observable.list,
  net.anwiba.commons.process.cancel,
  net.anwiba.commons.utilities.string
 Bundle-ClassPath: .,
- lib/anwiba-tools-icons-1.0.48.jar
+ lib/anwiba-tools-icons-1.0.52.jar

@@ -35,6 +35,7 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
   private final IValidator<String> validator;
   private final IConverter<String, T, RuntimeException> toObjectConverter;
   private final IConverter<T, String, RuntimeException> toStringConverter;
+  private IKeyListenerFactory<T> keyListenerFactory;
 
   public DefaultObjectFieldConfiguration(
       final IObjectModel<T> model,
@@ -52,6 +53,7 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
         true,
         10,
         new ArrayList<>(),
+        null,
         null);
   }
 
@@ -72,6 +74,7 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
         isEditable,
         10,
         new ArrayList<>(),
+        null,
         null);
   }
 
@@ -85,8 +88,17 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
       final boolean isEditable,
       final int columns,
       final List<IActionFactory<T>> actionFactorys,
+      final IKeyListenerFactory<T> keyListenerFactory,
       final Color backgroundColor) {
-    super(model, validStateModel, toolTipFactory, isEditable, columns, actionFactorys, backgroundColor);
+    super(
+        model,
+        validStateModel,
+        toolTipFactory,
+        isEditable,
+        columns,
+        actionFactorys,
+        keyListenerFactory,
+        backgroundColor);
     this.validator = validator;
     this.toObjectConverter = toObjectConverter;
     this.toStringConverter = toStringConverter;

@@ -81,7 +81,7 @@ public class ObjectFieldConfiguration extends AbstractObjectTextFieldConfigurati
       final int columns,
       final List<IActionFactory<Object>> actionFactorys,
       final Color backgroundColor) {
-    super(model, validStateModel, null, isEditable, columns, actionFactorys, backgroundColor);
+    super(model, validStateModel, null, isEditable, columns, actionFactorys, null, backgroundColor);
     final IObjectContainer<Object> broker = new ObjectContainer<>();
     this.stringToObjectConverter = new StringToObjectConverter(broker);
     this.objectToStringConverter = new ObjectToStringConverter(broker);

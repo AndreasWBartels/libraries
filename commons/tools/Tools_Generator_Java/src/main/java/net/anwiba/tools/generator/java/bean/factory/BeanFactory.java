@@ -69,7 +69,7 @@ public class BeanFactory extends AbstractSourceFactory {
     try {
       final JDefinedClass bean = _class(configuration.name(), ClassType.CLASS);
       if (configuration.extend() != null) {
-        bean._extends(_class(configuration.extend()));
+        bean._extends(_classByNames(configuration.extend()));
       }
       annotate(bean, configuration.annotations());
       final Iterable<JFieldVar> fields = members(bean, configuration);
@@ -165,6 +165,8 @@ public class BeanFactory extends AbstractSourceFactory {
               setter.name(), //
               member.isImutable(), //
               member.isNullable(), //
+              setter.isInjection(),
+              setter.getInjectionAnnotationName(),
               annotations, //
               _type(member.type().generics()[0]), //
               "name", //$NON-NLS-1$

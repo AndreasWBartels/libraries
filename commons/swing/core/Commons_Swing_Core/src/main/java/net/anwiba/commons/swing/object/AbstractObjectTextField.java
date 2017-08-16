@@ -147,6 +147,11 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
     this.toStringConverter = configuration.getToStringConverter();
     final PlainDocument document = new PlainDocument();
     final TextField<T> field = new TextField<>(document, configuration, this.validStateModel);
+    final IKeyListenerFactory<T> keyListenerFactory = configuration.getKeyListenerFactory();
+    if (keyListenerFactory != null) {
+      field.addKeyListener(keyListenerFactory.create(this.model, document));
+    }
+
     this.textField = field;
     final Collection<IActionFactory<T>> actionFactorys = configuration.getActionFactorys();
     if (configuration.getBackgroundColor() != null) {

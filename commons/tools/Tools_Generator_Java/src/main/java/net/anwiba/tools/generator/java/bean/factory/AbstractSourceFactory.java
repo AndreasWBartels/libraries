@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,12 +21,9 @@
  */
 package net.anwiba.tools.generator.java.bean.factory;
 
-import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.utilities.ArrayUtilities;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.Parameter;
-import net.anwiba.tools.generator.java.bean.configuration.Type;
-import net.anwiba.tools.generator.java.bean.value.IValueTypeVisitor;
+import static net.anwiba.commons.ensure.Conditions.*;
+import static net.anwiba.commons.ensure.Ensure.*;
+import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
@@ -40,9 +37,12 @@ import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JPrimitiveType;
 import com.sun.codemodel.JType;
 
-import static net.anwiba.commons.ensure.Conditions.*;
-import static net.anwiba.commons.ensure.Ensure.*;
-import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.utilities.ArrayUtilities;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.Parameter;
+import net.anwiba.tools.generator.java.bean.configuration.Type;
+import net.anwiba.tools.generator.java.bean.value.IValueTypeVisitor;
 
 public class AbstractSourceFactory {
 
@@ -64,7 +64,7 @@ public class AbstractSourceFactory {
   protected void annotate(final JAnnotatable annotatable, final Annotation annotation) {
     ensureThatArgument(annotatable, notNull());
     ensureThatArgument(annotation, notNull());
-    final JAnnotationUse annotate = annotatable.annotate(_class(annotation.name()));
+    final JAnnotationUse annotate = annotatable.annotate(_classByNames(annotation.name()));
     final Iterable<Parameter> parameters = annotation.parameters();
     for (final Parameter parameter : parameters) {
       for (final Object value : parameter.values()) {
@@ -110,7 +110,7 @@ public class AbstractSourceFactory {
     return _class;
   }
 
-  protected JClass _class(final String type, final String... generics) {
+  protected JClass _classByNames(final String type, final String... generics) {
     ensureThatArgument(type, notNull());
     if (generics.length == 0) {
       return this.codeModel.ref(type);
@@ -124,6 +124,10 @@ public class AbstractSourceFactory {
       }
     }, generics, JClass.class);
     return this.codeModel.ref(type).narrow(classes);
+  }
+
+  protected JClass _class(final String typeName, final JClass... generics) {
+    return this.codeModel.ref(typeName).narrow(generics);
   }
 
   protected JType _type(final String type, final String... generics) {
@@ -151,7 +155,7 @@ public class AbstractSourceFactory {
   }
 
   public JExpression format(final String string, final JExpression... params) {
-    final JClass formater = _class(java.text.MessageFormat.class.getName());
+    final JClass formater = _classByNames(java.text.MessageFormat.class.getName());
     JInvocation expression = formater.staticInvoke("format").arg(string); //$NON-NLS-1$
     for (final JExpression var : params) {
       expression = expression.arg(var);

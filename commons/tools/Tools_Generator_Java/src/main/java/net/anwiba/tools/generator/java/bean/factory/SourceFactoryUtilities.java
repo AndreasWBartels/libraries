@@ -194,6 +194,7 @@ public class SourceFactoryUtilities {
       final String nameVariableName,
       final JType valueType,
       final String valueVariableName,
+      final boolean isInjection,
       final IProcedure<JVar, RuntimeException>... procedure) {
     if (method == null || field == null) {
       return null;
@@ -203,6 +204,9 @@ public class SourceFactoryUtilities {
     for (final IProcedure<JVar, RuntimeException> closure : procedure) {
       closure.execute(nameParam);
       closure.execute(valueParam);
+    }
+    if (isInjection) {
+      method.body().invoke("_inject").arg(nameParam).arg(valueParam); //$NON-NLS-1$
     }
     method.body().add(JExpr.refthis(field.name()).invoke("put").arg(nameParam).arg(valueParam)); //$NON-NLS-1$
     return valueParam;

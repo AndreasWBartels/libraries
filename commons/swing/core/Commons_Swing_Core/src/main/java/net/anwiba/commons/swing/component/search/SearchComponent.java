@@ -21,9 +21,11 @@
  */
 package net.anwiba.commons.swing.component.search;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -73,7 +75,9 @@ public class SearchComponent<C, R> implements IComponentProvider {
   @Override
   public JComponent getComponent() {
     if (this.contentPane == null) {
-      this.contentPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+      this.contentPane = new JPanel(new BorderLayout());
+      this.contentPane.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 2));;
+      final JPanel controllPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
       final ISearchEngine<C, R> engine = this.engine;
 
       final AbstractAction previousAction = new PreviousAction<>(engine);
@@ -162,16 +166,17 @@ public class SearchComponent<C, R> implements IComponentProvider {
           });
         }
       });
-      this.contentPane.add(createSearchField(stringField));
       for (final JComponent component : this.components) {
-        this.contentPane.add(component);
+        controllPane.add(component);
       }
+      this.contentPane.add(createSearchField(stringField), BorderLayout.NORTH);
+      this.contentPane.add(controllPane, BorderLayout.CENTER);
     }
     return this.contentPane;
   }
 
   private Component createSearchField(final StringField stringField) {
-    final JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    final JPanel searchPanel = new JPanel(new GridLayout(1, 1));
     searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
     searchPanel.add(stringField.getComponent());
     return searchPanel;

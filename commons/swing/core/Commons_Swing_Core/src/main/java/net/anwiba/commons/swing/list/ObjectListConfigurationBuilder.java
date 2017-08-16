@@ -8,18 +8,20 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
 package net.anwiba.commons.swing.list;
+
+import java.awt.event.MouseListener;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -72,6 +74,7 @@ public class ObjectListConfigurationBuilder<T> {
       return ObjectListConfigurationBuilder.this.border;
     }
   };
+  private MouseListener mouseListener;
 
   public ObjectListConfigurationBuilder<T> setObjectUi(final IObjectUi<T> objectUi) {
     this.objectUi = objectUi;
@@ -127,6 +130,11 @@ public class ObjectListConfigurationBuilder<T> {
     return new IObjectListConfiguration<T>() {
 
       @Override
+      public MouseListener getMouseListener() {
+        return ObjectListConfigurationBuilder.this.mouseListener;
+      }
+
+      @Override
       public int getVisibleRowCount() {
         return ObjectListConfigurationBuilder.this.visibleRowCount;
       }
@@ -148,7 +156,13 @@ public class ObjectListConfigurationBuilder<T> {
     };
   }
 
-  public void setVerticalAlignment(final int verticalAlignment) {
+  public ObjectListConfigurationBuilder<T> setVerticalAlignment(final int verticalAlignment) {
     this.verticalAlignment = verticalAlignment;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setMouseListener(final MouseListener mouseListener) {
+    this.mouseListener = mouseListener;
+    return this;
   }
 }

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,14 +21,9 @@
  */
 package net.anwiba.commons.swing.list;
 
-import net.anwiba.commons.model.ISelectionListener;
-import net.anwiba.commons.model.SelectionEvent;
-import net.anwiba.commons.model.SelectionModel;
-import net.anwiba.commons.swing.component.IComponentProvider;
-import net.anwiba.commons.utilities.collection.IterableUtilities;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -36,6 +31,12 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import net.anwiba.commons.model.ISelectionListener;
+import net.anwiba.commons.model.SelectionEvent;
+import net.anwiba.commons.model.SelectionModel;
+import net.anwiba.commons.swing.component.IComponentProvider;
+import net.anwiba.commons.utilities.collection.IterableUtilities;
 
 public class ObjectListComponent<T> implements IComponentProvider {
 
@@ -48,9 +49,9 @@ public class ObjectListComponent<T> implements IComponentProvider {
     private final SelectionModel<T> objectSelectionModel;
 
     public JListSelectionListener(
-      final IListModel<T> listModel,
-      final ListSelectionModel listSelectionModel,
-      final SelectionModel<T> objectSelectionModel) {
+        final IListModel<T> listModel,
+        final ListSelectionModel listSelectionModel,
+        final SelectionModel<T> objectSelectionModel) {
       this.listModel = listModel;
       this.listSelectionModel = listSelectionModel;
       this.objectSelectionModel = objectSelectionModel;
@@ -66,7 +67,8 @@ public class ObjectListComponent<T> implements IComponentProvider {
         return;
       }
       final List<T> objects = new ArrayList<>();
-      for (int i = this.listSelectionModel.getMinSelectionIndex(); i <= this.listSelectionModel.getMaxSelectionIndex(); i++) {
+      for (int i = this.listSelectionModel.getMinSelectionIndex(); i <= this.listSelectionModel
+          .getMaxSelectionIndex(); i++) {
         if (this.listSelectionModel.isSelectedIndex(i)) {
           objects.add(this.listModel.getObject(i));
         }
@@ -81,9 +83,9 @@ public class ObjectListComponent<T> implements IComponentProvider {
     private final SelectionModel<T> objectSelectionModel;
 
     public SelectionListener(
-      final IListModel<T> listModel,
-      final ListSelectionModel tableSelectionModel,
-      final SelectionModel<T> objectSelectionModel) {
+        final IListModel<T> listModel,
+        final ListSelectionModel tableSelectionModel,
+        final SelectionModel<T> objectSelectionModel) {
       this.listModel = listModel;
       this.tableSelectionModel = tableSelectionModel;
       this.objectSelectionModel = objectSelectionModel;
@@ -134,17 +136,14 @@ public class ObjectListComponent<T> implements IComponentProvider {
     final JList<T> list = new JList<>(listModel);
     list.setVisibleRowCount(configuration.getVisibleRowCount());
     list.setSelectionMode(configuration.getSelectionMode());
-    list.setCellRenderer(new ObjectUiCellRenderer<>(configuration.getObjectUiCellRendererConfiguration(), configuration
-        .getObjectUi()));
+    list.setCellRenderer(
+        new ObjectUiCellRenderer<>(configuration.getObjectUiCellRendererConfiguration(), configuration.getObjectUi()));
     final ListSelectionModel tableSelectionModel = list.getSelectionModel();
-    tableSelectionModel.addListSelectionListener(new JListSelectionListener<>(
-        listModel,
-        tableSelectionModel,
-        this.selectionModel));
-    this.selectionModel.addSelectionListener(new SelectionListener<>(
-        listModel,
-        tableSelectionModel,
-        this.selectionModel));
+    tableSelectionModel
+        .addListSelectionListener(new JListSelectionListener<>(listModel, tableSelectionModel, this.selectionModel));
+    this.selectionModel
+        .addSelectionListener(new SelectionListener<>(listModel, tableSelectionModel, this.selectionModel));
+    Optional.ofNullable(configuration.getMouseListener()).ifPresent(l -> list.addMouseListener(l));
     this.component = new JScrollPane(list);
   }
 

@@ -36,8 +36,8 @@ public class EnsurePredicateFactory extends AbstractSourceFactory {
 
   public EnsurePredicateFactory(final JCodeModel codeModel) {
     super(codeModel);
-    this.ensureClass = _class(net.anwiba.commons.ensure.Ensure.class.getName());
-    this.conditionsClass = _class(net.anwiba.commons.ensure.Conditions.class.getName());
+    this.ensureClass = _classByNames(net.anwiba.commons.ensure.Ensure.class.getName());
+    this.conditionsClass = _classByNames(net.anwiba.commons.ensure.Conditions.class.getName());
   }
 
   public JStatement ensureArgumentNotNull(final JVar param) {

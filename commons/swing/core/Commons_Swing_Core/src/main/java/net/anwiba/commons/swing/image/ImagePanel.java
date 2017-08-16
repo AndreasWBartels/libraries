@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -30,6 +30,7 @@ import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -39,6 +40,9 @@ import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.ImageFileFilter;
 import net.anwiba.commons.image.ImageReaderUtilities;
 import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.process.cancel.Canceler;
+import net.anwiba.commons.resource.reference.IResourceReference;
+import net.anwiba.commons.resource.reference.IResourceReferenceHandler;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 @SuppressWarnings("serial")
@@ -47,8 +51,12 @@ public class ImagePanel extends JComponent {
   private IImageContainer imageContainer = null;
   private BufferedImage thumbnail = null;
   private Thread thread = null;
+  private final IResourceReferenceHandler resourceReferenceHandler;
 
-  public ImagePanel(final IObjectModel<File> imageFileModel) {
+  public ImagePanel(
+      final IResourceReferenceHandler resourceReferenceHandler,
+      final IObjectModel<IResourceReference> imageFileModel) {
+    this.resourceReferenceHandler = resourceReferenceHandler;
     final ImageFileFilter fileFilter = new ImageFileFilter();
     setPreferredSize(new Dimension(100, 100));
     setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -80,9 +88,9 @@ public class ImagePanel extends JComponent {
     });
   }
 
-  protected void load(final IObjectModel<File> imageFileModel, final ImageFileFilter fileFilter) {
-    final File imageFile = imageFileModel.get();
-    if (imageFile != null && imageFile.isFile() && fileFilter.accept(imageFile)) {
+  protected void load(final IObjectModel<IResourceReference> imageFileModel, final ImageFileFilter fileFilter) {
+    final IResourceReference imageFile = imageFileModel.get();
+    if (isAccepted(fileFilter, imageFile)) {
       if (this.thread != null) {
         this.thread.interrupt();
       }
@@ -101,6 +109,18 @@ public class ImagePanel extends JComponent {
     }
   }
 
+  private boolean isAccepted(final ImageFileFilter fileFilter, final IResourceReference imageFile) {
+    try {
+      if (this.resourceReferenceHandler.isFileSystemResource(imageFile)) {
+        final File file = this.resourceReferenceHandler.getFile(imageFile);
+        return file != null && file.isFile() && fileFilter.accept(file);
+      }
+      return imageFile != null;
+    } catch (final URISyntaxException exception) {
+      return false;
+    }
+  }
+
   protected void reset() {
     if (this.imageContainer != null) {
       this.imageContainer.dispose();
@@ -110,13 +130,17 @@ public class ImagePanel extends JComponent {
     GuiUtilities.invokeLater(() -> repaint());
   }
 
-  protected synchronized boolean loadImage(final File imageFile) throws IOException {
+  protected synchronized boolean loadImage(final IResourceReference imageFile) throws IOException {
     if (this.imageContainer == null) {
-      final IImageContainer container = ImageReaderUtilities.createImageContainer(imageFile);
-      if (container == null) {
+      try {
+        final IImageContainer container = ImageReaderUtilities.read(Canceler.DummyCancler, imageFile);
+        if (container == null) {
+          return false;
+        }
+        this.imageContainer = container;
+      } catch (final InterruptedException exception) {
         return false;
       }
-      this.imageContainer = container;
     }
     final Rectangle bound = imageBound();
     if (this.thumbnail != null

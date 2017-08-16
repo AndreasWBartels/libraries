@@ -10,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
-    <version>1.0.48</version>
+    <version>1.0.52</version>
   </parent>
 
   <scm>
@@ -21,13 +21,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <projectNameTemplate>Gis_Gpsd</projectNameTemplate>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <executions>
@@ -71,7 +64,7 @@
       <plugin>
         <groupId>net.anwiba.commons.tools</groupId>
         <artifactId>anwiba-tools-definition-schema-json</artifactId>
-        <version>${net.anwiba.commons.version}</version>
+        <version>${net.anwiba.plugins.version}</version>
         <executions>
           <execution>
             <id>generate</id>
@@ -81,7 +74,7 @@
             </goals>
             <configuration>
               <pakkage>net.anwiba.spatial.gps.gpsd.response</pakkage>
-              <comment>// Copyright (c) 2012 by Andreas W. Bartels (bartels@anwiba.de)</comment>
+              <comment>// Copyright (c) 2017 by Andreas W. Bartels (bartels@anwiba.de)</comment>
             </configuration>
           </execution>
         </executions>

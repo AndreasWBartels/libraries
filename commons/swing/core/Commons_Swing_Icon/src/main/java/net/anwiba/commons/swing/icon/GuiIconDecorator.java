@@ -241,8 +241,10 @@ public class GuiIconDecorator {
       final DecorationPosition position,
       final ImageIcon icon,
       final ImageIcon decorationIcon) {
-    final Point point = getPosition(iconSize, position);
-    return add(icon, decorationIcon, point.x, point.y, getSize(iconSize, position), getSize(iconSize, position));
+    final int width = getSize(iconSize, position);
+    final int height = getSize(iconSize, position);
+    final Point point = getPosition(iconSize, position, width, height);
+    return add(icon, decorationIcon, point.x, point.y, width, height);
   }
 
   public static int getSize(final int iconSize, final DecorationPosition position) {
@@ -260,22 +262,26 @@ public class GuiIconDecorator {
     return (iconSize * 2) / 3;
   }
 
-  private static Point getPosition(final int size, final DecorationPosition position) {
+  private static Point getPosition(
+      final int size,
+      final DecorationPosition position,
+      final int width,
+      final int height) {
     switch (position) {
       case LowerLeft: {
-        return new Point(0, size);
+        return new Point(0, size - height);
       }
       case LowerRight: {
-        return new Point(size - getSize(size, position), size);
+        return new Point(size - width, size - height);
       }
       case UpperLeft: {
-        return new Point(0, size - getSize(size, position));
+        return new Point(0, 0);
       }
       case UpperRight: {
-        return new Point(size - getSize(size, position), size - getSize(size, position));
+        return new Point(size - getSize(size, position), 0);
       }
       case Fill: {
-        return new Point(0, size);
+        return new Point(0, 0);
       }
     }
     return new Point(0, 0);

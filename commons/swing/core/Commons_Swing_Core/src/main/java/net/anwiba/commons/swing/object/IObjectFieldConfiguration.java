@@ -51,4 +51,6 @@ public interface IObjectFieldConfiguration<T> {
 
   Color getBackgroundColor();
 
+  IKeyListenerFactory<T> getKeyListenerFactory();
+
 }

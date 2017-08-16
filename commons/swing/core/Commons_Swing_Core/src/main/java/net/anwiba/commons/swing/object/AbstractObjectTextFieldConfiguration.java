@@ -38,6 +38,7 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
   private final IObjectModel<T> model;
   private final List<IActionFactory<T>> actionFactorys = new ArrayList<>();
   private final Color backgroundColor;
+  private final IKeyListenerFactory<T> keyListenerFactory;
 
   public AbstractObjectTextFieldConfiguration(
       final IObjectModel<T> model,
@@ -46,12 +47,14 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
       final boolean isEditable,
       final int columns,
       final List<IActionFactory<T>> actionFactorys,
+      final IKeyListenerFactory<T> keyListenerFactory,
       final Color backgroundColor) {
     this.model = model;
     this.validStateModel = validStateModel;
     this.factory = toolTipFactory;
     this.isEditable = isEditable;
     this.columns = columns;
+    this.keyListenerFactory = keyListenerFactory;
     this.backgroundColor = backgroundColor;
     this.actionFactorys.addAll(actionFactorys);
   }
@@ -89,5 +92,10 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
   @Override
   public Collection<IActionFactory<T>> getActionFactorys() {
     return this.actionFactorys;
+  }
+
+  @Override
+  public IKeyListenerFactory<T> getKeyListenerFactory() {
+    return this.keyListenerFactory;
   }
 }

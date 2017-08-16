@@ -168,6 +168,7 @@ public class JObjectToBeanConverter {
     properties.setterName("set").setterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_ANY_SETTER).build());
     properties.isImutable(false);
     properties.isNullable(true);
+    properties.setInjectionAnnotationName(com.fasterxml.jackson.annotation.JsonProperty.class.getSimpleName());
     properties.setImplementsNamedValueProvider(jssdAnnotations.containsKey(JSSD_NAMED_VALUE_PROVIDER));
     properties.namesGetterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE).build());
     builder.properties(properties.build());

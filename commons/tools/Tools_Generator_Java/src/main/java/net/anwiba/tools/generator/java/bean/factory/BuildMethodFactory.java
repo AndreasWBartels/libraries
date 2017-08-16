@@ -37,7 +37,7 @@ public final class BuildMethodFactory extends AbstractSourceFactory {
   }
 
   public void create(final JDefinedClass beanBuilder, final String name, final Iterable<JFieldVar> fields) {
-    final JClass bean = _class(name);
+    final JClass bean = _classByNames(name);
     final JMethod method = beanBuilder.method(JMod.PUBLIC, bean, "build"); //$NON-NLS-1$
     JInvocation instance = JExpr._new(bean);
     for (final JFieldVar field : fields) {

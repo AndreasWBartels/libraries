@@ -52,6 +52,7 @@ import net.anwiba.commons.swing.icon.GuiIconSize;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.list.ObjectListConfigurationBuilder;
 import net.anwiba.commons.swing.preference.WindowPreferences;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 
 @SuppressWarnings("serial")
@@ -227,12 +228,16 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
     }
     if (selectionModel.get() == null) {
       ComboBoxChooserDialog.this.chooserPanelConfiguration = null;
-      setTryEnabled(false);
-      contentComponent.removeAll();
-      setIcon(null);
-      setMessage(null);
-      setTryEnabled(false);
-      setOkEnabled(false);
+      GuiUtilities.invokeLater(() -> {
+        setTryEnabled(false);
+        contentComponent.removeAll();
+        setIcon(null);
+        setMessage(null);
+        setTryEnabled(false);
+        setOkEnabled(false);
+        validate();
+        doLayout();
+      });
       return;
     }
     ComboBoxChooserDialog.this.chooserPanelConfiguration = selectionModel.get();
@@ -240,21 +245,30 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
         .getOptionPanelFactory();
     this.chooserPanel = chooserPanelFactory.create(getOwner(), this.valueModel.get());
     this.chooserPanel.addInputListener(this.inputListener);
-    setIcon(ComboBoxChooserDialog.this.chooserPanelConfiguration.getGuiIcon().getLargeIcon());
-    setMessage(this.chooserPanel.getMessage());
     this.valueModel = this.chooserPanel.getModel();
     this.validStateModel = this.chooserPanel.getValidStateModel();
     this.valueModel.addChangeListener(this.valueChangeListener);
     this.validStateModel.addChangeListener(this.validateStateListener);
-    contentComponent.removeAll();
-    contentComponent.add(this.chooserPanel.getComponent());
-    if (this.valueModel.get() == null || !this.validStateModel.get().isValid()) {
-      setTryEnabled(false);
-      setOkEnabled(false);
-      return;
-    }
-    setTryEnabled(!(ComboBoxChooserDialog.this.chooserPanelConfiguration.getTryTaskFactory() == null));
-    setOkEnabled(true);
+
+    GuiUtilities.invokeLater(() -> {
+      try {
+        setIcon(ComboBoxChooserDialog.this.chooserPanelConfiguration.getGuiIcon().getLargeIcon());
+        setMessage(this.chooserPanel.getMessage());
+        contentComponent.removeAll();
+        contentComponent.add(this.chooserPanel.getComponent());
+        if (this.valueModel.get() == null || !this.validStateModel.get().isValid()) {
+          setTryEnabled(false);
+          setOkEnabled(false);
+          return;
+        }
+        setTryEnabled(!(ComboBoxChooserDialog.this.chooserPanelConfiguration.getTryTaskFactory() == null));
+        setOkEnabled(true);
+      } finally {
+        validate();
+        doLayout();
+      }
+    });
+
   }
 
   @Override
