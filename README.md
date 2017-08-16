@@ -11,8 +11,8 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
   * [GeoJSON](https://github.com/AndreasWBartels/libraries/wiki/GeoJSON)
   * [GPSD-Client](https://github.com/AndreasWBartels/libraries/wiki/GPSD-Client)
   * [OSM](https://github.com/AndreasWBartels/libraries/wiki/OSM)
-   * Overpass
-   * Nominatim
+    * Overpass
+    * Nominatim
 
 * [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
 * [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
