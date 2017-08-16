@@ -29,6 +29,7 @@
     <module>Commons_NLS</module>
     <module>Commons_Preferences</module>
     <module>Commons_Process</module>
+    <module>Commons_Http</module>
     <module>Commons_Image</module>
     <module>Commons_Workflow</module>
   </modules>

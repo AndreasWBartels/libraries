@@ -64,6 +64,12 @@
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-http</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-workflow</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
@@ -128,6 +134,11 @@
               <includeDependencySources>true</includeDependencySources>
 
               <dependencySourceExcludes>
+                <dependencySourceExclude>com.fasterxml.jackson.core:*</dependencySourceExclude>
+                <dependencySourceExclude>com.sun.media:*</dependencySourceExclude>
+                <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
+                <dependencySourceExclude>log4j:*</dependencySourceExclude>
+                <dependencySourceExclude>javax.media:*</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-ensure</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-lang</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-logging</dependencySourceExclude>
@@ -135,11 +146,7 @@
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-resource</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-utilities</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-core</dependencySourceExclude>
-                <dependencySourceExclude>com.fasterxml.jackson.core:*</dependencySourceExclude>
-                <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
-                <dependencySourceExclude>log4j:*</dependencySourceExclude>
-                <dependencySourceExclude>javax.media:*</dependencySourceExclude>
-                <dependencySourceExclude>com.sun.media:*</dependencySourceExclude>
+                <dependencySourceExclude>org.apache.httpcomponents:httpclient</dependencySourceExclude>
               </dependencySourceExcludes>
             </configuration>
           </execution>
@@ -157,18 +164,19 @@
           <useBaseVersion>true</useBaseVersion>
           <artifactSet>
             <excludes>
-              <exclude>net.anwiba.commons:anwiba-commons-ensure</exclude>
-              <exclude>net.anwiba.commons:anwiba-commons-lang</exclude>
-              <exclude>net.anwiba.commons:anwiba-commons-logging</exclude>
-              <exclude>net.anwiba.commons:anwiba-commons-reflaction</exclude>
-              <exclude>net.anwiba.commons:anwiba-commons-resource</exclude>
-              <exclude>net.anwiba.commons:anwiba-commons-utilities</exclude>
-              <exclude>net.anwiba.commons:anwiba-commons-core</exclude>
-              <exclude>com.fasterxml.jackson.core:*</exclude>
-              <exclude>commons-logging:commons-logging</exclude>
-              <exclude>log4j:log4j:jar:</exclude>
-              <exclude>javax.media:jai_core:jar:</exclude>
-              <exclude>com.sun.media:jai-codec:jar:</exclude>
+              <dependencySourceExclude>com.fasterxml.jackson.core:*</dependencySourceExclude>
+              <dependencySourceExclude>com.sun.media:*</dependencySourceExclude>
+              <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
+              <dependencySourceExclude>log4j:*</dependencySourceExclude>
+              <dependencySourceExclude>javax.media:*</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-ensure</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-lang</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-logging</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-reflaction</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-resource</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-utilities</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-core</dependencySourceExclude>
+              <dependencySourceExclude>org.apache.httpcomponents:httpclient</dependencySourceExclude>
             </excludes>
           </artifactSet>
         </configuration>
