@@ -23,24 +23,36 @@ package net.anwiba.commons.swing.list;
 
 import java.awt.event.MouseListener;
 
+import javax.swing.DropMode;
+import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.TransferHandler;
 import javax.swing.border.Border;
 
+import net.anwiba.commons.model.ISelectionModel;
+import net.anwiba.commons.model.SelectionModel;
 import net.anwiba.commons.swing.ui.IObjectUi;
+import net.anwiba.commons.swing.ui.IObjectUiCellRendererConfiguration;
 import net.anwiba.commons.swing.ui.ToStringUi;
 
 public class ObjectListConfigurationBuilder<T> {
 
-  int visibleRowCount = 8;
-  int selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
-  IObjectUi<T> objectUi = new ToStringUi<>();
-  int iconTextGap = 2;
-  int verticalAlignment = SwingConstants.CENTER;
-  int verticalTextPosition = SwingConstants.CENTER;
-  int horizontalTextPosition = SwingConstants.TRAILING;
-  int horizontalAlignment = SwingConstants.LEADING;
-  Border border = null;
+  private int visibleRowCount = 8;
+  private int selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
+  private IObjectUi<T> objectUi = new ToStringUi<>();
+  private int iconTextGap = 2;
+  private int verticalAlignment = SwingConstants.CENTER;
+  private int verticalTextPosition = SwingConstants.CENTER;
+  private int horizontalTextPosition = SwingConstants.TRAILING;
+  private int horizontalAlignment = SwingConstants.LEADING;
+  private Border border = null;
+  private int layoutOrientation = JList.VERTICAL;
+  private MouseListener mouseListener;
+  private ISelectionModel<T> selectionModel;
+  private TransferHandler transferHandler;
+  private boolean isDragEnabled = false;
+  private DropMode dropMode = DropMode.USE_SELECTION;
 
   IObjectUiCellRendererConfiguration objectUiCellRendererConfiguration = new IObjectUiCellRendererConfiguration() {
 
@@ -74,7 +86,6 @@ public class ObjectListConfigurationBuilder<T> {
       return ObjectListConfigurationBuilder.this.border;
     }
   };
-  private MouseListener mouseListener;
 
   public ObjectListConfigurationBuilder<T> setObjectUi(final IObjectUi<T> objectUi) {
     this.objectUi = objectUi;
@@ -116,6 +127,31 @@ public class ObjectListConfigurationBuilder<T> {
     return this;
   }
 
+  public ObjectListConfigurationBuilder<T> setHorizontalAlignmentLeft() {
+    this.horizontalAlignment = SwingConstants.LEFT;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setHorizontalAlignmentRight() {
+    this.horizontalAlignment = SwingConstants.LEFT;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setHorizontalAlignmentCenter() {
+    this.horizontalAlignment = SwingConstants.CENTER;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setHorizontalAlignmentLeading() {
+    this.horizontalAlignment = SwingConstants.LEADING;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setHorizontalAlignmentTrailing() {
+    this.horizontalAlignment = SwingConstants.TRAILING;
+    return this;
+  }
+
   public ObjectListConfigurationBuilder<T> setBorder(final Border border) {
     this.border = border;
     return this;
@@ -126,8 +162,78 @@ public class ObjectListConfigurationBuilder<T> {
     return this;
   }
 
+  public ObjectListConfigurationBuilder<T> setVerticalAlignment(final int verticalAlignment) {
+    this.verticalAlignment = verticalAlignment;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setMouseListener(final MouseListener mouseListener) {
+    this.mouseListener = mouseListener;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setVerticalOrientation() {
+    this.layoutOrientation = JList.VERTICAL;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setVerticalWrapOrientation() {
+    this.layoutOrientation = JList.VERTICAL_WRAP;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setHorizontalWrapOrientation() {
+    this.layoutOrientation = JList.HORIZONTAL_WRAP;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setTransferHandler(final TransferHandler transferHandler) {
+    this.transferHandler = transferHandler;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setSelectionModel(final ISelectionModel<T> selectionModel) {
+    this.selectionModel = selectionModel;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setDragDisabled() {
+    this.isDragEnabled = false;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setDragEnabled() {
+    this.isDragEnabled = true;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setDropInsertEnabled() {
+    this.dropMode = DropMode.INSERT;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setDropReplaceEnabled() {
+    this.dropMode = DropMode.ON;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setDropReplaceOrInsertEnabled() {
+    this.dropMode = DropMode.ON_OR_INSERT;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setDropToSelectedEnabled() {
+    this.dropMode = DropMode.USE_SELECTION;
+    return this;
+  }
+
   public IObjectListConfiguration<T> build() {
     return new IObjectListConfiguration<T>() {
+
+      @Override
+      public int getLayoutOrientation() {
+        return ObjectListConfigurationBuilder.this.layoutOrientation;
+      }
 
       @Override
       public MouseListener getMouseListener() {
@@ -153,16 +259,28 @@ public class ObjectListConfigurationBuilder<T> {
       public IObjectUiCellRendererConfiguration getObjectUiCellRendererConfiguration() {
         return ObjectListConfigurationBuilder.this.objectUiCellRendererConfiguration;
       }
+
+      @Override
+      public ISelectionModel<T> getSelectionModel() {
+        return ObjectListConfigurationBuilder.this.selectionModel == null
+            ? new SelectionModel<>()
+            : ObjectListConfigurationBuilder.this.selectionModel;
+      }
+
+      @Override
+      public TransferHandler getTransferHandler() {
+        return ObjectListConfigurationBuilder.this.transferHandler;
+      }
+
+      @Override
+      public DropMode getDropMode() {
+        return ObjectListConfigurationBuilder.this.dropMode;
+      }
+
+      @Override
+      public boolean isDragEnabled() {
+        return ObjectListConfigurationBuilder.this.isDragEnabled;
+      }
     };
-  }
-
-  public ObjectListConfigurationBuilder<T> setVerticalAlignment(final int verticalAlignment) {
-    this.verticalAlignment = verticalAlignment;
-    return this;
-  }
-
-  public ObjectListConfigurationBuilder<T> setMouseListener(final MouseListener mouseListener) {
-    this.mouseListener = mouseListener;
-    return this;
   }
 }

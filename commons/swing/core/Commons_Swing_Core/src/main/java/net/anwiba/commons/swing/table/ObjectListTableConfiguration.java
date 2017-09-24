@@ -39,6 +39,7 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
 
   public ObjectListTableConfiguration(
       final IColumToStringConverter columnToStringConverter,
+      final int autoRizeMode,
       final int selectionMode,
       final int preferredVisibleRowCount,
       final List<IObjectListColumnConfiguration<T>> columnConfigurations,
@@ -46,6 +47,7 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
       final IKeyListenerFactory<T> keyListenerFactory,
       final ITableActionConfiguration<T> actionConfiguration) {
     super(
+        autoRizeMode,
         selectionMode,
         preferredVisibleRowCount,
         columnConfigurations,

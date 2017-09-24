@@ -13,7 +13,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core</artifactId>
-    <version>1.0.52</version>
+    <version>1.0.58</version>
   </parent>
 
   <scm>
@@ -26,5 +26,7 @@
     <module>Gis_Geo_Json</module>
     <module>Gis_Gpsd</module>
     <module>Gis_Osm</module>
+    <module>Gis_Ors</module>
+    <module>Gis_Topo_Json</module>
   </modules>
 </project>

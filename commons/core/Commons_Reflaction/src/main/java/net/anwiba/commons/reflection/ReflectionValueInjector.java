@@ -34,9 +34,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.anwiba.commons.privileged.PrivilegedActionInvoker;
 import net.anwiba.commons.reflection.annotation.Injection;
 import net.anwiba.commons.reflection.annotation.Nullable;
+import net.anwiba.commons.reflection.privileged.PrivilegedActionInvoker;
+import net.anwiba.commons.reflection.privileged.PrivilegedFieldSetterAction;
 
 public class ReflectionValueInjector implements IReflectionValueInjector {
 
@@ -170,7 +171,7 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
 
   private Object getValue(final Parameter parameter) {
     final Class<?> clazz = parameter.getType();
-    if (clazz.isInstance(ReflectionValueInjector.class)) {
+    if (clazz.isAssignableFrom(IReflectionValueInjector.class)) {
       return this;
     }
     if (this.values.contains(clazz)) {

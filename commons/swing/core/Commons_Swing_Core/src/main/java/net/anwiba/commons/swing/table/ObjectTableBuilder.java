@@ -115,4 +115,9 @@ public class ObjectTableBuilder<T> {
     this.builder.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     return this;
   }
+
+  public ObjectTableBuilder<T> setAutoResizeModeOff() {
+    this.builder.setAutoResizeModeOff();
+    return this;
+  }
 }

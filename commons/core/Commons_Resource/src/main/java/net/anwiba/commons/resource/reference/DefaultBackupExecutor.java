@@ -29,13 +29,19 @@ import java.nio.file.StandardCopyOption;
 
 public final class DefaultBackupExecutor implements IBackupExecutor {
 
+  private final IResourceReferenceHandler referenceHandler;
+
+  public DefaultBackupExecutor(final IResourceReferenceHandler referenceHandler) {
+    this.referenceHandler = referenceHandler;
+  }
+
   @Override
   public IResourceReference backup(final IResourceReference resourceReference) throws IOException {
+    if (!this.referenceHandler.exsits(resourceReference)) {
+      return null;
+    }
     try {
-      if (!ResourceReferenceUtilities.isFileSystemResource(resourceReference)) {
-        return null;
-      }
-      final File file = ResourceReferenceUtilities.getFile(resourceReference);
+      final File file = this.referenceHandler.getFile(resourceReference);
       if (file.exists()) {
         final File backup = new File(file.getPath() + "~"); //$NON-NLS-1$
         Files.move(file.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
@@ -45,7 +51,6 @@ public final class DefaultBackupExecutor implements IBackupExecutor {
         if (file.exists()) {
           throw new IOException("Coudn't delete file " + file); //$NON-NLS-1$
         }
-        return new ResourceReferenceFactory().create(backup);
       }
       return null;
     } catch (final URISyntaxException exception) {

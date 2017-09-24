@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
-import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class Bean {
 
@@ -18,7 +17,7 @@ public class Bean {
     }
 
     public static Bean create(String type) {
-        if (StringUtilities.isNullOrTrimmedEmpty(type)) {
+        if (_isNullOrTrimmedEmpty(type)) {
             return new Bean();
         }
         Class<? extends Bean> clazz = _createClass(type);
@@ -57,7 +56,7 @@ public class Bean {
         }
         try {
             String packageName = Bean.class.getPackage().getName();
-            String typeName = StringUtilities.setFirstTrimedCharacterToUpperCase(type);
+            String typeName = _setFirstCharacterToUpperCase(type);
             String className = MessageFormat.format("{0}.{1}", packageName, typeName);
             Class<?> clazz = Class.forName(className);
             if (!Bean.class.isAssignableFrom(clazz)) {
@@ -70,6 +69,17 @@ public class Bean {
             _classes.put(type, null);
             return null;
         }
+    }
+
+    private static boolean _isNullOrTrimmedEmpty(String value) {
+        return ((value == null)||value.trim().isEmpty());
+    }
+
+    private static String _setFirstCharacterToUpperCase(String value) {
+        if ((value == null)||value.trim().isEmpty()) {
+            return null;
+        }
+        return (value.substring(0, 1).toUpperCase()+ value.substring(1, value.length()));
     }
 
 }

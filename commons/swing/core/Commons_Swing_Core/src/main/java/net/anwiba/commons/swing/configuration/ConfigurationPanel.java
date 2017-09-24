@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -30,8 +30,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import net.anwiba.commons.model.ISelectionListener;
+import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.SelectionEvent;
-import net.anwiba.commons.model.SelectionModel;
 import net.anwiba.commons.swing.list.ObjectListComponent;
 import net.anwiba.commons.swing.list.ObjectListComponentModel;
 import net.anwiba.commons.swing.list.ObjectListConfigurationBuilder;
@@ -57,7 +57,7 @@ public class ConfigurationPanel extends JPanel {
     splitPane.setOneTouchExpandable(true);
     splitPane.setResizeWeight(1);
     add(splitPane, BorderLayout.CENTER);
-    final SelectionModel<IConfiguration> selectionModel = configurationList.getSelectionModel();
+    final ISelectionModel<IConfiguration> selectionModel = configurationList.getSelectionModel();
     selectionModel.addSelectionListener(new ISelectionListener<IConfiguration>() {
 
       @Override
@@ -70,7 +70,7 @@ public class ConfigurationPanel extends JPanel {
   }
 
   protected final void updateParameters(
-      final SelectionModel<IConfiguration> selectionModel,
+      final ISelectionModel<IConfiguration> selectionModel,
       final ParameterTableModel parameterTableModel) {
     if (selectionModel.isEmpty()) {
       parameterTableModel.setParameters(null);

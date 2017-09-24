@@ -27,10 +27,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-public final class DefaultRestoreExecutor implements IBackupExecutor {
+public final class DefaultRestoreExecutor implements IRestoreExecutor {
 
   @Override
-  public IResourceReference backup(final IResourceReference resourceReference) throws IOException {
+  public IResourceReference restore(final IResourceReference resourceReference) throws IOException {
     try {
       if (!ResourceReferenceUtilities.isFileSystemResource(resourceReference)) {
         throw new IOException("Unsupported resource"); //$NON-NLS-1$

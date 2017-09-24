@@ -131,7 +131,6 @@ public class BeanFactory extends AbstractSourceFactory {
             Builders.type(member.type().generics()[1]).build(),
             member.name(),
             false,
-            false,
             new ArrayList<Annotation>(),
             MessageFormat.format("{0}Names", getter.name()), //$NON-NLS-1$
             new ArrayList<Annotation>(),

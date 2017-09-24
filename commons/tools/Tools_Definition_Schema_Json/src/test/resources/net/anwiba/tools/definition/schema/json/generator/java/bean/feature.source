@@ -69,9 +69,8 @@ package net.anwiba.generated.test.bean;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.anwiba.commons.ensure.Conditions;
-import net.anwiba.commons.ensure.Ensure;
 
 public class Feature {
 
@@ -83,7 +82,7 @@ public class Feature {
     }
 
     public final Feature(final Envelope envelope, final Object geometry, final Map<String, net.anwiba.generated.test.bean.Entity> attributes) {
-        Ensure.ensureThatArgument(envelope, Conditions.notNull());
+        Objects.requireNonNull(envelope);
         this.envelope = envelope;
         this.geometry = geometry;
         if (attributes == null) {
@@ -95,7 +94,7 @@ public class Feature {
 
     @JsonProperty("envelope")
     public void setEnvelope(final Envelope envelope) {
-        Ensure.ensureThatArgument(envelope, Conditions.notNull());
+        Objects.requireNonNull(envelope);
         this.envelope = envelope;
     }
 
@@ -115,7 +114,7 @@ public class Feature {
     }
 
     public void setAttributes(final String name, final net.anwiba.generated.test.bean.Entity value) {
-        Ensure.ensureThatArgument(name, Conditions.notNull());
+        Objects.requireNonNull(name);
         this.attributes.put(name, value);
     }
 
@@ -151,9 +150,8 @@ package net.anwiba.generated.test.bean;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.anwiba.commons.ensure.Conditions;
-import net.anwiba.commons.ensure.Ensure;
 
 public class FeatureBuilder {
 
@@ -162,7 +160,7 @@ public class FeatureBuilder {
     private final Map<String, net.anwiba.generated.test.bean.Entity> attributes = new LinkedHashMap<String, net.anwiba.generated.test.bean.Entity>();
 
     public final FeatureBuilder(final Envelope envelope) {
-        Ensure.ensureThatArgument(envelope, Conditions.notNull());
+        Objects.requireNonNull(envelope);
         this.envelope = envelope;
     }
 

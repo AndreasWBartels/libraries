@@ -32,6 +32,7 @@ import javax.swing.JTextArea;
 
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class MessagePanel extends JPanel {
 
@@ -88,11 +89,13 @@ public class MessagePanel extends JPanel {
       setMessage(this.defaultMessage);
       return;
     }
-    this.messageTitleLabel.setForeground(MessageUI.getColor(message));
-    this.messageTitleLabel.setText(message.getText());
-    this.messageTextArea.setForeground(MessageUI.getColor(message));
-    this.messageTextArea.setText(message.getDescription());
-    this.messageTypeLabel.setIcon(MessageUI.getIcon(message, getIcon()));
+    GuiUtilities.invokeLater(() -> {
+      this.messageTitleLabel.setForeground(MessageUI.getColor(message));
+      this.messageTitleLabel.setText(message.getText());
+      this.messageTextArea.setForeground(MessageUI.getColor(message));
+      this.messageTextArea.setText(message.getDescription());
+      this.messageTypeLabel.setIcon(MessageUI.getIcon(message, getIcon()));
+    });
   }
 
   final public Icon getIcon() {

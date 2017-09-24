@@ -13,9 +13,12 @@ package net.anwiba.commons.resource.utilities;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.CharBuffer;
 
 import net.anwiba.commons.logging.ILevel;
@@ -63,7 +66,7 @@ public class IoUtilities {
   public static void pipe(final Readable in, final Appendable out, final int bufferSize) throws IOException {
     final CharBuffer buffer = CharBuffer.allocate(bufferSize);
     int numChars;
-    while ((numChars = in.read(buffer)) > 0) {
+    while ((numChars = in.read(buffer)) > -1) {
       out.append(buffer, 0, numChars);
     }
   }
@@ -123,5 +126,17 @@ public class IoUtilities {
       return Integer.MAX_VALUE;
     }
     return contentLength + 1;
+  }
+
+  public static String toString(final Reader reader) throws IOException {
+    final StringBuffer buffer = new StringBuffer();
+    pipe(reader, buffer);
+    return buffer.toString();
+  }
+
+  public static void pipe(final InputStream inputStream, final File file) throws IOException {
+    try (final OutputStream outputStream = new FileOutputStream(file)) {
+      pipe(inputStream, outputStream);
+    }
   }
 }

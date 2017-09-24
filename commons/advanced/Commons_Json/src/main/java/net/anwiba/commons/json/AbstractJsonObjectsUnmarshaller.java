@@ -11,30 +11,25 @@
 package net.anwiba.commons.json;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.anwiba.commons.resource.utilities.IoUtilities;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
-public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOException> {
+public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOException>
+    extends
+    AbstractJsonUnmarshaller<T, List<T>, R, IOException> {
 
   private final ObjectMapper mapper = new ObjectMapper();
-  private final Class<R> errorResponseClass;
   private final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory;
   private final Class<T> clazz;
   @SuppressWarnings("rawtypes")
@@ -45,21 +40,19 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
       final Class<R> errorResponseClass,
       @SuppressWarnings("rawtypes") final Map<Class, Object> injectionValues,
       final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory) {
+    super(clazz, errorResponseClass, injectionValues);
     this.clazz = clazz;
-    this.errorResponseClass = errorResponseClass;
     this.injectionValues.putAll(injectionValues);
     this.exceptionFactory = exceptionFactory;
     this.mapper.getFactory().configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
   }
 
-  public List<T> unmarshal(final InputStream inputStream) throws IOException, E {
-    return unmarshal(IoUtilities.toString(inputStream, "UTF-8")); //$NON-NLS-1$
-  }
-
+  @Override
   public List<T> unmarshal(final String body) throws IOException, E {
-    final T result = validate(body);
+    @SuppressWarnings("unchecked")
+    final List<T> result = (List<T>) validate(body);
     if (result != null) {
-      return Arrays.asList(result);
+      return result;
     }
     try {
       final InjectableValues.Std injectableValues = new InjectableValues.Std();
@@ -90,40 +83,8 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
     }
   }
 
-  private <X> X check(final String body, final Class<X> type)
-      throws IOException,
-      JsonParseException,
-      JsonMappingException,
-      JsonProcessingException {
-    final InjectableValues.Std injectableValues = new InjectableValues.Std();
-    for (@SuppressWarnings("rawtypes")
-    final Class key : this.injectionValues.keySet()) {
-      injectableValues.addValue(key, this.injectionValues.get(key));
-    }
-    return this.mapper.readerFor(type).with(injectableValues).readValue(body);
-  }
-
-  @SuppressWarnings("unchecked")
-  private T validate(final String body) throws IOException, E {
-    if (Void.class.equals(this.errorResponseClass)) {
-      return null;
-    }
-    try {
-      final R response = check(body, this.errorResponseClass);
-      if (this.clazz.isInstance(response)) {
-        return (T) response;
-      }
-      throw this.exceptionFactory.create(response);
-    } catch (final JsonParseException e) {
-      return null;
-    } catch (final JsonMappingException e) {
-      return null;
-    }
-  }
-
-  private static IOException createIOException(final String content, final Exception exception) {
-    return new IOException(MessageFormat.format(
-        "Error during mapping json resource, coudn''t map the content:\n {0}", content), //$NON-NLS-1$
-        exception);
+  @Override
+  protected IOException createException(final R response) {
+    return this.exceptionFactory.create(response);
   }
 }

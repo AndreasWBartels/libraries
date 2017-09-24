@@ -23,9 +23,16 @@ package net.anwiba.commons.swing.list;
 
 import java.awt.event.MouseListener;
 
+import javax.swing.DropMode;
+import javax.swing.TransferHandler;
+
+import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.ui.IObjectUi;
+import net.anwiba.commons.swing.ui.IObjectUiCellRendererConfiguration;
 
 public interface IObjectListConfiguration<T> {
+
+  int getLayoutOrientation();
 
   int getSelectionMode();
 
@@ -36,5 +43,13 @@ public interface IObjectListConfiguration<T> {
   int getVisibleRowCount();
 
   MouseListener getMouseListener();
+
+  ISelectionModel<T> getSelectionModel();
+
+  TransferHandler getTransferHandler();
+
+  DropMode getDropMode();
+
+  boolean isDragEnabled();
 
 }

@@ -42,9 +42,9 @@ import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ISelectionListener;
+import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.model.SelectionEvent;
-import net.anwiba.commons.model.SelectionModel;
 import net.anwiba.commons.swing.component.IInputListener;
 import net.anwiba.commons.swing.dialog.IValueDialog;
 import net.anwiba.commons.swing.dialog.MessageDialog;
@@ -152,7 +152,7 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
     contentPanel.setLayout(new BorderLayout(4, 4));
     contentPanel.add(BorderLayout.WEST, listComponent);
     contentPanel.add(BorderLayout.CENTER, contentComponent);
-    final SelectionModel<IChooserPanelConfiguration<T>> selectionModel = list.getSelectionModel();
+    final ISelectionModel<IChooserPanelConfiguration<T>> selectionModel = list.getSelectionModel();
     if (!optionPanelConfigurations.isEmpty()) {
       selectionModel.setSelectedObject(optionPanelConfigurations.get(0));
       if (this.valueModel.get() != null) {
@@ -212,7 +212,7 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
     }
   }
 
-  void update(final JPanel contentComponent, final SelectionModel<IChooserPanelConfiguration<T>> selectionModel) {
+  void update(final JPanel contentComponent, final ISelectionModel<IChooserPanelConfiguration<T>> selectionModel) {
     if (this.validStateModel != null) {
       this.validStateModel.removeChangeListener(this.validateStateListener);
 

@@ -2,9 +2,8 @@
 
 package net.anwiba.generated.test.bean;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.anwiba.commons.ensure.Conditions;
-import net.anwiba.commons.ensure.Ensure;
 
 public class Error {
 
@@ -14,7 +13,7 @@ public class Error {
 
     @JsonProperty("code")
     public void setCode(final int code) {
-        Ensure.ensureThatArgument(code, Conditions.notNull());
+        Objects.requireNonNull(code);
         this.code = code;
     }
 
@@ -25,7 +24,7 @@ public class Error {
 
     @JsonProperty("message")
     public void setMessage(final String message) {
-        Ensure.ensureThatArgument(message, Conditions.notNull());
+        Objects.requireNonNull(message);
         this.message = message;
     }
 

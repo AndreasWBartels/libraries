@@ -23,7 +23,8 @@ package net.anwiba.commons.reflection;
 
 import java.lang.reflect.InvocationTargetException;
 
-import net.anwiba.commons.privileged.PrivilegedActionInvoker;
+import net.anwiba.commons.reflection.privileged.PrivilegedActionInvoker;
+import net.anwiba.commons.reflection.privileged.PrivilegedObjectFactoryAction;
 
 public class ReflectionConstructorInvoker<C> {
 

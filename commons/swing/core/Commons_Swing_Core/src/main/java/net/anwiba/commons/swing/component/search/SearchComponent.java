@@ -26,15 +26,19 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.model.IChangeableObjectListener;
+import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
+import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
 import net.anwiba.commons.swing.component.IComponentProvider;
 import net.anwiba.commons.swing.component.search.action.IAdvancedSearchActionFactory;
 import net.anwiba.commons.swing.component.search.action.NextAction;
@@ -44,6 +48,7 @@ import net.anwiba.commons.swing.object.StringField;
 import net.anwiba.commons.swing.object.StringObjectFieldConfigurationBuilder;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.factory.IFactory;
+import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class SearchComponent<C, R> implements IComponentProvider {
 
@@ -90,22 +95,73 @@ public class SearchComponent<C, R> implements IComponentProvider {
           .setToolTipFactory((validationResult, context) -> "feature search condition")
           .setColumns(24)
           .setModel(searchStringModel);
+      final IObjectModel<C> searchFeatureAcceptorModel = new ObjectModel<>();
+      final AbstractAction searchAction = new ConfigurableActionBuilder()
+          .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.MEDIA_PLAYBACK_START)
+          .setTooltip("search")
+          .setTask(() -> {
+            engine.reset();
+            engine.search(
+                Optional.ofNullable(searchFeatureAcceptorModel.get()).orElseGet(
+                    () -> this.stringConditionFactory.create(searchStringModel.get())));
+          })
+          .build();
+      final BooleanModel resetActionEnabledModel = new BooleanModel(!engine.getSearchResultsModel().isEmpty());
+      final AbstractAction resetAction = new ConfigurableActionBuilder()
+          .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.EDIT_DELETE)
+          .setTooltip("reset")
+          .setEnabledModel(resetActionEnabledModel)
+          .setTask(() -> {
+            engine.reset();
+          })
+          .build();
+      builder.addActionFactory((c, d, b) -> searchAction);
       if (this.advancedSearchActionFactory != null) {
         builder.addActionFactory(
             (context, document, clearBlock) -> SearchComponent.this.advancedSearchActionFactory
-                .create(searchStringModel, engine));
+                .create(searchStringModel, searchFeatureAcceptorModel, engine));
       }
       builder.addClearAction("clear");
       builder.addActionFactory((c, d, b) -> previousAction);
       builder.addActionFactory((c, d, b) -> nextAction);
+      builder.addActionFactory((c, d, b) -> resetAction);
       final IObjectFieldConfiguration<String> configuration = builder.build();
       final StringField stringField = new StringField(configuration);
       this.stringField = stringField;
       final IFactory<String, C, RuntimeException> stringConditionFactory = this.stringConditionFactory;
+      engine.getSearchResultsModel().addListModelListener(new IChangeableListListener<R>() {
+
+        @Override
+        public void objectsAdded(final Iterable<Integer> indeces, final Iterable<R> object) {
+          resetActionEnabledModel.set(!engine.getSearchResultsModel().isEmpty());
+        }
+
+        @Override
+        public void objectsRemoved(final Iterable<Integer> indeces, final Iterable<R> object) {
+          resetActionEnabledModel.set(!engine.getSearchResultsModel().isEmpty());
+        }
+
+        @Override
+        public void objectsUpdated(
+            final Iterable<Integer> indeces,
+            final Iterable<R> oldObjects,
+            final Iterable<R> newObjects) {
+          resetActionEnabledModel.set(!engine.getSearchResultsModel().isEmpty());
+        }
+
+        @Override
+        public void objectsChanged(final Iterable<R> oldObjects, final Iterable<R> newObjects) {
+          resetActionEnabledModel.set(!engine.getSearchResultsModel().isEmpty());
+        }
+      });
       searchStringModel.addChangeListener(new IChangeableObjectListener() {
 
         @Override
         public void objectChanged() {
+          searchFeatureAcceptorModel.set(null);
+          if (StringUtilities.isNullOrEmpty(searchStringModel.get())) {
+            return;
+          }
           engine.search(stringConditionFactory.create(searchStringModel.get()));
         }
       });

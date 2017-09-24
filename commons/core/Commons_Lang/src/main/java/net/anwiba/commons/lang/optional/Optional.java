@@ -23,6 +23,7 @@
 package net.anwiba.commons.lang.optional;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.ISupplier;
@@ -91,10 +92,18 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
     return this;
   }
 
+  //  @Override
+  //  public IOptional<T, E> or(final IConsumer<T, E> consumer) throws E {
+  //    if (!isAccepted()) {
+  //      consumer.consume(this.value);
+  //    }
+  //    return this;
+  //  }
+
   @Override
-  public IOptional<T, E> or(final IConsumer<T, E> consumer) throws E {
+  public IOptional<T, E> or(final IBlock<E> block) throws E {
     if (!isAccepted()) {
-      consumer.consume(this.value);
+      block.execute();
     }
     return this;
   }

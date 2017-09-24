@@ -47,6 +47,7 @@ public class PropertiesBuilder {
   private final String valueGetterMethodName = GET_VALUE;
   private boolean isImutable = false;
   private String injectionAnnotationName = null;
+  private boolean isInterfaceEnabled;
 
   PropertiesBuilder(final Type type, final String name) {
     this.type = type;
@@ -84,7 +85,6 @@ public class PropertiesBuilder {
         new NamedValueProvider(
             Builders.type(this.type.name()).build(),
             this.name,
-            true,
             true,
             this.namesGetterAnnotations,
             this.namesGetterMethodName,

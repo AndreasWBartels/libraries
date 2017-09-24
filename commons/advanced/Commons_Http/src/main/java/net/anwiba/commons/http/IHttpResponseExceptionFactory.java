@@ -26,8 +26,7 @@ import java.io.InputStream;
 
 public interface IHttpResponseExceptionFactory {
 
-  boolean isApplicable(String contentType);
-
-  IOException create(int statusCode, String statusMessage, String contentEncoding, InputStream inputStream);
+  IOException create(int statusCode, String statusMessage, String contentEncoding, InputStream inputStream)
+      throws IOException;
 
 }

@@ -8,7 +8,6 @@ import java.util.HashMap;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
-import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class Factory {
 
@@ -24,7 +23,7 @@ public class Factory {
     public static Factory create(
         @JsonProperty("class")
         java.lang.String _class) {
-        if (StringUtilities.isNullOrTrimmedEmpty(_class)) {
+        if (_isNullOrTrimmedEmpty(_class)) {
             return new Factory();
         }
         Class<? extends Factory> clazz = _createClass(_class);
@@ -63,7 +62,7 @@ public class Factory {
         }
         try {
             java.lang.String packageName = Factory.class.getPackage().getName();
-            java.lang.String typeName = StringUtilities.setFirstTrimedCharacterToUpperCase(type);
+            java.lang.String typeName = _setFirstCharacterToUpperCase(type);
             java.lang.String className = MessageFormat.format("{0}.{1}", packageName, typeName);
             Class<?> clazz = Class.forName(className);
             if (!Factory.class.isAssignableFrom(clazz)) {
@@ -76,6 +75,17 @@ public class Factory {
             _classes.put(type, null);
             return null;
         }
+    }
+
+    private static boolean _isNullOrTrimmedEmpty(java.lang.String value) {
+        return ((value == null)||value.trim().isEmpty());
+    }
+
+    private static java.lang.String _setFirstCharacterToUpperCase(java.lang.String value) {
+        if ((value == null)||value.trim().isEmpty()) {
+            return null;
+        }
+        return (value.substring(0, 1).toUpperCase()+ value.substring(1, value.length()));
     }
 
 }

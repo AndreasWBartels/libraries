@@ -11,8 +11,6 @@
 package net.anwiba.commons.json;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,12 +21,11 @@ import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import net.anwiba.commons.resource.utilities.IoUtilities;
-
-public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException> {
+public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException>
+    extends
+    AbstractJsonUnmarshaller<T, T, R, IOException> {
 
   private final ObjectMapper mapper = new ObjectMapper();
-  private final Class<R> errorResponseClass;
   private final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory;
   private final Class<T> clazz;
   @SuppressWarnings("rawtypes")
@@ -40,17 +37,14 @@ public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException
       final Class<R> errorResponseClass,
       final Map<Class, Object> injectionValues,
       final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory) {
+    super(clazz, errorResponseClass, injectionValues);
     this.clazz = clazz;
-    this.errorResponseClass = errorResponseClass;
     this.injectionValues.putAll(injectionValues);
     this.exceptionFactory = exceptionFactory;
     this.mapper.getFactory().configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
   }
 
-  public T unmarshal(final InputStream inputStream) throws IOException, E {
-    return unmarshal(IoUtilities.toString(inputStream, "UTF-8")); //$NON-NLS-1$
-  }
-
+  @Override
   public T unmarshal(final String body) throws IOException, E {
     final T result = validate(body);
     if (result != null) {
@@ -78,27 +72,8 @@ public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException
     return this.mapper.readerFor(type).with(injectableValues).readValue(body);
   }
 
-  @SuppressWarnings("unchecked")
-  private T validate(final String body) throws IOException, E {
-    if (Void.class.equals(this.errorResponseClass)) {
-      return null;
-    }
-    try {
-      final R response = read(body, this.errorResponseClass);
-      if (this.clazz.isInstance(response)) {
-        return (T) response;
-      }
-      throw this.exceptionFactory.create(response);
-    } catch (final JsonParseException e) {
-      return null;
-    } catch (final JsonMappingException e) {
-      return null;
-    }
-  }
-
-  private IOException createIOException(final String content, final Exception exception) {
-    return new IOException(
-        MessageFormat.format("Error during mapping json resource, coudn''t map the content:\n {0}", content), //$NON-NLS-1$
-        exception);
+  @Override
+  protected IOException createException(final R response) {
+    return this.exceptionFactory.create(response);
   }
 }

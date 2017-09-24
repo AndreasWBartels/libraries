@@ -2,9 +2,8 @@
 
 package net.anwiba.generated.test.bean;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.anwiba.commons.ensure.Conditions;
-import net.anwiba.commons.ensure.Ensure;
 
 public class Error {
 
@@ -13,9 +12,9 @@ public class Error {
     private String[] details = null;
 
     public final Error(final int code, final String message, final String[] details) {
-        Ensure.ensureThatArgument(code, Conditions.notNull());
+        Objects.requireNonNull(code);
         this.code = code;
-        Ensure.ensureThatArgument(message, Conditions.notNull());
+        Objects.requireNonNull(message);
         this.message = message;
         this.details = details;
     }
@@ -40,9 +39,8 @@ public class Error {
 
 package net.anwiba.generated.test.bean;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.anwiba.commons.ensure.Conditions;
-import net.anwiba.commons.ensure.Ensure;
 
 public class ErrorBuilder {
 
@@ -51,9 +49,9 @@ public class ErrorBuilder {
     private String[] details = null;
 
     public final ErrorBuilder(final int code, final String message) {
-        Ensure.ensureThatArgument(code, Conditions.notNull());
+        Objects.requireNonNull(code);
         this.code = code;
-        Ensure.ensureThatArgument(message, Conditions.notNull());
+        Objects.requireNonNull(message);
         this.message = message;
     }
 

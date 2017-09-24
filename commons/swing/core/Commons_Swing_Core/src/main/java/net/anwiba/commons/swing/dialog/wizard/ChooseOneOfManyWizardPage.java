@@ -102,6 +102,7 @@ public class ChooseOneOfManyWizardPage<T> extends AbstractWizardPage {
         getNextEnabledModel().set(DataState.VALIDE.equals(state) || DataState.MODIFIED.equals(state));
       }
     });
+    listComponent.getSelectionModel().setSelectedObject(this.originalValue);
     this.component.add(listComponent.getComponent());
     return this.component;
   }

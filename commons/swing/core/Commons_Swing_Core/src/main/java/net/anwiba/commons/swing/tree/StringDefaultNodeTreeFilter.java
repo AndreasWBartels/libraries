@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.tree;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -86,6 +87,9 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
   }
 
   Iterable<TreeNode> iterable(final TreeNode parent) {
+    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
+      return () -> new ArrayList<TreeNode>().iterator();
+    }
     return new Iterable<TreeNode>() {
 
       @Override
@@ -124,5 +128,4 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
     final List<TreeNode> list = ListUtilities.filter(iterable(parent), this.acceptor);
     return list.size();
   }
-
 }

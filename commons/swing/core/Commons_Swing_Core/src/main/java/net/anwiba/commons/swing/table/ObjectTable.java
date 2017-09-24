@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -57,42 +57,33 @@ public class ObjectTable<T> implements IComponentProvider {
     final ISortedRowMapper sortedRowMapper = new SortedRowMapper<>(tableRowSorter);
     final Table table = new Table(tableModel);
     table.setRowSorter(tableRowSorter);
+    table.setAutoResizeMode(configuration.getAutoizeMode());
     table.setSelectionMode(configuration.getSelectionMode());
     table.setAutoCreateColumnsFromModel(false);
-    table.setPreferredScrollableViewportSize(new Dimension(100, configuration.getPreferredVisibleRowCount()
-        * (table.getRowHeight() + table.getRowMargin())));
+    table.setPreferredScrollableViewportSize(
+        new Dimension(
+            100,
+            configuration.getPreferredVisibleRowCount() * (table.getRowHeight() + table.getRowMargin())));
     final TableColumnModel columnModel = table.getColumnModel();
     for (int i = 0; i < columnModel.getColumnCount(); i++) {
       applyToColumn(columnModel.getColumn(i), configuration.getColumnConfiguration(i));
     }
     final ListSelectionModel tableSelectionModel = table.getSelectionModel();
-    tableSelectionModel.addListSelectionListener(new TableSelectionListener<>(
-        tableModel,
-        tableSelectionModel,
-        this.selectionModel,
-        sortedRowMapper));
-    this.selectionModel.addSelectionListener(new SelectionListener<>(
-        tableModel,
-        tableSelectionModel,
-        this.selectionModel,
-        sortedRowMapper));
+    tableSelectionModel.addListSelectionListener(
+        new TableSelectionListener<>(tableModel, tableSelectionModel, this.selectionModel, sortedRowMapper));
+    this.selectionModel.addSelectionListener(
+        new SelectionListener<>(tableModel, tableSelectionModel, this.selectionModel, sortedRowMapper));
     final ISelectionIndexModel<T> selectionIndexModel = new SelectionIndexModel<>(
         tableSelectionModel,
         sortedRowMapper,
         this.selectionModel);
     this.sortStateModel = tableRowSorter == null ? new BooleanModel(false) : tableRowSorter.getSortStateModel();
     final IMouseListenerFactory<T> mouseListenerFactory = configuration.getMouseListenerFactory();
-    table.addMouseListener(mouseListenerFactory.create(
-        tableModel,
-        selectionIndexModel,
-        this.getSelectionModel(),
-        this.sortStateModel));
+    table.addMouseListener(
+        mouseListenerFactory.create(tableModel, selectionIndexModel, this.getSelectionModel(), this.sortStateModel));
     final IKeyListenerFactory<T> keyListenerFactory = configuration.getKeyListenerFactory();
-    table.addKeyListener(keyListenerFactory.create(
-        tableModel,
-        selectionIndexModel,
-        this.selectionModel,
-        this.sortStateModel));
+    table.addKeyListener(
+        keyListenerFactory.create(tableModel, selectionIndexModel, this.selectionModel, this.sortStateModel));
     if (configuration.getTableActionConfiguration().isEmpty()) {
       this.component = new JScrollPane(table);
       return;

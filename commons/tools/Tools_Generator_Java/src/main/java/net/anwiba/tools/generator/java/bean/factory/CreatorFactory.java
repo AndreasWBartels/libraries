@@ -35,7 +35,6 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -87,9 +86,10 @@ public class CreatorFactory extends AbstractSourceFactory {
         "_classes",
         new String[]{ JAVA_LANG_STRING, JAVA_LANG_CLASS });
     createTypeCreateMethod(configuration, creator, bean);
-    createValidateBeanMethod(configuration, bean);
     createCreateBeanMethod(bean);
     createCreateClassMethod(bean, classes);
+    createIsNullOrTrimmedEmpty(bean);
+    createSetFirstCharacterToUpperCase(bean);
   }
 
   private void createFactoryCreateMethod(final Creator creator, final JDefinedClass bean) {
@@ -122,21 +122,21 @@ public class CreatorFactory extends AbstractSourceFactory {
         "clazz",
         _createClass(type));
     JBlock block = method.body()._if(clazz.ne(JExpr._null()))._then();
-    block._return(_createBean(configuration, clazz));
+    block._return(_createBean(clazz));
     method.body().assign(clazz, _createClass(lowerCase(type)));
     block = method.body()._if(clazz.ne(JExpr._null()))._then();
-    block._return(_createBean(configuration, clazz));
+    block._return(_createBean(clazz));
     final JVar className = method.body().decl(
-        _classByNames(java.lang.String.class.getName()),
+        _String(),
         "className", //$NON-NLS-1$
         format("{0}{1}", type, JExpr.lit(bean.name())));
     method.body().assign(clazz, _createClass(className));
     block = method.body()._if(clazz.ne(JExpr._null()))._then();
-    block._return(_createBean(configuration, clazz));
+    block._return(_createBean(clazz));
     method.body().assign(className, format("{0}{1}", lowerCase(type), JExpr.lit(bean.name()))); //$NON-NLS-1$
     method.body().assign(clazz, _createClass(className));
     block = method.body()._if(clazz.ne(JExpr._null()))._then();
-    block._return(_createBean(configuration, clazz));
+    block._return(_createBean(clazz));
     method.body()._return(JExpr._new(bean));
   }
 
@@ -148,82 +148,8 @@ public class CreatorFactory extends AbstractSourceFactory {
     return JExpr.invoke("_createClass").arg(type);
   }
 
-  private JExpression _validateBean(final JExpression type) {
-    return JExpr.invoke("_validateBean").arg(type);
-  }
-
-  private JExpression _createBean(final Bean configuration, final JExpression type) {
-    //    final Member unkownMembers = configuration.member("_unknownMembers");
-    //    if (unkownMembers != null) {
-    //      return _validateBean(JExpr.invoke("_createBean").arg(type));
-    //    }
+  private JExpression _createBean(final JExpression type) {
     return JExpr.invoke("_createBean").arg(type);
-  }
-
-  private JMethod createValidateBeanMethod(final Bean configuration, final JDefinedClass bean) {
-    if (configuration.member("_unknownMembers") != null) {
-      final JMethod method = bean.method(JMod.PRIVATE | JMod.STATIC, bean, "_validateBean");
-      final JVar param = method.param(_classByNames(bean.name()), "bean");
-      final JTryBlock _try = method.body()._try();
-      final JVar clazz = _try.body().decl(_type(java.lang.Class.class.getName()), "clazz", param.invoke("getClass"));
-      final JClass mapClass = _classByNames(
-          java.util.Map.class.getName(),
-          String.class.getName(),
-          Object.class.getName());
-      final JClass methodInvokerClass = _class("net.anwiba.commons.reflection.ReflectionMethodInvoker", bean, mapClass);
-      final JVar methodInvoker = _try
-          .body()
-          .decl(methodInvokerClass, "methodInvoker", JExpr._new(methodInvokerClass).arg(clazz).arg("get")); //$NON-NLS-1$
-      final JVar unkownMembers = _try.body().decl(
-          mapClass,
-          "unkownMembers", //$NON-NLS-1$
-          methodInvoker.invoke("invoke").arg(param));
-      final JClass setterInvokerClass = _classByNames("net.anwiba.commons.reflection.ReflectionFieldSetter");
-      final JVar setterInvoker = _try
-          .body()
-          .decl(setterInvokerClass, "setterInvoker", JExpr._new(setterInvokerClass).arg(param)); //$NON-NLS-1$
-      _try.body()._if(unkownMembers.eq(JExpr._null()))._then()._return(param);
-      final JForEach _for = _try
-          .body()
-          .forEach(_type(java.lang.String.class.getName()), "member", unkownMembers.invoke("keySet"));
-      _setMemberValues(clazz, unkownMembers, setterInvoker, _for);
-      _try.body()._return(param);
-      final JCatchBlock _invokationCatch = _try
-          ._catch(_classByNames(java.lang.reflect.InvocationTargetException.class.getName()));
-      final JVar invokationException = _invokationCatch.param("exception"); //$NON-NLS-1$
-      _invokationCatch.body()._throw(
-          JExpr._new(_classByNames(java.lang.RuntimeException.class.getName())).arg(invokationException));
-      return method;
-    }
-    return null;
-  }
-
-  private void _setMemberValues(
-      final JVar clazz,
-      final JVar unkownMembers,
-      final JVar setterInvoker,
-      final JForEach _for) {
-
-    final JTryBlock _try = _for.body()._try();
-
-    final JBlock body = _try.body();
-    final JVar value = body
-        .decl(_type(java.lang.Object.class.getName()), "value", unkownMembers.invoke("get").arg(JExpr.ref("member")));
-    body._if(value.eq(JExpr._null()))._then()._continue();
-    body._if(clazz.invoke("getDeclaredField").arg(JExpr.ref("member")).eq(JExpr._null()))._then()._continue();
-    body.invoke(setterInvoker, "invoke").arg(JExpr.ref("member")).arg(value);
-
-    final JCatchBlock _noSuchFieldCatch = _try._catch(_classByNames(java.lang.NoSuchFieldException.class.getName()));
-    final JVar noSuchFieldException = _noSuchFieldCatch.param("exception"); //$NON-NLS-1$
-    _noSuchFieldCatch
-        .body()
-        ._throw(JExpr._new(_classByNames(java.lang.RuntimeException.class.getName())).arg(noSuchFieldException));
-    final JCatchBlock _securityCatch = _try._catch(_classByNames(java.lang.SecurityException.class.getName()));
-    final JVar securityException = _securityCatch.param("exception"); //$NON-NLS-1$
-    _securityCatch
-        .body()
-        ._throw(JExpr._new(_classByNames(java.lang.RuntimeException.class.getName())).arg(securityException));
-
   }
 
   public JMethod createCreateBeanMethod(final JDefinedClass bean) {
@@ -257,13 +183,10 @@ public class CreatorFactory extends AbstractSourceFactory {
 
     final JTryBlock _try = method.body()._try();
     final JBlock body = _try.body();
-    final JVar packageName = body
-        .decl(_classByNames(java.lang.String.class.getName()), "packageName", packageName(bean));
-    final JVar typeName = body
-        .decl(_classByNames(java.lang.String.class.getName()), "typeName", setFirstCharacterToUpperCase(type));
-    final JVar className = body
-        .decl(_classByNames(java.lang.String.class.getName()), "className", format("{0}.{1}", packageName, typeName));
-    final JVar clazz = body.decl(_classByNames(java.lang.Class.class.getName(), "?"), "clazz", classForName(className));
+    final JVar packageName = body.decl(_String(), "packageName", packageName(bean));
+    final JVar typeName = body.decl(_String(), "typeName", setFirstCharacterToUpperCase(type));
+    final JVar className = body.decl(_String(), "className", format("{0}.{1}", packageName, typeName));
+    final JVar clazz = body.decl(_Class(), "clazz", classForName(className));
     final JExpression condition = isAssignableFrom(bean, clazz).not();
     final JBlock block = body._if(condition)._then().block();
     block.invoke(classes, "put").arg(type).arg(JExpr._null());
@@ -277,16 +200,34 @@ public class CreatorFactory extends AbstractSourceFactory {
     return method;
   }
 
-  private JExpression isNullOrTrimmedEmpty(final JVar className) {
-    return _classByNames(net.anwiba.commons.utilities.string.StringUtilities.class.getName())
-        .staticInvoke("isNullOrTrimmedEmpty")
-        .arg(className);
+  private JMethod createIsNullOrTrimmedEmpty(final JDefinedClass bean) {
+    final JMethod method = bean.method(JMod.PRIVATE | JMod.STATIC, _boolean(), "_isNullOrTrimmedEmpty");
+    final JVar value = method.param(java.lang.String.class, "value");
+    method.body()._return(value.eq(JExpr._null()).cor(value.invoke("trim").invoke("isEmpty")));
+    return method;
+  }
+
+  private JMethod createSetFirstCharacterToUpperCase(final JDefinedClass bean) {
+    final JMethod method = bean.method(JMod.PRIVATE | JMod.STATIC, _String(), "_setFirstCharacterToUpperCase");
+    final JVar value = method.param(java.lang.String.class, "value");
+    final JBlock body = method.body();
+    body._if(value.eq(JExpr._null()).cor(value.invoke("trim").invoke("isEmpty")))._then()._return(JExpr._null());
+    final JInvocation firstCharacter = value
+        .invoke("substring")
+        .arg(JExpr.lit(0))
+        .arg(JExpr.lit(1))
+        .invoke("toUpperCase");
+    final JInvocation restCharacters = value.invoke("substring").arg(JExpr.lit(1)).arg(value.invoke("length"));
+    body._return(firstCharacter.plus(restCharacters));
+    return method;
   }
 
   private JExpression setFirstCharacterToUpperCase(final JVar className) {
-    return _classByNames(net.anwiba.commons.utilities.string.StringUtilities.class.getName())
-        .staticInvoke("setFirstTrimedCharacterToUpperCase") //$NON-NLS-1$
-        .arg(className);
+    return JExpr.invoke("_setFirstCharacterToUpperCase").arg(className);
+  }
+
+  private JExpression isNullOrTrimmedEmpty(final JVar className) {
+    return JExpr.invoke("_isNullOrTrimmedEmpty").arg(className);
   }
 
   private JExpression classForName(final JVar className) {

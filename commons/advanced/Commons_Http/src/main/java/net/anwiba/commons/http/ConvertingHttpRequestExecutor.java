@@ -26,38 +26,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.lang.functional.IClosure;
-import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.Logging;
 import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.resource.utilities.IoUtilities;
 import net.anwiba.commons.utilities.io.NoneClosingInputStream;
 
-public class ConvertingHttpRequestExecutor {
+public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExecutor {
 
-  private final static ILogger logger = Logging.getLogger(ConvertingHttpRequestExecutor.class);
   private final IHttpRequestExecutor httpRequestExecutor;
 
   public ConvertingHttpRequestExecutor(final IHttpRequestExecutor httpRequestExecutor) {
     this.httpRequestExecutor = httpRequestExecutor;
   }
 
+  @Override
   public <T> T execute(
       final ICanceler cancelable,
-      final IClosure<IRequest, CreationException> requestFactory,
+      final IRequest request,
       final IResultProducer<T> resultProducer,
-      final IHttpResponseExceptionFactory... exceptionFactories)
+      final IApplicableHttpResponseExceptionFactory... exceptionFactories)
       throws InterruptedException,
       HttpServerException,
       HttpRequestException,
       IOException {
-    return execute(cancelable, requestFactory, resultProducer, new ExceptionProducer(exceptionFactories));
+    return execute(cancelable, request, resultProducer, new ExceptionProducer(exceptionFactories));
   }
 
+  @Override
   public <T> T execute(
       final ICanceler cancelable,
-      final IClosure<IRequest, CreationException> requestFactory,
+      final IRequest request,
       final IResultProducer<T> resultProducer,
       final IResultProducer<IOException> errorProducer)
       throws InterruptedException,
@@ -66,7 +63,6 @@ public class ConvertingHttpRequestExecutor {
       IOException {
 
     try {
-      final IRequest request = requestFactory.execute();
       try (final IResponse response = this.httpRequestExecutor.execute(cancelable, request)) {
         final int statusCode = response.getStatusCode();
         final String statusText = response.getStatusText();
@@ -80,8 +76,13 @@ public class ConvertingHttpRequestExecutor {
             try (InputStream inputStream = new BufferedInputStream(new NoneClosingInputStream(stream))) {
               try {
                 inputStream.mark(IoUtilities.maximumLimitOfBytes(contentLength));
-                return resultProducer
-                    .execute(inputStream, statusCode, statusText, contentType, response.getContentEncoding());
+                return resultProducer.execute(
+                    cancelable,
+                    statusCode,
+                    statusText,
+                    contentType,
+                    response.getContentEncoding(),
+                    inputStream);
               } catch (final IOException exception) {
                 inputStream.reset();
                 throw new HttpRequestException(
@@ -97,15 +98,14 @@ public class ConvertingHttpRequestExecutor {
           }
         }
         try (InputStream inputStream = response.getInputStream()) {
-          throw errorProducer.execute(inputStream, statusCode, statusText, contentType, response.getContentEncoding());
+          throw errorProducer
+              .execute(cancelable, statusCode, statusText, contentType, response.getContentEncoding(), inputStream);
         }
       }
     } catch (final InterruptedIOException exception) {
       final InterruptedException interruptedException = new InterruptedException();
       interruptedException.initCause(exception);
       throw interruptedException;
-    } catch (final CreationException exception) {
-      throw new IOException(exception);
     }
   }
 }

@@ -68,7 +68,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
         this.objects.add(objects[i]);
       }
     }
-    fireIntervalAdded(this, rows, rows + objects.length - 1);
+    fireIntervalAdded(this, rows, getSize() - 1);
     fireObjectAdded(Arrays.asList(objects));
   }
 

@@ -5,17 +5,13 @@ package net.anwiba.generated.test.bean;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.anwiba.commons.ensure.Conditions;
-import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.reflection.OptionalReflectionMethodInvoker;
-import net.anwiba.commons.utilities.provider.INamedValueProvider;
 
-public class Entity
-    implements INamedValueProvider<Object, RuntimeException>
-{
+public class Entity {
 
     private final Map<String, Object> _unknownMembers = new LinkedHashMap<String, Object>();
 
@@ -30,7 +26,7 @@ public class Entity
 
     @JsonAnySetter
     public void set(final String name, final Object value) {
-        Ensure.ensureThatArgument(name, Conditions.notNull());
+        Objects.requireNonNull(name);
         _inject(name, value);
         this._unknownMembers.put(name, value);
     }
@@ -44,12 +40,10 @@ public class Entity
     }
 
     @JsonIgnore
-    @Override
     public Iterable<String> getNames() {
         return this._unknownMembers.keySet();
     }
 
-    @Override
     public Object getValue(final String name) {
         if (name == null) {
             return null;

@@ -60,7 +60,7 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
       }
       return false;
     } catch (InterruptedException | IOException exception) {
-      logger.log(ILevel.WARNING, "connect to " + uri.toString() + "faild " + exception.getMessage());
+      logger.log(ILevel.WARNING, "connect to " + uri.toString() + " faild " + exception.getMessage());
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       return false;
     }
@@ -106,7 +106,7 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
       }
       throw new IOException(response.getStatusText());
     } catch (InterruptedException | IOException exception) {
-      logger.log(ILevel.DEBUG, "connect to " + uri.toString() + "faild " + exception.getMessage());
+      logger.log(ILevel.DEBUG, "connect to " + uri.toString() + " faild " + exception.getMessage());
       throw new IOException(exception);
     }
   }

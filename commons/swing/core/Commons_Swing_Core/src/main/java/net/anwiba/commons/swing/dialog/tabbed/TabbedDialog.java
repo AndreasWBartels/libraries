@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -39,6 +40,7 @@ import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.swing.dialog.DataState;
 import net.anwiba.commons.swing.dialog.DialogType;
+import net.anwiba.commons.swing.dialog.IAdditionalActionFactory;
 import net.anwiba.commons.swing.dialog.IDataStateListener;
 import net.anwiba.commons.swing.dialog.MessageDialog;
 import net.anwiba.commons.swing.icon.GuiIcons;
@@ -93,6 +95,7 @@ public class TabbedDialog extends MessageDialog {
         IMessageConstants.EMPTY_MESSAGE,
         GuiIcons.EMPTY_ICON.getLargeIcon(),
         DialogType.CANCEL_APPLY_OK,
+        Collections.emptyList(),
         true,
         tabsFactory);
   }
@@ -100,13 +103,29 @@ public class TabbedDialog extends MessageDialog {
   public TabbedDialog(
       final Window owner,
       final IWindowPreferences preferences,
-
       final String title,
       final IMessage message,
       final Icon icon,
       final DialogType dialogType,
       final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
-    this(owner, preferences, title, message, icon, dialogType, true, tabsFactory);
+    this(owner, preferences, title, message, icon, dialogType, Collections.emptyList(), true, tabsFactory);
+  }
+
+  public TabbedDialog(
+      final Window owner,
+      final IWindowPreferences preferences,
+      final String title,
+      final List<IAdditionalActionFactory> actionFactories) {
+    this(
+        owner,
+        preferences,
+        title,
+        IMessageConstants.EMPTY_MESSAGE,
+        GuiIcons.EMPTY_ICON.getLargeIcon(),
+        DialogType.CANCEL_APPLY_OK,
+        actionFactories,
+        true,
+        v -> Collections.emptyList());
   }
 
   public TabbedDialog(
@@ -116,6 +135,7 @@ public class TabbedDialog extends MessageDialog {
       final IMessage message,
       final Icon icon,
       final DialogType dialogType,
+      final List<IAdditionalActionFactory> actionFactories,
       final boolean modal,
       final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
     super(owner, preferences, title, message, icon, dialogType, modal);

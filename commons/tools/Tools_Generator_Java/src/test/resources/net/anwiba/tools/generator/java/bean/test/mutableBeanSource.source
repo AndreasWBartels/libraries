@@ -2,8 +2,7 @@
 
 package net.anwiba.test;
 
-import net.anwiba.commons.ensure.Conditions;
-import net.anwiba.commons.ensure.Ensure;
+import java.util.Objects;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public class Bean {
@@ -22,7 +21,7 @@ public class Bean {
     }
 
     public void setLabels(final String[] labels) {
-        Ensure.ensureThatArgument(labels, Conditions.notNull());
+        Objects.requireNonNull(labels);
         this.labels = labels;
     }
 

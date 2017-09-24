@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -32,20 +32,17 @@ public class NamedValueProvider {
   private final List<Annotation> valueGetterMethodAnnotations;
   private final String valueGetterMethodName;
   private final boolean isNameGetterEnabled;
-  private final boolean isInterfaceEnabled;
 
   public NamedValueProvider(
-    final Type type,
-    final String fieldName,
-    final boolean isInterfaceEnabled,
-    final boolean isNameGetterEnabled,
-    final List<Annotation> namesMethodAnnotations,
-    final String namesMethodName,
-    final List<Annotation> valueGetterMethodAnnotations,
-    final String valueGetterMethodName) {
+      final Type type,
+      final String fieldName,
+      final boolean isNameGetterEnabled,
+      final List<Annotation> namesMethodAnnotations,
+      final String namesMethodName,
+      final List<Annotation> valueGetterMethodAnnotations,
+      final String valueGetterMethodName) {
     this.type = type;
     this.fieldName = fieldName;
-    this.isInterfaceEnabled = isInterfaceEnabled;
     this.isNameGetterEnabled = isNameGetterEnabled;
     this.namesMethodAnnotations = namesMethodAnnotations;
     this.namesMethodName = namesMethodName;
@@ -79,9 +76,5 @@ public class NamedValueProvider {
 
   public boolean isNameGetterEnabled() {
     return this.isNameGetterEnabled;
-  }
-
-  public boolean isInterfaceEnabled() {
-    return this.isInterfaceEnabled;
   }
 }

@@ -54,6 +54,9 @@ public class GeoJsonV01_0TestResources extends AbstractResourceFactory {
   @Location("multiPolygon.json")
   public static String multiPolygon;
 
+  @Location("disordedMultiPolygon.json")
+  public static String disordedMultiPolygon;
+
   @Location("geometryCollection.json")
   public static String geometryCollection;
 

@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
-
 public class JsonObjectUnmarshaller<T> extends AbstractJsonObjectUnmarshaller<T, Void, IOException> {
 
   public JsonObjectUnmarshaller(final Class<T> clazz) {
@@ -40,7 +38,7 @@ public class JsonObjectUnmarshaller<T> extends AbstractJsonObjectUnmarshaller<T,
 
       @Override
       public IOException create(final Void response) {
-        throw new UnreachableCodeReachedException();
+        throw new RuntimeException("Unreachable code reached");
       }
     });
   }

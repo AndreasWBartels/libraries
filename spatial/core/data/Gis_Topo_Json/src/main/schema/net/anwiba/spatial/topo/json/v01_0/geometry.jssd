@@ -1,0 +1,8 @@
+@JssdFactory
+@JssdUnknownMember
+{
+  @JssdImmutable
+  "type" : <String> "Geometry",
+  "id" : <Object> null,
+  "properties" : <properties> null
+}

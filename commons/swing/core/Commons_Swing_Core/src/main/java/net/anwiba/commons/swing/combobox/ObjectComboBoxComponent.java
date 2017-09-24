@@ -28,7 +28,7 @@ import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.component.IComponentProvider;
 import net.anwiba.commons.swing.list.IObjectListConfiguration;
 import net.anwiba.commons.swing.list.ObjectListConfigurationBuilder;
-import net.anwiba.commons.swing.list.ObjectUiCellRenderer;
+import net.anwiba.commons.swing.ui.ObjectUiCellRenderer;
 
 public class ObjectComboBoxComponent<T> implements IComponentProvider {
 

@@ -154,6 +154,18 @@ public class AbstractSourceFactory {
     return this.codeModel.VOID;
   }
 
+  protected JPrimitiveType _boolean() {
+    return this.codeModel.BOOLEAN;
+  }
+
+  protected JClass _String() {
+    return _classByNames(JAVA_LANG_STRING);
+  }
+
+  protected JClass _Class() {
+    return _classByNames(JAVA_LANG_CLASS, "?"); //$NON-NLS-1$
+  }
+
   public JExpression format(final String string, final JExpression... params) {
     final JClass formater = _classByNames(java.text.MessageFormat.class.getName());
     JInvocation expression = formater.staticInvoke("format").arg(string); //$NON-NLS-1$

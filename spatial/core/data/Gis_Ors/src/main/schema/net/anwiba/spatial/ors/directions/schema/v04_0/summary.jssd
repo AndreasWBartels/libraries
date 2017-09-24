@@ -1,0 +1,6 @@
+{
+  "distance": <double> 0,
+  "duration": <int> 0,
+  "ascent": <int> 0,
+  "descent": <int> 0
+}

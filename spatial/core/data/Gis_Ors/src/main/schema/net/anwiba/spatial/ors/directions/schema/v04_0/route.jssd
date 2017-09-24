@@ -1,0 +1,6 @@
+{
+  "summary": <summary> null,
+  "geometry_format": <String> "geojson",
+  "geometry": <net.anwiba.spatial.geo.json.v01_0.Geometry> null,
+  "segments": <segments> null
+}

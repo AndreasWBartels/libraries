@@ -1,0 +1,6 @@
+@JssdUnknownMember
+{
+  @JssdImmutable
+  "type" : <String> "GeometryCollection",
+  "geometries" : <geometry[]> null
+}

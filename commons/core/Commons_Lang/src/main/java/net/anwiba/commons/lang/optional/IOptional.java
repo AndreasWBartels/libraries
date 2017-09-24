@@ -23,6 +23,7 @@
 package net.anwiba.commons.lang.optional;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.ISupplier;
@@ -31,7 +32,9 @@ public interface IOptional<T, E extends Exception> {
 
   public IOptional<T, E> consum(IConsumer<T, E> converter) throws E;
 
-  public IOptional<T, E> or(IConsumer<T, E> converter) throws E;
+  public IOptional<T, E> or(IBlock<E> converter) throws E;
+
+  //  public IOptional<T, E> or(IConsumer<T, E> converter) throws E;
 
   public <O> IOptional<O, E> convert(IConverter<T, O, E> converter) throws E;
 

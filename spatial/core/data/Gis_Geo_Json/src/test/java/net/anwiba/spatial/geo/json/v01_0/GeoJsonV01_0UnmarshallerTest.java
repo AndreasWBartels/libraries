@@ -146,6 +146,14 @@ public class GeoJsonV01_0UnmarshallerTest {
   }
 
   @Test
+  public void geometryDisordered() throws IOException, GeoJsonMarshallingException {
+    final GeoJsonObjectUnmarshaller<Geometry> unmarshaller = this.factory.create(Geometry.class);
+    final GeoJsonObject response = unmarshaller.unmarshal(GeoJsonV01_0TestResources.disordedMultiPolygon);
+    assertThat(response, notNullValue());
+    assertThat(response, instanceOf(MultiPolygon.class));
+  }
+
+  @Test
   public void errorResponse() throws IOException, GeoJsonMarshallingException {
     final ErrorResponse response = this.factory
         .create(ErrorResponse.class)

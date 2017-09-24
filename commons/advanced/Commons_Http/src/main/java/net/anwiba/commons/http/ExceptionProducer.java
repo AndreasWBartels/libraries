@@ -5,24 +5,26 @@ package net.anwiba.commons.http;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.resource.utilities.IoUtilities;
 
 public final class ExceptionProducer implements IResultProducer<IOException> {
 
-  private final IHttpResponseExceptionFactory[] exceptionFactories;
+  private final IApplicableHttpResponseExceptionFactory[] exceptionFactories;
 
-  public ExceptionProducer(final IHttpResponseExceptionFactory... exceptionFactories) {
+  public ExceptionProducer(final IApplicableHttpResponseExceptionFactory... exceptionFactories) {
     this.exceptionFactories = exceptionFactories;
   }
 
   @Override
   public IOException execute(
-      final InputStream inputStream,
+      final ICanceler canceler,
       final int statusCode,
       final String statusMessage,
       final String contentType,
-      final String contentEncoding) throws IOException, InterruptedException {
-    for (final IHttpResponseExceptionFactory exceptionFactory : this.exceptionFactories) {
+      final String contentEncoding,
+      final InputStream inputStream) throws IOException, InterruptedException {
+    for (final IApplicableHttpResponseExceptionFactory exceptionFactory : this.exceptionFactories) {
       if (exceptionFactory.isApplicable(contentType)) {
         return exceptionFactory.create(statusCode, statusMessage, contentEncoding, inputStream);
       }

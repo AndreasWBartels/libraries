@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -349,19 +350,12 @@ public class StringUtilities {
   }
 
   public static String setFirstTrimedCharacterToUpperCase(final String string) {
-    if (isNullOrTrimmedEmpty(string)) {
-      return null;
-    }
-    final String trimed = string.trim();
-    final StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < trimed.length(); ++i) {
-      if (i == 0) {
-        builder.append(String.valueOf(trimed.charAt(i)).toUpperCase());
-        continue;
-      }
-      builder.append(trimed.charAt(i));
-    }
-    return builder.toString();
+    return Optional
+        .ofNullable(string)
+        .map(s -> s.trim())
+        .filter(s -> !s.isEmpty())
+        .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1, s.length()))
+        .orElse(null);
   }
 
   public static String concatenatedString(final String separator, final Collection<String> values) {

@@ -200,7 +200,8 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
 
       @Override
       public Boolean visitFileResource(final FileResourceReference fileResourceReference) {
-        return Boolean.valueOf(fileResourceReference.getFile().exists());
+        final File file = fileResourceReference.getFile();
+        return Files.exists(file.toPath());
       }
 
       @Override

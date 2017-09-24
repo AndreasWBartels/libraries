@@ -1,0 +1,15 @@
+{
+  "version": <String> null,
+  "timestamp": <int> 0,
+  "attribution" : <String> null,
+  "service": <String> null,
+  "query": <query> null,
+  "language":  <String> null,
+  "units": <String> null,
+  "geometry": <boolean> null,
+  "geometry_format": <String> "geojson",
+  "instructions_format": <String> null,
+  "instructions": <boolean> null,
+  "elevation": <boolean> false,
+  "options": <options> null
+ }

@@ -1,0 +1,5 @@
+{
+  "distance": <double> 0,
+  "duration": <int> 0,
+  "steps": <step[]> null
+}

@@ -31,7 +31,8 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import net.anwiba.commons.privileged.PrivilegedActionInvoker;
+import net.anwiba.commons.reflection.privileged.PrivilegedActionInvoker;
+import net.anwiba.commons.reflection.privileged.PrivilegedMethodInvokeAction;
 
 public class ReflectionMethodInvoker<C, R> {
 

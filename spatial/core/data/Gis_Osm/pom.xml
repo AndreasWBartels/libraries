@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <name>spatial osm project</name>
-  <description>anwiba spatial osm json io project</description>
+  <description>anwiba spatial open street map json io project</description>
   <url>${scm.url.net.anwiba.master}/spatial/core/data/Gis_Osm</url>
 
   <artifactId>anwiba-spatial-data-osm</artifactId>
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
-    <version>1.0.52</version>
+    <version>1.0.58</version>
   </parent>
 
   <scm>

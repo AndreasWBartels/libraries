@@ -11,7 +11,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-core</artifactId>
-    <version>1.0.52</version>
+    <version>1.0.58</version>
   </parent>
 
   <scm>
@@ -21,6 +21,11 @@
   </scm>
 
   <dependencies>
+
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>

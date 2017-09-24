@@ -33,25 +33,28 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.anwiba.commons.model.ISelectionListener;
+import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.SelectionEvent;
-import net.anwiba.commons.model.SelectionModel;
 import net.anwiba.commons.swing.component.IComponentProvider;
+import net.anwiba.commons.swing.ui.ObjectUiCellRenderer;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 
 public class ObjectListComponent<T> implements IComponentProvider {
 
   private final JComponent component;
-  private final SelectionModel<T> selectionModel = new SelectionModel<>();
+  private final ISelectionModel<T> selectionModel;
+  private JList<T> list;
 
   public static final class JListSelectionListener<T> implements ListSelectionListener {
     private final IListModel<T> listModel;
     private final ListSelectionModel listSelectionModel;
-    private final SelectionModel<T> objectSelectionModel;
+    private final ISelectionModel<T> objectSelectionModel;
 
     public JListSelectionListener(
         final IListModel<T> listModel,
         final ListSelectionModel listSelectionModel,
-        final SelectionModel<T> objectSelectionModel) {
+        final ISelectionModel<T> objectSelectionModel) {
       this.listModel = listModel;
       this.listSelectionModel = listSelectionModel;
       this.objectSelectionModel = objectSelectionModel;
@@ -80,12 +83,12 @@ public class ObjectListComponent<T> implements IComponentProvider {
   public static final class SelectionListener<T> implements ISelectionListener<T> {
     private final IListModel<T> listModel;
     private final ListSelectionModel tableSelectionModel;
-    private final SelectionModel<T> objectSelectionModel;
+    private final ISelectionModel<T> objectSelectionModel;
 
     public SelectionListener(
         final IListModel<T> listModel,
         final ListSelectionModel tableSelectionModel,
-        final SelectionModel<T> objectSelectionModel) {
+        final ISelectionModel<T> objectSelectionModel) {
       this.listModel = listModel;
       this.tableSelectionModel = tableSelectionModel;
       this.objectSelectionModel = objectSelectionModel;
@@ -133,18 +136,34 @@ public class ObjectListComponent<T> implements IComponentProvider {
   }
 
   public ObjectListComponent(final IObjectListConfiguration<T> configuration, final IListModel<T> listModel) {
-    final JList<T> list = new JList<>(listModel);
-    list.setVisibleRowCount(configuration.getVisibleRowCount());
-    list.setSelectionMode(configuration.getSelectionMode());
-    list.setCellRenderer(
+    this.list = new JList<>(listModel);
+    this.list.setVisibleRowCount(configuration.getVisibleRowCount());
+    this.list.setSelectionMode(configuration.getSelectionMode());
+    this.list.setLayoutOrientation(configuration.getLayoutOrientation());
+    this.list.setCellRenderer(
         new ObjectUiCellRenderer<>(configuration.getObjectUiCellRendererConfiguration(), configuration.getObjectUi()));
-    final ListSelectionModel tableSelectionModel = list.getSelectionModel();
+    final ListSelectionModel tableSelectionModel = this.list.getSelectionModel();
+    this.selectionModel = configuration.getSelectionModel();
     tableSelectionModel
         .addListSelectionListener(new JListSelectionListener<>(listModel, tableSelectionModel, this.selectionModel));
     this.selectionModel
         .addSelectionListener(new SelectionListener<>(listModel, tableSelectionModel, this.selectionModel));
-    Optional.ofNullable(configuration.getMouseListener()).ifPresent(l -> list.addMouseListener(l));
-    this.component = new JScrollPane(list);
+
+    this.list.setTransferHandler(configuration.getTransferHandler());
+    this.list.setDropMode(configuration.getDropMode());
+    this.list.setDragEnabled(configuration.isDragEnabled());
+
+    Optional.ofNullable(configuration.getMouseListener()).ifPresent(l -> this.list.addMouseListener(l));
+    this.component = new JScrollPane(this.list);
+  }
+
+  public void scrollToSelectedObject() {
+    final int selectedIndex = this.list.getSelectedIndex();
+    if (selectedIndex != -1) {
+      GuiUtilities.invokeLater(() -> {
+        this.list.ensureIndexIsVisible(selectedIndex);
+      });
+    }
   }
 
   @Override
@@ -152,7 +171,7 @@ public class ObjectListComponent<T> implements IComponentProvider {
     return this.component;
   }
 
-  public SelectionModel<T> getSelectionModel() {
+  public ISelectionModel<T> getSelectionModel() {
     return this.selectionModel;
   }
 

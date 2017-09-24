@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -37,6 +37,9 @@ public class TreeModel<T extends ITreeNode<?>> implements ITreeModel<T> {
   public int getChildCount(final Object parent) {
     if (parent == null) {
       throw new IllegalArgumentException("parent is null"); //$NON-NLS-1$
+    }
+    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
+      return 0;
     }
     return ((T) parent).getChildCount();
   }
@@ -82,6 +85,9 @@ public class TreeModel<T extends ITreeNode<?>> implements ITreeModel<T> {
   public T getChild(final Object parent, final int index) {
     if (parent == null) {
       throw new IllegalArgumentException("parent is null"); //$NON-NLS-1$
+    }
+    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
+      throw new IllegalStateException();
     }
     return (T) ((T) parent).getChildAt(index);
   }

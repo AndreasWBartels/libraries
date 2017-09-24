@@ -8,18 +8,23 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
 package net.anwiba.commons.swing.component.search.text;
+
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.model.IChangeableListListener;
@@ -30,11 +35,6 @@ import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.component.search.ISearchEngine;
 import net.anwiba.commons.utilities.string.IStringPart;
 import net.anwiba.commons.utilities.string.StringUtilities;
-
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
 public final class DocumentSearchEngine implements ISearchEngine<String, IStringPart> {
 
@@ -94,12 +94,8 @@ public final class DocumentSearchEngine implements ISearchEngine<String, IString
   }
 
   protected void updateCursor() {
-    this.currentResultIndex = this.resultsModel.isEmpty()
-        ? -1
-        : 0;
-    this.resultCursor.set(this.currentResultIndex == -1
-        ? null
-        : this.resultsModel.get(this.currentResultIndex));
+    this.currentResultIndex = this.resultsModel.isEmpty() ? -1 : 0;
+    this.resultCursor.set(this.currentResultIndex == -1 ? null : this.resultsModel.get(this.currentResultIndex));
   }
 
   @Override
@@ -148,9 +144,7 @@ public final class DocumentSearchEngine implements ISearchEngine<String, IString
       this.document.getText(0, this.document.getLength());
       final String text = this.document.getText(0, this.document.getLength());
       this.resultsModel.set(StringUtilities.getStringPositions(text, this.condition));
-      this.currentResultIndex = this.resultsModel.isEmpty()
-          ? -1
-          : 0;
+      this.currentResultIndex = this.resultsModel.isEmpty() ? -1 : 0;
     } catch (final BadLocationException exception) {
       throw new RuntimeException(exception);
     }
@@ -174,5 +168,10 @@ public final class DocumentSearchEngine implements ISearchEngine<String, IString
   @Override
   public IObjectListModel<IStringPart> getSearchResultsModel() {
     return this.resultsModel;
+  }
+
+  @Override
+  public void reset() {
+    this.resultsModel.removeAll();
   }
 }
