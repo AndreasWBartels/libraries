@@ -10,9 +10,12 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
 * [JSSD](https://github.com/AndreasWBartels/libraries/wiki/JSSD)
   * [GeoJSON](https://github.com/AndreasWBartels/libraries/wiki/GeoJSON)
   * [GPSD-Client](https://github.com/AndreasWBartels/libraries/wiki/GPSD-Client)
-  * [OSM](https://github.com/AndreasWBartels/libraries/wiki/OSM)
+  * [Open Street Map (OSM)](https://github.com/AndreasWBartels/libraries/wiki/OSM)
     * Overpass
     * Nominatim
+  * [Open Routing Service (ORS)](https://github.com/AndreasWBartels/libraries/wiki/ORS)
+  * [TopoJson](https://github.com/AndreasWBartels/libraries/wiki/TopoJson)
+
 
 * [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
 * [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
