@@ -1,0 +1,367 @@
+[
+    {
+        "error_class": "None",
+        "layer_id": "None",
+        "error_type": "None",
+        "state": "processing",
+        "timestamp": "2017-10-03T18:27:19.980951",
+        "message": "The processing of the geo-preview has started"
+  },
+    {
+        "error_class": "None",
+        "layer_fields": [{
+                "field_name": "ogc_fid",
+                "data_type": "integer"
+            },
+            {
+                "field_name": "osm_id",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "name",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "waterway",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "covered",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "width",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "depth",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "layer",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "blockage",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "tunnel",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "natural",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "water",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "z_index",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "wkb_geometry",
+                "data_type": "USER-DEFINED"
+            }],
+        "layer_id": "pre_d1fefc28_210c_4ae9_9772_00105147f8e6",
+        "error_type": "None",
+        "bounding_box": "BOX(87.9112243 20.7823544,92.8529506928314 26.7560518665462)",
+        "state": "success",
+        "timestamp": "2017-10-03T18:35:32.665193",
+        "message": "Import successful"
+    },
+    {
+        "error_class": "None",
+        "layer_id": "None",
+        "error_type": "None",
+        "state": "processing",
+        "timestamp": "2017-10-04T18:27:38.442199",
+        "message": "The processing of the geo-preview has started"
+    },
+    {
+        "error_class": "None",
+        "layer_fields": [{
+                "field_name": "ogc_fid",
+                "data_type": "integer"
+            },
+            {
+                "field_name": "osm_id",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "name",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "waterway",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "covered",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "width",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "depth",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "layer",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "blockage",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "tunnel",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "natural",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "water",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "z_index",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "wkb_geometry",
+                "data_type": "USER-DEFINED"
+            }],
+        "layer_id": "pre_d1fefc28_210c_4ae9_9772_00105147f8e6",
+        "error_type": "None",
+        "bounding_box": "BOX(87.9112243 20.7823544,92.8529506928314 26.7560518665462)",
+        "state": "success",
+        "timestamp": "2017-10-04T18:36:06.718812",
+        "message": "Import successful"
+    },
+    {
+        "error_class": "None",
+        "layer_id": "None",
+        "error_type": "None",
+        "state": "processing",
+        "timestamp": "2017-10-05T18:27:17.949969",
+        "message": "The processing of the geo-preview has started"
+    },
+    {
+        "error_class": "None",
+        "layer_fields": [{
+                "field_name": "ogc_fid",
+                "data_type": "integer"
+            },
+            {
+                "field_name": "osm_id",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "name",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "waterway",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "covered",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "width",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "depth",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "layer",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "blockage",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "tunnel",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "natural",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "water",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "z_index",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "wkb_geometry",
+                "data_type": "USER-DEFINED"
+            }],
+        "layer_id": "pre_d1fefc28_210c_4ae9_9772_00105147f8e6",
+        "error_type": "None",
+        "bounding_box": "BOX(87.9112243 20.7823544,92.8529506928314 26.7560518665462)",
+        "state": "success",
+        "timestamp": "2017-10-05T18:35:45.818480",
+        "message": "Import successful"
+    },
+    {
+        "error_class": "None",
+        "layer_id": "None",
+        "error_type": "None",
+        "state": "processing",
+        "timestamp": "2017-10-06T19:24:11.498670",
+        "message": "The processing of the geo-preview has started"
+    },
+    {
+        "error_class": "None",
+        "layer_fields": [{
+                "field_name": "ogc_fid",
+                "data_type": "integer"
+            },
+            {
+                "field_name": "osm_id",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "name",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "waterway",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "covered",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "width",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "depth",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "layer",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "blockage",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "tunnel",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "natural",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "water",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "z_index",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "wkb_geometry",
+                "data_type": "USER-DEFINED"
+            }],
+        "layer_id": "pre_d1fefc28_210c_4ae9_9772_00105147f8e6",
+        "error_type": "None",
+        "bounding_box": "BOX(87.9112243 20.7823544,92.8529506928314 26.7560518665462)",
+        "state": "success",
+        "timestamp": "2017-10-06T19:32:12.272806",
+        "message": "Import successful"
+    },
+    {
+        "error_class": "None",
+        "layer_id": "None",
+        "error_type": "None",
+        "state": "processing",
+        "timestamp": "2017-10-07T18:28:02.498946",
+        "message": "The processing of the geo-preview has started"
+    },
+    {
+        "error_class": "None",
+        "layer_fields": [{
+                "field_name": "ogc_fid",
+                "data_type": "integer"
+            },
+            {
+                "field_name": "osm_id",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "name",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "waterway",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "covered",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "width",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "depth",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "layer",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "blockage",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "tunnel",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "natural",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "water",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "z_index",
+                "data_type": "character varying"
+            },
+            {
+                "field_name": "wkb_geometry",
+                "data_type": "USER-DEFINED"
+            }],
+        "layer_id": "pre_d1fefc28_210c_4ae9_9772_00105147f8e6",
+        "error_type": "None",
+        "bounding_box": "BOX(87.9112243 20.7823544,92.8529506928314 26.7560518665462)",
+        "state": "success",
+        "timestamp": "2017-10-07T18:35:59.770969",
+        "message": "Import successful"
+    }
+]

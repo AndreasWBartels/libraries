@@ -61,7 +61,7 @@ public class ObjectModel<T> extends AbstractObjectChangedNotifier implements IOb
   public void set(final T value) {
     accept(this.isNullable, value);
     synchronized (this.monitor) {
-      if (this.comperator.compare(this.value, value)) {
+      if (this.comperator.equals(this.value, value)) {
         return;
       }
       this.value = value;

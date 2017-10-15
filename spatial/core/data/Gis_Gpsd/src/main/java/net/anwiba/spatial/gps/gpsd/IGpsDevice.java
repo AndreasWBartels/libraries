@@ -23,7 +23,7 @@ package net.anwiba.spatial.gps.gpsd;
 
 import java.io.IOException;
 
-import net.anwiba.commons.utilities.io.IClosableIterator;
+import net.anwiba.commons.lang.functional.IClosableIterator;
 
 public interface IGpsDevice {
 

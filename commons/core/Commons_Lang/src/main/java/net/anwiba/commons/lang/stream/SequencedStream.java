@@ -74,6 +74,11 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
+  public IStream<T, E> notNull() {
+    return new SequencedStream<>(new FilteringIterableIterable<>(this.iterable, v -> v != null));
+  }
+
+  @Override
   public void foreach(final IConsumer<T, E> consumer) throws E {
     this.iterable.foreach(consumer);
   }
@@ -132,4 +137,5 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
       return l;
     });
   }
+
 }

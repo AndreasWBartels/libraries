@@ -24,6 +24,6 @@ package net.anwiba.commons.lang.functional;
 @FunctionalInterface
 public interface IEqualComperator<T> {
 
-  boolean compare(T value, T other);
+  boolean equals(T value, T other);
 
 }

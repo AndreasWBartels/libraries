@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.utilities.ArrayUtilities;
@@ -134,11 +135,27 @@ public class IterableUtilities {
   public static <T> String toString(final Iterable<T> iterable, final String seperator) {
     final StringBuilder builder = new StringBuilder();
     boolean flag = false;
-    for (final T parameter : iterable) {
+    for (final T value : iterable) {
       if (flag) {
         builder.append(seperator);
       }
-      builder.append(parameter);
+      builder.append(value);
+      flag = true;
+    }
+    return builder.toString();
+  }
+
+  public static <T> String toString(
+      final Iterable<T> iterable,
+      final String seperator,
+      final IConverter<T, String, ConversionException> converter) throws ConversionException {
+    final StringBuilder builder = new StringBuilder();
+    boolean flag = false;
+    for (final T value : iterable) {
+      if (flag) {
+        builder.append(seperator);
+      }
+      builder.append(converter.convert(value));
       flag = true;
     }
     return builder.toString();

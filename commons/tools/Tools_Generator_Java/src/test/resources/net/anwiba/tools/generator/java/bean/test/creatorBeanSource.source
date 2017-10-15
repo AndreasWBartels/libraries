@@ -12,10 +12,6 @@ public class Bean {
     private String type = "Bean";
     private final static HashMap<String, Class> _classes = new HashMap<String, Class>();
 
-    public String getType() {
-        return this.type;
-    }
-
     public static Bean create(String type) {
         if (_isNullOrTrimmedEmpty(type)) {
             return new Bean();
@@ -80,6 +76,10 @@ public class Bean {
             return null;
         }
         return (value.substring(0, 1).toUpperCase()+ value.substring(1, value.length()));
+    }
+
+    public String getType() {
+        return this.type;
     }
 
 }

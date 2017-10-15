@@ -31,6 +31,7 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 
+import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.tools.generator.java.bean.configuration.Annotation;
 import net.anwiba.tools.generator.java.bean.configuration.Type;
 
@@ -53,7 +54,7 @@ public class MemberFactory extends AbstractSourceFactory {
       final boolean isNullable,
       final boolean isPrimitivesEnabled,
       final boolean isArrayNullable,
-      final boolean isCollectionNullable) {
+      final boolean isCollectionNullable) throws CreationException {
     final String fieldName = createFieldName(name);
     final JType clazz = _class(type, isPrimitivesEnabled);
     final JFieldVar field = isInstanceOfMap(clazz) //
@@ -62,6 +63,7 @@ public class MemberFactory extends AbstractSourceFactory {
             ? listMember(instance, clazz, fieldName, type.generics(), isNullable, isCollectionNullable)
             : objectMember(instance, clazz, fieldName, value, isImutable, isArrayNullable);
     annotate(field, annotation);
+
     return field;
   }
 

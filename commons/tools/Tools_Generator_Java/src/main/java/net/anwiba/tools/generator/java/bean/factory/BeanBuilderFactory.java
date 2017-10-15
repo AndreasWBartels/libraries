@@ -22,7 +22,12 @@
 package net.anwiba.tools.generator.java.bean.factory;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -54,16 +59,47 @@ public class BeanBuilderFactory extends AbstractSourceFactory {
     try {
       final JDefinedClass beanBuilder = _class(configuration.name() + "Builder", ClassType.CLASS); //$NON-NLS-1$
       annotate(beanBuilder, configuration.annotations());
-      final Iterable<JFieldVar> fields = setters(beanBuilder, configuration);
+      final Map<Member, JFieldVar> fieldsByMember = fields(beanBuilder, configuration);
+      final Collection<JFieldVar> fields = fieldsByMember.values();
       this.constructorFactory.constructor(configuration, beanBuilder, fields);
       this.buildMethodFactory.create(beanBuilder, configuration.name(), fields);
+      setters(beanBuilder, fieldsByMember, configuration);
     } catch (final JClassAlreadyExistsException exception) {
       throw new CreationException(exception.getLocalizedMessage(), exception);
     }
   }
 
-  public Iterable<JFieldVar> setters(final JDefinedClass instance, final Bean configuration) {
+  private Iterable<JFieldVar> setters(
+      final JDefinedClass instance,
+      final Map<Member, JFieldVar> fieldsByMember,
+      final Bean configuration) throws CreationException {
     final List<JFieldVar> result = new ArrayList<>();
+    final Set<Entry<Member, JFieldVar>> entrySet = fieldsByMember.entrySet();
+    for (final Entry<Member, JFieldVar> entry : entrySet) {
+      final Member member = entry.getKey();
+      final JFieldVar field = entry.getValue();
+      result.add(field);
+      if (!member.setter().isEnabled() || !member.isNullable()) {
+        continue;
+      }
+      final Setter setter = member.setter();
+      this.setterFactory.create(
+          instance,
+          true,
+          field,
+          setter.name(),
+          false,
+          member.isNullable(),
+          configuration.isArrayNullable(),
+          configuration.isCollectionNullable(),
+          setter.annotations());
+    }
+    return result;
+  }
+
+  public Map<Member, JFieldVar> fields(final JDefinedClass instance, final Bean configuration)
+      throws CreationException {
+    final Map<Member, JFieldVar> result = new LinkedHashMap<>();
     for (final Member member : configuration.members()) {
       if (!member.setter().isEnabled()) {
         continue;
@@ -79,21 +115,7 @@ public class BeanBuilderFactory extends AbstractSourceFactory {
           configuration.isPrimitivesEnabled(),
           configuration.isArrayNullable(),
           configuration.isCollectionNullable());
-      result.add(field);
-      if (!member.isNullable()) {
-        continue;
-      }
-      final Setter setter = member.setter();
-      this.setterFactory.create(
-          instance,
-          true,
-          field,
-          setter.name(),
-          false,
-          member.isNullable(),
-          configuration.isArrayNullable(),
-          configuration.isCollectionNullable(),
-          setter.annotations());
+      result.put(member, field);
     }
     return result;
   }

@@ -10,7 +10,7 @@ public class Bean {
     private String type = "Bean";
     private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
-    public final Bean(final Map<String, Object> properties) {
+    public Bean(final Map<String, Object> properties) {
         this.properties.putAll(properties);
     }
 
@@ -45,7 +45,11 @@ public class BeanBuilder {
 
     private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
-    public final BeanBuilder() {
+    public BeanBuilder() {
+    }
+
+    public Bean build() {
+        return new Bean(properties);
     }
 
     public BeanBuilder setProperties(final Map<String, Object> properties) {
@@ -56,10 +60,6 @@ public class BeanBuilder {
         this.properties.clear();
         this.properties.putAll(properties);
         return this;
-    }
-
-    public Bean build() {
-        return new Bean(properties);
     }
 
 }

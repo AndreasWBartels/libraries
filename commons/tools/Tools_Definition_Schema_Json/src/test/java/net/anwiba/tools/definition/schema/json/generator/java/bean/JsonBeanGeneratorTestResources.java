@@ -30,6 +30,24 @@ public class JsonBeanGeneratorTestResources extends AbstractResourceFactory {
     initialize(JsonBeanGeneratorTestResources.class);
   }
 
+  @Location("typeInfoFactory.jssd")
+  public static String typeInfoFactoryBeanDefinition;
+
+  @Location("typeInfoFactory.source")
+  public static String typeInfoFactoryBeanSource;
+
+  @Location("value.jssd")
+  public static String valueBeanDefinition;
+
+  @Location("value.source")
+  public static String valueBeanSource;
+
+  @Location("pattern.jssd")
+  public static String patternBeanDefinition;
+
+  @Location("pattern.source")
+  public static String patternBeanSource;
+
   @Location("error.jssd")
   public static String errorBeanDefinition;
 
@@ -66,11 +84,17 @@ public class JsonBeanGeneratorTestResources extends AbstractResourceFactory {
   @Location("entity.jssd")
   public static String entityBeanDefinition;
 
-  @Location("factoryWitUnknownMembers.source")
-  public static String factoryWitUnknownMembersBeanSource;
+  @Location("factoryWithUnknownMembers.source")
+  public static String factoryWithUnknownMembersBeanSource;
 
-  @Location("factoryWitUnknownMembers.jssd")
-  public static String factoryWitUnknownMembersBeanDefinition;
+  @Location("factoryWithUnknownMembers.jssd")
+  public static String factoryWithUnknownMembersBeanDefinition;
+
+  @Location("factoryWithIgnoreUnknownMembers.source")
+  public static String factoryWithIgnoreUnknownMembersBeanSource;
+
+  @Location("factoryWithIgnoreUnknownMembers.jssd")
+  public static String factoryWithIgnoreUnknownMembersBeanDefinition;
 
   @Location("factory.source")
   public static String factoryBeanSource;

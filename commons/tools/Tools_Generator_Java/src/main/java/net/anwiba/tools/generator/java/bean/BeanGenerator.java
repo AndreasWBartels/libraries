@@ -66,7 +66,7 @@ public class BeanGenerator {
 
   public void add(final Bean configuration) throws CreationException {
     this.beanFactory.create(configuration);
-    if (!configuration.isMutable() || configuration.isBuilderEnabled()) {
+    if (configuration.isBuilderEnabled()) {
       this.beanBuilderFactory.create(configuration);
     }
   }

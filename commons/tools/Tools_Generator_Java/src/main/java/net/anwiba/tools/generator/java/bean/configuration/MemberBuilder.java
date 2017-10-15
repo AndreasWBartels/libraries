@@ -28,6 +28,8 @@ import java.util.List;
 import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.utilities.ArrayUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.tools.generator.java.bean.factory.IAsObjectMethodFactory;
+import net.anwiba.tools.generator.java.bean.factory.IValueOfMethodFactory;
 
 @SuppressWarnings("nls")
 public class MemberBuilder {
@@ -45,6 +47,8 @@ public class MemberBuilder {
   private boolean isMultiValue = false;
   private final boolean isSingleValue = true;
   private boolean isImutable = false;
+  private IValueOfMethodFactory valueOfMethodFactory;
+  private IAsObjectMethodFactory asObjectMethodFactory;
 
   MemberBuilder(final Type type, final String name) {
     this.type = type;
@@ -62,7 +66,7 @@ public class MemberBuilder {
         false,
         null,
         this.setterAnnotations,
-        new Argument(this.type, this.name, this.setterArgumentAnnotations),
+        new Argument(this.name, this.setterArgumentAnnotations, this.type),
         map);
     final Getter getter = new Getter(
         createGetterName(this.type, this.name),
@@ -77,7 +81,11 @@ public class MemberBuilder {
         this.isImutable,
         this.annotations,
         setter,
-        getter);
+        getter,
+        this.valueOfMethodFactory == null ? (model, instance, field) -> {
+        } : this.valueOfMethodFactory,
+        this.asObjectMethodFactory == null ? (model, instance, field) -> {
+        } : this.asObjectMethodFactory);
   }
 
   public MemberBuilder value(final String value) {
@@ -251,6 +259,15 @@ public class MemberBuilder {
     builder.append(name.substring(0, 1).toUpperCase());
     builder.append(name.substring(1, name.length()));
     return builder.toString();
+  }
+
+  public void addValueOf(final IValueOfMethodFactory valueOfMethodFactory) {
+    this.valueOfMethodFactory = valueOfMethodFactory;
+
+  }
+
+  public void asObject(final IAsObjectMethodFactory asObjectMethodFactory) {
+    this.asObjectMethodFactory = asObjectMethodFactory;
   }
 
 }

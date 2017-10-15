@@ -65,4 +65,6 @@ public interface IStream<T, E extends Exception> {
 
   public <O> O[] asArray(IntFunction<O[]> factory) throws E;
 
+  public IStream<T, E> notNull();
+
 }

@@ -10,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
-    <version>1.0.58</version>
+    <version>1.0.64</version>
   </parent>
 
   <scm>
@@ -21,13 +21,7 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <projectNameTemplate>Gis_Geo_Json</projectNameTemplate>
-        </configuration>
-      </plugin>
+
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <executions>

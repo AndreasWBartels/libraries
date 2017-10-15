@@ -47,7 +47,6 @@ public class PropertiesBuilder {
   private final String valueGetterMethodName = GET_VALUE;
   private boolean isImutable = false;
   private String injectionAnnotationName = null;
-  private boolean isInterfaceEnabled;
 
   PropertiesBuilder(final Type type, final String name) {
     this.type = type;
@@ -63,7 +62,7 @@ public class PropertiesBuilder {
         this.injectionAnnotationName != null,
         this.injectionAnnotationName,
         this.setterAnnotations,
-        new Argument(this.type, this.name, new ArrayList<Annotation>()),
+        new Argument(this.name, new ArrayList<Annotation>(), this.type),
         new HashMap<String, List<Annotation>>());
     final String getterName = this.getterName == null
         ? MemberBuilder.createGetterName(this.type, this.name)

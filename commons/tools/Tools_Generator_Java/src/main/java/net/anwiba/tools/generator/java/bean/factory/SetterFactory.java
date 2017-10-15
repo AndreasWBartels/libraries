@@ -39,6 +39,7 @@ import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 
+import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.tools.generator.java.bean.configuration.Annotation;
 
@@ -65,7 +66,7 @@ public class SetterFactory extends AbstractSourceFactory {
       final JType nameType,
       final String nameVar,
       final JType valueType,
-      final String value) {
+      final String value) throws CreationException {
     mapSetter(
         instance,
         field,
@@ -93,7 +94,7 @@ public class SetterFactory extends AbstractSourceFactory {
       final JType nameVariableType,
       final String nameVariableName,
       final JType valueVariableType,
-      final String valueVariableName) {
+      final String valueVariableName) throws CreationException {
     if (isInjection) {
       addInject(instance, injectionAnnotation);
     }
@@ -139,7 +140,7 @@ public class SetterFactory extends AbstractSourceFactory {
       final boolean isNullable,
       final boolean isArrayNullable,
       final boolean isCollectionNullable,
-      final List<Annotation> annotations) {
+      final List<Annotation> annotations) throws CreationException {
     final JMethod method = instance.method(JMod.PUBLIC, returnInstance ? instance : _void(), name);
     annotate(method, annotations);
     final JVar variable = addParameter(

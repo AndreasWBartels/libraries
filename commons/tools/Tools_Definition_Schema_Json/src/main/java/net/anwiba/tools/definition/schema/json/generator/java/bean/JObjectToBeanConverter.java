@@ -15,12 +15,29 @@ import static net.anwiba.tools.generator.java.bean.configuration.Builders.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JCatchBlock;
+import com.sun.codemodel.JClass;
+import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JInvocation;
+import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JMod;
+import com.sun.codemodel.JTryBlock;
+import com.sun.codemodel.JVar;
+
+import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.resource.utilities.StringUtilities;
 import net.anwiba.tools.definition.schema.json.gramma.element.IJsonTypeVisitor;
 import net.anwiba.tools.definition.schema.json.gramma.element.JAnnotation;
@@ -30,6 +47,7 @@ import net.anwiba.tools.definition.schema.json.gramma.element.JParameter;
 import net.anwiba.tools.definition.schema.json.gramma.element.JType;
 import net.anwiba.tools.definition.schema.json.gramma.element.JValue;
 import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.AnnotationBuilder;
 import net.anwiba.tools.generator.java.bean.configuration.Argument;
 import net.anwiba.tools.generator.java.bean.configuration.Bean;
 import net.anwiba.tools.generator.java.bean.configuration.BeanBuilder;
@@ -39,11 +57,17 @@ import net.anwiba.tools.generator.java.bean.configuration.MemberBuilder;
 import net.anwiba.tools.generator.java.bean.configuration.PropertiesBuilder;
 import net.anwiba.tools.generator.java.bean.configuration.TypeBuilder;
 import net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities;
+import net.anwiba.tools.generator.java.bean.value.ValueType;
 
 @SuppressWarnings("nls")
 public class JObjectToBeanConverter {
 
+  private static final String SHAPE = "shape";
+  private static final String INPUT = "input";
+  private static final String OUTPUT = "output";
+  private static final String INOUT = "inout";
   private static final String DELEGATION = "delegation";
+  private static final String PATTERN = "pattern";
   private static final String PROPERTY = "property";
   private static final String ARGUMENTS = "arguments";
   private static final String ARGUMENT = "argument";
@@ -51,9 +75,12 @@ public class JObjectToBeanConverter {
   private static final String FACTORY = "factory";
   private static final String SOURCE = "source";
   private static final String TYPE = "type";
+  private static final String TYPES = "types";
   private static final String REFLECTION = "reflection";
   private static final String VALUE = "value";
+  private static final String USING = "using";
   private static final String _UNKNOWN_MEMBERS = "_unknownMembers";
+  private static final String TYPE_INFO = "typeinfo";
 
   private static final String JSSD_PROPERTIES = "JssdProperties";
   private static final String JSSD_NO_PROPERTY = "JssdNoProperty";
@@ -64,10 +91,15 @@ public class JObjectToBeanConverter {
   private static final String JSSD_BUILDER = "JssdBuilder";
   private static final String JSSD_NAMED_VALUE_PROVIDER = "JssdNamedValueProvider";
   private static final String JSSD_UNKNOWN_MEMBER = "JssdUnknownMember";
+  private static final String JSSD_IGNORE_UNKNOWN_MEMBER = "JssdIgnoreUnknownMember";
   private static final String JSSD_PRIMITIVES_ENABLED = "JssdPrimitivesEnabled";
   private static final String JSSD_EQUALS = "JssdEquals";
   private static final String JSSD_EXTENDS = "JssdExtends";
   private static final String JSSD_NAME = "JssdName";
+  private static final String JSSD_PATTERN = "JssdPattern";
+  private static final String JSSD_VALUE = "JssdValue";
+
+  private static final String JSSD_SERIALIZER = "JssdSerializer";
 
   private static final String ORG_CODEHAUS_JACKSON_MAP_ANNOTATE_JACKSON_INJECT = com.fasterxml.jackson.annotation.JacksonInject.class
       .getName();
@@ -75,11 +107,27 @@ public class JObjectToBeanConverter {
       .getName();
   private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_CREATOR = com.fasterxml.jackson.annotation.JsonCreator.class
       .getName();
+  private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_TYPE_INFO = com.fasterxml.jackson.annotation.JsonTypeInfo.class
+      .getName();
+  private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE = com.fasterxml.jackson.annotation.JsonSubTypes.class
+      .getName();
+  private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE = com.fasterxml.jackson.annotation.JsonSubTypes.Type.class
+      .getName();
   private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE = com.fasterxml.jackson.annotation.JsonIgnore.class
+      .getName();
+  private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE_PROPERTIES = com.fasterxml.jackson.annotation.JsonIgnoreProperties.class
       .getName();
   private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_ANY_SETTER = com.fasterxml.jackson.annotation.JsonAnySetter.class
       .getName();
   private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_ANY_GETTER = com.fasterxml.jackson.annotation.JsonAnyGetter.class
+      .getName();
+  private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_FORMAT = com.fasterxml.jackson.annotation.JsonFormat.class
+      .getName();
+  private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_VALUE = com.fasterxml.jackson.annotation.JsonValue.class
+      .getName();
+  private static final String ORG_CODEHAUS_JACKSON_DATABIND_ANNOTATE_JSON_SERIALIZER = com.fasterxml.jackson.databind.annotation.JsonSerialize.class
+      .getName();
+  private static final String ORG_CODEHAUS_JACKSON_DATABIND_ANNOTATE_JSON_DESERIALIZER = com.fasterxml.jackson.databind.annotation.JsonDeserialize.class
       .getName();
 
   private final BeanNameConverter beanNameConverter;
@@ -97,33 +145,52 @@ public class JObjectToBeanConverter {
     this.annotationHandler = new AnnotationHandler();
   }
 
-  public Bean convert(final String name, final JObject object) {
-    final Map<String, JAnnotation> jssdAnnotations = this.annotationHandler
-        .extractJssdAnnotations(object.annotations());
-    final BeanBuilder builder = bean(getClassName(jssdAnnotations, JSSD_NAME, VALUE, name));
-    builder.extend(getClassName(jssdAnnotations, JSSD_EXTENDS, TYPE, null));
-    builder.setMutable(!this.isBuilderBeanPatternEnabled);
-    builder.setEnableBuilder(jssdAnnotations.containsKey(JSSD_BUILDER));
-    builder.setArrayNullable(!jssdAnnotations.containsKey(JSSD_ARRAYS_NOT_NULLABLE));
-    builder.setCollectionNullable(!jssdAnnotations.containsKey(JSSD_ARRAYS_NOT_NULLABLE));
-    builder.setEqualsEnabled(jssdAnnotations.containsKey(JSSD_EQUALS));
-    builder.setPrimitivesEnabled(jssdAnnotations.containsKey(JSSD_PRIMITIVES_ENABLED));
-    builder.comment(this.comment);
-    addMembers(object, builder, getFactoryMembers(jssdAnnotations.get(JSSD_FACTORY)));
-    if (jssdAnnotations.containsKey(JSSD_UNKNOWN_MEMBER)) {
-      addUnknownMembersMethod(builder, jssdAnnotations);
+  public Bean convert(final String name, final JObject object) throws ConversionException {
+    try {
+      final Map<String, JAnnotation> jssdAnnotations = this.annotationHandler
+          .extractJssdAnnotations(object.annotations());
+      final BeanBuilder builder = bean(getClassName(jssdAnnotations, JSSD_NAME, VALUE, name));
+      builder.extend(getClassName(jssdAnnotations, JSSD_EXTENDS, TYPE, null));
+      builder.setMutable(!(this.isBuilderBeanPatternEnabled || jssdAnnotations.containsKey(JSSD_VALUE)));
+      builder.setEnableBuilder(jssdAnnotations.containsKey(JSSD_BUILDER) || this.isBuilderBeanPatternEnabled);
+      builder.setArrayNullable(!jssdAnnotations.containsKey(JSSD_ARRAYS_NOT_NULLABLE));
+      builder.setCollectionNullable(!jssdAnnotations.containsKey(JSSD_ARRAYS_NOT_NULLABLE));
+      builder.setEqualsEnabled(jssdAnnotations.containsKey(JSSD_EQUALS));
+      builder.setPrimitivesEnabled(jssdAnnotations.containsKey(JSSD_PRIMITIVES_ENABLED));
+      builder.comment(this.comment);
+      if (jssdAnnotations.containsKey(JSSD_VALUE) && object.numberOfValues() != 1) {
+        throw new ConversionException("Jssd value allows only on member");
+      }
+      addMembers(object, builder, getFactoryMembers(jssdAnnotations.get(JSSD_FACTORY)));
+      if (jssdAnnotations.containsKey(JSSD_FACTORY)) {
+        addFactoryMethode(builder, jssdAnnotations);
+      }
+      if (jssdAnnotations.containsKey(JSSD_UNKNOWN_MEMBER)) {
+        addUnknownMembersMethod(builder, jssdAnnotations);
+      } else if (jssdAnnotations.containsKey(JSSD_IGNORE_UNKNOWN_MEMBER)) {
+        addIgnoreUnknownMembersMethod(builder);
+      }
+      addClassAnnotations(object, builder);
+      return builder.build();
+    } catch (final ConversionException exception) {
+      throw new ConversionException("Couldn't convert object '" + name + "', " + exception.getMessage(), exception);
     }
-    if (jssdAnnotations.containsKey(JSSD_FACTORY)) {
-      addFactoryMethode(builder, jssdAnnotations);
-    }
-    addClassAnnotations(object, builder);
-    return builder.build();
+  }
+
+  private void addIgnoreUnknownMembersMethod(final BeanBuilder builder) {
+    builder.annotation(
+        annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE_PROPERTIES).parameter("ignoreUnknown", true).build());
   }
 
   private Set<String> getFactoryMembers(final JAnnotation annotation) {
     if (annotation == null) {
-      return new HashSet<>();
+      return Collections.emptySet();
     }
+    final JParameter typeParameter = annotation.parameter(TYPE);
+    if (typeParameter != null && typeParameter.value().equals(TYPE_INFO)) {
+      return Collections.emptySet();
+    }
+
     if (annotation.hasParameters()) {
       if (annotation.parameter(ARGUMENT) != null) {
         return new HashSet<>(Arrays.asList(getTypeName(annotation.parameter(ARGUMENT).value().toString())));
@@ -168,40 +235,71 @@ public class JObjectToBeanConverter {
     properties.setterName("set").setterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_ANY_SETTER).build());
     properties.isImutable(false);
     properties.isNullable(true);
-    properties.setInjectionAnnotationName(com.fasterxml.jackson.annotation.JsonProperty.class.getSimpleName());
     properties.setImplementsNamedValueProvider(jssdAnnotations.containsKey(JSSD_NAMED_VALUE_PROVIDER));
     properties.namesGetterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE).build());
     builder.properties(properties.build());
   }
 
-  private void addFactoryMethode(final BeanBuilder builder, final Map<String, JAnnotation> jssdAnnotations) {
+  private void addFactoryMethode(final BeanBuilder builder, final Map<String, JAnnotation> jssdAnnotations)
+      throws ConversionException {
     final JAnnotation annotation = jssdAnnotations.get(JSSD_FACTORY);
-    final CreatorBuilder createMethodeBuilder = creator(CREATE)
-        .annotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_CREATOR).build());
     final JParameter typeParameter = annotation.parameter(TYPE);
+    if (typeParameter != null && typeParameter.value().equals(TYPE_INFO)) {
+      final JParameter propertyParameter = annotation.parameter(PROPERTY);
+      builder.annotation(
+          annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_TYPE_INFO)
+              .parameter("use", JsonTypeInfo.Id.NAME)
+              .parameter("include", JsonTypeInfo.As.PROPERTY)
+              .parameter("property", propertyParameter == null ? TYPE : propertyParameter.value().toString())
+              .build());
+      final JParameter typesParameter = annotation.parameter(TYPES);
+      if (typesParameter != null) {
+        final AnnotationBuilder annotationBuilder = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE);
+
+        final List<Annotation> annotations = new ArrayList<>();
+
+        final StringTokenizer tokenizer = new StringTokenizer(typesParameter.value().toString(), ",");
+        while (tokenizer.hasMoreTokens()) {
+          final String token = tokenizer.nextToken();
+          annotations.add(
+              annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
+                  .parameter(
+                      VALUE,
+                      net.anwiba.commons.utilities.string.StringUtilities.setFirstTrimedCharacterToUpperCase(token),
+                      ValueType.CLASS)
+                  .build());
+        }
+        annotationBuilder.parameter(VALUE, annotations);
+        builder.annotation(annotationBuilder.build());
+      }
+      return;
+    }
+
+    final CreatorBuilder createMethodeBuilder = creator(CREATE).annotation(
+        annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_CREATOR).parameter("mode", JsonCreator.Mode.PROPERTIES).build());
     if (!annotation.hasParameters() || (typeParameter == null || typeParameter.value().equals(REFLECTION))) {
       final String anotationName = getAnnotationName(annotation.parameter(SOURCE));
       final JParameter argumentParameter = annotation.parameter(ARGUMENT);
       if (argumentParameter == null) {
-        builder.creator(createMethodeBuilder.addArgument(argument(JAVA_LANG_STRING, TYPE, anotationName)).build());
+        builder.creator(createMethodeBuilder.addArgument(argument(anotationName, TYPE, JAVA_LANG_STRING)).build());
       } else {
         builder.creator(
             createMethodeBuilder
-                .addArgument(argument(JAVA_LANG_STRING, argumentParameter.value().toString(), anotationName))
+                .addArgument(argument(anotationName, argumentParameter.value().toString(), JAVA_LANG_STRING))
                 .build());
       }
     } else if (typeParameter.value().equals(DELEGATION)) {
       final JParameter factoryParameter = annotation.parameter(FACTORY);
       if (factoryParameter == null) {
-        throw new IllegalArgumentException("missing factory parameter in JssdFactory annotation");
+        throw new ConversionException("missing factory parameter in JssdFactory annotation");
       }
       createMethodeBuilder
-          .setFactory(argument(factoryParameter.value().toString(), ORG_CODEHAUS_JACKSON_MAP_ANNOTATE_JACKSON_INJECT));
+          .setFactory(argument(ORG_CODEHAUS_JACKSON_MAP_ANNOTATE_JACKSON_INJECT, factoryParameter.value().toString()));
       final JParameter argumentsParameter = annotation.parameter(ARGUMENTS);
       if (argumentsParameter != null) {
         final List<Argument> arguments = arguments(
-            argumentsParameter.value().toString(),
-            ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY);
+            ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY,
+            argumentsParameter.value().toString());
         for (final Argument argument : arguments) {
           createMethodeBuilder.addArgument(argument);
         }
@@ -220,26 +318,26 @@ public class JObjectToBeanConverter {
     }
   }
 
-  private List<Argument> arguments(final String parameters, final String anotationName) {
+  private List<Argument> arguments(final String anotationName, final String parameters) {
     final StringTokenizer tokenizer = new StringTokenizer(parameters, ",");
     final ArrayList<Argument> arguments = new ArrayList<>();
     while (tokenizer.hasMoreTokens()) {
-      arguments.add(argument(tokenizer.nextToken(), anotationName));
+      arguments.add(argument(anotationName, tokenizer.nextToken()));
     }
     return arguments;
   }
 
-  private Argument argument(final String parameter, final String anotationName) {
+  private Argument argument(final String anotationName, final String parameter) {
     final String name = StringUtilities.getStringBeforLastChar(parameter, ':').trim();
     final String type = StringUtilities.getStringAfterLastChar(parameter, ':').trim();
-    return argument(type, name, anotationName);
+    return argument(anotationName, name, type);
   }
 
-  private Argument argument(final String type, final String name, final String anotationName) {
+  private Argument argument(final String anotationName, final String value, final String type) {
     return new Argument(
-        type(type).build(),
-        SourceFactoryUtilities.createFieldName(name),
-        Arrays.asList(annotation(anotationName).parameter(VALUE, name).build()));
+        SourceFactoryUtilities.createFieldName(value),
+        Arrays.asList(annotation(anotationName).parameter(VALUE, value).build()),
+        type(type).build());
   }
 
   public String getClassName(
@@ -259,7 +357,8 @@ public class JObjectToBeanConverter {
     return defaultValue == null ? null : this.beanNameConverter.convert(defaultValue);
   }
 
-  public void addMembers(final JObject object, final BeanBuilder builder, final Set<String> factoryMembers) {
+  public void addMembers(final JObject object, final BeanBuilder builder, final Set<String> factoryMembers)
+      throws ConversionException {
     for (final String fieldname : object.names()) {
       final JField field = object.field(fieldname);
       final Map<String, JAnnotation> jssdAnnotations = this.annotationHandler
@@ -271,7 +370,6 @@ public class JObjectToBeanConverter {
         final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY)
             .parameter(VALUE, field.name())
             .build();
-        //properties.annotation(jsonPropertyAnnotation);
         properties.getterAnnotation(jsonPropertyAnnotation);
         properties.setterAnnotation(jsonPropertyAnnotation);
         properties.isNullable(true);
@@ -281,14 +379,12 @@ public class JObjectToBeanConverter {
         builder.properties(properties.build());
         continue;
       }
-      builder.member(convert(jssdAnnotations, field, factoryMembers));
+      builder.member(convert(object, field, factoryMembers));
     }
   }
 
-  public Member convert(
-      final Map<String, JAnnotation> jssdAnnotations,
-      final JField field,
-      final Set<String> factoryMembers) {
+  public Member convert(final JObject object, final JField field, final Set<String> factoryMembers)
+      throws ConversionException {
     final JType type = field.type();
     final TypeBuilder typeBuilder = type(this.beanNameConverter.convert(type.name()));
     typeBuilder.dimension(type.dimension());
@@ -296,19 +392,100 @@ public class JObjectToBeanConverter {
       typeBuilder.generic(this.beanNameConverter.convert(generic));
     }
     final MemberBuilder builder = member(typeBuilder.build(), field.name());
-    if (!jssdAnnotations.containsKey(JSSD_NO_PROPERTY)) {
+    adjustValue(builder, type, field.value());
+    if (object.hasAnnotation(JSSD_VALUE)) {
+      final JAnnotation annotation = object.annotation(JSSD_VALUE);
+      builder.getterAnnotation(annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_VALUE).build());
+      if (annotation.hasParameter(TYPE)) {
+        final String jsonType = this.beanNameConverter.convert(annotation.parameter(TYPE).value());
+        builder.addValueOf((model, instance, member) -> {
+          final JMethod method = instance.method(JMod.PUBLIC | JMod.STATIC, instance, "valueOf"); //$NON-NLS-1$
+          final JVar value = method.param(model.ref(jsonType), "object"); //$NON-NLS-1$
+          final JTryBlock _try = method.body()._try();
+          final JExpression dotclass = model.ref(jsonType).dotclass();
+          final JInvocation result = JExpr
+              ._new(model.ref(com.fasterxml.jackson.databind.ObjectMapper.class.getName()))
+              .invoke("writerFor")
+              .arg(dotclass)
+              .invoke("writeValueAsString")
+              .arg(value);
+          _try.body()._return(JExpr._new(instance).arg(result));
+          final JCatchBlock _catch = _try._catch(model.ref(Exception.class));
+          final JVar exception = _catch.param("exception");
+          _catch.body()._throw(JExpr._new(model.ref(IllegalArgumentException.class)).arg(exception));
+        });
+        builder.asObject((model, instance, member) -> {
+          final JClass ref = model.ref(jsonType);
+          final JMethod method = instance.method(JMod.PUBLIC, ref, "as" + ref.name());
+          final JBlock body = method.body();
+          final JTryBlock _try = body._try();
+          final JExpression dotclass = ref.dotclass();
+          _try.body()._return(
+              JExpr
+                  ._new(model.ref(com.fasterxml.jackson.databind.ObjectMapper.class.getName()))
+                  .invoke("readerFor")
+                  .arg(dotclass)
+                  .invoke("readValue")
+                  .arg(member));
+          final JCatchBlock _catch = _try._catch(model.ref(Exception.class));
+          final JVar exception = _catch.param("exception");
+          _catch.body()._throw(JExpr._new(model.ref(IllegalStateException.class)).arg(exception));
+        });
+      }
+      return builder.build();
+    }
+    if (!field.hasAnnotation(JSSD_NO_PROPERTY)) {
       final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY)
           .parameter(VALUE, field.name())
           .build();
-      //builder.annotation(jsonPropertyAnnotation);
+      builder.getterAnnotation(jsonPropertyAnnotation);
+      builder.setterAnnotation(jsonPropertyAnnotation);
+    } else {
+      final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE).build();
       builder.getterAnnotation(jsonPropertyAnnotation);
       builder.setterAnnotation(jsonPropertyAnnotation);
     }
-    builder.isNullable(!(jssdAnnotations.containsKey(JSSD_NOT_NULLABLE)));
-    builder.isImutable((jssdAnnotations.containsKey(JSSD_IMMUTABLE)));
+    builder.isNullable(!field.hasAnnotation(JSSD_NOT_NULLABLE));
+    builder.isImutable((field.hasAnnotation(JSSD_IMMUTABLE)));
     builder.isSetterEnabled(!factoryMembers.contains(field.name()));
-    adjustValue(builder, type, field.value());
     for (final JAnnotation annotation : field.annotations()) {
+      if (Objects.equals(annotation.name(), JSSD_SERIALIZER)) {
+        if (annotation.hasParameter(INPUT)) {
+          final Annotation jsonAnnotation = annotation(ORG_CODEHAUS_JACKSON_DATABIND_ANNOTATE_JSON_DESERIALIZER)
+              .parameter(USING, annotation.parameter(INPUT).value().toString())
+              .build();
+          builder.setterAnnotation(jsonAnnotation);
+        }
+        if (annotation.hasParameter(OUTPUT)) {
+          final Annotation jsonAnnotation = annotation(ORG_CODEHAUS_JACKSON_DATABIND_ANNOTATE_JSON_SERIALIZER)
+              .parameter(USING, annotation.parameter(OUTPUT).value().toString())
+              .build();
+          builder.setterAnnotation(jsonAnnotation);
+        }
+      }
+      if (Objects.equals(annotation.name(), JSSD_PATTERN)) {
+        final AnnotationBuilder jsonAnnotationBuilder = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_FORMAT);
+        final Annotation jsonAnnotation = jsonAnnotationBuilder.build();
+        if (!(annotation.hasParameter(INPUT) || annotation.hasParameter(OUTPUT) || annotation.hasParameter(INOUT))) {
+          throw new IllegalArgumentException("missing pattern parameter in JssdPattern annotation");
+        }
+        if (annotation.hasParameter(OUTPUT)) {
+          jsonAnnotationBuilder.parameter(SHAPE, JsonFormat.Shape.STRING);
+          jsonAnnotationBuilder.parameter(PATTERN, annotation.parameter(OUTPUT).value().toString());
+          builder.getterAnnotation(jsonAnnotation);
+        }
+        if (annotation.hasParameter(INPUT)) {
+          jsonAnnotationBuilder.parameter(SHAPE, JsonFormat.Shape.STRING);
+          jsonAnnotationBuilder.parameter(PATTERN, annotation.parameter(INPUT).value().toString());
+          builder.setterAnnotation(jsonAnnotation);
+        }
+        if (annotation.hasParameter(INOUT)) {
+          jsonAnnotationBuilder.parameter(SHAPE, JsonFormat.Shape.STRING);
+          jsonAnnotationBuilder.parameter(PATTERN, annotation.parameter(INOUT).value().toString());
+          builder.getterAnnotation(jsonAnnotation);
+          builder.setterAnnotation(jsonAnnotation);
+        }
+      }
       if (this.annotationHandler.isJssdAnnotation(annotation)) {
         continue;
       }
@@ -325,8 +502,9 @@ public class JObjectToBeanConverter {
     return builder.build();
   }
 
-  private void adjustValue(final MemberBuilder builder, final JType type, final JValue value) {
-    final IJsonTypeVisitor<Void, RuntimeException> visitor = new IJsonTypeVisitor<Void, RuntimeException>() {
+  private void adjustValue(final MemberBuilder builder, final JType type, final JValue value)
+      throws ConversionException {
+    final IJsonTypeVisitor<Void, ConversionException> visitor = new IJsonTypeVisitor<Void, ConversionException>() {
 
       @Override
       public Void visitString() throws RuntimeException {
@@ -385,7 +563,7 @@ public class JObjectToBeanConverter {
       }
 
       @Override
-      public Void visitArray() throws RuntimeException {
+      public Void visitArray() throws ConversionException {
         if (shortTypes.contains(type.name())) {
           final List<Number> list = value.value();
           final short[] values = new short[list.size()];
@@ -467,7 +645,7 @@ public class JObjectToBeanConverter {
           builder.value(values);
           return null;
         }
-        throw new UnsupportedOperationException("not yet implemented");
+        throw new ConversionException("type '" + type.name() + "', isn't supported");
       }
 
       @Override

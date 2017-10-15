@@ -78,10 +78,10 @@ public class Feature {
     private Object geometry = null;
     private final Map<String, net.anwiba.generated.test.bean.Entity> attributes = new LinkedHashMap<String, net.anwiba.generated.test.bean.Entity>();
 
-    public final Feature() {
+    public Feature() {
     }
 
-    public final Feature(final Envelope envelope, final Object geometry, final Map<String, net.anwiba.generated.test.bean.Entity> attributes) {
+    public Feature(final Envelope envelope, final Object geometry, final Map<String, net.anwiba.generated.test.bean.Entity> attributes) {
         Objects.requireNonNull(envelope);
         this.envelope = envelope;
         this.geometry = geometry;
@@ -159,9 +159,13 @@ public class FeatureBuilder {
     private Object geometry = null;
     private final Map<String, net.anwiba.generated.test.bean.Entity> attributes = new LinkedHashMap<String, net.anwiba.generated.test.bean.Entity>();
 
-    public final FeatureBuilder(final Envelope envelope) {
+    public FeatureBuilder(final Envelope envelope) {
         Objects.requireNonNull(envelope);
         this.envelope = envelope;
+    }
+
+    public Feature build() {
+        return new Feature(envelope, geometry, attributes);
     }
 
     @JsonProperty("geometry")
@@ -179,10 +183,6 @@ public class FeatureBuilder {
         this.attributes.clear();
         this.attributes.putAll(attributes);
         return this;
-    }
-
-    public Feature build() {
-        return new Feature(envelope, geometry, attributes);
     }
 
 }

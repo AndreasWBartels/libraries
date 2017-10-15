@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -37,11 +37,13 @@ public final class Request implements IRequest {
   private final String encoding;
   private final String mimeType;
   private final String userAgent;
+  private final IParameters properties;
 
   public Request(
       final HttpMethodType methodType,
       final String urlString,
       final IParameters parameters,
+      final IParameters properties,
       final String userAgent,
       final IClosure<InputStream, IOException> inputStreamClosure,
       final long contentLength,
@@ -51,6 +53,7 @@ public final class Request implements IRequest {
     this.methodType = methodType;
     this.urlString = urlString;
     this.parameters = parameters;
+    this.properties = properties;
     this.userAgent = userAgent;
     this.inputStreamClosure = inputStreamClosure;
     this.contentLength = contentLength;
@@ -96,5 +99,10 @@ public final class Request implements IRequest {
   @Override
   public String getEncoding() {
     return this.encoding;
+  }
+
+  @Override
+  public IParameters getProperties() {
+    return this.properties;
   }
 }

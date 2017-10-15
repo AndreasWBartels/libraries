@@ -29,7 +29,7 @@ public class Argument {
   private final Type type;
   private final List<Annotation> annotations;
 
-  public Argument(final Type type, final String name, final List<Annotation> annotations) {
+  public Argument(final String name, final List<Annotation> annotations, final Type type) {
     this.type = type;
     this.name = name;
     this.annotations = annotations;

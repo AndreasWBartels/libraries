@@ -63,6 +63,9 @@ public class ObjectToArrayConverter {
       final Object array = Array.newInstance(clazz.getComponentType(), object.size());
       int index = 0;
       for (final Object value : object) {
+        if (!clazz.getComponentType().isInstance(object)) {
+          continue;
+        }
         Array.set(array, index, clazz.getComponentType().cast(value));
         index++;
       }

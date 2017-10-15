@@ -24,6 +24,8 @@ package net.anwiba.commons.utilities.io;
 import java.io.Closeable;
 import java.io.IOException;
 
+import net.anwiba.commons.lang.functional.ICloseableConsumer;
+
 public interface ICloseableIoConsumer<I, O> extends Closeable, ICloseableConsumer<I, O, IOException> {
   // nothing to do
 }

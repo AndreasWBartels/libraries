@@ -1,0 +1,5 @@
+@JssdFactory(type="typeinfo",types="foo,bar")
+{
+   "type" : <String> "Factory",
+   "id" : <String> null
+}

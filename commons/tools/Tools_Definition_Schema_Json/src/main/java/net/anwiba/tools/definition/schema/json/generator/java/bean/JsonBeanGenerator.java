@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.tools.definition.schema.json.JSSDReader;
 import net.anwiba.tools.definition.schema.json.gramma.element.JObject;
 import net.anwiba.tools.definition.schema.json.gramma.parser.JssdParserException;
@@ -38,8 +39,20 @@ public class JsonBeanGenerator {
       throws CreationException,
       IOException,
       JssdParserException {
+    CreationException createException = null;
     for (final JObject object : this.jssdReader.read(inputStream, this.encoding)) {
-      this.generator.add(this.objectToBeanConverter.convert(name, object));
+      try {
+        this.generator.add(this.objectToBeanConverter.convert(name, object));
+      } catch (final ConversionException exception) {
+        if (createException == null) {
+          createException = new CreationException(exception.getMessage(), exception);
+          continue;
+        }
+        createException.addSuppressed(exception);
+      }
+    }
+    if (createException != null) {
+      throw createException;
     }
   }
 

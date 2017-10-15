@@ -25,18 +25,17 @@ package net.anwiba.commons.json;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("rawtypes")
 public class JsonObjectUnmarshallerBuilder<T> {
 
   private final Class<T> clazz;
-  final Map<Class, Object> injectionValues = new HashMap<>();
+  final Map<String, Object> injectionValues = new HashMap<>();
 
   public JsonObjectUnmarshallerBuilder(final Class<T> clazz) {
     this.clazz = clazz;
   }
 
-  public <C> JsonObjectUnmarshallerBuilder<T> addInjectionValues(final Class<C> clazz, final C value) {
-    this.injectionValues.put(clazz, value);
+  public <C> JsonObjectUnmarshallerBuilder<T> addInjectionValues(final String property, final C value) {
+    this.injectionValues.put(property, value);
     return this;
   }
 

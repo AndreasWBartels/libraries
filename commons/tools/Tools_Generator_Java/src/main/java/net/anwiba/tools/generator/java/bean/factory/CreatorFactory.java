@@ -92,7 +92,7 @@ public class CreatorFactory extends AbstractSourceFactory {
     createSetFirstCharacterToUpperCase(bean);
   }
 
-  private void createFactoryCreateMethod(final Creator creator, final JDefinedClass bean) {
+  private void createFactoryCreateMethod(final Creator creator, final JDefinedClass bean) throws CreationException {
     final JMethod method = bean.method(JMod.PUBLIC | JMod.STATIC, bean, creator.name());
     annotate(method, creator.annotations());
     final Iterable<Argument> arguments = creator.arguments();
@@ -107,7 +107,8 @@ public class CreatorFactory extends AbstractSourceFactory {
     method.body()._return(invoke);
   }
 
-  private void createTypeCreateMethod(final Bean configuration, final Creator creator, final JDefinedClass bean) {
+  private void createTypeCreateMethod(final Bean configuration, final Creator creator, final JDefinedClass bean)
+      throws CreationException {
     final JMethod method = bean.method(JMod.PUBLIC | JMod.STATIC, bean, creator.name());
     annotate(method, creator.annotations());
     final Iterable<Argument> arguments = creator.arguments();

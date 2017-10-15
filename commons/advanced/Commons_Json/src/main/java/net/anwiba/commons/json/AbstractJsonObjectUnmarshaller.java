@@ -11,6 +11,7 @@
 package net.anwiba.commons.json;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,14 +29,12 @@ public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException
   private final ObjectMapper mapper = new ObjectMapper();
   private final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory;
   private final Class<T> clazz;
-  @SuppressWarnings("rawtypes")
-  private final Map<Class, Object> injectionValues = new HashMap<>();
+  private final Map<String, Object> injectionValues = new HashMap<>();
 
-  @SuppressWarnings("rawtypes")
   public AbstractJsonObjectUnmarshaller(
       final Class<T> clazz,
       final Class<R> errorResponseClass,
-      final Map<Class, Object> injectionValues,
+      final Map<String, Object> injectionValues,
       final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory) {
     super(clazz, errorResponseClass, injectionValues);
     this.clazz = clazz;
@@ -45,31 +44,32 @@ public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException
   }
 
   @Override
-  public T unmarshal(final String body) throws IOException, E {
-    final T result = validate(body);
+  protected T _unmarshal(final InputStream stream) throws IOException, E {
+    stream.mark(Integer.MAX_VALUE);
+    final T result = validate(stream);
     if (result != null) {
       return result;
     }
+    stream.reset();
+    stream.mark(Integer.MAX_VALUE);
     try {
-      return read(body, this.clazz);
-    } catch (final JsonParseException exception) {
-      throw createIOException(body, exception);
-    } catch (final JsonMappingException exception) {
-      throw createIOException(body, exception);
+      return read(stream, this.clazz);
+    } catch (final JsonParseException | JsonMappingException exception) {
+      stream.reset();
+      throw createIOException(stream, exception);
     }
   }
 
-  private <X> X read(final String body, final Class<X> type)
+  private <X> X read(final InputStream stream, final Class<X> type)
       throws IOException,
       JsonParseException,
       JsonMappingException,
       JsonProcessingException {
     final InjectableValues.Std injectableValues = new InjectableValues.Std();
-    for (@SuppressWarnings("rawtypes")
-    final Class key : this.injectionValues.keySet()) {
+    for (final String key : this.injectionValues.keySet()) {
       injectableValues.addValue(key, this.injectionValues.get(key));
     }
-    return this.mapper.readerFor(type).with(injectableValues).readValue(body);
+    return this.mapper.readerFor(type).with(injectableValues).readValue(stream);
   }
 
   @Override

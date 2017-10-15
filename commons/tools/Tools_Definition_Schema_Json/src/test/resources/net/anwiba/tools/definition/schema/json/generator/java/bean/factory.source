@@ -14,11 +14,7 @@ public class Factory {
     private final String type = "Factory";
     private final static HashMap<java.lang.String, Class> _classes = new HashMap<java.lang.String, Class>();
 
-    public String getType() {
-        return this.type;
-    }
-
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public static Factory create(
         @JsonProperty("type")
         java.lang.String type) {
@@ -85,6 +81,11 @@ public class Factory {
             return null;
         }
         return (value.substring(0, 1).toUpperCase()+ value.substring(1, value.length()));
+    }
+
+    @JsonProperty("type")
+    public String getType() {
+        return this.type;
     }
 
 }

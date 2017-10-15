@@ -2,32 +2,20 @@
 
 package net.anwiba.generated.test.bean;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.anwiba.commons.reflection.OptionalReflectionMethodInvoker;
 
 public class Entity {
 
     private final Map<String, Object> _unknownMembers = new LinkedHashMap<String, Object>();
 
-    private void _inject(String name, Object value) {
-        try {
-            OptionalReflectionMethodInvoker<Entity, Object> setterInvoker = OptionalReflectionMethodInvoker.createSetter(this.getClass(), "JsonProperty", "value", name);
-            setterInvoker.invoke(this, value);
-        } catch (InvocationTargetException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
     @JsonAnySetter
     public void set(final String name, final Object value) {
         Objects.requireNonNull(name);
-        _inject(name, value);
         this._unknownMembers.put(name, value);
     }
 

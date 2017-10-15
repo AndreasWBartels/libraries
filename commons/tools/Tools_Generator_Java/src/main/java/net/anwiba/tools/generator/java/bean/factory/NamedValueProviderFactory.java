@@ -32,6 +32,7 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
 
+import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.tools.generator.java.bean.configuration.Annotation;
 import net.anwiba.tools.generator.java.bean.configuration.NamedValueProvider;
 import net.anwiba.tools.generator.java.bean.configuration.Type;
@@ -42,7 +43,8 @@ public class NamedValueProviderFactory extends AbstractSourceFactory {
     super(codeModel);
   }
 
-  public void create(final JDefinedClass instance, final NamedValueProvider configuration, final JFieldVar field) {
+  public void create(final JDefinedClass instance, final NamedValueProvider configuration, final JFieldVar field)
+      throws CreationException {
     final Type type = configuration.getType();
     if (configuration.isNameGetterEnabled()) {
       nameGetter(instance, configuration.getNamesMethodName(), configuration.getNamesMethodAnnotations(), field);
@@ -60,7 +62,7 @@ public class NamedValueProviderFactory extends AbstractSourceFactory {
       final String methodName,
       final Iterable<Annotation> annotations,
       final Type type,
-      final JFieldVar field) {
+      final JFieldVar field) throws CreationException {
     final JMethod method = instance.method(JMod.PUBLIC, _class(type, true), methodName);
     final JVar param = method.param(JMod.FINAL, _type(JAVA_LANG_STRING), "name"); //$NON-NLS-1$
     annotate(method, annotations);
@@ -72,7 +74,7 @@ public class NamedValueProviderFactory extends AbstractSourceFactory {
       final JDefinedClass instance,
       final String methodName,
       final Iterable<Annotation> annotations,
-      final JFieldVar field) {
+      final JFieldVar field) throws CreationException {
     final JMethod method = instance.method(JMod.PUBLIC, _type(JAVA_LANG_ITERABLE, JAVA_LANG_STRING), methodName);
     annotate(method, annotations);
     method.body()._return(JExpr.refthis(field.name()).invoke("keySet")); //$NON-NLS-1$

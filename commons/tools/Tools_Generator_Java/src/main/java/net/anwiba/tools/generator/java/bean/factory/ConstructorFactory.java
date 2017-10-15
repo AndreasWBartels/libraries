@@ -50,7 +50,7 @@ public class ConstructorFactory extends AbstractSourceFactory {
     if (configuration.isMutable() && !configuration.isBuilderEnabled()) {
       return;
     }
-    final JMethod constructor = bean.constructor(JMod.FINAL | JMod.PUBLIC);
+    final JMethod constructor = bean.constructor(JMod.PUBLIC);
     for (final JFieldVar field : fields) {
       final Member member = configuration.member(field.name());
       if (constructor == null

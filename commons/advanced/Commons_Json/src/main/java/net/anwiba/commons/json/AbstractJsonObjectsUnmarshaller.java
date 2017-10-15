@@ -11,6 +11,7 @@
 package net.anwiba.commons.json;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,13 +33,12 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
   private final ObjectMapper mapper = new ObjectMapper();
   private final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory;
   private final Class<T> clazz;
-  @SuppressWarnings("rawtypes")
-  private final Map<Class, Object> injectionValues = new HashMap<>();
+  private final Map<String, Object> injectionValues = new HashMap<>();
 
   public AbstractJsonObjectsUnmarshaller(
       final Class<T> clazz,
       final Class<R> errorResponseClass,
-      @SuppressWarnings("rawtypes") final Map<Class, Object> injectionValues,
+      final Map<String, Object> injectionValues,
       final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory) {
     super(clazz, errorResponseClass, injectionValues);
     this.clazz = clazz;
@@ -48,21 +48,23 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
   }
 
   @Override
-  public List<T> unmarshal(final String body) throws IOException, E {
+  protected List<T> _unmarshal(final InputStream stream) throws IOException, E {
+    stream.mark(Integer.MAX_VALUE);
     @SuppressWarnings("unchecked")
-    final List<T> result = (List<T>) validate(body);
+    final List<T> result = (List<T>) validate(stream);
     if (result != null) {
       return result;
     }
+    stream.reset();
+    stream.mark(Integer.MAX_VALUE);
     try {
       final InjectableValues.Std injectableValues = new InjectableValues.Std();
-      for (@SuppressWarnings("rawtypes")
-      final Class key : this.injectionValues.keySet()) {
+      for (final String key : this.injectionValues.keySet()) {
         injectableValues.addValue(key, this.injectionValues.get(key));
       }
 
       final JsonFactory f = new JsonFactory();
-      try (final JsonParser parser = f.createParser(body)) {
+      try (final JsonParser parser = f.createParser(stream)) {
         final ObjectReader reader = this.mapper.readerFor(this.clazz).with(injectableValues);
         final JsonToken token = parser.nextToken();
         if (token != JsonToken.START_ARRAY) {
@@ -76,10 +78,9 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
         }
         return results;
       }
-    } catch (final JsonParseException exception) {
-      throw createIOException(body, exception);
-    } catch (final JsonMappingException exception) {
-      throw createIOException(body, exception);
+    } catch (final JsonParseException | JsonMappingException exception) {
+      stream.reset();
+      throw createIOException(stream, exception);
     }
   }
 

@@ -25,8 +25,11 @@ import static net.anwiba.commons.ensure.Conditions.*;
 import static net.anwiba.commons.ensure.Ensure.*;
 import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
 
+import java.util.List;
+
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JAnnotatable;
+import com.sun.codemodel.JAnnotationArrayMember;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -37,6 +40,7 @@ import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JPrimitiveType;
 import com.sun.codemodel.JType;
 
+import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.utilities.ArrayUtilities;
 import net.anwiba.tools.generator.java.bean.configuration.Annotation;
@@ -53,7 +57,12 @@ public class AbstractSourceFactory {
     this.codeModel = codeModel;
   }
 
-  protected void annotate(final JAnnotatable annotatable, final Iterable<Annotation> annotationConfigurations) {
+  protected JCodeModel getCodeModel() {
+    return this.codeModel;
+  }
+
+  protected void annotate(final JAnnotatable annotatable, final Iterable<Annotation> annotationConfigurations)
+      throws CreationException {
     ensureThatArgument(annotatable, notNull());
     ensureThatArgument(annotationConfigurations, notNull());
     for (final Annotation annotationConfiguration : annotationConfigurations) {
@@ -61,14 +70,51 @@ public class AbstractSourceFactory {
     }
   }
 
-  protected void annotate(final JAnnotatable annotatable, final Annotation annotation) {
+  Class<? extends java.lang.annotation.Annotation> getAnnotationClass(final String name) throws CreationException {
+    try {
+      return (Class<? extends java.lang.annotation.Annotation>) this.codeModel
+          .getClass()
+          .getClassLoader()
+          .loadClass(name);
+    } catch (final ClassNotFoundException exception) {
+      throw new CreationException(exception.getMessage(), exception);
+    }
+  }
+
+  protected void annotate(final JAnnotatable annotatable, final Annotation annotation) throws CreationException {
     ensureThatArgument(annotatable, notNull());
     ensureThatArgument(annotation, notNull());
     final JAnnotationUse annotate = annotatable.annotate(_classByNames(annotation.name()));
+    parameter(annotate, annotation);
+  }
+
+  private void parameter(final JAnnotationUse annotate, final Annotation annotation) throws CreationException {
     final Iterable<Parameter> parameters = annotation.parameters();
     for (final Parameter parameter : parameters) {
       for (final Object value : parameter.values()) {
         parameter.type().accept(new IValueTypeVisitor() {
+
+          @Override
+          public void annotations() throws CreationException {
+            final List<Annotation> chAnnotations = (List<Annotation>) value;
+            final JAnnotationArrayMember paramArray = annotate.paramArray(parameter.name());
+            for (final Annotation parameter2 : chAnnotations) {
+              parameter(paramArray.annotate(getAnnotationClass(parameter2.name())), parameter2);
+            }
+          }
+
+          @Override
+          public void annotation() throws CreationException {
+            final Annotation chAnnotation = (Annotation) value;
+            parameter(
+                annotate.annotationParam(parameter.name(), getAnnotationClass(chAnnotation.name())),
+                chAnnotation);
+          }
+
+          @Override
+          public void enumartation() {
+            annotate.param(parameter.name(), (Enum) value);
+          }
 
           @Override
           public void string() {
@@ -82,7 +128,16 @@ public class AbstractSourceFactory {
 
           @Override
           public void clazz() {
+            if (value instanceof String) {
+              annotate.param(parameter.name(), _class((String) value));
+              return;
+            }
             annotate.param(parameter.name(), Class.class.cast(value));
+          }
+
+          @Override
+          public void logical() {
+            annotate.param(parameter.name(), Boolean.class.cast(value));
           }
         });
       }

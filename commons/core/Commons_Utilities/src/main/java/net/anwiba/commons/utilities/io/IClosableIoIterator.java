@@ -25,6 +25,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Objects;
 
+import net.anwiba.commons.lang.functional.IClosableIterator;
 import net.anwiba.commons.lang.functional.IConsumer;
 
 public interface IClosableIoIterator<T> extends Closeable, IClosableIterator<T, IOException> {

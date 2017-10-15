@@ -24,8 +24,8 @@ package net.anwiba.spatial.gps.gpsd;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import net.anwiba.commons.lang.functional.IClosableIterator;
 import net.anwiba.commons.lang.object.ObjectPair;
-import net.anwiba.commons.utilities.io.IClosableIterator;
 import net.anwiba.spatial.gps.gpsd.response.Devices;
 import net.anwiba.spatial.gps.gpsd.response.Poll;
 import net.anwiba.spatial.gps.gpsd.response.Tpv;
@@ -68,6 +68,9 @@ public final class GpsDevice implements IGpsDevice {
 
       @Override
       public boolean hasNext() throws IOException {
+        if (this.record != null) {
+          return true;
+        }
         final ObjectPair<Devices, Watch> watch = connection.watch(false, GpsDevice.this.path);
         if (!watch.getSecondObject().isEnable()) {
           return false;

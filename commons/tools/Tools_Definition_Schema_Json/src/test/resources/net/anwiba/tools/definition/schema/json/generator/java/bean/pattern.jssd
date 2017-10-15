@@ -1,0 +1,4 @@
+{
+  @JssdPattern(inout = "yyyy-MM-dd'T'HH:mm:ssSSSS")
+  "created":  <java.util.Date> null
+}

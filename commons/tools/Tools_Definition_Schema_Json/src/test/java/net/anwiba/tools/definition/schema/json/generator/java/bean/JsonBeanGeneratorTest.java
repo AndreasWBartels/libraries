@@ -38,6 +38,51 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
 
   @SuppressWarnings({ "boxing" })
   @Test
+  public void typeInfoFactoryBean() throws CreationException, JssdParserException, IOException {
+    final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
+    generator.add(
+        new ByteArrayInputStream(JsonBeanGeneratorTestResources.typeInfoFactoryBeanDefinition.getBytes()),
+        "net.anwiba.generated.test.bean.Factory");
+    final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
+    generator.generate(ouputStream);
+    assertThat(ouputStream.size(), greaterThan(0));
+    final String actual = ouputStream.toString();
+    final String expected = JsonBeanGeneratorTestResources.typeInfoFactoryBeanSource;
+    assertThat(actual, equalTo(expected));
+  }
+
+  @SuppressWarnings({ "boxing" })
+  @Test
+  public void valueBean() throws CreationException, JssdParserException, IOException {
+    final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
+    generator.add(
+        new ByteArrayInputStream(JsonBeanGeneratorTestResources.valueBeanDefinition.getBytes()),
+        "net.anwiba.generated.test.bean.Factory");
+    final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
+    generator.generate(ouputStream);
+    assertThat(ouputStream.size(), greaterThan(0));
+    final String actual = ouputStream.toString();
+    final String expected = JsonBeanGeneratorTestResources.valueBeanSource;
+    assertThat(actual, equalTo(expected));
+  }
+
+  @SuppressWarnings({ "boxing" })
+  @Test
+  public void patternBean() throws CreationException, JssdParserException, IOException {
+    final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
+    generator.add(
+        new ByteArrayInputStream(JsonBeanGeneratorTestResources.patternBeanDefinition.getBytes()),
+        "net.anwiba.generated.test.bean.Factory");
+    final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
+    generator.generate(ouputStream);
+    assertThat(ouputStream.size(), greaterThan(0));
+    final String actual = ouputStream.toString();
+    final String expected = JsonBeanGeneratorTestResources.patternBeanSource;
+    assertThat(actual, equalTo(expected));
+  }
+
+  @SuppressWarnings({ "boxing" })
+  @Test
   public void reflactionFactoryWithConfiguredArgumentNameBuilder()
       throws CreationException,
       JssdParserException,
@@ -140,15 +185,31 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
 
   @SuppressWarnings({ "boxing" })
   @Test
-  public void factoryWitUnknownMembersBean() throws CreationException, IOException, JssdParserException {
+  public void factoryWithUnknownMembersBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
     generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.factoryWitUnknownMembersBeanDefinition.getBytes()),
+        new ByteArrayInputStream(JsonBeanGeneratorTestResources.factoryWithUnknownMembersBeanDefinition.getBytes()),
         "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
-    assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.factoryWitUnknownMembersBeanSource));
+    assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.factoryWithUnknownMembersBeanSource));
+  }
+
+  @SuppressWarnings({ "boxing" })
+  @Test
+  public void factoryWithIgnoreUnknownMembersBean() throws CreationException, IOException, JssdParserException {
+    final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
+    generator.add(
+        new ByteArrayInputStream(
+            JsonBeanGeneratorTestResources.factoryWithIgnoreUnknownMembersBeanDefinition.getBytes()),
+        "net.anwiba.generated.test.bean.Factory");
+    final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
+    generator.generate(ouputStream);
+    assertThat(ouputStream.size(), greaterThan(0));
+    assertThat(
+        ouputStream.toString(),
+        equalTo(JsonBeanGeneratorTestResources.factoryWithIgnoreUnknownMembersBeanSource));
   }
 
   @SuppressWarnings({ "boxing" })

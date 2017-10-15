@@ -24,6 +24,9 @@ package net.anwiba.tools.generator.java.bean.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anwiba.tools.generator.java.bean.factory.IAsObjectMethodFactory;
+import net.anwiba.tools.generator.java.bean.factory.IValueOfMethodFactory;
+
 public class Member {
 
   private final Type type;
@@ -34,6 +37,8 @@ public class Member {
   private final Object value;
   private final boolean isNullable;
   private final boolean isImutable;
+  private final IValueOfMethodFactory valueOfMethodFactory;
+  private final IAsObjectMethodFactory asObjectMethodFactory;
 
   public Member(
       final Type type,
@@ -43,7 +48,9 @@ public class Member {
       final boolean isImutable,
       final List<Annotation> annotationConfigurations,
       final Setter setter,
-      final Getter getter) {
+      final Getter getter,
+      final IValueOfMethodFactory valueOfMethodFactory,
+      final IAsObjectMethodFactory asObjectMethodFactory) {
     this.type = type;
     this.name = name;
     this.value = value;
@@ -51,6 +58,8 @@ public class Member {
     this.isImutable = isImutable;
     this.setter = setter;
     this.getter = getter;
+    this.valueOfMethodFactory = valueOfMethodFactory;
+    this.asObjectMethodFactory = asObjectMethodFactory;
     this.annotations.addAll(annotationConfigurations);
   }
 
@@ -83,6 +92,14 @@ public class Member {
   }
 
   public boolean isImutable() {
-    return isImutable;
+    return this.isImutable;
+  }
+
+  public IAsObjectMethodFactory asObjectMethodFactory() {
+    return this.asObjectMethodFactory;
+  }
+
+  public IValueOfMethodFactory valueOfMethodFactory() {
+    return this.valueOfMethodFactory;
   }
 }

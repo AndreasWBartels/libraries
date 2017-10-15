@@ -10,9 +10,12 @@
  */
 package net.anwiba.commons.json;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,60 +27,69 @@ import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.anwiba.commons.lang.io.NoneClosingInputStream;
+
 public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
 
   private final ObjectMapper mapper = new ObjectMapper();
   private final Class<R> errorResponseClass;
   private final Class<T> clazz;
-  @SuppressWarnings("rawtypes")
-  private final Map<Class, Object> injectionValues = new HashMap<>();
+  private final Map<String, Object> injectionValues = new HashMap<>();
 
   public AbstractJsonUnmarshaller(
       final Class<T> clazz,
       final Class<R> errorResponseClass,
-      @SuppressWarnings("rawtypes") final Map<Class, Object> injectionValues) {
+      final Map<String, Object> injectionValues) {
     this.clazz = clazz;
     this.errorResponseClass = errorResponseClass;
     this.injectionValues.putAll(injectionValues);
     this.mapper.getFactory().configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
   }
 
-  public O unmarshal(final InputStream inputStream) throws IOException, E {
-    return unmarshal(toString(inputStream, "UTF-8")); //$NON-NLS-1$
+  public final O unmarshal(final String body) throws IOException, E {
+    return unmarshal(new ByteArrayInputStream(body.getBytes(Charset.forName("UTF-8")))); //$NON-NLS-1$
   }
 
-  public static String toString(final InputStream inputStream, final String contentEncoding) throws IOException {
+  public final O unmarshal(final InputStream inputStream) throws IOException, E {
+    return _unmarshal(
+        new NoneClosingInputStream(
+            inputStream instanceof BufferedInputStream
+                ? (BufferedInputStream) inputStream
+                : new BufferedInputStream(inputStream)));
+  }
+
+  protected abstract O _unmarshal(final InputStream inputStream) throws IOException, E;
+
+  private String toString(final InputStream inputStream, final String contentEncoding) throws IOException {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     final byte[] buffer = new byte[4096];
     int numChars;
     while ((numChars = inputStream.read(buffer)) > 0) {
       out.write(buffer, 0, numChars);
     }
-    return out.toString(contentEncoding);
+    final String string = out.toString(contentEncoding);
+    return string.length() > 8200 ? string.substring(0, 8200) + "..." : string; //$NON-NLS-1$
   }
 
-  protected abstract O unmarshal(final String body) throws IOException, E;
-
-  private <X> X check(final String body, final Class<X> type)
+  private <X> X check(final InputStream stream, final Class<X> type)
       throws IOException,
       JsonParseException,
       JsonMappingException,
       JsonProcessingException {
     final InjectableValues.Std injectableValues = new InjectableValues.Std();
-    for (@SuppressWarnings("rawtypes")
-    final Class key : this.injectionValues.keySet()) {
+    for (final String key : this.injectionValues.keySet()) {
       injectableValues.addValue(key, this.injectionValues.get(key));
     }
-    return this.mapper.readerFor(type).with(injectableValues).readValue(body);
+    return this.mapper.readerFor(type).with(injectableValues).readValue(stream);
   }
 
   @SuppressWarnings("unchecked")
-  protected T validate(final String body) throws IOException, E {
+  protected T validate(final InputStream stream) throws IOException, E {
     if (Void.class.equals(this.errorResponseClass)) {
       return null;
     }
     try {
-      final R response = check(body, this.errorResponseClass);
+      final R response = check(stream, this.errorResponseClass);
       if (this.clazz.isInstance(response)) {
         return (T) response;
       }
@@ -91,9 +103,15 @@ public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
 
   protected abstract E createException(R response);
 
-  protected IOException createIOException(final String content, final Exception exception) {
-    return new IOException(
-        MessageFormat.format("Error during mapping json resource, coudn''t map the content:\n {0}", content), //$NON-NLS-1$
-        exception);
+  protected IOException createIOException(final InputStream content, final Exception exception) {
+    try {
+      return new IOException(MessageFormat.format(
+          "Error during mapping json resource, coudn''t map the content:\n {0}", //$NON-NLS-1$
+          toString(content, "UTF-8")), exception); //$NON-NLS-1$
+    } catch (final IOException exception1) {
+      return new IOException(
+          "Error during mapping json resource, coudn''t map the content", //$NON-NLS-1$
+          exception);
+    }
   }
 }

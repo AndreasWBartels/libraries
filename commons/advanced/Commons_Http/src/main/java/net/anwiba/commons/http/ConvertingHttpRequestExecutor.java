@@ -26,9 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
+import net.anwiba.commons.lang.io.NoneClosingInputStream;
 import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.resource.utilities.IoUtilities;
-import net.anwiba.commons.utilities.io.NoneClosingInputStream;
 
 public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExecutor {
 

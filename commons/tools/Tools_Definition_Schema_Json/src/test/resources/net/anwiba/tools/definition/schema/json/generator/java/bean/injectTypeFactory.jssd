@@ -1,6 +1,5 @@
 @JssdFactory(type="reflection",source="inject")
 {
   @JssdImmutable
-  @JssdNoProperty
   "type" : <String> "Factory"
 }

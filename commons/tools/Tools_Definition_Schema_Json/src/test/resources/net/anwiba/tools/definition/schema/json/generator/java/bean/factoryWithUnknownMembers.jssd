@@ -1,0 +1,6 @@
+@JssdUnknownMember
+@JssdFactory
+{
+  @JssdImmutable
+  "type" : <String> "Factory"
+}

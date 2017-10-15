@@ -25,7 +25,12 @@ import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilitie
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -72,22 +77,24 @@ public class BeanFactory extends AbstractSourceFactory {
         bean._extends(_classByNames(configuration.extend()));
       }
       annotate(bean, configuration.annotations());
-      final Iterable<JFieldVar> fields = members(bean, configuration);
       if (configuration.isMutable()) {
         this.constructorFactory.constructor(configuration, bean, new ArrayList<JFieldVar>());
       }
-      if (configuration.members().iterator().hasNext()) {
-        this.constructorFactory.constructor(configuration, bean, fields);
-      }
+
+      final Map<Member, JFieldVar> fieldsByMember = fields(bean, configuration);
+      final Collection<JFieldVar> fields = fieldsByMember.values();
+      this.constructorFactory.constructor(configuration, bean, fields);
       this.creatorFactory.creator(configuration, bean, fields);
+      memberMethods(bean, fieldsByMember, configuration);
       this.equalsFactory.create(configuration, bean, fields);
     } catch (final JClassAlreadyExistsException exception) {
       throw new CreationException(exception.getLocalizedMessage(), exception);
     }
   }
 
-  public Iterable<JFieldVar> members(final JDefinedClass instance, final Bean configuration) {
-    final List<JFieldVar> result = new ArrayList<>();
+  public Map<Member, JFieldVar> fields(final JDefinedClass instance, final Bean configuration)
+      throws CreationException {
+    final Map<Member, JFieldVar> result = new LinkedHashMap<>();
     for (final Member member : configuration.members()) {
       final JFieldVar field = this.memberFactory.create(
           instance,
@@ -100,19 +107,32 @@ public class BeanFactory extends AbstractSourceFactory {
           configuration.isPrimitivesEnabled(),
           configuration.isArrayNullable(),
           configuration.isCollectionNullable());
-      result.add(field);
+      result.put(member, field);
+    }
+    return result;
+  }
+
+  private void memberMethods(
+      final JDefinedClass instance,
+      final Map<Member, JFieldVar> fieldsByMember,
+      final Bean configuration) throws CreationException {
+    final Set<Entry<Member, JFieldVar>> entrySet = fieldsByMember.entrySet();
+    for (final Entry<Member, JFieldVar> entry : entrySet) {
+      final Member member = entry.getKey();
+      final JFieldVar field = entry.getValue();
       createSetter(instance, configuration, member, field);
       createGetter(instance, configuration, member, field);
       createNamedValueProvider(instance, configuration, member, field);
+      member.asObjectMethodFactory().create(getCodeModel(), instance, field);
+      member.valueOfMethodFactory().create(getCodeModel(), instance, field);
     }
-    return result;
   }
 
   public void createNamedValueProvider(
       final JDefinedClass instance,
       final Bean configuration,
       final Member member,
-      final JFieldVar field) {
+      final JFieldVar field) throws CreationException {
     final NamedValueProvider namedValueProvider = configuration.namedValueProvider(member.name());
     if (namedValueProvider != null) {
       this.namedValueProviderFactory.create(instance, namedValueProvider, field);
@@ -123,7 +143,7 @@ public class BeanFactory extends AbstractSourceFactory {
       final JDefinedClass instance,
       final Bean configuration,
       final Member member,
-      final JFieldVar field) {
+      final JFieldVar field) throws CreationException {
     final Getter getter = member.getter();
     if (getter.isEnabled()) {
       if (getter.isNamedValueGetterEnabled()) {
@@ -151,7 +171,7 @@ public class BeanFactory extends AbstractSourceFactory {
       final JDefinedClass instance,
       final Bean configuration,
       final Member member,
-      final JFieldVar field) {
+      final JFieldVar field) throws CreationException {
     final Setter setter = member.setter();
     final Argument argument = setter.arguments().iterator().next();
     if (configuration.isMutable() && setter.isEnabled()) {

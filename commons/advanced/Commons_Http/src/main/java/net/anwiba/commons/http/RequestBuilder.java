@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -38,6 +38,7 @@ public class RequestBuilder {
   private HttpMethodType httpMethodType = HttpMethodType.GET;
   private final String urlString;
   private final List<IParameter> queryParameters = new ArrayList<>();
+  private final List<IParameter> headerParameters = new ArrayList<>();
   IClosure<InputStream, IOException> inputStreamClosure;
   private long contentLenght;
   private String encoding;
@@ -71,6 +72,7 @@ public class RequestBuilder {
         this.httpMethodType,
         this.urlString,
         new Parameters(this.queryParameters),
+        new Parameters(this.headerParameters),
         this.userAgent,
         this.inputStreamClosure,
         this.contentLenght,
@@ -85,6 +87,16 @@ public class RequestBuilder {
 
   public RequestBuilder query(final IParameter parameter) {
     this.queryParameters.add(parameter);
+    return this;
+  }
+
+  public RequestBuilder header(final String key, final String value) {
+    this.headerParameters.add(new Parameter(key, value));
+    return this;
+  }
+
+  public RequestBuilder header(final IParameter parameter) {
+    this.headerParameters.add(parameter);
     return this;
   }
 

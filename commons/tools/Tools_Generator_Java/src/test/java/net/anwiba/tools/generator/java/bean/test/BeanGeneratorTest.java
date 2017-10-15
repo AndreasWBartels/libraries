@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,10 +21,10 @@
  */
 package net.anwiba.tools.generator.java.bean.test;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.tools.generator.java.bean.BeanGenerator;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.BeanBuilder;
+import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
+import static net.anwiba.tools.generator.java.bean.configuration.Builders.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,11 +32,10 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
-import static net.anwiba.tools.generator.java.bean.configuration.Builders.*;
-import static org.hamcrest.Matchers.*;
-
-import static org.junit.Assert.*;
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.tools.generator.java.bean.BeanGenerator;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.BeanBuilder;
 
 public class BeanGeneratorTest {
 
@@ -50,7 +49,7 @@ public class BeanGeneratorTest {
     builder.comment(COPYRIGHT);
     builder.member(member(type(String.class.getName()).build(), "name").build());
     builder.member(member(type(String.class.getName(), 1).build(), "labels").isNullable(false).build());
-    builder.member(member(type("int", 1).build(), "values").isNullable(true).value(new int[] { 1, 2 }).build());
+    builder.member(member(type("int", 1).build(), "values").isNullable(true).value(new int[]{ 1, 2 }).build());
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
     builder.setEqualsEnabled(true);
     generator.add(builder.build());
@@ -66,6 +65,7 @@ public class BeanGeneratorTest {
     final BeanGenerator generator = new BeanGenerator();
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.comment(COPYRIGHT);
+    builder.setEnableBuilder(true);
     builder.setMutable(false);
     builder.member(member(type(String.class.getName()).build(), "name").build());
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
@@ -84,10 +84,11 @@ public class BeanGeneratorTest {
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.comment(COPYRIGHT);
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
-    builder.properties(properties(type(Object.class.getName()).build(), "properties")
-        .isNullable(true)
-        .setImplementsNamedValueProvider(true)
-        .build());
+    builder.properties(
+        properties(type(Object.class.getName()).build(), "properties")
+            .isNullable(true)
+            .setImplementsNamedValueProvider(true)
+            .build());
     generator.add(builder.build());
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
@@ -103,10 +104,12 @@ public class BeanGeneratorTest {
     builder.comment(COPYRIGHT);
     builder.setMutable(false);
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
-    builder.properties(properties(type(Object.class.getName()).build(), "properties")
-        .isNullable(true)
-        .setImplementsNamedValueProvider(true)
-        .build());
+    builder.properties(
+        properties(type(Object.class.getName()).build(), "properties")
+            .isNullable(true)
+            .setImplementsNamedValueProvider(true)
+            .build());
+    builder.setEnableBuilder(true);
     generator.add(builder.build());
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
@@ -121,9 +124,8 @@ public class BeanGeneratorTest {
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.comment(COPYRIGHT);
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
-    builder.creator(creator("create")
-        .addArgument(type("java.lang.String").build(), "type", new ArrayList<Annotation>())
-        .build());
+    builder.creator(
+        creator("create").addArgument(type("java.lang.String").build(), "type", new ArrayList<Annotation>()).build());
     generator.add(builder.build());
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);

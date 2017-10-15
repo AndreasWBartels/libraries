@@ -1,0 +1,25 @@
+-----------------------------------net.anwiba.generated.test.bean.Factory.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Factory {
+
+    private Date created = null;
+
+    @JsonProperty("created")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssSSSS")
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    @JsonProperty("created")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssSSSS")
+    public Date getCreated() {
+        return this.created;
+    }
+
+}

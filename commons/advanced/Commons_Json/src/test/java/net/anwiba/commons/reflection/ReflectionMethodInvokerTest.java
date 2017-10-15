@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import net.anwiba.commons.json.schema.v1_0.Property;
 
+@SuppressWarnings("nls")
 public class ReflectionMethodInvokerTest {
 
   @Test

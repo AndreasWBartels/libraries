@@ -54,7 +54,7 @@ public class CreatorBuilder {
   }
 
   public CreatorBuilder addArgument(final Type type, final String name, final List<Annotation> annotations) {
-    addArgument(new Argument(type, name, annotations));
+    addArgument(new Argument(name, annotations, type));
     return this;
   }
 

@@ -76,8 +76,11 @@ public class BeanBuilder {
           this.properties.isImutable(), //
           IterableUtilities.asList(this.properties.annotations()), //
           this.properties.getSetterConfiguration(), //
-          this.properties.getGetterConfiguration()//
-      ));
+          this.properties.getGetterConfiguration(), //
+          (model, instance, field) -> {
+          },
+          (model, instance, field) -> {
+          }));
       if (this.properties.isNamedValueProviderEnabled()) {
         namedValueProviders(this.properties.getNamedValueProvider());
       }

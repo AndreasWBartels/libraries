@@ -10,7 +10,7 @@ import net.anwiba.tools.generator.java.json.bean.test.ComplexFactory;
 public class Factory {
 
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public static Factory create(
         @JacksonInject("factory")
         ComplexFactory factory,

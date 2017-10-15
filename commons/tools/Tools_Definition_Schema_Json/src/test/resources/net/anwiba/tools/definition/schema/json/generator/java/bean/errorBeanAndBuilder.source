@@ -11,7 +11,7 @@ public class Error {
     private String message = null;
     private String[] details = null;
 
-    public final Error(final int code, final String message, final String[] details) {
+    public Error(final int code, final String message, final String[] details) {
         Objects.requireNonNull(code);
         this.code = code;
         Objects.requireNonNull(message);
@@ -48,21 +48,21 @@ public class ErrorBuilder {
     private String message = null;
     private String[] details = null;
 
-    public final ErrorBuilder(final int code, final String message) {
+    public ErrorBuilder(final int code, final String message) {
         Objects.requireNonNull(code);
         this.code = code;
         Objects.requireNonNull(message);
         this.message = message;
     }
 
+    public Error build() {
+        return new Error(code, message, details);
+    }
+
     @JsonProperty("details")
     public ErrorBuilder setDetails(final String[] details) {
         this.details = details;
         return this;
-    }
-
-    public Error build() {
-        return new Error(code, message, details);
     }
 
 }

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,6 +26,13 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Optional;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.ContentType;
+
 import net.anwiba.commons.http.apache.InputStreamEntity;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.logging.ILevel;
@@ -33,13 +40,6 @@ import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
 import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.utilities.parameter.IParameter;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
 
 public class HttpRequestExecutor implements IHttpRequestExecutor {
 
@@ -66,9 +66,11 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
     switch (request.getMethodType()) {
       case POST: {
         final RequestBuilder requestBuilder = RequestBuilder.post(request.getUriString());
-        final Iterable<IParameter> parameters = request.getParameters().parameters();
-        for (final IParameter parameter : parameters) {
+        for (final IParameter parameter : request.getParameters().parameters()) {
           requestBuilder.addParameter(parameter.getName(), parameter.getValue());
+        }
+        for (final IParameter parameter : request.getProperties().parameters()) {
+          requestBuilder.addHeader(parameter.getName(), parameter.getValue());
         }
         Optional.ofNullable(request.getUserAgent()).ifPresent(value -> requestBuilder.addHeader("User-Agent", value));
         final HttpEntity entity = createEntity(request);
@@ -77,9 +79,11 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
       }
       case GET: {
         final RequestBuilder requestBuilder = RequestBuilder.get(request.getUriString());
-        final Iterable<IParameter> parameters = request.getParameters().parameters();
-        for (final IParameter parameter : parameters) {
+        for (final IParameter parameter : request.getParameters().parameters()) {
           requestBuilder.addParameter(parameter.getName(), parameter.getValue());
+        }
+        for (final IParameter parameter : request.getProperties().parameters()) {
+          requestBuilder.addHeader(parameter.getName(), parameter.getValue());
         }
         Optional.ofNullable(request.getUserAgent()).ifPresent(value -> requestBuilder.addHeader("User-Agent", value));
         return requestBuilder.build();

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -22,6 +22,10 @@
 package net.anwiba.commons.process.cancel;
 
 import java.io.Serializable;
+
+import net.anwiba.commons.lang.functional.IBlock;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.lang.functional.IWatcher;
 
 public interface ICanceler extends Serializable {
 
@@ -50,12 +54,12 @@ public interface ICanceler extends Serializable {
     }
 
     @Override
-    public void addCancelerListener(final ICancelerListener listner) {
+    public void addCancelerListener(final ICancelerListener listener) {
       // nothing to do
     }
 
     @Override
-    public void removeCancelerListener(final ICancelerListener listner) {
+    public void removeCancelerListener(final ICancelerListener listener) {
       // nothing to do
     }
   };
@@ -71,5 +75,24 @@ public interface ICanceler extends Serializable {
   void addCancelerListener(ICancelerListener listner);
 
   void removeCancelerListener(ICancelerListener listner);
+
+  default <T, E extends Exception> IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> watcherFactory() {
+    return closure -> {
+      final ICancelerListener listener = () -> closure.execute();
+      addCancelerListener(listener);
+      return new IWatcher() {
+
+        @Override
+        public void check() throws InterruptedException {
+          ICanceler.this.check();
+        }
+
+        @Override
+        public void close() throws RuntimeException {
+          removeCancelerListener(listener);
+        }
+      };
+    };
+  }
 
 }

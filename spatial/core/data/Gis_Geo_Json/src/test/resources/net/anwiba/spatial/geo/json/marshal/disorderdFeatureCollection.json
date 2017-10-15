@@ -1,0 +1,59 @@
+{
+    "features": [{
+        "geometry": {
+            "coordinates": [4.1788951, 35.2113945],
+            "type": "Point"
+        },
+        "type": "Feature",
+        "properties": {
+            "upstream": "OpenStreetMap\u00b6n4475707297",
+            "completeness": "29.41%",
+            "type": "clinic",
+            "date_modified": "2017-01-05T20:25:42Z",
+            "version": 2,
+            "source_url": "http://www.openstreetmap.org/node/4475707297",
+            "source": "OpenStreetMap",
+            "name": "\u0646\u0627\u062c\u0648\u064a",
+            "uuid": "7e6d8247c4ff41f388c4fbf3feb0b3af",
+            "what3words": "online.february.freezers"
+        }
+    }, {
+        "geometry": {
+            "coordinates": [3.0202952, 36.7880307],
+            "type": "Point"
+        },
+        "type": "Feature",
+        "properties": {
+            "upstream": "OpenStreetMap\u00b6n4581255978",
+            "completeness": "29.41%",
+            "type": "hospital",
+            "date_modified": "2016-12-30T14:09:38Z",
+            "version": 2,
+            "source_url": "http://www.openstreetmap.org/node/4581255978",
+            "source": "OpenStreetMap",
+            "name": "\u0646\u0627\u062f\u064a\u0629 \u0628\u0648\u062c\u0646\u0627\u062d",
+            "uuid": "0a6413c6d3e44193bbc9765f3fb3d5c8",
+            "what3words": "penned.tagging.madder"
+        }
+    }, {
+        "geometry": {
+            "coordinates": [6.8486140592713, 33.3677238],
+            "type": "Point"
+        },
+        "type": "Feature",
+        "properties": {
+            "upstream": "OpenStreetMap\u00b6w442469739",
+            "completeness": "35.29%",
+            "type": "hospital",
+            "date_modified": "2016-09-14T17:42:01Z",
+            "version": 2,
+            "source_url": "http://www.openstreetmap.org/way/442469739",
+            "physical-address": "39000",
+            "source": "OpenStreetMap",
+            "name": "\u0648\u062d\u062f\u0629 \u0639\u0644\u0627\u062c \u062d\u064a \u0627\u0644\u0646\u0648\u0631",
+            "uuid": "13fe17201a414ab5b2c73808da219004",
+            "what3words": "rekindle.bowls.comically"
+        }
+    }],
+    "type": "FeatureCollection"
+}
