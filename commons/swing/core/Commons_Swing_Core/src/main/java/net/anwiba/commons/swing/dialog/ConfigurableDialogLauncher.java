@@ -145,36 +145,36 @@ public class ConfigurableDialogLauncher {
   public IDialogResult launch(final Window owner) {
     final IObjectModel<IDialogResult> model = new ObjectModel<>();
 
-    try {
-      final IDialogConfiguration configuration = ConfigurableDialogLauncher.this.dialogConfigurationBuilder.build();
-      final ConfigurableDialog dialog = new ProgressDialogLauncher<>((progressMonitor, canceler) -> {
-        final ConfigurableDialog configurableDialog = new ConfigurableDialog(owner, configuration);
-        configurableDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        if (ModalityType.MODELESS.equals(configuration.getModalityType())) {
-          configurableDialog.addWindowListener(new WindowAdapter() {
+    GuiUtilities.invokeAndWait(() -> {
+      try {
+        final IDialogConfiguration configuration = ConfigurableDialogLauncher.this.dialogConfigurationBuilder.build();
+        final ConfigurableDialog dialog = new ProgressDialogLauncher<>((progressMonitor, canceler) -> {
+          final ConfigurableDialog configurableDialog = new ConfigurableDialog(owner, configuration);
+          configurableDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+          if (ModalityType.MODELESS.equals(configuration.getModalityType())) {
+            configurableDialog.addWindowListener(new WindowAdapter() {
 
-            @Override
-            public void windowClosed(final WindowEvent e) {
-              ConfigurableDialogLauncher.this.onCloseExecutables.stream().forEach(b -> b.execute());
-            }
-          });
-        }
-        ConfigurableDialogLauncher.this.beforeShowExecutables.stream().forEach(b -> b.execute(configurableDialog));
-        return configurableDialog;
-      }).setTitle(configuration.getTitle()).setText("Initialize").setDescription("").launch(owner);
+              @Override
+              public void windowClosed(final WindowEvent e) {
+                ConfigurableDialogLauncher.this.onCloseExecutables.stream().forEach(b -> b.execute());
+              }
+            });
+          }
+          ConfigurableDialogLauncher.this.beforeShowExecutables.stream().forEach(b -> b.execute(configurableDialog));
+          return configurableDialog;
+        }).setTitle(configuration.getTitle()).setText("Initialize").setDescription("").launch(owner);
 
-      GuiUtilities.invokeAndWait(() -> {
         dialog.toFront();
         dialog.setVisible(true);
         if (!ModalityType.MODELESS.equals(configuration.getModalityType())) {
           this.onCloseExecutables.stream().forEach(b -> b.execute());
         }
         model.set(dialog.getResult());
-      });
-      return model.get();
-    } catch (final InterruptedException exception) {
-      return DialogResult.CANCEL;
-    }
+      } catch (final InterruptedException exception) {
+        model.set(DialogResult.CANCEL);
+      }
+    });
+    return model.get();
   }
 
   public ConfigurableDialogLauncher setModelessModality() {

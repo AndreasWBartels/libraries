@@ -36,6 +36,12 @@ public class JsonBeanGeneratorTestResources extends AbstractResourceFactory {
   @Location("typeInfoFactory.source")
   public static String typeInfoFactoryBeanSource;
 
+  @Location("typeInfoWithNameFactory.jssd")
+  public static String typeInfoWithNameFactoryBeanDefinition;
+
+  @Location("typeInfoWithNameFactory.source")
+  public static String typeInfoWithNameFactoryBeanSource;
+
   @Location("value.jssd")
   public static String valueBeanDefinition;
 

@@ -1,0 +1,18 @@
+[
+{
+  "type": "object",
+  "name": "size",
+  "properties" : {
+      "value": {"type": "integer", "name": "value"},
+      "unit": {"type": "string", "name": "unit"}
+  }
+},
+{
+  "type": "object",
+  "name": "description",
+  "properties" : {
+      "value": {"type": "string", "name": "value"},
+      "language": {"type": "string", "name": "language"}
+  }
+}
+]

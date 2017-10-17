@@ -32,12 +32,8 @@ public class JsonObjectUnmarshaller<T> extends AbstractJsonObjectUnmarshaller<T,
   }
 
   public JsonObjectUnmarshaller(final Class<T> clazz, final Map<String, Object> injectionValues) {
-    super(clazz, Void.class, injectionValues, new IJsonObjectMarshallingExceptionFactory<Void, IOException>() {
-
-      @Override
-      public IOException create(final Void response) {
-        throw new RuntimeException("Unreachable code reached"); //$NON-NLS-1$
-      }
+    super(clazz, Void.class, injectionValues, response -> {
+      throw new RuntimeException("Unreachable code reached"); //$NON-NLS-1$
     });
   }
 }

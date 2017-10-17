@@ -127,10 +127,12 @@ public class JTreeUtilities {
       final DefaultMutableTreeNode root,
       final DefaultMutableTreeNode node,
       final int index) {
-    model.insertNodeInto(node, root, index);
-    final TreePath treePath = new TreePath(node.getPath());
-    tree.getSelectionModel().setSelectionPath(treePath);
-    tree.scrollPathToVisible(treePath);
+    synchronized (tree) {
+      model.insertNodeInto(node, root, index);
+      final TreePath treePath = new TreePath(node.getPath());
+      tree.getSelectionModel().setSelectionPath(treePath);
+      tree.scrollPathToVisible(treePath);
+    }
   }
 
   public static void collapse(final JTree tree, final DefaultMutableTreeNode node) {

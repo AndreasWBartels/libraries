@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "name": "size",
+  "properties" : {
+      "value": {"type": "integer", "name": "value"},
+      "unit": {"type": "string", "name": "unit"}
+  }
+}

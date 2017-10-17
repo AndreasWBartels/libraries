@@ -9,7 +9,7 @@
   <groupId>net.anwiba</groupId>
   <artifactId>anwiba-maven-default</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.64</version>
+  <version>1.0.68</version>
   <inceptionYear>2007</inceptionYear>
 
   <scm>
@@ -825,11 +825,11 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <net.anwiba.version>1.0.64</net.anwiba.version>
+    <net.anwiba.version>1.0.68</net.anwiba.version>
     <url.net.anwiba>https://github.com/AndreasWBartels</url.net.anwiba>
     <net.anwiba.commons.version>${net.anwiba.version}</net.anwiba.commons.version>
     <net.anwiba.spatial.version>${net.anwiba.version}</net.anwiba.spatial.version>
-    <net.anwiba.plugins.version>1.0.64</net.anwiba.plugins.version>
+    <net.anwiba.plugins.version>1.0.68</net.anwiba.plugins.version>
     <scm.url.net.anwiba.base>scm:git:ssh://github.com:AndreasWBartels</scm.url.net.anwiba.base>
     <scm.url.net.anwiba.master>${url.net.anwiba}/libraries/tree/master</scm.url.net.anwiba.master>
 

@@ -1,0 +1,39 @@
+-----------------------------------net.anwiba.generated.test.bean.Factory.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Fuu.class, name = "foo"),
+    @JsonSubTypes.Type(value = Bur.class, name = "bar")
+})
+public class Factory {
+
+    private String type = "Factory";
+    private String id = null;
+
+    @JsonProperty("type")
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    @JsonProperty("type")
+    public String getType() {
+        return this.type;
+    }
+
+    @JsonProperty("id")
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    @JsonProperty("id")
+    public String getId() {
+        return this.id;
+    }
+
+}

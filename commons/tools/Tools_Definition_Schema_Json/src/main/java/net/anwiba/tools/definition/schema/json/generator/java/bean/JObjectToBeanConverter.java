@@ -62,6 +62,7 @@ import net.anwiba.tools.generator.java.bean.value.ValueType;
 @SuppressWarnings("nls")
 public class JObjectToBeanConverter {
 
+  private static final String NAME = "name";
   private static final String SHAPE = "shape";
   private static final String INPUT = "input";
   private static final String OUTPUT = "output";
@@ -258,9 +259,25 @@ public class JObjectToBeanConverter {
 
         final List<Annotation> annotations = new ArrayList<>();
 
-        final StringTokenizer tokenizer = new StringTokenizer(typesParameter.value().toString(), ",");
-        while (tokenizer.hasMoreTokens()) {
-          final String token = tokenizer.nextToken();
+        final StringTokenizer typeTokenizer = new StringTokenizer(typesParameter.value().toString(), ",");
+        while (typeTokenizer.hasMoreTokens()) {
+          final String token = typeTokenizer.nextToken().trim();
+          final int index = token.indexOf(':');
+          if (index > -1) {
+            final String value = token.substring(0, index).trim();
+            final String name = token.substring(index + 1, token.length()).trim();
+            annotations
+                .add(
+                    annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
+                        .parameter(
+                            VALUE,
+                            net.anwiba.commons.utilities.string.StringUtilities
+                                .setFirstTrimedCharacterToUpperCase(value),
+                            ValueType.CLASS)
+                        .parameter(NAME, name)
+                        .build());
+            continue;
+          }
           annotations.add(
               annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
                   .parameter(

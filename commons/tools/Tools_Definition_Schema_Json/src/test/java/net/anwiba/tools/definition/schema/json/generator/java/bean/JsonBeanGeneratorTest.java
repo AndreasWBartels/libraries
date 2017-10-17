@@ -53,6 +53,21 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
 
   @SuppressWarnings({ "boxing" })
   @Test
+  public void typeInfoWithNameFactoryBean() throws CreationException, JssdParserException, IOException {
+    final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
+    generator.add(
+        new ByteArrayInputStream(JsonBeanGeneratorTestResources.typeInfoWithNameFactoryBeanDefinition.getBytes()),
+        "net.anwiba.generated.test.bean.Factory");
+    final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
+    generator.generate(ouputStream);
+    assertThat(ouputStream.size(), greaterThan(0));
+    final String actual = ouputStream.toString();
+    final String expected = JsonBeanGeneratorTestResources.typeInfoWithNameFactoryBeanSource;
+    assertThat(actual, equalTo(expected));
+  }
+
+  @SuppressWarnings({ "boxing" })
+  @Test
   public void valueBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
     generator.add(

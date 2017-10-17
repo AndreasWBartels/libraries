@@ -174,7 +174,7 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
       }
     });
     thread.start();
-    GuiUtilities.invokeAndWait(() -> dialog.setVisible(true));
+    dialog.setVisible(true);
     final Exception exception = exceptionContainer.get();
     if (exception != null) {
       if (exception instanceof InterruptedException) {

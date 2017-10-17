@@ -44,19 +44,24 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
     refreshIndex();
   }
 
-  private synchronized void refreshIndex() {
-    this.indexByobjectMap.clear();
-    for (int i = 0; i < this.objects.size(); i++) {
-      this.indexByobjectMap.put(getObject(i), Integer.valueOf(i));
+  private void refreshIndex() {
+    synchronized (this) {
+      this.indexByobjectMap.clear();
+      for (int i = 0; i < this.objects.size(); i++) {
+        this.indexByobjectMap.put(getObject(i), Integer.valueOf(i));
+      }
     }
   }
 
   @Override
   public int getSize() {
-    return this.objects.size();
+    synchronized (this) {
+      return this.objects.size();
+    }
   }
 
-  public synchronized void add(@SuppressWarnings("unchecked") final T... objects) {
+  public void add(@SuppressWarnings("unchecked") final T... objects) {
+
     if (objects.length == 0) {
       return;
     }
@@ -72,7 +77,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
     fireObjectAdded(Arrays.asList(objects));
   }
 
-  public synchronized void remove(@SuppressWarnings("unchecked") final T... objects) {
+  public void remove(@SuppressWarnings("unchecked") final T... objects) {
     if (objects.length == 0) {
       return;
     }

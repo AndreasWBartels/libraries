@@ -32,6 +32,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.ISelectionListener;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.SelectionEvent;
@@ -42,6 +43,8 @@ import net.anwiba.commons.utilities.collection.IterableUtilities;
 
 public class ObjectListComponent<T> implements IComponentProvider {
 
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(ObjectListComponent.class);
   private final JComponent component;
   private final ISelectionModel<T> selectionModel;
   private JList<T> list;
@@ -108,13 +111,20 @@ public class ObjectListComponent<T> implements IComponentProvider {
       if (objects.size() == this.objectSelectionModel.size() && objects.containsAll(selectedObjects)) {
         return;
       }
-      this.tableSelectionModel.setValueIsAdjusting(true);
-      this.tableSelectionModel.clearSelection();
-      final int[] indexes = this.listModel.getIndicesOf(selectedObjects);
-      for (final int index : indexes) {
-        this.tableSelectionModel.addSelectionInterval(index, index);
-      }
-      this.tableSelectionModel.setValueIsAdjusting(false);
+
+      GuiUtilities.invokeLater(() -> {
+        this.tableSelectionModel.setValueIsAdjusting(true);
+        this.tableSelectionModel.clearSelection();
+        final int[] indexes = this.listModel.getIndicesOf(selectedObjects);
+        for (final int index : indexes) {
+          try {
+            this.tableSelectionModel.addSelectionInterval(index, index);
+          } catch (final NullPointerException exception) {
+            logger.log(ILevel.ERROR, exception.getMessage(), exception);
+          }
+        }
+        this.tableSelectionModel.setValueIsAdjusting(false);
+      });
     }
 
     private List<T> getObjects(final IListModel<T> tableModel, final ListSelectionModel tableSelectionModel) {

@@ -13,7 +13,7 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.64</version>
+    <version>1.0.68</version>
   </parent>
 
   <properties>

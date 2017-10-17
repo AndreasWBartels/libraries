@@ -13,6 +13,7 @@ package net.anwiba.commons.json;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,8 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
         final ObjectReader reader = this.mapper.readerFor(this.clazz).with(injectableValues);
         final JsonToken token = parser.nextToken();
         if (token != JsonToken.START_ARRAY) {
-          return reader.readValue(parser);
+          final T value = reader.readValue(parser);
+          return Arrays.asList(value);
         }
         // and then each time, advance to opening START_OBJECT
         final List<T> results = new ArrayList<>();
