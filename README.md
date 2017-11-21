@@ -8,7 +8,7 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
 ## Tools
 
 * [JSSD](https://github.com/AndreasWBartels/libraries/wiki/JSSD)   
-JSON serializer
+Schemas and JSON serializer
   * [GeoJSON](https://github.com/AndreasWBartels/libraries/wiki/GeoJSON)
   * [GPSD-Client](https://github.com/AndreasWBartels/libraries/wiki/GPSD-Client)
   * [Open Street Map (OSM)](https://github.com/AndreasWBartels/libraries/wiki/OSM)
