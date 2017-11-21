@@ -8,6 +8,7 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
 ## Tools
 
 * [JSSD](https://github.com/AndreasWBartels/libraries/wiki/JSSD)
+JSON serializer
   * [GeoJSON](https://github.com/AndreasWBartels/libraries/wiki/GeoJSON)
   * [GPSD-Client](https://github.com/AndreasWBartels/libraries/wiki/GPSD-Client)
   * [Open Street Map (OSM)](https://github.com/AndreasWBartels/libraries/wiki/OSM)
@@ -17,6 +18,7 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
   * [TopoJson](https://github.com/AndreasWBartels/libraries/wiki/TopoJson)
 
 
+* [Java preferences](https://github.com/AndreasWBartels/libraries/wiki/Java-Preferences)
 * [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
 * [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
   * [Eclipse Swing Icons Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Swing-Icons-Plugins)
