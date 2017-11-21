@@ -30,3 +30,6 @@ The libraries are licensed under the terms of the GNU Lesser General Public Lice
 
 For more see [WIKI](https://github.com/AndreasWBartels/libraries/wiki) 
 
+## Maven dependencies
+
+[see](https://mvnrepository.com/artifact/net.anwiba)
