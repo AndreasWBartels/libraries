@@ -38,6 +38,8 @@ import javax.swing.event.ChangeListener;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.IMessageConstants;
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.dialog.DataState;
 import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.IAdditionalActionFactory;
@@ -96,6 +98,7 @@ public class TabbedDialog extends MessageDialog {
         GuiIcons.EMPTY_ICON.getLargeIcon(),
         DialogType.CANCEL_APPLY_OK,
         Collections.emptyList(),
+        new ObjectModel<>(),
         true,
         tabsFactory);
   }
@@ -108,14 +111,25 @@ public class TabbedDialog extends MessageDialog {
       final Icon icon,
       final DialogType dialogType,
       final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
-    this(owner, preferences, title, message, icon, dialogType, Collections.emptyList(), true, tabsFactory);
+    this(
+        owner,
+        preferences,
+        title,
+        message,
+        icon,
+        dialogType,
+        Collections.emptyList(),
+        new ObjectModel<>(),
+        true,
+        tabsFactory);
   }
 
   public TabbedDialog(
       final Window owner,
       final IWindowPreferences preferences,
       final String title,
-      final List<IAdditionalActionFactory> actionFactories) {
+      final List<IAdditionalActionFactory> actionFactories,
+      final IObjectModel<DataState> dataStateModel) {
     this(
         owner,
         preferences,
@@ -124,6 +138,7 @@ public class TabbedDialog extends MessageDialog {
         GuiIcons.EMPTY_ICON.getLargeIcon(),
         DialogType.CANCEL_APPLY_OK,
         actionFactories,
+        dataStateModel,
         true,
         v -> Collections.emptyList());
   }
@@ -136,9 +151,10 @@ public class TabbedDialog extends MessageDialog {
       final Icon icon,
       final DialogType dialogType,
       final List<IAdditionalActionFactory> actionFactories,
+      final IObjectModel<DataState> dataStateModel,
       final boolean modal,
       final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
-    super(owner, preferences, title, message, icon, dialogType, modal);
+    super(owner, preferences, title, message, icon, dialogType, actionFactories, dataStateModel, modal);
     createTabbedView(tabsFactory);
     locate();
   }

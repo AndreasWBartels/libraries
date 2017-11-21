@@ -24,6 +24,8 @@ package net.anwiba.commons.lang.functional;
 
 import java.util.NoSuchElementException;
 
+import net.anwiba.commons.lang.counter.IntCounter;
+
 public interface IIterable<O, E extends Exception> {
 
   IIterator<O, E> iterator();
@@ -86,6 +88,15 @@ public interface IIterable<O, E extends Exception> {
     while (iterator.hasNext()) {
       final O value = iterator.next();
       consumer.consume(value);
+    }
+  }
+
+  default void foreach(final IAssimilator<Integer, O, E> assimilator) throws E {
+    final IIterator<O, E> iterator = this.iterator();
+    final IntCounter counter = new IntCounter(-1);
+    while (iterator.hasNext()) {
+      final O value = iterator.next();
+      assimilator.assimilate(counter.next(), value);
     }
   }
 

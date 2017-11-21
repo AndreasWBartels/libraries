@@ -38,7 +38,7 @@ import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
-import net.anwiba.commons.process.cancel.ICanceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.utilities.parameter.IParameter;
 
 public class HttpRequestExecutor implements IHttpRequestExecutor {
@@ -54,6 +54,7 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
   @Override
   public IResponse execute(final ICanceler canceler, final IRequest request) throws InterruptedException, IOException {
     final HttpUriRequest method = create(request);
+    canceler.watcherFactory().create(() -> method.abort());
     logger.log(ILevel.DEBUG, () -> MessageFormat.format("request url: <{0}>", method.getURI()));
     final HttpClient client = this.httpClientFactory.create();
     canceler.check();

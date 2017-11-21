@@ -38,8 +38,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
@@ -128,8 +131,28 @@ public class IconConfigurationReader {
 
   private File getIconsPath(final IJavaProject javaProject, final IClasspathEntry classpathEntry) {
     final URI locationURI = javaProject.getProject().getLocationURI();
-    final String osString = classpathEntry.getPath().toOSString();
+    final boolean isMavenPomDerived = isMavenPomDerived(classpathEntry);
+    final IPath path = classpathEntry.getPath();
+    if (isMavenPomDerived) {
+      final String osString = isMavenPomDerived
+          ? path.makeRelativeTo(path.uptoSegment(1)).toString()
+          : path.toOSString();
+      final File basePath = new File(new File(locationURI), osString);
+      return new File(basePath, ICONS_PATH_SEGMENT);
+    }
+    final String osString = isMavenPomDerived
+        ? path.makeRelativeTo(path.uptoSegment(1)).toString()
+        : path.toOSString();
     final File basePath = new File(new File(locationURI).getParentFile(), osString);
     return new File(basePath, ICONS_PATH_SEGMENT);
+  }
+
+  private boolean isMavenPomDerived(final IClasspathEntry classpathEntry) {
+    for (final IClasspathAttribute classpathAttribute : classpathEntry.getExtraAttributes()) {
+      if (Objects.equals(classpathAttribute.getName(), "maven.pomderived")) {
+        return Objects.equals(classpathAttribute.getValue(), "true");
+      }
+    }
+    return false;
   }
 }

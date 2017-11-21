@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -37,8 +37,7 @@ import net.anwiba.commons.model.ObjectModel;
 public class FilteredTreeModel<T extends ITreeNode> implements ITreeModel<T> {
 
   private final NeutralTreeNodeFilter<T> neutralTreeNodeFilter = new NeutralTreeNodeFilter<>();
-  private final IObjectModel<ITreeNodeFilter<T>> filterModel = new ObjectModel<>(
-      this.neutralTreeNodeFilter);
+  private final IObjectModel<ITreeNodeFilter<T>> filterModel = new ObjectModel<>(this.neutralTreeNodeFilter);
 
   private final T rootNode;
 
@@ -98,8 +97,20 @@ public class FilteredTreeModel<T extends ITreeNode> implements ITreeModel<T> {
 
   private final List<TreeModelListener> listeners = new ArrayList<>();
 
-  protected synchronized void fireTreeStructureChanged(final T rootNode) {
-    final TreeModelEvent treeModelEvent = new TreeModelEvent(this, new TreePath(rootNode));
+  protected synchronized void fireTreeStructureChanged(final T node) {
+    final TreeModelEvent treeModelEvent = new TreeModelEvent(this, new TreePath(node));
+    final List<TreeModelListener> currentListeners = new ArrayList<>(this.listeners);
+    for (final TreeModelListener listener : currentListeners) {
+      listener.treeStructureChanged(treeModelEvent);
+    }
+  }
+
+  protected void fireTreeNodesRemoved(
+      final Object source,
+      final Object[] path,
+      final int[] childIndices,
+      final Object[] children) {
+    final TreeModelEvent treeModelEvent = new TreeModelEvent(source, path, childIndices, children);
     final List<TreeModelListener> currentListeners = new ArrayList<>(this.listeners);
     for (final TreeModelListener listener : currentListeners) {
       listener.treeStructureChanged(treeModelEvent);

@@ -35,7 +35,6 @@ public class DefaultObjectFieldConfiguration<T> extends AbstractObjectTextFieldC
   private final IValidator<String> validator;
   private final IConverter<String, T, RuntimeException> toObjectConverter;
   private final IConverter<T, String, RuntimeException> toStringConverter;
-  private IKeyListenerFactory<T> keyListenerFactory;
 
   public DefaultObjectFieldConfiguration(
       final IObjectModel<T> model,

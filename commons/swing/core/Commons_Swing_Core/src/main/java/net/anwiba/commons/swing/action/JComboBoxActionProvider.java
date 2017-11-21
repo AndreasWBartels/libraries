@@ -8,20 +8,18 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
 package net.anwiba.commons.swing.action;
-
-import net.anwiba.commons.swing.utilities.JComboBoxUtilities;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -39,19 +37,21 @@ import javax.swing.JComboBox;
 import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
-@SuppressWarnings("rawtypes")
-public class JComboBoxActionProvider implements IActionContainerProvider<JComboBox> {
+import net.anwiba.commons.swing.utilities.JComboBoxUtilities;
 
-  final JComboBox comboBox;
+@SuppressWarnings("rawtypes")
+public class JComboBoxActionProvider<T> implements IActionContainerProvider<JComboBox> {
+
+  final JComboBox<T> comboBox;
   JButton button;
   private final Action action;
 
-  public JComboBoxActionProvider(final ComboBoxModel comboBoxModel, final Action action) {
+  public JComboBoxActionProvider(final ComboBoxModel<T> comboBoxModel, final Action action) {
     this(comboBoxModel, action, null);
   }
 
   @SuppressWarnings("unchecked")
-  public JComboBoxActionProvider(final ComboBoxModel comboBoxModel, final Action action, final String toolTip) {
+  public JComboBoxActionProvider(final ComboBoxModel<T> comboBoxModel, final Action action, final String toolTip) {
     this.action = action;
     this.comboBox = new JComboBox(comboBoxModel);
     final JButton comboBoxButton = JComboBoxUtilities.getComboBoxButton(this.comboBox);
@@ -134,7 +134,7 @@ public class JComboBoxActionProvider implements IActionContainerProvider<JComboB
   }
 
   @Override
-  public JComboBox getContainer() {
+  public JComboBox<T> getContainer() {
     return this.comboBox;
   }
 

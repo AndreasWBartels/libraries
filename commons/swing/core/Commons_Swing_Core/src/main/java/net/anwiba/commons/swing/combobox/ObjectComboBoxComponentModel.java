@@ -48,6 +48,7 @@ public class ObjectComboBoxComponentModel<T> extends ObjectListComponentModel<T>
 
   private static final long serialVersionUID = 1L;
 
+  @SuppressWarnings("unchecked")
   @Override
   public void setSelectedItem(final Object item) {
     this.model.set((T) item);

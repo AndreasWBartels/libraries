@@ -357,7 +357,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
   @Override
   public boolean canDelete(final IResourceReference resourceReference) {
     try {
-      return ifFile(resourceReference).convert(input -> canDelete(input)).getOr(Boolean.FALSE).booleanValue();
+      return ifFile(resourceReference).convert(input -> canDelete(input)).getOr(() -> Boolean.FALSE).booleanValue();
     } catch (final IOException exception) {
       return false;
     }

@@ -25,7 +25,7 @@ package net.anwiba.eclipse.project.dependency.runner;
 import net.anwiba.commons.eclipse.logging.ILogger;
 import net.anwiba.commons.internal.eclipse.logging.Level;
 import net.anwiba.commons.lang.object.ObjectUtilities;
-import net.anwiba.commons.process.cancel.ICanceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.eclipse.project.dependency.internal.java.Dependency;
 import net.anwiba.eclipse.project.dependency.internal.java.Import;
 import net.anwiba.eclipse.project.dependency.internal.java.Library;

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -39,79 +39,63 @@ public class MessageTypeUI {
   public static Icon getIcon(final MessageType messageType, final Icon defaultIcon, final GuiIconSize size) {
     final IMessageTypeVisitor<Icon> visitor = new IMessageTypeVisitor<Icon>() {
 
-      Icon result;
-
       @Override
-      public Icon getResult() {
-        return this.result;
+      public Icon visitInfo() {
+        return GuiIcons.INFORMATION_ICON.getIcon(size);
       }
 
       @Override
-      public void visitInfo() {
-        this.result = GuiIcons.INFORMATION_ICON.getIcon(size);
+      public Icon visitError() {
+        return GuiIcons.ERROR_ICON.getIcon(size);
       }
 
       @Override
-      public void visitError() {
-        this.result = GuiIcons.ERROR_ICON.getIcon(size);
+      public Icon visitWarning() {
+        return GuiIcons.WARNING_ICON.getIcon(size);
       }
 
       @Override
-      public void visitWarning() {
-        this.result = GuiIcons.WARNING_ICON.getIcon(size);
+      public Icon visitDefault() {
+        return defaultIcon;
       }
 
       @Override
-      public void visitDefault() {
-        this.result = defaultIcon;
-      }
-
-      @Override
-      public void visitQuery() {
-        this.result = GuiIcons.QUERY_ICON.getIcon(size);
+      public Icon visitQuery() {
+        return GuiIcons.QUERY_ICON.getIcon(size);
       }
     };
-    messageType.accept(visitor);
-    return visitor.getResult();
+    return messageType.accept(visitor);
   }
 
   public static Color getColor(final MessageType messageType) {
     final IMessageTypeVisitor<Color> visitor = new IMessageTypeVisitor<Color>() {
 
-      Color result;
-
       @Override
-      public Color getResult() {
-        return this.result;
+      public Color visitInfo() {
+        return Color.BLUE;
       }
 
       @Override
-      public void visitInfo() {
-        this.result = Color.BLUE;
+      public Color visitError() {
+        return Color.RED;
       }
 
       @Override
-      public void visitError() {
-        this.result = Color.RED;
+      public Color visitWarning() {
+        return Color.ORANGE;
       }
 
       @Override
-      public void visitWarning() {
-        this.result = Color.ORANGE;
+      public Color visitDefault() {
+        return Color.BLACK;
       }
 
       @Override
-      public void visitDefault() {
-        this.result = Color.BLACK;
-      }
-
-      @Override
-      public void visitQuery() {
-        this.result = Color.BLACK;
+      public Color visitQuery() {
+        return Color.BLACK;
       }
     };
-    messageType.accept(visitor);
-    return visitor.getResult();
+    return messageType.accept(visitor);
   }
 
 }

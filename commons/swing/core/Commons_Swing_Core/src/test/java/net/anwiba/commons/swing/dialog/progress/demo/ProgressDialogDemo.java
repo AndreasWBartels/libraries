@@ -30,10 +30,10 @@ import de.jdemo.extensions.SwingDemoCase;
 import de.jdemo.junit.DemoAsTestRunner;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageType;
-import net.anwiba.commons.process.cancel.ICanceler;
-import net.anwiba.commons.progress.AbstractProgressTask;
-import net.anwiba.commons.progress.IProgressMonitor;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
+import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.commons.thread.progress.AbstractProgressTask;
+import net.anwiba.commons.thread.progress.IProgressMonitor;
 
 @RunWith(DemoAsTestRunner.class)
 public class ProgressDialogDemo extends SwingDemoCase {

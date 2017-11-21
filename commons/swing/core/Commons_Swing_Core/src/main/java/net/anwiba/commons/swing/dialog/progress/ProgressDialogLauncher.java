@@ -28,7 +28,7 @@ import javax.swing.SwingUtilities;
 
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.MessageBuilder;
-import net.anwiba.commons.progress.IProgressTask;
+import net.anwiba.commons.thread.progress.IProgressTask;
 
 public class ProgressDialogLauncher<O, E extends Exception> {
 

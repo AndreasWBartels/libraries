@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,6 +21,14 @@
  */
 package net.anwiba.commons.swing.object.demo;
 
+import java.awt.Component;
+import java.text.MessageFormat;
+
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+
+import de.jdemo.extensions.SwingDemoCase;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
@@ -30,15 +38,6 @@ import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 
-import de.jdemo.extensions.SwingDemoCase;
-
-import java.awt.Component;
-import java.text.MessageFormat;
-
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-
 public class AbstractObjectFieldDemo extends SwingDemoCase {
 
   private static ILogger logger = Logging.getLogger(AbstractObjectFieldDemo.class.getName());
@@ -47,7 +46,6 @@ public class AbstractObjectFieldDemo extends SwingDemoCase {
     return createPanel(field.getComponent(), field);
   }
 
-  @SuppressWarnings("synthetic-access")
   protected JPanel createPanel(final Component component, final IObjectField<?> field) {
     final JTextField textField = new JTextField();
     textField.setEditable(false);
@@ -57,8 +55,11 @@ public class AbstractObjectFieldDemo extends SwingDemoCase {
 
       @Override
       public void objectChanged() {
-        logger.log(ILevel.DEBUG, MessageFormat.format("Object changed to: {0}", //$NON-NLS-1$
-            field.getModel().get()));
+        logger.log(
+            ILevel.DEBUG,
+            MessageFormat.format(
+                "Object changed to: {0}", //$NON-NLS-1$
+                field.getModel().get()));
         update(field, textField, validField);
       }
     });
@@ -66,8 +67,11 @@ public class AbstractObjectFieldDemo extends SwingDemoCase {
 
       @Override
       public void objectChanged() {
-        logger.log(ILevel.DEBUG, MessageFormat.format("valid state changed to: {0}", //$NON-NLS-1$
-            Boolean.valueOf(field.getValidationResultDistributor().get().isValid())));
+        logger.log(
+            ILevel.DEBUG,
+            MessageFormat.format(
+                "valid state changed to: {0}", //$NON-NLS-1$
+                Boolean.valueOf(field.getValidationResultDistributor().get().isValid())));
         update(field, textField, validField);
       }
     });

@@ -5,8 +5,8 @@ package net.anwiba.commons.http;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public final class ExceptionProducer implements IResultProducer<IOException> {
 

@@ -28,8 +28,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -44,6 +47,8 @@ import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
 import net.anwiba.commons.message.IMessage;
+import net.anwiba.commons.message.IMessageTypeVisitor;
+import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.preferences.DummyPreferences;
@@ -51,7 +56,6 @@ import net.anwiba.commons.swing.preference.IWindowPreferences;
 import net.anwiba.commons.swing.preference.WindowPreferences;
 import net.anwiba.commons.swing.preference.WindowPrefereneceUpdatingListener;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
-import net.anwiba.commons.swing.utilities.MessageDialogUtilities;
 
 public abstract class AbstractDialog extends JDialog {
 
@@ -95,7 +99,16 @@ public abstract class AbstractDialog extends JDialog {
       final Icon icon,
       final DialogType dialogType,
       final boolean modal) {
-    this(owner, new WindowPreferences(new DummyPreferences()), title, message, icon, dialogType, modal);
+    this(
+        owner,
+        new WindowPreferences(new DummyPreferences()),
+        title,
+        message,
+        icon,
+        dialogType,
+        Collections.emptyList(),
+        new ObjectModel<>(),
+        modal);
   }
 
   public AbstractDialog(
@@ -105,6 +118,8 @@ public abstract class AbstractDialog extends JDialog {
       final IMessage message,
       final Icon icon,
       final DialogType dialogType,
+      final List<IAdditionalActionFactory> actionFactories,
+      final IObjectModel<DataState> dataStateModel,
       final boolean modal) {
     this(
         owner,
@@ -116,7 +131,8 @@ public abstract class AbstractDialog extends JDialog {
         true,
         dialogType,
         s -> s,
-        new ArrayList<>(),
+        actionFactories,
+        dataStateModel,
         modal ? DEFAULT_MODALITY_TYPE : ModalityType.MODELESS);
   }
 
@@ -131,6 +147,7 @@ public abstract class AbstractDialog extends JDialog {
       final DialogType dialogType,
       final IFunction<String, String, RuntimeException> actionButtonTextFactory,
       final List<IAdditionalActionFactory> additionalActionFactories,
+      final IObjectModel<DataState> dataStateModel,
       final ModalityType modalityType) {
     super(owner, title, modalityType);
     this.preferdSize = preferdSize;
@@ -140,25 +157,29 @@ public abstract class AbstractDialog extends JDialog {
     this.messagePanel = isMessagePanelEnabled && message != null ? new MessagePanel(message, icon) : null;
     this.actionButtonTextFactory = actionButtonTextFactory;
     setIcon(icon);
-    createView(dialogType, additionalActionFactories);
+    createView(dialogType, additionalActionFactories, dataStateModel);
     setMessage(message);
   }
 
   public void locate() {
     removeComponentListener(this.updater);
     removeWindowListener(this.updater);
-    if (this.windowPreferences.getBounds() == null) {
-      if (this.preferdSize == null) {
-        pack();
+    try {
+      if (this.windowPreferences.getBounds() == null) {
+        if (this.preferdSize == null) {
+          pack();
+        } else {
+          setSize(this.preferdSize);
+        }
+        GuiUtilities.center(this);
       } else {
-        setSize(this.preferdSize);
+        setBounds(this.windowPreferences.getBounds());
       }
-      GuiUtilities.center(this);
-    } else {
-      setBounds(this.windowPreferences.getBounds());
+
+    } finally {
+      addComponentListener(this.updater);
+      addWindowListener(this.updater);
     }
-    addComponentListener(this.updater);
-    addWindowListener(this.updater);
   }
 
   protected void checkButton(final DataState dataState) {
@@ -188,12 +209,13 @@ public abstract class AbstractDialog extends JDialog {
 
   final protected void createView(
       final DialogType dialogType,
-      final List<IAdditionalActionFactory> additionalActionFactories) {
+      final List<IAdditionalActionFactory> additionalActionFactories,
+      final IObjectModel<DataState> dataStateModel) {
 
     this.contentPane = new JPanel();
     this.contentContainerPanel.add(this.contentPane);
     this.buttomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-    final Action[] actions = getActions(dialogType, this.dialogResultModel, additionalActionFactories);
+    final Action[] actions = getActions(dialogType, this.dialogResultModel, additionalActionFactories, dataStateModel);
     for (final Action action : actions) {
       final JButton button = new JButton(action);
       this.buttomPanel.add(button);
@@ -216,73 +238,88 @@ public abstract class AbstractDialog extends JDialog {
 
   protected Action[] getActions(
       final DialogType dialogType,
-      @SuppressWarnings("unused") final IObjectModel<IDialogResult> resultModel,
-      @SuppressWarnings("unused") final List<IAdditionalActionFactory> additionalActionFactories) {
+      final IObjectModel<IDialogResult> resultModel,
+      final List<IAdditionalActionFactory> additionalActionFactories,
+      final IObjectModel<DataState> dataStateModel) {
     final IDialogTypeVisitor<Action[]> visitor = new IDialogTypeVisitor<Action[]>() {
 
-      Action[] actions;
-
       @Override
-      public Action[] getResult() {
-        return this.actions;
+      public Action[] visitCancelApplyOk() {
+        final Action[] actions = new Action[3];
+        actions[0] = getCancelAction();
+        actions[1] = getApplyAction();
+        actions[2] = getOkAction();
+        return actions;
       }
 
       @Override
-      public void visitCancelApplyOk() {
-        this.actions = new Action[3];
-        this.actions[0] = getCancelAction();
-        this.actions[1] = getApplyAction();
-        this.actions[2] = getOkAction();
+      public Action[] visitCancelOk() {
+        final Action[] actions = new Action[2];
+        actions[0] = getCancelAction();
+        actions[1] = getOkAction();
+        return actions;
       }
 
       @Override
-      public void visitCancelOk() {
-        this.actions = new Action[2];
-        this.actions[0] = getCancelAction();
-        this.actions[1] = getOkAction();
+      public Action[] visitCancelTryOk() {
+        final Action[] actions = new Action[3];
+        actions[0] = getCancelAction();
+        actions[1] = getTryAction();
+        actions[2] = getOkAction();
+        return actions;
       }
 
       @Override
-      public void visitCancelTryOk() {
-        this.actions = new Action[3];
-        this.actions[0] = getCancelAction();
-        this.actions[1] = getTryAction();
-        this.actions[2] = getOkAction();
+      public Action[] visitClose() {
+        final Action[] actions = new Action[1];
+        actions[0] = getCloseAction();
+        return actions;
       }
 
       @Override
-      public void visitClose() {
-        this.actions = new Action[1];
-        this.actions[0] = getCloseAction();
+      public Action[] visitOk() {
+        final Action[] actions = new Action[1];
+        actions[0] = getOkAction();
+        return actions;
       }
 
       @Override
-      public void visitCloseDetails() {
-        this.actions = new Action[2];
-        this.actions[0] = getCloseAction();
-        this.actions[1] = getDetailsAction();
+      public Action[] visitCloseDetails() {
+        final Action[] actions = new Action[2];
+        actions[0] = getCloseAction();
+        actions[1] = getDetailsAction();
+        return actions;
       }
 
       @Override
-      public void visitNone() {
-        this.actions = new Action[0];
+      public Action[] visitNone() {
+        final Action[] actions = new Action[0];
+        return actions;
       }
 
       @Override
-      public void visitYesNo() {
-        this.actions = new Action[2];
-        this.actions[0] = getYesAction();
-        this.actions[1] = getNoAction();
+      public Action[] visitYesNo() {
+        final Action[] actions = new Action[2];
+        actions[0] = getYesAction();
+        actions[1] = getNoAction();
+        return actions;
       }
 
       @Override
-      public void visitCancel() {
-        this.actions = new Action[1];
-        this.actions[0] = getCancelAction();
+      public Action[] visitCancel() {
+        final Action[] actions = new Action[1];
+        actions[0] = getCancelAction();
+        return actions;
       }
     };
-    dialogType.accept(visitor);
-    return visitor.getResult();
+    final List<Action> actions = new LinkedList<>();
+    for (final IAdditionalActionFactory actionFactory : additionalActionFactories) {
+      actions.add(actionFactory.create(resultModel, dataStateModel, () -> {
+        setVisible(false);
+      }));
+    }
+    actions.addAll(Arrays.asList(dialogType.accept(visitor)));
+    return actions.stream().toArray(Action[]::new);
   }
 
   final public Action getApplyAction() {
@@ -485,11 +522,43 @@ public abstract class AbstractDialog extends JDialog {
   final public void setMessage(final IMessage message) {
     if (this.messagePanel == null) {
       if (message != null) {
-        GuiUtilities.invokeLater(() -> MessageDialogUtilities.show(this, getTitle(), message));
+        logger.log(getLevel(message.getMessageType()), message.getText(), message.getThrowable());
       }
       return;
     }
     GuiUtilities.invokeLater(() -> this.messagePanel.setMessage(message));
+  }
+
+  private Level getLevel(final MessageType messageType) {
+    final IMessageTypeVisitor<Level> visitor = new IMessageTypeVisitor<Level>() {
+
+      @Override
+      public Level visitInfo() {
+        return ILevel.INFO;
+      }
+
+      @Override
+      public Level visitWarning() {
+        return ILevel.WARNING;
+      }
+
+      @Override
+      public Level visitError() {
+        return ILevel.ERROR;
+      }
+
+      @Override
+      public Level visitDefault() {
+        return ILevel.INFO;
+      }
+
+      @Override
+      public Level visitQuery() {
+        throw new IllegalStateException();
+      }
+
+    };
+    return messageType.accept(visitor);
   }
 
   final public void setIcon(final Icon icon) {

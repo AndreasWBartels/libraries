@@ -23,7 +23,7 @@ package net.anwiba.eclipse.project.dependency.action;
 
 import net.anwiba.commons.eclipse.logging.ILogger;
 import net.anwiba.commons.internal.eclipse.logging.Level;
-import net.anwiba.commons.process.cancel.Canceler;
+import net.anwiba.commons.thread.cancel.Canceler;
 import net.anwiba.eclipse.project.dependency.java.IWorkspace;
 import net.anwiba.eclipse.project.dependency.model.IDependenciesModel;
 import net.anwiba.eclipse.project.dependency.plugin.DependenciesPlugin;

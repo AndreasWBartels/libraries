@@ -33,7 +33,7 @@ import net.anwiba.commons.model.IObjectListModel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectListModel;
 import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.process.cancel.Canceler;
+import net.anwiba.commons.thread.cancel.Canceler;
 import net.anwiba.eclipse.project.dependency.action.SaveGraphmlAction;
 import net.anwiba.eclipse.project.dependency.action.SaveIntersectionGraphmlAction;
 import net.anwiba.eclipse.project.dependency.action.SaveJarListAction;

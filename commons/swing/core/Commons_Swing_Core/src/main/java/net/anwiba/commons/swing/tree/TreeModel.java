@@ -21,6 +21,10 @@
  */
 package net.anwiba.commons.swing.tree;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
 
@@ -44,13 +48,16 @@ public class TreeModel<T extends ITreeNode<?>> implements ITreeModel<T> {
     return ((T) parent).getChildCount();
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes" })
   @Override
   public boolean isLeaf(final Object node) {
     if (node == null) {
       throw new IllegalArgumentException("node is null"); //$NON-NLS-1$
     }
-    return ((T) node).isLeaf();
+    if (!(node instanceof ITreeNode)) {
+      throw new IllegalArgumentException("unsupported instance"); //$NON-NLS-1$
+    }
+    return ((ITreeNode) node).isLeaf();
   }
 
   @Override
@@ -58,21 +65,51 @@ public class TreeModel<T extends ITreeNode<?>> implements ITreeModel<T> {
     throw new UnsupportedOperationException("not yet implemented"); //$NON-NLS-1$
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public int getIndexOfChild(final Object parent, final Object child) {
-    return 0;
+    if (!(parent instanceof ITreeNode)) {
+      throw new IllegalArgumentException("unsupported instance"); //$NON-NLS-1$
+    }
+    if (!(child instanceof ITreeNode)) {
+      throw new IllegalArgumentException("unsupported instance"); //$NON-NLS-1$
+    }
+    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
+      throw new IllegalStateException();
+    }
+    return ((ITreeNode) parent).getIndex((ITreeNode) child);
+  }
+
+  private final List<TreeModelListener> listeners = new ArrayList<>();
+
+  protected synchronized void fireTreeStructureChanged(final T node) {
+    final TreeModelEvent treeModelEvent = new TreeModelEvent(this, new TreePath(node));
+    final List<TreeModelListener> currentListeners = new ArrayList<>(this.listeners);
+    for (final TreeModelListener listener : currentListeners) {
+      listener.treeStructureChanged(treeModelEvent);
+    }
+  }
+
+  protected void fireTreeNodesRemoved(
+      final Object source,
+      final Object[] path,
+      final int[] childIndices,
+      final Object[] children) {
+    final TreeModelEvent treeModelEvent = new TreeModelEvent(source, path, childIndices, children);
+    final List<TreeModelListener> currentListeners = new ArrayList<>(this.listeners);
+    for (final TreeModelListener listener : currentListeners) {
+      listener.treeStructureChanged(treeModelEvent);
+    }
   }
 
   @Override
-  public void addTreeModelListener(final TreeModelListener l) {
-    // TODO Auto-generated method stub
-
+  public synchronized void addTreeModelListener(final TreeModelListener listener) {
+    this.listeners.add(listener);
   }
 
   @Override
-  public void removeTreeModelListener(final TreeModelListener l) {
-    // TODO Auto-generated method stub
-
+  public synchronized void removeTreeModelListener(final TreeModelListener listener) {
+    this.listeners.remove(listener);
   }
 
   @Override

@@ -1,0 +1,51 @@
+/*
+ * #%L
+ * anwiba commons advanced
+ * %%
+ * Copyright (C) 2007 - 2016 Andreas Bartels
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+package net.anwiba.commons.thread.queue;
+
+import java.util.concurrent.TimeUnit;
+
+import net.anwiba.commons.thread.cancel.ICancelerListener;
+import net.anwiba.commons.thread.process.IProcessIdentfier;
+
+public interface IRunnable extends Runnable {
+  // nothing to do
+
+  IProcessIdentfier getIdentifier();
+
+  @SuppressWarnings("unused")
+  default long getDelay(final TimeUnit unit) {
+    return 0;
+  }
+
+  default boolean isPeriodic() {
+    return false;
+  }
+
+  public boolean cancel(final boolean mayInterruptIfRunning);
+
+  public boolean isCancelled();
+
+  void addCancelerListener(ICancelerListener listner);
+
+  void removeCancelerListener(ICancelerListener listner);
+
+}

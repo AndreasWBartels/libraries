@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.swing.dialog.progress;
 
-import net.anwiba.commons.progress.IProgressTask;
+import net.anwiba.commons.thread.progress.IProgressTask;
 
 public class ProgressDialogUtilities {
 

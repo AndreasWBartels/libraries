@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.swing.menu;
 
+import javax.swing.JMenu;
+
+import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.swing.action.AbstractIdBasedWeightDescription;
-import net.anwiba.commons.utilities.factory.IFactory;
-
-import javax.swing.JMenu;
 
 public class MenuDescription extends AbstractIdBasedWeightDescription {
 
@@ -33,10 +33,10 @@ public class MenuDescription extends AbstractIdBasedWeightDescription {
   private final IFactory<String, JMenu, RuntimeException> factory;
 
   public MenuDescription(
-    final String id,
-    final String title,
-    final int weight,
-    final IFactory<String, JMenu, RuntimeException> factory) {
+      final String id,
+      final String title,
+      final int weight,
+      final IFactory<String, JMenu, RuntimeException> factory) {
     super(id, weight);
     this.title = title;
     this.factory = factory;
@@ -46,7 +46,7 @@ public class MenuDescription extends AbstractIdBasedWeightDescription {
     this(id, title, weight, new IFactory<String, JMenu, RuntimeException>() {
 
       @Override
-      public JMenu create(final String title) {
+      public JMenu create(@SuppressWarnings("hiding") final String title) {
         return new JMenu(title);
       }
     });
@@ -58,7 +58,7 @@ public class MenuDescription extends AbstractIdBasedWeightDescription {
 
   @Override
   public int hashCode() {
-    return this.getId().hashCode();
+    return getId().hashCode();
   }
 
   @Override

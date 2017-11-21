@@ -41,6 +41,7 @@ import net.anwiba.commons.swing.table.IColumnObjectFactory;
 import net.anwiba.commons.swing.table.IColumnValueAdaptor;
 import net.anwiba.commons.swing.table.IColumnValueProvider;
 import net.anwiba.commons.swing.table.IObjectListTableConfiguration;
+import net.anwiba.commons.swing.table.IObjectTableBuilder;
 import net.anwiba.commons.swing.table.ObjectListColumnConfiguration;
 import net.anwiba.commons.swing.table.ObjectListTable;
 import net.anwiba.commons.swing.table.ObjectListTableConfigurationBuilder;
@@ -203,7 +204,7 @@ public class ObjectListTableDemo extends SwingDemoCase {
 
   @Demo
   public void filterable() {
-    final ObjectTableBuilder<DemoObject> builder = new ObjectTableBuilder<>();
+    final IObjectTableBuilder<DemoObject> builder = new ObjectTableBuilder<>();
     builder.setValues(this.factory.createObjectList(20));
     final boolean isSortable = true;
     builder.addColumnConfiguration(createNumberColumn(isSortable));

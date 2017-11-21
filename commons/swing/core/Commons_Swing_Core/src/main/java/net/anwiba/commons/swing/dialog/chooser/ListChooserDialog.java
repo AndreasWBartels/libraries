@@ -66,7 +66,6 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
 
   IInputListener inputListener = new IInputListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void inputHappened() {
       setMessage(ListChooserDialog.this.chooserPanel.getMessage());
@@ -75,7 +74,6 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
 
   private final IChangeableObjectListener valueChangeListener = new IChangeableObjectListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void objectChanged() {
       if (!ListChooserDialog.this.validStateModel.get().isValid()) {
@@ -94,7 +92,6 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
 
   private final IChangeableObjectListener validateStateListener = new IChangeableObjectListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void objectChanged() {
       setMessage(ListChooserDialog.this.chooserPanel.getMessage());
@@ -192,10 +189,11 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
         setMessage(Message.create(this.chooserPanel.getMessage().getText(), "successful")); //$NON-NLS-1$
         return true;
       }
-      setMessage(Message.create(
-          this.chooserPanel.getMessage().getText(),
-          "The connection attempt failed.", //$NON-NLS-1$
-          MessageType.ERROR));
+      setMessage(
+          Message.create(
+              this.chooserPanel.getMessage().getText(),
+              "The connection attempt failed.", //$NON-NLS-1$
+              MessageType.ERROR));
       setOkEnabled(false);
       return false;
     } catch (final InterruptedException exception) {

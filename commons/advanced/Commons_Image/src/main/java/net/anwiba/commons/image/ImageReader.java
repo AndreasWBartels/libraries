@@ -35,11 +35,11 @@ import javax.media.jai.RenderedOp;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
-import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.resource.reference.IResourceReference;
 import net.anwiba.commons.resource.reference.IResourceReferenceFactory;
 import net.anwiba.commons.resource.reference.IResourceReferenceHandler;
 import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public final class ImageReader {
 

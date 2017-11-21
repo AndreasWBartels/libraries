@@ -134,9 +134,4 @@ public class JTreeUtilities {
       tree.scrollPathToVisible(treePath);
     }
   }
-
-  public static void collapse(final JTree tree, final DefaultMutableTreeNode node) {
-    // TODO_NOW (andreas) Sep 4, 2017: Auto-generated method stub
-
-  }
 }

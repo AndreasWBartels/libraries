@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.swing.dialog.chooser;
 
-import net.anwiba.commons.progress.AbstractProgressTask;
+import net.anwiba.commons.thread.progress.AbstractProgressTask;
 
 public abstract class ITryTask extends AbstractProgressTask {
 

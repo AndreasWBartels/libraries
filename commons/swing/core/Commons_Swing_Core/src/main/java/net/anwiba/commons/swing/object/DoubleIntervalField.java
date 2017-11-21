@@ -8,18 +8,24 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
 package net.anwiba.commons.swing.object;
+
+import java.text.MessageFormat;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.logging.ILevel;
@@ -34,12 +40,6 @@ import net.anwiba.commons.utilities.interval.DoubleInterval;
 import net.anwiba.commons.utilities.number.StringToDoubleConverter;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 import net.anwiba.commons.utilities.validation.IValidator;
-
-import java.text.MessageFormat;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
 
 public class DoubleIntervalField implements IObjectField<DoubleInterval> {
 
@@ -64,19 +64,14 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
         }
         final double value = valueObject.doubleValue();
         final boolean isInBoundery = Double.isNaN(this.minimum)
-            ? (Double.isNaN(this.maximum)
-                ? true
-                : value <= this.maximum)
-            : Double.isNaN(this.maximum)
-                ? this.minimum <= value
-                : this.minimum <= value && value <= this.maximum;
+            ? (Double.isNaN(this.maximum) ? true : value <= this.maximum)
+            : Double.isNaN(this.maximum) ? this.minimum <= value : this.minimum <= value && value <= this.maximum;
         if (isInBoundery) {
           return IValidationResult.valid();
         }
-        return IValidationResult.inValid(MessageFormat.format(
-            "Value is out of bounderies ({0}, {1})",
-            toString(this.minimum),
-            toString(this.maximum)));
+        return IValidationResult.inValid(
+            MessageFormat
+                .format("Value is out of bounderies ({0}, {1})", toString(this.minimum), toString(this.maximum)));
       } catch (final NumberFormatException exception) {
         return IValidationResult.inValid(exception.getLocalizedMessage());
       }
@@ -90,7 +85,7 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
     }
   }
 
-  private final IObjectModel<IValidationResult> validationModel;
+  private final IObjectModel<IValidationResult> validationResultModel;
   private final IObjectModel<IValidationResult> minimumValidationModel = new ObjectModel<>(IValidationResult.valid());
   private final IObjectModel<IValidationResult> maximumValidationModel = new ObjectModel<>(IValidationResult.valid());
   private final IObjectModel<Double> minimumValueModel = new ObjectModel<>();
@@ -103,102 +98,113 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
   private final IConverter<Double, String, RuntimeException> toStringFormater;
 
   public DoubleIntervalField(
-    final IConverter<Double, String, RuntimeException> toStringFormater,
-    final double minimum,
-    final double maximum,
-    final IObjectModel<DoubleInterval> model,
-    final IObjectModel<IValidationResult> validationModel) {
+      final IConverter<Double, String, RuntimeException> toStringFormater,
+      final double minimum,
+      final double maximum,
+      final IObjectModel<DoubleInterval> model,
+      final IObjectModel<IValidationResult> validationModel) {
     this.model = model;
     this.minimum = minimum;
     this.maximum = maximum;
     this.toStringFormater = toStringFormater;
-    this.validationModel = validationModel;
-    final IObjectModel<Double> minimumValueModel = this.minimumValueModel;
-    final IObjectModel<Double> maximumValueModel = this.maximumValueModel;
-    minimumValueModel.set(model.get() == null
-        ? null
-        : Double.valueOf(model.get().getMinimum()));
-    maximumValueModel.set(model.get() == null
-        ? null
-        : Double.valueOf(model.get().getMaximum()));
-    final IObjectModel<IValidationResult> minimumValidationModel = this.minimumValidationModel;
-    final IObjectModel<IValidationResult> maximumValidationModel = this.maximumValidationModel;
+    this.validationResultModel = validationModel;
+    this.minimumValueModel.set(model.get() == null ? null : Double.valueOf(model.get().getMinimum()));
+    this.maximumValueModel.set(model.get() == null ? null : Double.valueOf(model.get().getMaximum()));
     validationModel.set(checkValid());
     final IChangeableObjectListener validationListener = new IChangeableObjectListener() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void objectChanged() {
         logger.log(ILevel.DEBUG, "validation state changed"); //$NON-NLS-1$
-        logger.log(ILevel.DEBUG, MessageFormat.format("minimum value: {0}", //$NON-NLS-1$
-            (minimumValidationModel.get().isValid()
-                ? "valid" //$NON-NLS-1$
-                : MessageFormat.format("invalid: {0}", minimumValidationModel.get().getMessage())))); //$NON-NLS-1$
-        logger.log(ILevel.DEBUG, "maximum value: " //$NON-NLS-1$
-            + (maximumValidationModel.get().isValid()
-                ? "valid" //$NON-NLS-1$
-                : MessageFormat.format("invalid: {0}", maximumValidationModel.get().getMessage()))); //$NON-NLS-1$
-        if (!minimumValidationModel.get().isValid()) {
-          validationModel.set(IValidationResult.inValid("Illegal minimum value. "
-              + minimumValidationModel.get().getMessage()));
+        logger.log(
+            ILevel.DEBUG,
+            MessageFormat.format(
+                "minimum value: {0}", //$NON-NLS-1$
+                (DoubleIntervalField.this.minimumValidationModel.get().isValid()
+                    ? "valid" //$NON-NLS-1$
+                    : MessageFormat
+                        .format("invalid: {0}", DoubleIntervalField.this.minimumValidationModel.get().getMessage())))); //$NON-NLS-1$
+        logger.log(
+            ILevel.DEBUG,
+            "maximum value: " //$NON-NLS-1$
+                + (DoubleIntervalField.this.maximumValidationModel.get().isValid()
+                    ? "valid" //$NON-NLS-1$
+                    : MessageFormat
+                        .format("invalid: {0}", DoubleIntervalField.this.maximumValidationModel.get().getMessage()))); //$NON-NLS-1$
+        if (!DoubleIntervalField.this.minimumValidationModel.get().isValid()) {
+          validationModel.set(
+              IValidationResult.inValid(
+                  "Illegal minimum value. " + DoubleIntervalField.this.minimumValidationModel.get().getMessage()));
           return;
         }
-        if (!maximumValidationModel.get().isValid()) {
-          validationModel.set(IValidationResult.inValid("Illegal maximum value. "
-              + maximumValidationModel.get().getMessage()));
+        if (!DoubleIntervalField.this.maximumValidationModel.get().isValid()) {
+          validationModel.set(
+              IValidationResult.inValid(
+                  "Illegal maximum value. " + DoubleIntervalField.this.maximumValidationModel.get().getMessage()));
           return;
         }
         final IValidationResult validationResult = checkValid();
         if (validationResult.isValid()) {
-          model.set(minimumValueModel.get() == null && maximumValueModel.get() == null
-              ? null
-              : new DoubleInterval(minimumValueModel.get().doubleValue(), maximumValueModel.get().doubleValue()));
+          model.set(
+              DoubleIntervalField.this.minimumValueModel.get() == null
+                  && DoubleIntervalField.this.maximumValueModel.get() == null
+                      ? null
+                      : new DoubleInterval(
+                          DoubleIntervalField.this.minimumValueModel.get().doubleValue(),
+                          DoubleIntervalField.this.maximumValueModel.get().doubleValue()));
         }
         validationModel.set(validationResult);
       }
     };
-    minimumValidationModel.addChangeListener(validationListener);
-    maximumValidationModel.addChangeListener(validationListener);
+    this.minimumValidationModel.addChangeListener(validationListener);
+    this.maximumValidationModel.addChangeListener(validationListener);
     model.addChangeListener(new IChangeableObjectListener() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void objectChanged() {
         logger.log(ILevel.DEBUG, MessageFormat.format("model changed: {0}", model.get())); //$NON-NLS-1$
-        minimumValueModel.set(model.get() == null
-            ? null
-            : Double.valueOf(model.get().getMinimum()));
-        maximumValueModel.set(model.get() == null
-            ? null
-            : Double.valueOf(model.get().getMaximum()));
+        DoubleIntervalField.this.minimumValueModel
+            .set(model.get() == null ? null : Double.valueOf(model.get().getMinimum()));
+        DoubleIntervalField.this.maximumValueModel
+            .set(model.get() == null ? null : Double.valueOf(model.get().getMaximum()));
       }
     });
-    minimumValueModel.addChangeListener(new IChangeableObjectListener() {
+    this.minimumValueModel.addChangeListener(new IChangeableObjectListener() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void objectChanged() {
-        logger.log(ILevel.DEBUG, MessageFormat.format("minimum model changed: {0}", minimumValueModel.get())); //$NON-NLS-1$
+        logger.log(
+            ILevel.DEBUG,
+            MessageFormat.format("minimum model changed: {0}", DoubleIntervalField.this.minimumValueModel.get())); //$NON-NLS-1$
         final IValidationResult validationResult = checkValid();
         if (validationResult.isValid()) {
-          model.set(minimumValueModel.get() == null && maximumValueModel.get() == null
-              ? null
-              : new DoubleInterval(minimumValueModel.get().doubleValue(), maximumValueModel.get().doubleValue()));
+          model.set(
+              DoubleIntervalField.this.minimumValueModel.get() == null
+                  && DoubleIntervalField.this.maximumValueModel.get() == null
+                      ? null
+                      : new DoubleInterval(
+                          DoubleIntervalField.this.minimumValueModel.get().doubleValue(),
+                          DoubleIntervalField.this.maximumValueModel.get().doubleValue()));
         }
         validationModel.set(validationResult);
       }
     });
-    maximumValueModel.addChangeListener(new IChangeableObjectListener() {
+    this.maximumValueModel.addChangeListener(new IChangeableObjectListener() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void objectChanged() {
-        logger.log(ILevel.DEBUG, MessageFormat.format("maximum model changed: {0}", maximumValueModel.get())); //$NON-NLS-1$
+        logger.log(
+            ILevel.DEBUG,
+            MessageFormat.format("maximum model changed: {0}", DoubleIntervalField.this.maximumValueModel.get())); //$NON-NLS-1$
         final IValidationResult validationResult = checkValid();
         if (validationResult.isValid()) {
-          model.set(minimumValueModel.get() == null && maximumValueModel.get() == null
-              ? null
-              : new DoubleInterval(minimumValueModel.get().doubleValue(), maximumValueModel.get().doubleValue()));
+          model.set(
+              DoubleIntervalField.this.minimumValueModel.get() == null
+                  && DoubleIntervalField.this.maximumValueModel.get() == null
+                      ? null
+                      : new DoubleInterval(
+                          DoubleIntervalField.this.minimumValueModel.get().doubleValue(),
+                          DoubleIntervalField.this.maximumValueModel.get().doubleValue()));
         }
         validationModel.set(validationResult);
       }
@@ -206,10 +212,9 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
   }
 
   protected IValidationResult checkValid() {
-    if (((this.minimumValueModel.get() == null && this.maximumValueModel.get() == null) || ((this.minimumValueModel
-        .get() != null && this.maximumValueModel.get() != null) && (this.minimumValueModel.get().doubleValue() < this.maximumValueModel
-        .get()
-        .doubleValue())))) {
+    if (((this.minimumValueModel.get() == null && this.maximumValueModel.get() == null)
+        || ((this.minimumValueModel.get() != null && this.maximumValueModel.get() != null)
+            && (this.minimumValueModel.get().doubleValue() < this.maximumValueModel.get().doubleValue())))) {
       return IValidationResult.valid();
     }
     if (this.minimumValueModel.get() == null) {
@@ -268,6 +273,6 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
 
   @Override
   public IObjectDistributor<IValidationResult> getValidationResultDistributor() {
-    return this.validationModel;
+    return this.validationResultModel;
   }
 }

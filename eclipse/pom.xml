@@ -13,20 +13,20 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.68</version>
+    <version>1.0.76</version>
   </parent>
 
   <properties>
     <net.anwiba.eclipse.version>${net.anwiba.commons.version}</net.anwiba.eclipse.version>
     <tycho.version>0.26.0</tycho.version>
-    <eclipse.jdt.core.version>3.12.2.v20161117-1814</eclipse.jdt.core.version>
-    <eclipse.osgi.version>3.10.101.v20150820-1432</eclipse.osgi.version>
+    <eclipse.jdt.core.version>3.13.100.xx-201711101938-e47</eclipse.jdt.core.version>
+    <eclipse.osgi.version>3.12.50.v20170928-1321</eclipse.osgi.version>
     <strictVersions>false</strictVersions>
   </properties>
 
   <modules>
-    <module>Eclipse_Libraries</module>
     <module>Eclipse_Commons</module>
+    <module>Eclipse_Libraries</module>
     <module>Eclipse_Icons</module>
     <module>Eclipse_Project_Dependencies</module>
     <module>Eclipse_Distribution</module>
@@ -34,10 +34,15 @@
 
   <repositories>
     <repository>
-      <id>eclipse-neon</id>
-      <url>http://download.eclipse.org/releases/neon/</url>
+      <id>eclipse-oxygen</id>
+      <url>http://download.eclipse.org/releases/oxygen/</url>
       <layout>p2</layout>
     </repository>
+<!--     <repository> -->
+<!--       <id>eclipse-neon</id> -->
+<!--       <url>http://download.eclipse.org/releases/neon/</url> -->
+<!--       <layout>p2</layout> -->
+<!--     </repository> -->
   </repositories>
 
   <build>

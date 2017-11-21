@@ -31,7 +31,6 @@ import javax.swing.JScrollPane;
 
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.swing.icon.GuiIcons;
-import net.anwiba.commons.swing.utilities.JTextComponentUtilities;
 
 public class TextDialogTab extends AbstractNoneEditTabbedDialogTab {
 
@@ -49,8 +48,8 @@ public class TextDialogTab extends AbstractNoneEditTabbedDialogTab {
     final JPanel component = new JPanel();
     component.setLayout(new GridLayout(1, 1));
     final String textString = createText(header, text);
-    final JEditorPane textArea = new JEditorPane("text/html", "<html><body></body></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-    JTextComponentUtilities.setTextAndMoveToTop(textArea, textString);
+    final JEditorPane textArea = new JEditorPane("text/html", textString); //$NON-NLS-1$
+    textArea.setCaretPosition(0);
     textArea.setMinimumSize(new Dimension(200, 100));
     textArea.setPreferredSize(new Dimension(200, 100));
     textArea.setEditable(false);

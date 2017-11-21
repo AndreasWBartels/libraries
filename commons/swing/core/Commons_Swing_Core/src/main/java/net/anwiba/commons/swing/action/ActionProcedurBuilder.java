@@ -64,7 +64,8 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
         final I value = Optional
             .<IActionInitializer<I>, InvocationTargetException> create(this.initializer)
             .convert(i -> i.initialize(component))
-            .getOr((I) null);
+            .get();
+        @SuppressWarnings("unchecked")
         final O result = this.task == null
             ? (O) value
             : ProgressDialogUtilities

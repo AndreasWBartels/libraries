@@ -8,6 +8,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/main/java/"/>
 	<classpathentry kind="src" path="src/main/resources/"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-tools-icons-1.0.68.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/anwiba-tools-icons-1.0.76.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

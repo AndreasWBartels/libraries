@@ -25,10 +25,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
@@ -45,6 +42,13 @@ public class ConfigurableDialog extends AbstractDialog {
   private final IObjectModel<DataState> dataStateModel;
 
   public ConfigurableDialog(final Window owner, final IDialogConfiguration configuration) {
+    this(owner, configuration, configuration.getContentPaneBuilder().setOwner(owner).build());
+  }
+
+  public ConfigurableDialog(
+      final Window owner,
+      final IDialogConfiguration configuration,
+      final IContentPanel contentPane) {
     super(
         owner,
         configuration.getWindowPreferences(),
@@ -56,9 +60,10 @@ public class ConfigurableDialog extends AbstractDialog {
         configuration.getDialogType(),
         configuration.getActionButtonTextFactory(),
         configuration.getAdditionalActionFactories(),
+        contentPane.getDataStateModel(),
         configuration.getModalityType());
     setIconImage(configuration.getImage());
-    this.contentPane = configuration.getContentPaneBuilder().setOwner(owner).build();
+    this.contentPane = contentPane;
     setContentPane(this.contentPane.getComponent());
     this.dataStateModel = this.contentPane.getDataStateModel();
     this.dataStateModel.addChangeListener(new IChangeableObjectListener() {
@@ -98,24 +103,14 @@ public class ConfigurableDialog extends AbstractDialog {
         }
       }, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
-
-    locate();
   }
 
   @Override
-  protected Action[] getActions(
-      final DialogType dialogType,
-      final IObjectModel<IDialogResult> dialogResultModel,
-      final List<IAdditionalActionFactory> additionalActionFactories) {
-    final Action[] result = super.getActions(dialogType, dialogResultModel, additionalActionFactories);
-    final List<Action> actions = new ArrayList<>();
-    for (final IAdditionalActionFactory additionalActionFactory : additionalActionFactories) {
-      actions.add(additionalActionFactory.create(dialogResultModel, this.dataStateModel, () -> close()));
+  public void setVisible(final boolean value) {
+    if (value) {
+      locate();
     }
-    for (final Action action : result) {
-      actions.add(action);
-    }
-    return actions.toArray(new Action[actions.size()]);
+    super.setVisible(value);
   }
 
   @Override

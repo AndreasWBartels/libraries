@@ -77,8 +77,10 @@ public class DialogConfigurationBuilder {
     return this;
   }
 
-  public void setActionButtonTextFactory(final IFunction<String, String, RuntimeException> actionButtonTextFactory) {
+  public DialogConfigurationBuilder setActionButtonTextFactory(
+      final IFunction<String, String, RuntimeException> actionButtonTextFactory) {
     this.actionButtonTextFactory = actionButtonTextFactory;
+    return this;
   }
 
   public DialogConfigurationBuilder setContentPaneFactory(final IContentPaneFactory contentPaneFactory) {

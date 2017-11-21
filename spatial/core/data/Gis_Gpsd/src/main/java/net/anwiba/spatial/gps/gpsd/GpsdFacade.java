@@ -61,7 +61,7 @@ public class GpsdFacade implements IGpsdFacade {
                   .create(gpsDevices.iterator())
                   .accept(i -> i.hasNext())
                   .convert(i -> i.next().getPath())
-                  .getOrThrow(new IOException("Couldn't find any device")));
+                  .getOrThrow(() -> new IOException("Couldn't find any device")));
 
       try (Connection connection = client.connect()) {
         for (int i = 0; i < 30; i++) {

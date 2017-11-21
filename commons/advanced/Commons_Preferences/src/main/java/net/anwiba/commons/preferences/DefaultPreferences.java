@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,17 +21,17 @@
  */
 package net.anwiba.commons.preferences;
 
-import net.anwiba.commons.lang.object.ObjectUtilities;
-import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.Logging;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import net.anwiba.commons.lang.object.ObjectUtilities;
+import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.logging.ILogger;
+import net.anwiba.commons.logging.Logging;
 
 class DefaultPreferences implements IPreferences {
 
@@ -49,11 +49,13 @@ class DefaultPreferences implements IPreferences {
   }
 
   @Override
-  public boolean nodeExists(final String... nodes) throws PreferencesException {
+  public boolean nodeExists(final String... nodes) {
     try {
       return this.preferences.nodeExists(new PathFactory().create(nodes));
     } catch (final BackingStoreException exception) {
-      throw new PreferencesException(exception);
+      logger.log(ILevel.DEBUG, exception.getMessage());
+      logger.log(ILevel.ALL, exception.getMessage(), exception);
+      return false;
     }
   }
 
@@ -92,7 +94,8 @@ class DefaultPreferences implements IPreferences {
     try {
       this.preferences.flush();
     } catch (final BackingStoreException exception) {
-      logger.log(ILevel.WARNING, exception.getLocalizedMessage(), exception);
+      logger.log(ILevel.WARNING, exception.getMessage());
+      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
     }
   }
 
@@ -106,7 +109,9 @@ class DefaultPreferences implements IPreferences {
         nodes.add(new DefaultPreferences(this.preferences.node(name)));
       }
       return nodes;
-    } catch (final BackingStoreException exception) {
+    } catch (final BackingStoreException | IllegalStateException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage());
+      logger.log(ILevel.ALL, exception.getMessage(), exception);
       return new ArrayList<>();
     }
   }
@@ -138,6 +143,8 @@ class DefaultPreferences implements IPreferences {
       Collections.sort(keys);
       return keys;
     } catch (final BackingStoreException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage());
+      logger.log(ILevel.ALL, exception.getMessage(), exception);
       return new ArrayList<>();
     }
   }
@@ -155,5 +162,21 @@ class DefaultPreferences implements IPreferences {
   @Override
   public String[] getPath() {
     return PreferenceUtilities.createPath(this.preferences);
+  }
+
+  @Override
+  public void delete() {
+    try {
+      this.preferences.removeNode();
+      this.preferences.flush();
+    } catch (final BackingStoreException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage());
+      logger.log(ILevel.ALL, exception.getMessage(), exception);
+    }
+  }
+
+  @Override
+  public void remove(final String key) {
+    this.preferences.remove(key);
   }
 }

@@ -22,7 +22,7 @@
 // Copyright (c) 2010 by Andreas W. Bartels (bartels@anwiba.de)
 package net.anwiba.eclipse.icons.runner;
 
-import net.anwiba.commons.process.cancel.ICanceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.eclipse.icons.description.GuiIconDescriptionsFactory;
 import net.anwiba.eclipse.icons.description.IGuiIconDescription;
 import net.anwiba.eclipse.icons.io.IconConfigurationReader;
@@ -89,10 +89,11 @@ public final class UpdateRunner implements IRunnableWithProgress {
   }
 
   private List<IGuiIconDescription> read(final IJavaProject... projects) throws IOException {
+    final GuiIconDescriptionsFactory guiIconDescriptionsFactory = new GuiIconDescriptionsFactory(this.device);
     final ArrayList<IGuiIconDescription> descriptions = new ArrayList<>();
     for (final IJavaProject project : projects) {
       final Map<Class, List<IconContext>> configurations = this.reader.read(project);
-      return new GuiIconDescriptionsFactory(this.device).create(this.canceler, configurations);
+      descriptions.addAll(guiIconDescriptionsFactory.create(this.canceler, configurations));
     }
     return descriptions;
 

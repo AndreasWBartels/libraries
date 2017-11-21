@@ -24,6 +24,7 @@ package net.anwiba.commons.lang.stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -36,6 +37,7 @@ import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
+import net.anwiba.commons.lang.functional.IAssimilator;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
@@ -54,6 +56,11 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   @Override
   public <O> IStream<O, E> convert(final IConverter<T, O, E> converter) {
     return new SequencedStream<>(new ConvertingIterableIterable<>(this.iterable, i -> i != null, converter));
+  }
+
+  @Override
+  public <O> IStream<O, E> convert(final IAggregator<Integer, T, O, E> aggegator) {
+    return new SequencedStream<>(new CountingIterableIterable<>(this.iterable, i -> i != null, aggegator));
   }
 
   @Override
@@ -81,6 +88,11 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   @Override
   public void foreach(final IConsumer<T, E> consumer) throws E {
     this.iterable.foreach(consumer);
+  }
+
+  @Override
+  public void foreach(final IAssimilator<Integer, T, E> assimilator) throws E {
+    this.iterable.foreach(assimilator);
   }
 
   @Override
@@ -136,6 +148,13 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
       l.put(keyFactrory.create(t), valueFactrory.create(t));
       return l;
     });
+  }
+
+  @Override
+  public IStream<T, E> revert() throws E {
+    final List<T> list = asList();
+    Collections.reverse(list);
+    return Streams.create(list);
   }
 
 }

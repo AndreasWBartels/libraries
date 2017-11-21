@@ -30,6 +30,7 @@ import java.util.function.IntFunction;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
+import net.anwiba.commons.lang.functional.IAssimilator;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
@@ -42,6 +43,8 @@ public interface IStream<T, E extends Exception> {
   public IStream<T, E> filter(IAcceptor<T> funtion);
 
   public <O> IStream<O, E> convert(IConverter<T, O, E> funtion);
+
+  public <O> IStream<O, E> convert(IAggregator<Integer, T, O, E> aggregator) throws E;
 
   public IStream<T, E> call(IConsumer<T, E> consumer) throws E;
 
@@ -59,12 +62,16 @@ public interface IStream<T, E extends Exception> {
 
   public IOptional<T, E> first(IAcceptor<T> acceptor) throws E;
 
-  public <O> IOptional<O, E> aggregate(O inital, IAggregator<O, T, O, E> accumulator) throws E;
+  public <O> IOptional<O, E> aggregate(O inital, IAggregator<O, T, O, E> aggregator) throws E;
 
   public void foreach(IConsumer<T, E> consumer) throws E;
 
-  public <O> O[] asArray(IntFunction<O[]> factory) throws E;
+  public void foreach(IAssimilator<Integer, T, E> assimilator) throws E;
+
+  public <O> O[] asArray(IntFunction<O[]> function) throws E;
 
   public IStream<T, E> notNull();
+
+  public IStream<T, E> revert() throws E;
 
 }

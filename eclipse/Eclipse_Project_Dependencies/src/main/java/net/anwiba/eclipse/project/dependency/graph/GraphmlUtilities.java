@@ -21,7 +21,7 @@
  */
 package net.anwiba.eclipse.project.dependency.graph;
 
-import net.anwiba.commons.program.ProgramLauncher;
+import net.anwiba.commons.utilities.program.ProgramLauncher;
 import net.anwiba.eclipse.project.dependency.java.LibraryType;
 import net.anwiba.tools.graphml.io.GraphMarkupLanguageWriter;
 import net.anwiba.tools.graphml.utilities.GraphUtilities;

@@ -46,7 +46,6 @@ public abstract class AbstractWizardController implements IWizardController {
   private final BooleanModel nextEnabledModel = new BooleanModel(true);
   private final IChangeableObjectListener nextEnableListener = new IChangeableObjectListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void objectChanged() {
       AbstractWizardController.this.nextEnabledModel
@@ -57,7 +56,6 @@ public abstract class AbstractWizardController implements IWizardController {
   private final BooleanModel backEnabledModel = new BooleanModel(true);
   private final IChangeableObjectListener backEnableListener = new IChangeableObjectListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void objectChanged() {
       AbstractWizardController.this.backEnabledModel
@@ -76,7 +74,8 @@ public abstract class AbstractWizardController implements IWizardController {
         AbstractWizardController.this.messageModel.set(null);
         return;
       }
-      AbstractWizardController.this.messageModel.set(AbstractWizardController.this.currentPage.getMessageDistributor().get());
+      AbstractWizardController.this.messageModel
+          .set(AbstractWizardController.this.currentPage.getMessageDistributor().get());
     }
   };
   private final List<IWizardPage> container;
@@ -91,7 +90,6 @@ public abstract class AbstractWizardController implements IWizardController {
     this.dataStateModel = dataStateModel;
     this.dataStateListener = new IChangeableObjectListener() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void objectChanged() {
         final IWizardPage page = AbstractWizardController.this.currentPage;

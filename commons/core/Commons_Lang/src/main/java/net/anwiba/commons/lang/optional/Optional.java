@@ -109,6 +109,14 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
   }
 
   @Override
+  public IOptional<T, E> or(final ISupplier<T, E> supplier) throws E {
+    if (!isAccepted()) {
+      return create(supplier.supply());
+    }
+    return this;
+  }
+
+  @Override
   public <O> IOptional<T, E> equals(final IConverter<T, O, E> converter, final O other) throws E {
     if (isAccepted() && ObjectUtilities.equals(converter.convert(this.value), other)) {
       return this;
@@ -117,27 +125,11 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
   }
 
   @Override
-  public <X extends Exception> T getOrThrow(final X throwable) throws E, X {
-    if (isAccepted()) {
-      return this.value;
-    }
-    throw throwable;
-  }
-
-  @Override
   public <X extends Exception> T getOrThrow(final ISupplier<X, E> supplier) throws E, X {
     if (isAccepted()) {
       return this.value;
     }
     throw supplier.supply();
-  }
-
-  @Override
-  public T getOr(final T value) throws E {
-    if (isAccepted()) {
-      return this.value;
-    }
-    return value;
   }
 
   @Override

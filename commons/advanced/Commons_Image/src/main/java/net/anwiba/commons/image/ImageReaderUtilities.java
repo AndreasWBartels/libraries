@@ -28,10 +28,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
-import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.resource.reference.IResourceReference;
 import net.anwiba.commons.resource.reference.ResourceReferenceFactory;
 import net.anwiba.commons.resource.reference.ResourceReferenceHandler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public class ImageReaderUtilities {
 

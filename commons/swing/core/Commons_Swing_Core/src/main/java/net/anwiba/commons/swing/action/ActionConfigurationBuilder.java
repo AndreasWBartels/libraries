@@ -28,8 +28,8 @@ import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanModel;
-import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.swing.icon.IGuiIcon;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public class ActionConfigurationBuilder {
 

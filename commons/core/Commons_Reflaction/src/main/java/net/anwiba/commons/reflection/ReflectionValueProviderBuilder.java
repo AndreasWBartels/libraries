@@ -47,7 +47,7 @@ public class ReflectionValueProviderBuilder implements IReflectionValueProviderB
   private final IReflectionValueProvider valueProvider;
 
   public ReflectionValueProviderBuilder() {
-    this(new EmptyReflectionValueProvider());
+    this(new DefaultReflectionValueProvider());
   }
 
   public ReflectionValueProviderBuilder(final IReflectionValueProvider valueProvider) {

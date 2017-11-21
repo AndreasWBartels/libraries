@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.action;
 
-import net.anwiba.commons.process.IProcessManager;
-
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+
+import net.anwiba.commons.thread.process.IProcessManager;
 
 public abstract class AbstractProcessAction extends AbstractAction {
 

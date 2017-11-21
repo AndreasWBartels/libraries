@@ -40,10 +40,10 @@ import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.ImageFileFilter;
 import net.anwiba.commons.image.ImageReaderUtilities;
 import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.process.cancel.Canceler;
 import net.anwiba.commons.resource.reference.IResourceReference;
 import net.anwiba.commons.resource.reference.IResourceReferenceHandler;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
+import net.anwiba.commons.thread.cancel.Canceler;
 
 @SuppressWarnings("serial")
 public class ImagePanel extends JComponent {

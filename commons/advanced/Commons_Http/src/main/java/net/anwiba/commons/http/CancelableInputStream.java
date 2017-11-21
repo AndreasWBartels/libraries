@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
-import net.anwiba.commons.process.cancel.ICanceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public class CancelableInputStream extends FilterInputStream {
 

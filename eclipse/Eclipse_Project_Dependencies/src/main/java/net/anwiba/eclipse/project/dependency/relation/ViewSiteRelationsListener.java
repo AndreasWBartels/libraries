@@ -27,7 +27,7 @@ import net.anwiba.commons.eclipse.utilities.JavaProjectUtilities;
 import net.anwiba.commons.internal.eclipse.logging.Level;
 import net.anwiba.commons.model.IObjectListModel;
 import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.process.cancel.Canceler;
+import net.anwiba.commons.thread.cancel.Canceler;
 import net.anwiba.eclipse.project.dependency.java.IItem;
 import net.anwiba.eclipse.project.dependency.model.IDependenciesModel;
 import net.anwiba.eclipse.project.dependency.object.IDependencyRelation;

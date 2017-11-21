@@ -68,8 +68,9 @@ public class LazyFolderTreeNode extends DefaultMutableTreeNode {
     return super.getChildCount();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Enumeration children() {
+  public Enumeration<DefaultMutableTreeNode> children() {
     initialize();
     return super.children();
   }

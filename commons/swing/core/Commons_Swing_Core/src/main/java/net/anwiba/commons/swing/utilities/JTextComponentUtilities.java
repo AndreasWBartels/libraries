@@ -30,6 +30,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
@@ -39,46 +40,22 @@ public class JTextComponentUtilities {
 
   private static ILogger logger = Logging.getLogger(JTextComponentUtilities.class.getName());
 
-  static final class SetTextRunnable implements Runnable {
-    private final String text;
-    private final JTextComponent textPane;
-
-    SetTextRunnable(final String text, final JTextComponent textPane) {
-      this.text = text;
-      this.textPane = textPane;
-    }
-
-    @Override
-    public void run() {
-      try {
-        this.textPane.setText(this.text);
-        this.textPane.setCaretPosition(0);
-      } catch (final Exception exception) {
-        logger.log(ILevel.DEBUG, exception.getMessage(), exception);
-      }
-    }
-  }
-
   public static void setTextAndMoveToTop(final JTextComponent textPane, final String text) {
-    GuiUtilities.invokeLater(new SetTextRunnable(text, textPane));
+    final Document document = textPane.getDocument();
+    if (document instanceof PlainDocument) {
+      setTextAndMoveToTop((PlainDocument) document, text);
+    } else {
+      GuiUtilities.invokeLater(() -> textPane.setText(text));
+    }
+    GuiUtilities.invokeLater(() -> textPane.setCaretPosition(0));
   }
 
-  public static void setTextAndMoveToTop(final Document document, final String text) {
-    GuiUtilities.invokeLater(new Runnable() {
-
-      @SuppressWarnings("synthetic-access")
-      @Override
-      public void run() {
-        try {
-          if (document instanceof AbstractDocument) {
-            ((AbstractDocument) document).replace(0, document.getLength(), text, null);
-            return;
-          }
-          document.remove(0, document.getLength());
-          document.insertString(0, text, null);
-        } catch (final BadLocationException exception) {
-          logger.log(ILevel.FATAL, exception.getLocalizedMessage(), exception);
-        }
+  public static void setTextAndMoveToTop(final PlainDocument document, final String text) {
+    GuiUtilities.invokeLater(() -> {
+      try {
+        ((AbstractDocument) document).replace(0, document.getLength(), text, null);
+      } catch (final BadLocationException exception) {
+        logger.log(ILevel.FATAL, exception.getLocalizedMessage(), exception);
       }
     });
   }

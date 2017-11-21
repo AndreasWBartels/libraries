@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -368,6 +368,12 @@ public class StringUtilities {
     return builder.toString();
   }
 
+  public static String concat(final String separator, final Iterable<String> values) {
+    final IStringAppender builder = new StringAppender(separator);
+    builder.append(values);
+    return builder.toString();
+  }
+
   public static int numberOfMatches(final String string, final String pattern) {
     if (isNullOrEmpty(string) || isNullOrEmpty(pattern)) {
       return 0;
@@ -420,4 +426,24 @@ public class StringUtilities {
     builder.append("</html>"); //$NON-NLS-1$
     return builder.toString();
   }
+
+  public static boolean inIgnoreCase(final String value, final String... values) {
+    if (value == null) {
+      return false;
+    }
+    return in(value.toLowerCase(), toLowerCase(values));
+  }
+
+  private static String[] toLowerCase(final String[] values) {
+    final String[] result = new String[values.length];
+    for (int i = 0; i < values.length; i++) {
+      result[i] = values[i].toLowerCase();
+    }
+    return result;
+  }
+
+  public static boolean in(final String value, final String... values) {
+    return new HashSet<>(Arrays.asList(values)).contains(value);
+  }
+
 }

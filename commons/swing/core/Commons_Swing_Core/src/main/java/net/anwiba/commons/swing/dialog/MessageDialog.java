@@ -24,10 +24,14 @@ package net.anwiba.commons.swing.dialog;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Window;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.Icon;
 
 import net.anwiba.commons.message.IMessage;
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.preference.IWindowPreferences;
 
 public class MessageDialog extends AbstractDialog {
@@ -68,7 +72,7 @@ public class MessageDialog extends AbstractDialog {
       final IMessage message,
       final Icon icon,
       final DialogType dialogType) {
-    this(owner, preferences, title, message, icon, dialogType, true);
+    this(owner, preferences, title, message, icon, dialogType, Collections.emptyList(), new ObjectModel<>(), true);
   }
 
   public MessageDialog(
@@ -88,8 +92,10 @@ public class MessageDialog extends AbstractDialog {
       final IMessage message,
       final Icon icon,
       final DialogType dialogType,
+      final List<IAdditionalActionFactory> actionFactories,
+      final IObjectModel<DataState> dataStateModel,
       final boolean modal) {
-    super(owner, preferences, title, message, icon, dialogType, modal);
+    super(owner, preferences, title, message, icon, dialogType, actionFactories, dataStateModel, modal);
   }
 
   @Override

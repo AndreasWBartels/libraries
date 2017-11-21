@@ -9,14 +9,14 @@
   <groupId>net.anwiba</groupId>
   <artifactId>anwiba-maven-default</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.68</version>
+  <version>1.0.76</version>
   <inceptionYear>2007</inceptionYear>
 
   <scm>
     <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
     <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
     <url>${scm.url.net.anwiba.master}/maven</url>
-   </scm>
+  </scm>
 
   <licenses>
     <license>
@@ -123,34 +123,19 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${org.apache.maven.compiler.version}</version>
         <configuration>
-          <compilerId>jdt</compilerId>
-          <source>${compile.source.version}</source>
-          <target>${compile.target.version}</target>
+          <compilerId>eclipse</compilerId>
+          <source>1.8</source>
+          <target>1.8</target>
           <maxmem>512</maxmem>
           <meminitial>64</meminitial>
           <encoding>UTF-8</encoding>
-          <compilerArgument>-Xlint:all,hiding,-unnecessary</compilerArgument>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
         </configuration>
+
         <dependencies>
-
           <dependency>
-            <groupId>org.sonatype.tycho</groupId>
-            <artifactId>tycho-compiler-jdt</artifactId>
-            <version>${org.sonatype.tycho.version}</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.sonatype.tycho</groupId>
-                <artifactId>org.eclipse.jdt.core</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-
-          <dependency>
-            <groupId>org.eclipse.jdt.core.compiler</groupId>
-            <artifactId>ecj</artifactId>
-            <version>${org.eclipse.jdt.version}</version>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-eclipse</artifactId>
+            <version>${org.codehaus.plexus.compiler.eclipse.version}</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -513,11 +498,11 @@
         <version>${apache.commons.logging.version}</version>
       </dependency>
 
-<!--       <dependency> -->
-<!--         <groupId>org.apache.commons</groupId> -->
-<!--         <artifactId>commons-csv</artifactId> -->
-<!--         <version>1.4</version> -->
-<!--       </dependency> -->
+      <!-- <dependency> -->
+      <!-- <groupId>org.apache.commons</groupId> -->
+      <!-- <artifactId>commons-csv</artifactId> -->
+      <!-- <version>1.4</version> -->
+      <!-- </dependency> -->
 
       <dependency>
         <groupId>org.bouncycastle</groupId>
@@ -627,14 +612,14 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-plugin-api</artifactId>
         <version>3.5.0</version>
-<!--         <version>${org.apache.maven.version}</version> -->
+        <!-- <version>${org.apache.maven.version}</version> -->
       </dependency>
 
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-project</artifactId>
         <version>2.2.1</version>
-<!--         <version>${org.apache.maven.version}</version> -->
+        <!-- <version>${org.apache.maven.version}</version> -->
       </dependency>
 
       <dependency>
@@ -807,15 +792,21 @@
       </dependency>
 
       <dependency>
-        <groupId>Jama</groupId>
-        <artifactId>Jama</artifactId>
-        <version>1.0.2</version>
-      </dependency>
-
-      <dependency>
         <groupId>net.sf.geographiclib</groupId>
         <artifactId>GeographicLib-Java</artifactId>
         <version>1.49</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.igniterealtime.smack</groupId>
+        <artifactId>smackx</artifactId>
+        <version>3.2.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.igniterealtime.smack</groupId>
+        <artifactId>smack</artifactId>
+        <version>3.2.1</version>
       </dependency>
 
     </dependencies>
@@ -825,11 +816,11 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <net.anwiba.version>1.0.68</net.anwiba.version>
+    <net.anwiba.version>1.0.76</net.anwiba.version>
     <url.net.anwiba>https://github.com/AndreasWBartels</url.net.anwiba>
     <net.anwiba.commons.version>${net.anwiba.version}</net.anwiba.commons.version>
     <net.anwiba.spatial.version>${net.anwiba.version}</net.anwiba.spatial.version>
-    <net.anwiba.plugins.version>1.0.68</net.anwiba.plugins.version>
+    <net.anwiba.plugins.version>1.0.76</net.anwiba.plugins.version>
     <scm.url.net.anwiba.base>scm:git:ssh://github.com:AndreasWBartels</scm.url.net.anwiba.base>
     <scm.url.net.anwiba.master>${url.net.anwiba}/libraries/tree/master</scm.url.net.anwiba.master>
 
@@ -865,7 +856,7 @@
     <org.apache.maven.annotation.version>3.5</org.apache.maven.annotation.version>
     <org.apache.maven.plugin.version>3.5.0</org.apache.maven.plugin.version>
     <org.apache.maven.project.version>2.2.1</org.apache.maven.project.version>
-    <org.apache.maven.compiler.version>2.3.2</org.apache.maven.compiler.version>
+    <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
     <org.apache.maven.dependency.version>2.10</org.apache.maven.dependency.version>
     <org.apache.maven.jar.version>2.4</org.apache.maven.jar.version>
     <org.apache.maven.jarsigner.version>1.4</org.apache.maven.jarsigner.version>
@@ -874,10 +865,21 @@
     <org.apache.maven.surefire.version>2.13</org.apache.maven.surefire.version>
     <org.apache.maven.source.version>2.1.2</org.apache.maven.source.version>
     <org.apache.maven.site.plugin.version>3.3</org.apache.maven.site.plugin.version>
+
+    <!-- <org.apache.maven.dependency.version>3.0.2</org.apache.maven.dependency.version> -->
+    <!-- <org.apache.maven.jar.version>3.0.2</org.apache.maven.jar.version> -->
+    <!-- <org.apache.maven.jarsigner.version>1.4</org.apache.maven.jarsigner.version> -->
+    <!-- <org.apache.maven.project.info.reports.version>2.9</org.apache.maven.project.info.reports.version> -->
+    <!-- <org.apache.maven.resources.version> 3.0.2</org.apache.maven.resources.version> -->
+    <!-- <org.apache.maven.surefire.version>2.20.1</org.apache.maven.surefire.version> -->
+    <!-- <org.apache.maven.source.version>3.0.1</org.apache.maven.source.version> -->
+    <!-- <org.apache.maven.site.plugin.version>3.6</org.apache.maven.site.plugin.version> -->
+
     <org.assertj.core.version>3.8.0</org.assertj.core.version>
     <org.bouncycastle.version>1.58</org.bouncycastle.version>
     <org.codehaus.jackson.version>1.9.11</org.codehaus.jackson.version>
     <org.codehaus.mojo.findbugs.maven.plugin>2.5.2</org.codehaus.mojo.findbugs.maven.plugin>
+    <org.codehaus.plexus.compiler.eclipse.version>2.8.2</org.codehaus.plexus.compiler.eclipse.version>
     <org.eclipse.jdt.version>4.5</org.eclipse.jdt.version>
     <org.hamcrest.version>1.3</org.hamcrest.version>
     <org.jfrog.maven.annomojo.version>1.3.1</org.jfrog.maven.annomojo.version>

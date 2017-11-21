@@ -48,19 +48,16 @@ public final class DocumentSearchEngine implements ISearchEngine<String, IString
     this.document = document;
     this.document.addDocumentListener(new DocumentListener() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void removeUpdate(final DocumentEvent e) {
         update();
       }
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void insertUpdate(final DocumentEvent e) {
         update();
       }
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public void changedUpdate(final DocumentEvent e) {
         update();

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -23,6 +23,7 @@ package net.anwiba.commons.utilities.registry;
 
 import net.anwiba.commons.lang.collection.ObjectCollection;
 import net.anwiba.commons.lang.functional.IApplicable;
+import net.anwiba.commons.lang.stream.Streams;
 
 public class AbstractApplicableRegistry<I, O extends IApplicable<I>> extends ObjectCollection<O>
     implements
@@ -36,11 +37,6 @@ public class AbstractApplicableRegistry<I, O extends IApplicable<I>> extends Obj
 
   @Override
   public O get(final I context) {
-    for (final O applicable : this) {
-      if (applicable.isApplicable(context)) {
-        return applicable;
-      }
-    }
-    return this.defaultFactory;
+    return Streams.of(this).filter(factory -> factory.isApplicable(context)).first().getOr(() -> this.defaultFactory);
   }
 }

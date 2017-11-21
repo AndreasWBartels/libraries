@@ -36,6 +36,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 import net.anwiba.commons.lang.functional.IBlock;
+import net.anwiba.commons.lang.functional.IClosure;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.message.IMessage;
@@ -48,11 +49,10 @@ import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class ConfigurableDialogLauncher {
 
-  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
-      .getLogger(ConfigurableDialogLauncher.class);
   private final DialogConfigurationBuilder dialogConfigurationBuilder = new DialogConfigurationBuilder();
   private final List<IBlock<RuntimeException>> onCloseExecutables = new ArrayList<>();
   private final List<IProcedure<ConfigurableDialog, RuntimeException>> beforeShowExecutables = new ArrayList<>();
+  private boolean isProgressDialogEnabled = false;
 
   public ConfigurableDialogLauncher setDialogIcon(final GuiIcon icon) {
     this.dialogConfigurationBuilder.setDialogIcon(icon);
@@ -148,27 +148,32 @@ public class ConfigurableDialogLauncher {
     GuiUtilities.invokeAndWait(() -> {
       try {
         final IDialogConfiguration configuration = ConfigurableDialogLauncher.this.dialogConfigurationBuilder.build();
-        final ConfigurableDialog dialog = new ProgressDialogLauncher<>((progressMonitor, canceler) -> {
+
+        final IClosure<ConfigurableDialog, RuntimeException> closure = () -> {
           final ConfigurableDialog configurableDialog = new ConfigurableDialog(owner, configuration);
           configurableDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-          if (ModalityType.MODELESS.equals(configuration.getModalityType())) {
-            configurableDialog.addWindowListener(new WindowAdapter() {
+          configurableDialog.addWindowListener(new WindowAdapter() {
 
-              @Override
-              public void windowClosed(final WindowEvent e) {
-                ConfigurableDialogLauncher.this.onCloseExecutables.stream().forEach(b -> b.execute());
-              }
-            });
-          }
+            @Override
+            public void windowClosed(final WindowEvent e) {
+              ConfigurableDialogLauncher.this.onCloseExecutables.stream().forEach(b -> b.execute());
+            }
+          });
           ConfigurableDialogLauncher.this.beforeShowExecutables.stream().forEach(b -> b.execute(configurableDialog));
           return configurableDialog;
-        }).setTitle(configuration.getTitle()).setText("Initialize").setDescription("").launch(owner);
+        };
+
+        final ProgressDialogLauncher<ConfigurableDialog, RuntimeException> progressDialogLauncher = new ProgressDialogLauncher<>(
+            (progressMonitor, canceler) -> {
+              return closure.execute();
+            });
+        final ConfigurableDialog dialog = this.isProgressDialogEnabled
+            ? progressDialogLauncher.setTitle(configuration.getTitle()).setText("Initialize").setDescription("").launch(
+                owner)
+            : closure.execute();
 
         dialog.toFront();
         dialog.setVisible(true);
-        if (!ModalityType.MODELESS.equals(configuration.getModalityType())) {
-          this.onCloseExecutables.stream().forEach(b -> b.execute());
-        }
         model.set(dialog.getResult());
       } catch (final InterruptedException exception) {
         model.set(DialogResult.CANCEL);
@@ -195,6 +200,16 @@ public class ConfigurableDialogLauncher {
 
   public ConfigurableDialogLauncher setMessagePanelDisabled() {
     this.dialogConfigurationBuilder.setMessagePanelEnabled(false);
+    return this;
+  }
+
+  public ConfigurableDialogLauncher setProgressDialogEnabled() {
+    this.isProgressDialogEnabled = true;
+    return this;
+  }
+
+  public ConfigurableDialogLauncher setProgressDialogDisabled() {
+    this.isProgressDialogEnabled = false;
     return this;
   }
 

@@ -29,8 +29,8 @@ import java.net.URI;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
-import net.anwiba.commons.process.cancel.ICanceler;
 import net.anwiba.commons.resource.reference.IStreamConnector;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public final class HttpClientConnector implements IStreamConnector<URI> {
 

@@ -23,6 +23,8 @@ package net.anwiba.commons.swing.dialog.wizard;
 
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -34,6 +36,7 @@ import net.anwiba.commons.logging.Logging;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.dialog.DataState;
 import net.anwiba.commons.swing.dialog.DialogMessages;
 import net.anwiba.commons.swing.dialog.DialogType;
@@ -65,6 +68,8 @@ public class WizardDialog extends MessageDialog {
         IMessageConstants.EMPTY_MESSAGE,
         GuiIcons.EMPTY_ICON.getLargeIcon(),
         DialogType.NONE,
+        Collections.emptyList(),
+        new ObjectModel<>(),
         true);
     this.controller = controller;
     this.controller.addChangeListener(new IChangeableObjectListener() {
@@ -110,15 +115,20 @@ public class WizardDialog extends MessageDialog {
   @Override
   protected Action[] getActions(
       final DialogType dialogType,
-      final IObjectModel<IDialogResult> dialogResultModel,
-      final List<IAdditionalActionFactory> additionalActionFactories) {
-    final Action[] actions;
-    actions = new Action[4];
-    actions[0] = getBackAction();
-    actions[1] = getNextAction();
-    actions[2] = getCancelAction();
-    actions[3] = getOkAction(DialogMessages.FINISH);
-    return actions;
+      final IObjectModel<IDialogResult> resultModel,
+      final List<IAdditionalActionFactory> additionalActionFactories,
+      final IObjectModel<DataState> dataStateModel) {
+    final List<Action> actions = new LinkedList<>();
+    for (final IAdditionalActionFactory actionFactory : additionalActionFactories) {
+      actions.add(actionFactory.create(resultModel, dataStateModel, () -> {
+        setVisible(false);
+      }));
+    }
+    actions.add(getBackAction());
+    actions.add(getNextAction());
+    actions.add(getCancelAction());
+    actions.add(getOkAction(DialogMessages.FINISH));
+    return actions.stream().toArray(Action[]::new);
   }
 
   final public Action getNextAction() {
@@ -180,7 +190,6 @@ public class WizardDialog extends MessageDialog {
   }
 
   final protected void updateState() {
-    final IWizardState wizardState = this.controller.getWizardState();
     setIcon(this.controller.getIcon());
     setMessage(this.controller.getMessage());
     setContentPane(this.controller.getContentPane());
@@ -224,8 +233,8 @@ public class WizardDialog extends MessageDialog {
   }
 
   final protected void updateNextAction(final Action action) {
-    GuiUtilities
-        .invokeLater(() -> action.setEnabled(this.controller.hasNext() && this.controller.getNextEnabledDistributor().get()));
+    GuiUtilities.invokeLater(
+        () -> action.setEnabled(this.controller.hasNext() && this.controller.getNextEnabledDistributor().get()));
   }
 
   final protected void updateBackAction(final Action action) {

@@ -22,7 +22,7 @@
 // Copyright (c) 2010 by Andreas W. Bartels (bartels@anwiba.de)
 package net.anwiba.eclipse.icons.description;
 
-import net.anwiba.commons.process.cancel.ICanceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.eclipse.icons.io.IconContext;
 import net.anwiba.tools.icons.configuration.generated.Class;
 

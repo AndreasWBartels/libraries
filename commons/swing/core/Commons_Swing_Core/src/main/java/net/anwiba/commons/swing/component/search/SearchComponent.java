@@ -33,6 +33,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.model.IChangeableObjectListener;
@@ -47,7 +48,6 @@ import net.anwiba.commons.swing.object.IObjectFieldConfiguration;
 import net.anwiba.commons.swing.object.StringField;
 import net.anwiba.commons.swing.object.StringObjectFieldConfigurationBuilder;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
-import net.anwiba.commons.utilities.factory.IFactory;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class SearchComponent<C, R> implements IComponentProvider {

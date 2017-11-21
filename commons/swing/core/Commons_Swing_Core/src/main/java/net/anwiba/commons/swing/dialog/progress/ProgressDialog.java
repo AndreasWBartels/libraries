@@ -36,15 +36,15 @@ import net.anwiba.commons.lang.object.ObjectContainer;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageType;
-import net.anwiba.commons.process.cancel.Canceler;
-import net.anwiba.commons.process.cancel.ICanceler;
-import net.anwiba.commons.progress.IProgressMonitor;
-import net.anwiba.commons.progress.IProgressTask;
 import net.anwiba.commons.swing.dialog.DialogResult;
 import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.MessageDialog;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
+import net.anwiba.commons.thread.cancel.Canceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.commons.thread.progress.IProgressMonitor;
+import net.anwiba.commons.thread.progress.IProgressTask;
 
 public class ProgressDialog extends MessageDialog implements IProgressBarParent {
 

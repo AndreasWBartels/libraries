@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -28,15 +28,9 @@ import static org.junit.Assert.*;
 import java.text.MessageFormat;
 import java.util.Optional;
 
-import net.anwiba.commons.lang.functional.IFunction;
-import net.anwiba.commons.lang.visitor.ClassSwitches;
-import net.anwiba.commons.lang.visitor.ClosurVisitor;
-import net.anwiba.commons.lang.visitor.EnumSwitches;
-import net.anwiba.commons.lang.visitor.EnumVisitors;
-import net.anwiba.commons.lang.visitor.FunctionSwitch;
-import net.anwiba.commons.lang.visitor.FunctionVisitor;
-
 import org.junit.Test;
+
+import net.anwiba.commons.lang.functional.IFunction;
 
 public class VisitorTest {
 
@@ -47,7 +41,7 @@ public class VisitorTest {
   @Test
   public void closur() throws Exception {
     final ClosurVisitor<VisitorTestEnum, VisitorTestEnum, RuntimeException> visitor = EnumVisitors //
-        .ifCase(() -> ONE, ONE)
+        .<VisitorTestEnum, VisitorTestEnum, RuntimeException> ifCase(() -> ONE, ONE)
         .ifCase(() -> THREE, TWO)
         .defaultCase(() -> FOUR);
     assertThat(visitor.accept(ONE), equalTo(ONE));
@@ -83,7 +77,8 @@ public class VisitorTest {
 
     final int value = 5;
     final FunctionSwitch<VisitorTestEnum, VisitorTestEnum, Integer, Exception> enumSwitch = EnumSwitches.create();
-    enumSwitch.ifCase(i -> value, ONE) //
+    enumSwitch
+        .ifCase(i -> value, ONE) //
         .ifCase(i -> value * 2, TWO, THREE)
         .defaultCase(i -> 0);
 
@@ -93,8 +88,9 @@ public class VisitorTest {
     assertThat(enumSwitch.switchTo(FOUR), equalTo(0));
 
     final FunctionSwitch<String, Object, Integer, Exception> stringSwitch //
-    = new FunctionSwitch<>(input -> Optional.of(input).map(Object::toString).get());
-    stringSwitch.ifCase(i -> value, ONE.name()) //
+        = new FunctionSwitch<>(input -> Optional.of(input).map(Object::toString).get());
+    stringSwitch
+        .ifCase(i -> value, ONE.name()) //
         .ifCase(i -> value * 2, TWO.name())
         .defaultCase(i -> 0);
 

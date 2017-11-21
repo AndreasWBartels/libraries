@@ -27,96 +27,174 @@ import java.util.List;
 
 import javax.swing.ListSelectionModel;
 
+import net.anwiba.commons.lang.comparable.NumberComparator;
+import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.swing.table.action.ITableActionFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
+import net.anwiba.commons.swing.table.renderer.BooleanRenderer;
+import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
+import net.anwiba.commons.swing.table.renderer.ObjectTableCellRenderer;
 
-public class ObjectTableBuilder<T> {
+public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
 
   final ObjectListTableConfigurationBuilder<T> builder = new ObjectListTableConfigurationBuilder<>();
   private final List<T> values = new ArrayList<>();
 
-  public ObjectTableBuilder<T> setKeyListenerFactory(final IKeyListenerFactory<T> keyListenerFactory) {
+  @Override
+  public IObjectTableBuilder<T> setKeyListenerFactory(final IKeyListenerFactory<T> keyListenerFactory) {
     this.builder.setKeyListenerFactory(keyListenerFactory);
     return this;
   }
 
-  public ObjectTableBuilder<T> setSelectionMode(final int selectionMode) {
+  @Override
+  public IObjectTableBuilder<T> setSelectionMode(final int selectionMode) {
     this.builder.setSelectionMode(selectionMode);
     return this;
   }
 
-  public ObjectTableBuilder<T> addColumnConfiguration(final IObjectListColumnConfiguration<T> columnConfiguration) {
+  @Override
+  public IObjectTableBuilder<T> addColumnConfiguration(final IObjectListColumnConfiguration<T> columnConfiguration) {
     this.builder.addColumnConfiguration(columnConfiguration);
     return this;
   }
 
-  public ObjectTableBuilder<T> addActionFactory(final ITableActionFactory<T> factory) {
+  @Override
+  public IObjectTableBuilder<T> addSortableStringConfiguration(
+
+      final String title,
+      final IFunction<T, String, RuntimeException> provider,
+      final int size) {
+
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new ObjectTableCellRenderer(), size, String.class, true, null));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addSortableDoubleConfiguration(
+      final String title,
+      final IFunction<T, Double, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new NumberTableCellRenderer("0.0000"), size, Double.class, true, new NumberComparator())); //$NON-NLS-1$
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addSortableBooleanConfiguration(
+      final String title,
+      final IFunction<T, Boolean, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new BooleanRenderer(), size, Boolean.class, true, null));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addActionFactory(final ITableActionFactory<T> factory) {
     this.builder.addActionFactory(factory);
     return this;
   }
 
-  public ObjectTableBuilder<T> setPreferredVisibleRowCount(final int preferredVisibleRowCount) {
+  @Override
+  public IObjectTableBuilder<T> setPreferredVisibleRowCount(final int preferredVisibleRowCount) {
     this.builder.setPreferredVisibleRowCount(preferredVisibleRowCount);
     return this;
   }
 
-  public ObjectTableBuilder<T> setMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
+  @Override
+  public IObjectTableBuilder<T> setMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
     this.builder.setMouseListenerFactory(mouseListenerFactory);
     return this;
   }
 
-  public ObjectTableBuilder<T> addAddObjectAction(final IColumnObjectFactory<T, T, RuntimeException> factory) {
+  @Override
+  public IObjectTableBuilder<T> addAddObjectAction(final IColumnObjectFactory<T, T, RuntimeException> factory) {
     this.builder.addAddObjectAction(factory);
     return this;
   }
 
-  public ObjectTableBuilder<T> addEditObjectAction(final IColumnObjectFactory<T, T, RuntimeException> factory) {
+  @Override
+  public IObjectTableBuilder<T> addEditObjectAction(final IColumnObjectFactory<T, T, RuntimeException> factory) {
     this.builder.addEditObjectAction(factory);
     return this;
   }
 
-  public ObjectTableBuilder<T> addRemoveObjectsAction() {
+  @Override
+  public IObjectTableBuilder<T> addRemoveObjectsAction() {
     this.builder.addRemoveObjectsAction();
     return this;
   }
 
-  public ObjectTableBuilder<T> addMoveObjectUpAction() {
+  @Override
+  public IObjectTableBuilder<T> addMoveObjectUpAction() {
     this.builder.addMoveObjectUpAction();
     return this;
   }
 
-  public ObjectTableBuilder<T> addMoveObjectDownAction() {
+  @Override
+  public IObjectTableBuilder<T> addMoveObjectDownAction() {
     this.builder.addMoveObjectDownAction();
     return this;
   }
 
-  public ObjectTableBuilder<T> setFilterToStringConverter(final IColumToStringConverter columnToStringConverter) {
+  @Override
+  public IObjectTableBuilder<T> setFilterToStringConverter(final IColumToStringConverter columnToStringConverter) {
     this.builder.setFilterToStringConverter(columnToStringConverter);
     return this;
   }
 
-  public ObjectTableBuilder<T> setValues(final List<T> values) {
+  @Override
+  public IObjectTableBuilder<T> setValues(final List<T> values) {
     this.values.clear();
     this.values.addAll(values);
     return this;
   }
 
-  public ObjectTableBuilder<T> addValue(final T value) {
+  @Override
+  public IObjectTableBuilder<T> addValue(final T value) {
     this.values.add(value);
     return this;
   }
 
+  @Override
   public ObjectListTable<T> build() {
     final IObjectListTableConfiguration<T> configuration = this.builder.build();
     return new ObjectListTable<>(configuration, this.values);
   }
 
-  public ObjectTableBuilder<T> setSingleSelectionMode() {
+  @Override
+  public IObjectTableBuilder<T> setSingleSelectionMode() {
     this.builder.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     return this;
   }
 
-  public ObjectTableBuilder<T> setAutoResizeModeOff() {
+  @Override
+  public IObjectTableBuilder<T> setAutoResizeModeOff() {
     this.builder.setAutoResizeModeOff();
     return this;
   }

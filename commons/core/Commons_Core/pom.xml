@@ -10,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-core</artifactId>
-    <version>1.0.68</version>
+    <version>1.0.76</version>
   </parent>
 
   <scm>
@@ -52,6 +52,30 @@
     </dependency>
 
     <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-message</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-model</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-nls</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-thread</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
@@ -77,8 +101,9 @@
           <useBaseVersion>true</useBaseVersion>
           <artifactSet>
             <excludes>
-              <exclude>commons-logging:commons-logging</exclude>
-              <exclude>log4j:log4j:jar:</exclude>
+              <dependencySourceExclude>commons-lang:*</dependencySourceExclude>
+              <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
+              <dependencySourceExclude>log4j:*</dependencySourceExclude>
             </excludes>
           </artifactSet>
         </configuration>
@@ -106,9 +131,9 @@
               <includeDependencySources>true</includeDependencySources>
 
               <dependencySourceExcludes>
+                <dependencySourceExclude>commons-lang:*</dependencySourceExclude>
                 <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
                 <dependencySourceExclude>log4j:*</dependencySourceExclude>
-
               </dependencySourceExcludes>
             </configuration>
           </execution>

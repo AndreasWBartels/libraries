@@ -23,7 +23,7 @@
 package net.anwiba.eclipse.icons.view.listener;
 
 import net.anwiba.commons.eclipse.utilities.JavaProjectUtilities;
-import net.anwiba.commons.process.cancel.Canceler;
+import net.anwiba.commons.thread.cancel.Canceler;
 import net.anwiba.eclipse.icons.GuiIconsViewPlugin;
 import net.anwiba.eclipse.icons.description.IGuiIconDescription;
 import net.anwiba.eclipse.icons.runner.UpdateRunner;

@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.http;
 
-import net.anwiba.commons.process.cancel.ICanceler;
-
 import java.io.IOException;
+
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public interface IHttpRequestExecutor {
 

@@ -8,9 +8,9 @@
 
   <artifactId>anwiba-spatial-data-gpsd</artifactId>
   <parent>
-    <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
-    <version>1.0.68</version>
+    <groupId>net.anwiba.spatial</groupId>
+    <version>1.0.76</version>
   </parent>
 
   <scm>

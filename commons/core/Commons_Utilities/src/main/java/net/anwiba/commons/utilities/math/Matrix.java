@@ -57,10 +57,37 @@ public class Matrix {
   }
 
   public Matrix multiply(final Matrix other) {
-    if (other.m != this.n) {
+    if (other.n != this.m) {
       throw new IllegalArgumentException();
     }
-    return matrix(multiply(this.n, this.m, other.n, this.values, other.values));
+    return matrix(multiply(this.n, this.m, other.m, this.values, other.values));
+  }
+
+  static public double[][] multiply(
+      final int n,
+      final int m,
+      final int p,
+      final double[][] matrix,
+      final double[][] other) {
+    final double[][] result = new double[n][p];
+
+    final double[] otherVector = new double[m];
+
+    double sum = 0.0;
+    for (int j = 0; j < p; j++) {
+      for (int k = 0; k < m; k++) {
+        otherVector[k] = other[k][j];
+      }
+      for (int i = 0; i < n; i++) {
+        final double[] vector = matrix[i];
+        sum = 0.0;
+        for (int k = 0; k < m; k++) {
+          sum += vector[k] * otherVector[k];
+        }
+        result[i][j] = sum;
+      }
+    }
+    return result;
   }
 
   private void check(final Matrix other) {
@@ -69,9 +96,22 @@ public class Matrix {
     }
   }
 
-  public Matrix sumate(final Matrix other) {
+  public Matrix summate(final double value) {
+    return matrix(summate(this.n, this.m, this.values, value));
+  }
+
+  public Matrix summate(final Matrix other) {
     check(other);
     return matrix(summate(this.n, this.m, this.values, other.values));
+  }
+
+  public Matrix subtract(final double value) {
+    return matrix(subtract(this.n, this.m, this.values, value));
+  }
+
+  public Matrix subtract(final Matrix other) {
+    check(other);
+    return matrix(subtract(this.n, this.m, this.values, other.values));
   }
 
   static public double[][] copy(final int n, final int m, final double[][] source) {
@@ -144,31 +184,21 @@ public class Matrix {
     return result;
   }
 
-  static public double[][] multiply(
-      final int n,
-      final int m,
-      final int p,
-      final double[][] matrix,
-      final double[][] other) {
-    final double[][] result = new double[n][p];
-    double sum = 0.0;
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < p; j++) {
-        sum = 0.0;
-        for (int k = 0; k < m; k++) {
-          sum += matrix[i][k] * other[k][j];
-        }
-        result[i][j] = sum;
-      }
-    }
-    return result;
-  }
-
   static public double[][] summate(final int n, final int m, final double[][] matrix, final double[][] other) {
     final double[][] result = new double[n][m];
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < m; j++) {
         result[i][j] = matrix[i][j] + other[i][j];
+      }
+    }
+    return result;
+  }
+
+  static public double[][] summate(final int n, final int m, final double[][] matrix, final double value) {
+    final double[][] result = new double[n][m];
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        result[i][j] = matrix[i][j] + value;
       }
     }
     return result;

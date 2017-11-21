@@ -106,17 +106,18 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
 
   public void removeAll() {
     int rows = 0;
+    final List<T> objects;
     synchronized (this) {
       rows = getSize();
       if (rows == 0) {
         return;
       }
-      final List<T> objects = new ArrayList<>(this.objects);
+      objects = new ArrayList<>(this.objects);
       this.objects.clear();
       this.indexByobjectMap.clear();
     }
     fireIntervalRemoved(this, 0, rows - 1);
-    fireObjectRemoved(this.objects);
+    fireObjectRemoved(objects);
   }
 
   @Override

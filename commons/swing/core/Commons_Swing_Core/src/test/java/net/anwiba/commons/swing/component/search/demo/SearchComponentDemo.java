@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -22,6 +22,7 @@
 package net.anwiba.commons.swing.component.search.demo;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -33,7 +34,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.text.Caret;
 
+import org.junit.runner.RunWith;
+
+import de.jdemo.annotation.Demo;
+import de.jdemo.extensions.SwingDemoCase;
+import de.jdemo.junit.DemoAsTestRunner;
+import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.swing.component.search.ISearchEngine;
@@ -41,15 +49,8 @@ import net.anwiba.commons.swing.component.search.SearchComponent;
 import net.anwiba.commons.swing.component.search.text.DocumentSearchEngine;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
-import net.anwiba.commons.utilities.factory.IFactory;
 import net.anwiba.commons.utilities.string.IStringPart;
 import net.anwiba.commons.utilities.string.StringUtilities;
-
-import org.junit.runner.RunWith;
-
-import de.jdemo.annotation.Demo;
-import de.jdemo.extensions.SwingDemoCase;
-import de.jdemo.junit.DemoAsTestRunner;
 
 @RunWith(DemoAsTestRunner.class)
 @SuppressWarnings("nls")
@@ -91,11 +92,11 @@ public class SearchComponentDemo extends SwingDemoCase {
 
   public static final class ResultMarker implements IChangeableObjectListener {
     private final ISearchEngine<String, IStringPart> engine;
-    private final JTextArea textArea;
+    private final Caret caret;
 
-    public ResultMarker(final ISearchEngine<String, IStringPart> engine, final JTextArea textArea) {
+    public ResultMarker(final ISearchEngine<String, IStringPart> engine, final Caret caret) {
       this.engine = engine;
-      this.textArea = textArea;
+      this.caret = caret;
     }
 
     @Override
@@ -104,14 +105,14 @@ public class SearchComponentDemo extends SwingDemoCase {
       if (part == null) {
         return;
       }
-      final JTextArea textArea = this.textArea;
       GuiUtilities.invokeLater(new Runnable() {
 
         @Override
         public void run() {
-          textArea.setCaretPosition(part.getPosition() + part.getLength());
-          textArea.moveCaretPosition(part.getPosition());
-          textArea.validate();
+          ResultMarker.this.caret.setVisible(true);
+          ResultMarker.this.caret.setSelectionVisible(true);
+          ResultMarker.this.caret.setDot(part.getPosition());
+          ResultMarker.this.caret.moveDot(part.getPosition() + part.getLength());
         }
       });
     }
@@ -155,16 +156,23 @@ public class SearchComponentDemo extends SwingDemoCase {
     final JTextArea textArea = new JTextArea(text);
     textArea.setWrapStyleWord(true);
     textArea.setLineWrap(true);
+    textArea.setCaretColor(Color.BLACK);
+    final Caret caret = textArea.getCaret();
+    caret.setVisible(true);
+    caret.setSelectionVisible(true);
+
     final JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setPreferredSize(new Dimension(400, 300));
     contentPane.add(scrollPane, BorderLayout.CENTER);
     final ISearchEngine<String, IStringPart> engine = new DocumentSearchEngine(textArea.getDocument());
     final IFactory<String, String, RuntimeException> stringToConditionFactory = new StringConditonFactory();
 
-    final SearchComponent<String, IStringPart> searchComponent = new SearchComponent<>(engine, stringToConditionFactory);
+    final SearchComponent<String, IStringPart> searchComponent = new SearchComponent<>(
+        engine,
+        stringToConditionFactory);
     final JToolBar toolbar = new JToolBar();
     toolbar.add(new ActivatSearchAction(null, GuiIcons.SEARCH_ICON.getSmallIcon(), searchComponent, contentPane));
-    engine.getResultCursorModel().addChangeListener(new ResultMarker(engine, textArea));
+    engine.getResultCursorModel().addChangeListener(new ResultMarker(engine, caret));
 
     contentPane.add(toolbar, BorderLayout.NORTH);
     show(contentPane);

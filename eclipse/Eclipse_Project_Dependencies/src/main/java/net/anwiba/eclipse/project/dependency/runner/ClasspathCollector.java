@@ -21,7 +21,7 @@
  */
 package net.anwiba.eclipse.project.dependency.runner;
 
-import net.anwiba.commons.process.cancel.ICanceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.eclipse.project.dependency.java.IDependency;
 import net.anwiba.eclipse.project.dependency.java.ILibrary;
 

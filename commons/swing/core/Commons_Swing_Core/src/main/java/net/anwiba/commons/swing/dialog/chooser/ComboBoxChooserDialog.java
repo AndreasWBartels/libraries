@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -65,7 +66,6 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
 
   IInputListener inputListener = new IInputListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void inputHappened() {
       setMessage(ComboBoxChooserDialog.this.chooserPanel.getMessage());
@@ -74,7 +74,6 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
 
   private final IChangeableObjectListener valueChangeListener = new IChangeableObjectListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void objectChanged() {
       if (!ComboBoxChooserDialog.this.validStateModel.get().isValid()) {
@@ -93,7 +92,6 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
 
   private final IChangeableObjectListener validateStateListener = new IChangeableObjectListener() {
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void objectChanged() {
       setMessage(ComboBoxChooserDialog.this.chooserPanel.getMessage());
@@ -119,6 +117,8 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
         IMessageConstants.EMPTY_MESSAGE,
         GuiIcons.EMPTY_ICON.getLargeIcon(),
         configuration.getDialogType(),
+        Collections.emptyList(),
+        new ObjectModel<>(),
         true);
     this.valueModel.set(configuration.getPresetValue());
     createGui(configuration);
@@ -195,10 +195,11 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
         setMessage(Message.create(this.chooserPanel.getMessage().getText(), "successful")); //$NON-NLS-1$
         return true;
       }
-      setMessage(Message.create(
-          this.chooserPanel.getMessage().getText(),
-          "The connection attempt failed.", //$NON-NLS-1$
-          MessageType.ERROR));
+      setMessage(
+          Message.create(
+              this.chooserPanel.getMessage().getText(),
+              "The connection attempt failed.", //$NON-NLS-1$
+              MessageType.ERROR));
       setOkEnabled(false);
       return false;
     } catch (final InterruptedException exception) {

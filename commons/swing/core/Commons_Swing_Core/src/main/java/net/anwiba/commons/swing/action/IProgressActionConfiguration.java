@@ -22,7 +22,7 @@
 package net.anwiba.commons.swing.action;
 
 import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.progress.AbstractProgressTask;
+import net.anwiba.commons.thread.progress.AbstractProgressTask;
 
 public interface IProgressActionConfiguration {
 

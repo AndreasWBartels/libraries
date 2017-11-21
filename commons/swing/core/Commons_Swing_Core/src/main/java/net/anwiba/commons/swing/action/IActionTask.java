@@ -24,7 +24,7 @@ package net.anwiba.commons.swing.action;
 import java.lang.reflect.InvocationTargetException;
 
 import net.anwiba.commons.message.IMessageCollector;
-import net.anwiba.commons.process.cancel.ICanceler;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 @FunctionalInterface
 public interface IActionTask<I, O> {

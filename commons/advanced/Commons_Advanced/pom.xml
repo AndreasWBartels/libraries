@@ -10,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-advanced</artifactId>
-    <version>1.0.68</version>
+    <version>1.0.76</version>
   </parent>
 
   <scm>
@@ -34,31 +34,7 @@
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-message</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-model</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-nls</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-preferences</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-process</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
 
@@ -77,6 +53,36 @@
     <dependency>
       <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-core</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-crypto</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-jdbc</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-mail</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-xml</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-xxmp</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
 
@@ -135,10 +141,19 @@
 
               <dependencySourceExcludes>
                 <dependencySourceExclude>com.fasterxml.jackson.core:*</dependencySourceExclude>
-                <dependencySourceExclude>com.sun.media:*</dependencySourceExclude>
+                <dependencySourceExclude>commons-codec:*</dependencySourceExclude>
+                <dependencySourceExclude>commons-lang:*</dependencySourceExclude>
                 <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
-                <dependencySourceExclude>log4j:*</dependencySourceExclude>
+                <dependencySourceExclude>com.sun.media:*</dependencySourceExclude>
+                <dependencySourceExclude>javax.activation:*</dependencySourceExclude>
+                <dependencySourceExclude>javax.mail:*</dependencySourceExclude>
                 <dependencySourceExclude>javax.media:*</dependencySourceExclude>
+                <dependencySourceExclude>jaxen:jaxen:*</dependencySourceExclude>
+                <dependencySourceExclude>log4j:log4j:*</dependencySourceExclude>
+                <dependencySourceExclude>org.apache.httpcomponents:*</dependencySourceExclude>
+                <dependencySourceExclude>org.bouncycastle:*</dependencySourceExclude>
+                <dependencySourceExclude>org.dom4j:*</dependencySourceExclude>
+                <dependencySourceExclude>org.igniterealtime.smack:*</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-ensure</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-lang</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-logging</dependencySourceExclude>
@@ -146,7 +161,10 @@
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-resource</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-utilities</dependencySourceExclude>
                 <dependencySourceExclude>net.anwiba.commons:anwiba-commons-core</dependencySourceExclude>
-                <dependencySourceExclude>org.apache.httpcomponents:httpclient</dependencySourceExclude>
+                <dependencySourceExclude>net.anwiba.commons:anwiba-commons-message</dependencySourceExclude>
+                <dependencySourceExclude>net.anwiba.commons:anwiba-commons-model</dependencySourceExclude>
+                <dependencySourceExclude>net.anwiba.commons:anwiba-commons-nls</dependencySourceExclude>
+                <dependencySourceExclude>net.anwiba.commons:anwiba-commons-thread</dependencySourceExclude>
               </dependencySourceExcludes>
             </configuration>
           </execution>
@@ -165,10 +183,19 @@
           <artifactSet>
             <excludes>
               <dependencySourceExclude>com.fasterxml.jackson.core:*</dependencySourceExclude>
-              <dependencySourceExclude>com.sun.media:*</dependencySourceExclude>
+              <dependencySourceExclude>commons-codec:*</dependencySourceExclude>
+              <dependencySourceExclude>commons-lang:*</dependencySourceExclude>
               <dependencySourceExclude>commons-logging:*</dependencySourceExclude>
-              <dependencySourceExclude>log4j:*</dependencySourceExclude>
+              <dependencySourceExclude>com.sun.media:*</dependencySourceExclude>
+              <dependencySourceExclude>javax.activation:*</dependencySourceExclude>
+              <dependencySourceExclude>javax.mail:*</dependencySourceExclude>
               <dependencySourceExclude>javax.media:*</dependencySourceExclude>
+              <dependencySourceExclude>jaxen:jaxen:*</dependencySourceExclude>
+              <dependencySourceExclude>log4j:log4j:*</dependencySourceExclude>
+              <dependencySourceExclude>org.apache.httpcomponents:*</dependencySourceExclude>
+              <dependencySourceExclude>org.bouncycastle:*</dependencySourceExclude>
+              <dependencySourceExclude>org.dom4j:*</dependencySourceExclude>
+              <dependencySourceExclude>org.igniterealtime.smack:*</dependencySourceExclude>
               <dependencySourceExclude>net.anwiba.commons:anwiba-commons-ensure</dependencySourceExclude>
               <dependencySourceExclude>net.anwiba.commons:anwiba-commons-lang</dependencySourceExclude>
               <dependencySourceExclude>net.anwiba.commons:anwiba-commons-logging</dependencySourceExclude>
@@ -176,7 +203,10 @@
               <dependencySourceExclude>net.anwiba.commons:anwiba-commons-resource</dependencySourceExclude>
               <dependencySourceExclude>net.anwiba.commons:anwiba-commons-utilities</dependencySourceExclude>
               <dependencySourceExclude>net.anwiba.commons:anwiba-commons-core</dependencySourceExclude>
-              <dependencySourceExclude>org.apache.httpcomponents:httpclient</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-message</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-model</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-nls</dependencySourceExclude>
+              <dependencySourceExclude>net.anwiba.commons:anwiba-commons-thread</dependencySourceExclude>
             </excludes>
           </artifactSet>
         </configuration>
