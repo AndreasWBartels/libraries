@@ -16,7 +16,7 @@ Schemas and JSON serializer
     * Nominatim
   * [Open Routing Service (ORS)](https://github.com/AndreasWBartels/libraries/wiki/ORS)
   * [TopoJson](https://github.com/AndreasWBartels/libraries/wiki/TopoJson)
-
+  * [Ckan](https://github.com/AndreasWBartels/libraries/wiki/Ckan)
 
 * [Java preferences](https://github.com/AndreasWBartels/libraries/wiki/Java-Preferences)
 * [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
