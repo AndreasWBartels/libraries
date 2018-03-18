@@ -26,10 +26,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public final class Parameters implements IParameters {
 
-  private static final long serialVersionUID = 655956184779585973L;
+  private static final long serialVersionUID = -1L;
+
   private final List<String> names = new ArrayList<>();
   private final List<IParameter> parameters = new ArrayList<>();
   private final Map<String, IParameter> map = new HashMap<>();
@@ -65,6 +68,12 @@ public final class Parameters implements IParameters {
   }
 
   @Override
+  public IParameters toLowerCase() {
+    return new Parameters(
+        this.parameters.stream().map(p -> new Parameter(p.getName(), p.getValue())).collect(Collectors.toList()));
+  }
+
+  @Override
   public Iterable<String> getNames() {
     return this.names;
   }
@@ -80,5 +89,56 @@ public final class Parameters implements IParameters {
   @Override
   public boolean containts(final String name) {
     return this.map.containsKey(name);
+  }
+
+  @Override
+  public void forEach(final Consumer<IParameter> consumer) {
+    this.parameters.forEach(consumer);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.map == null) ? 0 : this.map.hashCode());
+    result = prime * result + ((this.names == null) ? 0 : this.names.hashCode());
+    result = prime * result + ((this.parameters == null) ? 0 : this.parameters.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final Parameters other = (Parameters) obj;
+    if (this.map == null) {
+      if (other.map != null) {
+        return false;
+      }
+    } else if (!this.map.equals(other.map)) {
+      return false;
+    }
+    if (this.names == null) {
+      if (other.names != null) {
+        return false;
+      }
+    } else if (!this.names.equals(other.names)) {
+      return false;
+    }
+    if (this.parameters == null) {
+      if (other.parameters != null) {
+        return false;
+      }
+    } else if (!this.parameters.equals(other.parameters)) {
+      return false;
+    }
+    return true;
   }
 }

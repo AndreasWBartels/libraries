@@ -9,7 +9,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
-    <version>1.0.76</version>
+    <version>1.0.126</version>
   </parent>
 
   <scm>
@@ -83,7 +83,7 @@
             </goals>
             <configuration>
               <pakkage>net.anwiba.spatial.ors.schema.v04_0</pakkage>
-              <comment>Copyright (c) 2017 by Andreas W. Bartels (bartels@anwiba.de)</comment>
+              <comment>Copyright (c) 2017 by Andreas W. Bartels</comment>
             </configuration>
           </execution>
           <execution>
@@ -94,7 +94,7 @@
             </goals>
             <configuration>
               <pakkage>net.anwiba.spatial.ors.directions.schema.v04_0</pakkage>
-              <comment>Copyright (c) 2017 by Andreas W. Bartels (bartels@anwiba.de)</comment>
+              <comment>Copyright (c) 2017 by Andreas W. Bartels</comment>
             </configuration>
           </execution>
         </executions>

@@ -61,7 +61,8 @@ public class ConfigurableDialog extends AbstractDialog {
         configuration.getActionButtonTextFactory(),
         configuration.getAdditionalActionFactories(),
         contentPane.getDataStateModel(),
-        configuration.getModalityType());
+        configuration.getModalityType(),
+        configuration.getModalExclusionType());
     setIconImage(configuration.getImage());
     this.contentPane = contentPane;
     setContentPane(this.contentPane.getComponent());
@@ -103,14 +104,6 @@ public class ConfigurableDialog extends AbstractDialog {
         }
       }, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
-  }
-
-  @Override
-  public void setVisible(final boolean value) {
-    if (value) {
-      locate();
-    }
-    super.setVisible(value);
   }
 
   @Override

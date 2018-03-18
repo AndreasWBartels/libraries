@@ -15,7 +15,7 @@
           "mimetype": null,
           "cache_url": null,
           "name": null,
-          "language": "de",
+          "language": ["de" ],
           "created": "2017-10-05T10:23:29.112098",
           "url": "http://stadtplan.bonn.de/geojson?Thema=14574&koordsys=25832",
           "webstore_url": null,

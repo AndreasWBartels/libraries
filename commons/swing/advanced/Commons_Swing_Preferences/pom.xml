@@ -8,7 +8,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-swing-advanced</artifactId>
-    <version>1.0.76</version>
+    <version>1.0.126</version>
   </parent>
 
   <scm>
@@ -37,20 +37,15 @@
     </dependency>
 
     <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-model</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>de.jdemo</groupId>
       <artifactId>jdemo-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <projectNameTemplate>Commons_Swing_Preferences</projectNameTemplate>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

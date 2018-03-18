@@ -69,11 +69,11 @@ public final class Complex extends Number {
   }
 
   public boolean isReal() {
-    return 1.E-12 > Math.abs(imaginary());
+    return 1.E-12 > MathWrapper.abs(imaginary());
   }
 
   public double magnitude() {
-    return Math.sqrt(this.real * this.real + this.imaginary * this.imaginary);
+    return MathWrapper.sqrt(this.real * this.real + this.imaginary * this.imaginary);
   }
 
   @Override
@@ -111,7 +111,7 @@ public final class Complex extends Number {
   public Angle angle() {
     Angle result = new Angle();
     try {
-      result = Angle.radian(Math.atan2(this.imaginary, this.real));
+      result = Angle.radian(MathWrapper.atan2(this.imaginary, this.real));
     } catch (final Exception e) {
     }
     return result;
@@ -146,7 +146,7 @@ public final class Complex extends Number {
 
   public Complex divide(final Complex fraction) throws IllegalStateException {
     final double magnitude = fraction.magnitude();
-    if (Math.abs(magnitude) < 1.E-12) {
+    if (MathWrapper.abs(magnitude) < 1.E-12) {
       throw new IllegalStateException("denominator is zero");
     }
     return new Complex(
@@ -155,27 +155,27 @@ public final class Complex extends Number {
   }
 
   public static Complex sin(final Complex value) {
-    final double r = Math.sin(value.real()) * Math.cosh(value.imaginary());
-    final double i = Math.cos(value.real()) * Math.sinh(value.imaginary());
+    final double r = MathWrapper.sin(value.real()) * MathWrapper.cosh(value.imaginary());
+    final double i = MathWrapper.cos(value.real()) * MathWrapper.sinh(value.imaginary());
     return new Complex(r, i);
   }
 
   public static Complex cos(final Complex value) {
-    final double r = Math.cos(value.real()) * Math.cosh(value.imaginary());
-    final double i = -Math.sin(value.real()) * Math.sinh(value.imaginary());
+    final double r = MathWrapper.cos(value.real()) * MathWrapper.cosh(value.imaginary());
+    final double i = -MathWrapper.sin(value.real()) * MathWrapper.sinh(value.imaginary());
     return new Complex(r, i);
   }
 
   public static Complex tan(final Complex value) {
-    final double denominator = Math.cos(2. * value.real()) + Math.cosh(2 * value.imaginary());
-    final double r = Math.sin(2. * value.real()) / denominator;
-    final double i = Math.sinh(2. * value.imaginary()) / denominator;
+    final double denominator = MathWrapper.cos(2. * value.real()) + MathWrapper.cosh(2 * value.imaginary());
+    final double r = MathWrapper.sin(2. * value.real()) / denominator;
+    final double i = MathWrapper.sinh(2. * value.imaginary()) / denominator;
     return new Complex(r, i);
   }
 
   public static Complex pow(final Complex value) {
-    final double exponent = Math.pow(Math.E, value.real());
-    return new Complex(exponent * Math.cos(value.imaginary()), exponent * Math.sin(value.imaginary()));
+    final double exponent = MathWrapper.pow(MathWrapper.E, value.real());
+    return new Complex(exponent * MathWrapper.cos(value.imaginary()), exponent * MathWrapper.sin(value.imaginary()));
   }
 
   public static Complex sinh(final Complex value) {
@@ -183,8 +183,8 @@ public final class Complex extends Number {
   }
 
   public static Complex cosh(final Complex value) {
-    final double r = cosh(value.real()) * Math.cos(value.imaginary());
-    final double i = sinh(value.real()) * Math.sin(value.imaginary());
+    final double r = cosh(value.real()) * MathWrapper.cos(value.imaginary());
+    final double i = sinh(value.real()) * MathWrapper.sin(value.imaginary());
     return new Complex(r, i);
   }
 
@@ -202,29 +202,29 @@ public final class Complex extends Number {
   }
 
   public static double sinh(final double value) {
-    return (0.5 * (Math.exp(value) - Math.exp(-value)));
+    return (0.5 * (MathWrapper.exp(value) - MathWrapper.exp(-value)));
   }
 
   public static double cosh(final double value) {
-    return (0.5 * (Math.exp(value) + Math.exp(-value)));
+    return (0.5 * (MathWrapper.exp(value) + MathWrapper.exp(-value)));
   }
 
   public static Complex exp(final Complex value) {
-    final double rr = Math.exp(value.real()) * Math.cos(value.imaginary());
-    final double ii = Math.exp(value.real()) * Math.sin(value.imaginary());
+    final double rr = MathWrapper.exp(value.real()) * MathWrapper.cos(value.imaginary());
+    final double ii = MathWrapper.exp(value.real()) * MathWrapper.sin(value.imaginary());
     return new Complex(rr, ii);
   }
 
   public static Complex ln(final Complex value) {
-    final double rr = Math.log(value.magnitude()) / Math.log(Math.E);
+    final double rr = MathWrapper.log(value.magnitude()) / MathWrapper.log(MathWrapper.E);
     final double ii = value.angle().radian();
     return new Complex(rr, ii);
   }
 
   public static Complex sqrt(final Complex value) {
-    final double magnitude = Math.sqrt(value.magnitude());
+    final double magnitude = MathWrapper.sqrt(value.magnitude());
     final double phi = value.angle().radian() / 2.;
-    return new Complex(magnitude * Math.cos(phi), magnitude * Math.sin(phi));
+    return new Complex(magnitude * MathWrapper.cos(phi), magnitude * MathWrapper.sin(phi));
   }
 
   public static Complex asin(final Complex value) {
@@ -248,7 +248,7 @@ public final class Complex extends Number {
 
   @Override
   public String toString() {
-    return new String(real() + (imaginary() < 0.0 ? "-" : "+") + Math.abs(imaginary()) + "i");
+    return new String(real() + (imaginary() < 0.0 ? "-" : "+") + MathWrapper.abs(imaginary()) + "i");
   }
 
 }

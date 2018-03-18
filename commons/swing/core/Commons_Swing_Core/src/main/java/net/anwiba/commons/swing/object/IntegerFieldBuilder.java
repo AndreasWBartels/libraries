@@ -22,15 +22,15 @@
 
 package net.anwiba.commons.swing.object;
 
-import java.util.regex.Pattern;
+import java.util.function.Function;
 
-import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons;
 import net.anwiba.commons.utilities.validation.IValidationResult;
-import net.anwiba.commons.utilities.validation.IValidator;
 
 public class IntegerFieldBuilder
     extends
-    AbstractObjectFieldBuilder<Integer, IntegerObjectFieldConfigurationBuilder, IntegerFieldBuilder> {
+    AbstractAlgebraicObjectFieldBuilder<Integer, IntegerObjectFieldConfigurationBuilder, IntegerFieldBuilder> {
 
   public IntegerFieldBuilder() {
     super(new IntegerObjectFieldConfigurationBuilder());
@@ -41,36 +41,92 @@ public class IntegerFieldBuilder
     return new IntegerField(configuration);
   }
 
-  public AbstractObjectFieldBuilder<Integer, IntegerObjectFieldConfigurationBuilder, IntegerFieldBuilder> setRegularExpressionValidator(
-      final String patternString,
-      final String message) {
-    final Pattern pattern = Pattern.compile(patternString);
+  public IntegerFieldBuilder addModuloSpinnerActions(final int m, final int step) {
+    return addModuloSpinnerActions(m, step, 250, 100);
+  }
 
-    getConfigurationBuilder().setValidator(new IValidator<String>() {
+  public IntegerFieldBuilder addModuloSpinnerActions(
+      final int m,
+      final int step,
+      final int initialDelay,
+      final int delay) {
 
-      @Override
-      public IValidationResult validate(final String value) {
-        if (StringUtilities.isNullOrTrimmedEmpty(value)) {
-          return IValidationResult.inValid(message);
-        }
-        pattern.matcher(value).matches();
-        if (!value.matches(patternString)) {
-          return IValidationResult.inValid(message);
-        }
-        return IValidationResult.valid();
-      }
-    });
+    final Function<Integer, Integer> minus = input -> Optional
+        .of(input)
+        .convert(v1 -> (v1 - step) % m)
+        .convert(v2 -> v2 < 0 ? v2 + m : v2)
+        .convert(v3 -> v3 >= m ? v3 - m : v3)
+        .getOr(() -> m - step);
+
+    final Function<Integer, Boolean> minusEnabler = input -> true;
+
+    addButtonFactory(createButton(ContrastHightIcons.MINUS, minus, minusEnabler, initialDelay, delay));
+
+    final Function<Integer, Integer> add = input -> Optional
+        .of(input)
+        .convert(v1 -> (v1 + step) % m)
+        .convert(v2 -> v2 < 0 ? v2 + m : v2)
+        .convert(v3 -> v3 >= m ? v3 - m : v3)
+        .getOr(() -> 0);
+
+    final Function<Integer, Boolean> addEnabler = input -> true;
+
+    addButtonFactory(createButton(ContrastHightIcons.ADD, add, addEnabler, initialDelay, delay));
+
     return this;
   }
 
-  public IntegerFieldBuilder setToolTip(final String tooltipText) {
-    getConfigurationBuilder().setToolTipFactory((validationResult, text) -> {
-      if (!validationResult.isValid()) {
-        return validationResult.getMessage();
-      }
-      return tooltipText;
-    });
+  public IntegerFieldBuilder addSpinnerActions(final int minimum, final int maximum, final int step) {
+    return addSpinnerActions(minimum, maximum, step, 250, 100);
+  }
+
+  public IntegerFieldBuilder addSpinnerActions(
+      final int minimum,
+      final int maximum,
+      final int step,
+      final int initialDelay,
+      final int delay) {
+    addValidatorFactory(converter -> value -> Optional
+        .of(value) //
+        .convert(v1 -> converter.convert(v1))
+        .convert(v2 -> isValid(v2, minimum, maximum))
+        .getOr(() -> IValidationResult.valid()));
+
+    final Function<Integer, Integer> minus = input -> Optional
+        .of(input)
+        .convert(v1 -> v1 - step)
+        .convert(v2 -> v2 < minimum ? minimum : v2)
+        .convert(v3 -> v3 > maximum ? maximum : v3)
+        .getOr(() -> maximum);
+
+    final Function<Integer, Boolean> minusEnabler = input -> Optional
+        .of(input)
+        .convert(v4 -> v4 > minimum & minimum < maximum)
+        .getOr(() -> true);
+
+    addButtonFactory(createButton(ContrastHightIcons.MINUS, minus, minusEnabler, initialDelay, delay));
+
+    final Function<Integer, Integer> add = input -> Optional
+        .of(input)
+        .convert(v1 -> v1 + step)
+        .convert(v2 -> v2 < minimum ? minimum : v2)
+        .convert(v3 -> v3 > maximum ? maximum : v3)
+        .getOr(() -> minimum);
+
+    final Function<Integer, Boolean> addEnabler = input -> Optional
+        .of(input)
+        .convert(v4 -> v4 < maximum & minimum < maximum)
+        .getOr(() -> true);
+
+    addButtonFactory(createButton(ContrastHightIcons.ADD, add, addEnabler, initialDelay, delay));
     return this;
   }
 
+  public IValidationResult isValid(final Integer value, final int minimum, final int maximum) {
+    return value < minimum //
+        ? IValidationResult.inValid(value + " < " + minimum) //$NON-NLS-1$
+        : value > maximum ? //
+            IValidationResult.inValid(value + " > " + maximum) : // //$NON-NLS-1$
+            IValidationResult.valid();
+  }
 }

@@ -25,6 +25,8 @@ import java.util.List;
 
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
+import net.anwiba.commons.swing.table.action.ITableTextFieldActionConfiguration;
+import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.utilities.collection.ListUtilities;
 
@@ -36,6 +38,8 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
   private List<IColumnValueAdaptor<T>> columnValueAdaptors;
   private final IColumToStringConverter columnToStringConverter;
   private IColumnClassProvider columnClassProvider;
+  private final ITableTextFieldActionConfiguration<T> textFieldActionConfiguration;
+  private ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory;
 
   public ObjectListTableConfiguration(
       final IColumToStringConverter columnToStringConverter,
@@ -45,7 +49,9 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
       final List<IObjectListColumnConfiguration<T>> columnConfigurations,
       final IMouseListenerFactory<T> mouseListenerFactory,
       final IKeyListenerFactory<T> keyListenerFactory,
-      final ITableActionConfiguration<T> actionConfiguration) {
+      final ITableActionConfiguration<T> actionConfiguration,
+      final ITableTextFieldActionConfiguration<T> textFieldActionConfiguration,
+      final ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory) {
     super(
         autoRizeMode,
         selectionMode,
@@ -55,6 +61,8 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
         keyListenerFactory,
         actionConfiguration);
     this.columnToStringConverter = columnToStringConverter;
+    this.textFieldActionConfiguration = textFieldActionConfiguration;
+    this.textFieldKeyListenerFactory = textFieldKeyListenerFactory;
     this.columnValueProviders = ListUtilities.convert(
         columnConfigurations,
         new IConverter<IObjectListColumnConfiguration<T>, IColumnValueProvider<T>, RuntimeException>() {
@@ -112,4 +120,15 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
   public IColumnClassProvider getColumnClassProvider() {
     return this.columnClassProvider;
   }
+
+  @Override
+  public ITableTextFieldActionConfiguration<T> getTextFieldActionConfiguration() {
+    return this.textFieldActionConfiguration;
+  }
+
+  @Override
+  public ITableTextFieldKeyListenerFactory<T> getTextFieldKeyListenerFactory() {
+    return this.textFieldKeyListenerFactory;
+  }
+
 }

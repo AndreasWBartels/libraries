@@ -1,0 +1,54 @@
+{
+    "coverage": "",
+    "cache_last_updated": null,
+    "issued": "2014-11-05T00:00:00",
+    "package_id": "188dd4e7-f1c4-4683-ad38-1cacf946cc1c",
+    "webstore_last_updated": null,
+    "id": "132efd0f-9803-4814-8349-115211bbe6c8",
+    "size": null,
+    "display_name": {
+        "fr": "Download",
+        "de": "Download",
+        "en": "Download",
+        "it": "Download"
+    },
+    "title": {
+        "fr": "Download",
+        "de": "Download",
+        "en": "Download",
+        "it": "Download"
+    },
+    "download_url": "http://data.geo.admin.ch/ch.bafu.hydroweb-warnkarte_regional/data.zip",
+    "state": "active",
+    "media_type": "application/zip",
+    "hash": "",
+    "description": {
+        "fr": "Serveur de téléchargement de geo.admin.ch",
+        "en": "Download server from geo.admin.ch",
+        "de": "Download von data.geo.admin.ch",
+        "it": "Server di download di geo.admin.ch"
+    },
+    "format": "ZIP",
+    "mimetype_inner": null,
+    "url_type": null,
+    "name": {
+        "fr": "Download",
+        "de": "Download",
+        "en": "Download",
+        "it": "Download"
+    },
+    "mimetype": null,
+    "cache_url": null,
+    "language": [ "de" ],
+    "license": "",
+    "created": "2017-11-07T13:31:35.283472",
+    "url": "http://data.geo.admin.ch/ch.bafu.hydroweb-warnkarte_regional/data.zip",
+    "rights": "NonCommercialAllowed-CommercialAllowed-ReferenceRequired",
+    "modified": false,
+    "webstore_url": null,
+    "last_modified": null,
+    "position": 0,
+    "revision_id": "7297c8ff-1e64-48c1-a10b-3af47459812b",
+    "identifier": "",
+    "resource_type": null
+}

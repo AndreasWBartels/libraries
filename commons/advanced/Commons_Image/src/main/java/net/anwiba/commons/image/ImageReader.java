@@ -2,7 +2,7 @@
  * #%L
  * *
  * %%
- * Copyright (C) 2007 - 2016 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2016 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,12 +21,8 @@
  */
 package net.anwiba.commons.image;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 
 import javax.media.jai.JAI;
@@ -34,108 +30,114 @@ import javax.media.jai.RenderedOp;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
-import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.http.IHttpRequestExecutor;
+import net.anwiba.commons.http.IHttpRequestExecutorFactory;
+import net.anwiba.commons.http.IRequest;
+import net.anwiba.commons.http.IResponse;
+import net.anwiba.commons.http.RequestBuilder;
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.resource.reference.IResourceReference;
-import net.anwiba.commons.resource.reference.IResourceReferenceFactory;
 import net.anwiba.commons.resource.reference.IResourceReferenceHandler;
 import net.anwiba.commons.resource.utilities.IoUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.commons.utilities.io.url.IUrl;
+import net.anwiba.commons.utilities.io.url.UrlBuilder;
+import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.utilities.string.StringUtilities;
 
-public final class ImageReader {
+public final class ImageReader implements IImageReader {
 
-  private final IResourceReferenceFactory factory;
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(ImageReader.class);
   private final IResourceReferenceHandler handler;
+  private final IHttpRequestExecutorFactory httpRequestExcecutorFactory;
 
-  public ImageReader(final IResourceReferenceFactory factory, final IResourceReferenceHandler handler) {
+  public ImageReader(
+      final IResourceReferenceHandler handler,
+      final IHttpRequestExecutorFactory httpRequestExcecutorFactory) {
     super();
-    this.factory = factory;
     this.handler = handler;
+    this.httpRequestExcecutorFactory = httpRequestExcecutorFactory;
   }
 
-  public BufferedImage scale(final URL resource, final float factor) throws IOException {
-    final IResourceReference resourceReference = this.factory.create(resource);
-    try (InputStream stream = this.handler.openInputStream(resourceReference)) {
-      final RenderedOp scaledRenderedOp = ImageContainerUtilities.scale(createRenderOp(stream), factor);
-      try {
-        final BufferedImage image = scaledRenderedOp.getAsBufferedImage();
-        return image;
-      } finally {
-        scaledRenderedOp.dispose();
-      }
-    }
-  }
-
-  public BufferedImage readBufferedImage(final File file) throws IOException {
-    try {
-      final IResourceReference resourceReference = this.factory.create(file);
-      return readBufferedImage(ICanceler.DummyCancler, resourceReference);
-    } catch (final InterruptedException exception) {
-      throw new UnreachableCodeReachedException(exception);
-    }
-  }
-
-  public BufferedImage readBufferedImage(final URI uri) throws IOException {
-    try {
-      final IResourceReference resourceReference = this.factory.create(uri);
-      return readBufferedImage(ICanceler.DummyCancler, resourceReference);
-    } catch (final InterruptedException exception) {
-      throw new UnreachableCodeReachedException(exception);
-    }
-  }
-
-  public BufferedImage readBufferedImage(final ICanceler canceler, final URL resource)
-      throws InterruptedException,
-      IOException {
-    final IResourceReference resourceReference = this.factory.create(resource);
-    return readBufferedImage(canceler, resourceReference);
-  }
-
-  public BufferedImage readBufferedImage(final ICanceler canceler, final IResourceReference resourceReference)
-      throws InterruptedException,
-      IOException {
-    canceler.check();
-    try (InputStream stream = this.handler.openInputStream(resourceReference)) {
-      return readBufferedImage(stream);
-    }
-  }
-
-  public BufferedImage readBufferedImage(final ICanceler canceler, final InputStream inputStream)
-      throws InterruptedException,
-      IOException {
-    canceler.check();
-    return readBufferedImage(inputStream);
-  }
-
-  public BufferedImage readBufferedImage(final InputStream inputStream) throws IOException {
-    try {
-      final RenderedOp renderedOp = createRenderOp(inputStream);
-      try {
-        return renderedOp.getAsBufferedImage();
-      } finally {
-        renderedOp.dispose();
-      }
-    } catch (final RuntimeException exception) {
-      throw new IOException(exception);
-    }
-  }
-
-  public IImageContainer read(final ICanceler canceler, final URL resource) throws InterruptedException, IOException {
-    return read(canceler, this.factory.create(resource));
-  }
-
+  @Override
   public IImageContainer read(final ICanceler canceler, final IResourceReference resourceReference)
       throws InterruptedException,
       IOException {
     canceler.check();
+
     if (this.handler.isFileSystemResource(resourceReference)) {
       return read(canceler, this.handler.openInputStream(resourceReference));
     }
-    try (final InputStream stream = this.handler.openInputStream(resourceReference)) {
-      return read(canceler, IoUtilities.copy(stream));
+
+    if (!this.handler.hasLocation(resourceReference)) {
+      return read(canceler, this.handler.openInputStream(resourceReference));
+    }
+
+    final URL url = this.handler.getUrl(resourceReference);
+    if (!(StringUtilities.equalsIgnoreCase(url.getProtocol(), "http")
+        || StringUtilities.equalsIgnoreCase(url.getProtocol(), "https"))) {
+      try (final InputStream stream = url.openStream()) {
+        return read(canceler, IoUtilities.copy(stream));
+      }
+    }
+
+    final IRequest request = RequestBuilder.get(this.handler.toString(resourceReference)).build();
+
+    try (final IHttpRequestExecutor executor = this.httpRequestExcecutorFactory.create()) {
+      try (final IResponse response = executor.execute(canceler, request)) {
+        if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+
+          if (!response.getContentType().toLowerCase().startsWith("image")) {
+            logger.log(ILevel.ERROR, "unexpected content type '" + response.getContentType() + "'");
+            if (logger.isLoggable(ILevel.ERROR)) {
+              logger.log(ILevel.ERROR, response.getBody());
+            }
+            throw new IOException("unexpected content type '" + response.getContentType() + "'");
+          }
+
+          try (final InputStream stream = response.getInputStream()) {
+            return read(canceler, IoUtilities.copy(stream));
+          }
+        }
+        logger.log(
+            ILevel.DEBUG,
+            "connect to '"
+                + toPrintableString(resourceReference)
+                + "' faild "
+                + response.getStatusCode()
+                + " "
+                + response.getStatusText());
+        if (logger.isLoggable(ILevel.DEBUG)) {
+          logger.log(ILevel.DEBUG, response.getBody());
+        }
+        throw new IOException(response.getStatusCode() + " " + response.getStatusText());
+      } catch (final IOException exception) {
+        throw new IOException(
+            "Couldn't read '" + toPrintableString(resourceReference) + "', " + exception.getMessage(),
+            exception);
+      }
     }
   }
 
-  public IImageContainer read(final ICanceler canceler, final InputStream inputStream) throws InterruptedException {
+  private String toPrintableString(final IResourceReference resourceReference) {
+    final String string = this.handler.toString(resourceReference);
+    try {
+      final IUrl url = new UrlParser().parse(string);
+      if (url.getPassword() != null) {
+        return new UrlBuilder(url).setPassword("**********").build().toString(); //$NON-NLS-1$
+      }
+      return new UrlBuilder(url).build().toString();
+    } catch (final CreationException exception) {
+      return string;
+    }
+  }
+
+  @Override
+  public IImageContainer read(final ICanceler canceler, final InputStream inputStream)
+      throws InterruptedException,
+      IOException {
     canceler.check();
     return new PlanarImageContainer(createRenderOp(inputStream));
   }
@@ -144,11 +146,5 @@ public final class ImageReader {
   private RenderedOp createRenderOp(final InputStream inputStream) {
     final MemoryCacheSeekableStream memoryCacheSeekableStream = new MemoryCacheSeekableStream(inputStream);
     return JAI.create("Stream", memoryCacheSeekableStream); //$NON-NLS-1$
-
-  }
-
-  @SuppressWarnings("resource")
-  public IImageContainer createImageContainer(final File file) throws IOException {
-    return new PlanarImageContainer(createRenderOp(new FileInputStream(file)));
   }
 }

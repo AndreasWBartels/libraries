@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.anwiba.commons.lang.functional.IApplicable;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBuilder<T> {
 
@@ -36,9 +37,8 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
   private IResultProducer<T> resultProducer = null;
 
   @Override
-  public IObjectRequestExecutorBuilder<T> setConnectionManagerProvider(
-      final IHttpClientConnectionManagerProvider connectionManagerProvider) {
-    this.builder.setConnectionManagerProvider(connectionManagerProvider);
+  public IObjectRequestExecutorBuilder<T> usePoolingConnection() {
+    this.builder.usePoolingConnection();
     return this;
   }
 
@@ -77,7 +77,8 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           final int statusCode,
           final String statusMessage,
           final String contentEncoding,
-          final InputStream inputStream) throws IOException {
+          final InputStream inputStream)
+          throws IOException {
         return factory.create(statusCode, statusMessage, contentEncoding, inputStream);
       }
 
@@ -96,7 +97,17 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
     final IApplicableHttpResponseExceptionFactory[] exceptionFactories = ObjectRequestExecutorBuilder.this.applicableHttpResponseExceptionFactories
         .stream()
         .toArray(IApplicableHttpResponseExceptionFactory[]::new);
-    return (cancelable, request) -> convertingExecutor.execute(cancelable, request, producer, exceptionFactories);
-  }
+    return new IObjectRequestExecutor<T>() {
 
+      @Override
+      public T execute(final ICanceler cancelable, final IRequest request) throws InterruptedException, IOException {
+        return convertingExecutor.execute(cancelable, request, producer, exceptionFactories);
+      }
+
+      @Override
+      public void close() throws IOException {
+        convertingExecutor.close();
+      }
+    };
+  }
 }

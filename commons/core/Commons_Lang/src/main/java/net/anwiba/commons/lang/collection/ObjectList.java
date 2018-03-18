@@ -22,9 +22,14 @@
 
 package net.anwiba.commons.lang.collection;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class ObjectList<T> extends AbstractObjectList<T> {
+
+  public ObjectList() {
+    this(new LinkedList<>());
+  }
 
   public ObjectList(final List<T> objects) {
     super(objects);

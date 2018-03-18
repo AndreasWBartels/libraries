@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -45,11 +45,11 @@ public class GridBagLayoutComponentBuilder {
 
   public GridBagLayoutComponentBuilder label(final String text) {
     newline();
-    final JLabel label = new JLabel(text + ":"); //$NON-NLS-1$
+    final JLabel label = new JLabel(text + (text.isEmpty() ? "" : ":")); //$NON-NLS-1$ //$NON-NLS-2$
     label.setVerticalTextPosition(JLabel.TOP);
     label.setVerticalAlignment(JLabel.TOP);
-    label.setHorizontalTextPosition(JLabel.RIGHT);
-    label.setHorizontalAlignment(JLabel.RIGHT);
+    label.setHorizontalTextPosition(JLabel.LEFT);
+    label.setHorizontalAlignment(JLabel.LEFT);
     this.components.add(new GridBagLayoutComponent(label, ++this.column, this.row, 1, 1, UNDEFIND_ANCHOR));
     return this;
   }

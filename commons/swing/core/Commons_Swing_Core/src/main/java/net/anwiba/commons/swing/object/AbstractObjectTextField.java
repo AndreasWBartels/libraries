@@ -32,11 +32,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Collection;
 
-import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
@@ -48,9 +50,11 @@ import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
 import net.anwiba.commons.lang.functional.IBlock;
+import net.anwiba.commons.lang.functional.ICharFilter;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
@@ -83,8 +87,65 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
     }
 
     @Override
-    public void setBorder(final Border border) {
-      super.setBorder(border);
+    public void setDocument(final Document doc) {
+      if (this.isInititalized) {
+        throw new UnsupportedOperationException();
+      }
+      if (doc instanceof PlainDocument) {
+        super.setDocument(doc);
+        return;
+      }
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PlainDocument getDocument() {
+      return (PlainDocument) super.getDocument();
+    }
+
+    @Override
+    public void setToolTipText(final String text) {
+      super.setToolTipText(text);
+      final ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+      if (text == null && this.configuration.getToolTipFactory() != null) {
+        toolTipManager.registerComponent(this);
+      }
+    }
+
+    @Override
+    public String getToolTipText() {
+      final IToolTipFactory toolTipFactory = this.configuration.getToolTipFactory();
+      if (toolTipFactory == null) {
+        return super.getToolTipText();
+      }
+      final String value = getText();
+      final int columnWidth = getWidth();
+      final double valueWidth = JTextComponentUtilities.getValueWidth(this, value);
+      if (valueWidth > columnWidth - 2) {
+        return toolTipFactory.create(this.validationResult.get(), value);
+      }
+      return toolTipFactory.create(this.validationResult.get(), null);
+    }
+  }
+
+  @SuppressWarnings("serial")
+  public static final class PasswordField<T> extends JPasswordField {
+    private final IObjectFieldConfiguration<T> configuration;
+    private boolean isInititalized = false;
+    private final IObjectDistributor<IValidationResult> validationResult;
+
+    public PasswordField(
+        final PlainDocument document,
+        final IObjectFieldConfiguration<T> configuration,
+        final IObjectDistributor<IValidationResult> validationResult) {
+      super(document, null, configuration.getColumns());
+      this.validationResult = validationResult;
+      this.isInititalized = true;
+      this.configuration = configuration;
+      final ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+      if (configuration.getToolTipFactory() != null) {
+        toolTipManager.registerComponent(this);
+      }
     }
 
     @Override
@@ -131,11 +192,12 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
 
   private final IObjectModel<T> model;
   private final IObjectModel<IValidationResult> validStateModel;
-  private final TextField<T> textField;
+  private final JTextField textField;
   private final JComponent component;
   private final IValidator<String> validator;
   private final IConverter<String, T, RuntimeException> toObjectConverter;
   private final IConverter<T, String, RuntimeException> toStringConverter;
+  private final ICharFilter characterFilter;
   private final IActionNotifier actionNotifier;
   private FieldValueController<T> controller;
 
@@ -145,19 +207,39 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
     this.validator = configuration.getValidator();
     this.toObjectConverter = configuration.getToObjectConverter();
     this.toStringConverter = configuration.getToStringConverter();
+    this.characterFilter = configuration.getCharacterFilter();
     final PlainDocument document = new PlainDocument();
-    final TextField<T> field = new TextField<>(document, configuration, this.validStateModel);
+    final JTextField field = configuration.isDisguise()
+        ? new PasswordField<>(document, configuration, this.validStateModel)
+        : new TextField<>(document, configuration, this.validStateModel);
     final IKeyListenerFactory<T> keyListenerFactory = configuration.getKeyListenerFactory();
+    final IBlock<RuntimeException> clearBlock = () -> {
+      if (document.getLength() == 0) {
+        return;
+      }
+      if (!AbstractObjectTextField.this.validStateModel.get().isValid()) {
+        try {
+          document.remove(0, document.getLength());
+        } catch (final BadLocationException exception) {
+          // nothing to do
+        }
+        return;
+      }
+      AbstractObjectTextField.this.model.set(null);
+    };
     if (keyListenerFactory != null) {
-      field.addKeyListener(keyListenerFactory.create(this.model, document));
+      field.addKeyListener(keyListenerFactory.create(this.model, document, clearBlock));
     }
-
+    final IBooleanModel enabledModel = configuration.getEnabledModel();
+    field.setEnabled(enabledModel.get());
+    enabledModel.addChangeListener(() -> field.setEnabled(enabledModel.get()));
     this.textField = field;
     final Collection<IActionFactory<T>> actionFactorys = configuration.getActionFactorys();
+    final Collection<IButtonFactory<T>> buttonFactorys = configuration.getButtonFactorys();
     if (configuration.getBackgroundColor() != null) {
       this.textField.setBackground(configuration.getBackgroundColor());
     }
-    if (actionFactorys.isEmpty()) {
+    if (actionFactorys.isEmpty() && buttonFactorys.isEmpty()) {
       this.component = field;
     } else {
       final Border border = new MetalBorders.TextFieldBorder();
@@ -173,30 +255,21 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
       int width = 0;
       int height = 0;
       for (final IActionFactory<T> actionFactory : actionFactorys) {
-        final AbstractAction action = actionFactory.create(this.model, document, new IBlock<RuntimeException>() {
-
-          @Override
-          public void execute() throws RuntimeException {
-            if (document.getLength() == 0) {
-              return;
-            }
-            if (!AbstractObjectTextField.this.validStateModel.get().isValid()) {
-              try {
-                document.remove(0, document.getLength());
-              } catch (final BadLocationException exception) {
-                // nothing to do
-              }
-              return;
-            }
-            AbstractObjectTextField.this.model.set(null);
-          }
-        });
-        final JButton buttom = new JButton(action);
-        buttom.setBackground(field.getBackground());
-        buttom.setBorder(BorderFactory.createEmptyBorder());
-        width = width + buttom.getMinimumSize().width;
-        height = Math.max(height, buttom.getMinimumSize().height);
-        actionContainer.add(buttom);
+        final Action action = actionFactory.create(this.model, document, enabledModel, clearBlock);
+        final JButton button = new JButton(action);
+        button.setBackground(field.getBackground());
+        button.setBorder(BorderFactory.createEmptyBorder());
+        width = width + button.getMinimumSize().width;
+        height = Math.max(height, button.getMinimumSize().height);
+        actionContainer.add(button);
+      }
+      for (final IButtonFactory<T> buttonFactory : buttonFactorys) {
+        final AbstractButton button = buttonFactory.create(this.model, document, enabledModel, clearBlock);
+        button.setBackground(field.getBackground());
+        button.setBorder(BorderFactory.createEmptyBorder());
+        width = width + button.getMinimumSize().width;
+        height = Math.max(height, button.getMinimumSize().height);
+        actionContainer.add(button);
       }
       actionContainer.setMinimumSize(new Dimension(width, height));
       actionContainer.setMaximumSize(new Dimension(width, height));
@@ -228,6 +301,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
         this.toObjectConverter,
         this.toStringConverter,
         this.validStateModel,
+        this.characterFilter,
         this.validator);
     this.controller = valuesController;
     document.addDocumentListener(new DocumentListener() {
@@ -266,8 +340,39 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
 
       @Override
       public void keyTyped(final KeyEvent event) {
-        if (event.getKeyChar() == 0x1b) {
+        final char character = event.getKeyChar();
+        if (character == KeyEvent.VK_ESCAPE //
+            || character == KeyEvent.VK_CANCEL //
+        ) {
           valuesController.modelChanged();
+          return;
+        }
+        if (character == KeyEvent.VK_BACK_SPACE //
+            || character == KeyEvent.VK_DELETE //
+            || character == KeyEvent.VK_COPY //
+            || character == KeyEvent.VK_PASTE //
+            || character == KeyEvent.VK_ENTER //
+            || character == KeyEvent.VK_UP //
+            || character == KeyEvent.VK_DOWN //
+            || character == KeyEvent.VK_RIGHT //
+            || character == KeyEvent.VK_LEFT //
+            || character == KeyEvent.VK_DOWN //
+            || character == KeyEvent.VK_CONTROL //
+            || character == KeyEvent.VK_META //
+            || character == KeyEvent.VK_ALT //
+            || character == KeyEvent.VK_ALT_GRAPH //
+            || character == KeyEvent.VK_CONTEXT_MENU //
+            || character == KeyEvent.VK_PAGE_DOWN //
+            || character == KeyEvent.VK_PAGE_UP //
+            || character == KeyEvent.VK_PRINTSCREEN //
+            || character == KeyEvent.VK_CAPS_LOCK //
+            || character == KeyEvent.KEY_FIRST //
+            || character == KeyEvent.KEY_LAST //
+        ) {
+          return;
+        }
+        if (!AbstractObjectTextField.this.characterFilter.accept(character)) {
+          event.consume();
         }
       }
 

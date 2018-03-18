@@ -21,7 +21,7 @@
   <icon name="CONTENTS_ICON" ref="EMBLEM_DOCUMENTS">
     <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
   </icon>
-
+ 
   <icon name="DISABLED_CANCEL_ICON" ref="GTK_CANCLE_DISABLE">
     <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>
   </icon>

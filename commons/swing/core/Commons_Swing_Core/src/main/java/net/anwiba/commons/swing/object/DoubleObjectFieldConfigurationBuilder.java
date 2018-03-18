@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.swing.object;
 
+import java.text.DecimalFormatSymbols;
+
 import net.anwiba.commons.utilities.number.DoubleStringValidator;
 import net.anwiba.commons.utilities.number.DoubleToStringConverter;
 import net.anwiba.commons.utilities.number.StringToDoubleConverter;
@@ -31,6 +33,17 @@ public class DoubleObjectFieldConfigurationBuilder
 
   public DoubleObjectFieldConfigurationBuilder() {
     super(new DoubleStringValidator(), new StringToDoubleConverter(), new DoubleToStringConverter());
+
+    final DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
+    setCharacterFilter(
+        c -> Character.isDigit(c)
+            || c == '+'
+            || c == '-'
+            || c == ' '
+            || c == 'e'
+            || c == 'E'
+            || c == decimalFormatSymbols.getDecimalSeparator()
+            || c == decimalFormatSymbols.getGroupingSeparator());
   }
 
 }

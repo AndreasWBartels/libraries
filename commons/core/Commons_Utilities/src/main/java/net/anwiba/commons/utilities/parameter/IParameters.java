@@ -22,6 +22,7 @@
 package net.anwiba.commons.utilities.parameter;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
 
 import net.anwiba.commons.utilities.provider.INamedValueProvider;
 
@@ -36,5 +37,9 @@ public interface IParameters extends INamedValueProvider<String, RuntimeExceptio
   IParameters adapt(int rowIndex, IParameter parameter);
 
   boolean containts(String name);
+
+  void forEach(Consumer<IParameter> consumer);
+
+  IParameters toLowerCase();
 
 }

@@ -28,6 +28,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.anwiba.commons.message.IMessage;
@@ -50,7 +51,7 @@ public class MessagePanel extends JPanel {
     createView();
   }
 
-  private void createView() {
+  protected void createView() {
     final JPanel textPanel = new JPanel();
     textPanel.setLayout(new BorderLayout());
     textPanel.setBackground(Color.WHITE);
@@ -59,11 +60,16 @@ public class MessagePanel extends JPanel {
     this.messageTextArea.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
     this.messageTextArea.setBackground(Color.WHITE);
     this.messageTextArea.setOpaque(true);
-    this.messageTextArea.setColumns(25);
+    this.messageTextArea.setColumns(30);
+    this.messageTextArea.setRows(2);
     this.messageTextArea.setEditable(false);
     this.messageTextArea.setLineWrap(true);
     this.messageTextArea.setWrapStyleWord(true);
-    textPanel.add(BorderLayout.CENTER, this.messageTextArea);
+    final JScrollPane pane = new JScrollPane(this.messageTextArea);
+    pane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+    pane.setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0));
+    pane.setBackground(Color.WHITE);
+    textPanel.add(BorderLayout.CENTER, pane);
 
     setBorder(BorderFactory.createEmptyBorder(8, 8, 0, 8));
     setBackground(Color.WHITE);

@@ -108,7 +108,8 @@ public class DatabaseUtilities {
       final String url,
       final String user,
       final String password,
-      final boolean isReadOnly) throws SQLException {
+      final boolean isReadOnly)
+      throws SQLException {
     final Connection connection = DriverManager.getConnection(url, user, password);
     connection.setReadOnly(isReadOnly);
     return connection;
@@ -243,7 +244,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final double beforVersion,
       final String statement,
-      final String defaultStatement) throws SQLException {
+      final String defaultStatement)
+      throws SQLException {
     final double version = getVersionAsDouble(connection);
     if (version < beforVersion) {
       return statement;
@@ -278,7 +280,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String selectStatement,
       final String schemaName,
-      final String tableName) throws SQLException {
+      final String tableName)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Query: Schema " + schemaName + " table " + tableName); //$NON-NLS-1$ //$NON-NLS-2$
     logger.log(ILevel.DEBUG, "Query: " + selectStatement); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(selectStatement)) {
@@ -338,7 +341,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IConverter<IResult, T, SQLException> function) throws SQLException {
+      final IConverter<IResult, T, SQLException> function)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return results(connection, statementString, function);
     }
@@ -349,7 +353,8 @@ public class DatabaseUtilities {
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IResult, T, SQLException> function) throws SQLException {
+      final IConverter<IResult, T, SQLException> function)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return results(connection, statementString, prepareProcedure, function);
     }
@@ -358,7 +363,8 @@ public class DatabaseUtilities {
   public static <T> List<T> results(
       final Connection connection,
       final String statementString,
-      final IConverter<IResult, T, SQLException> function) throws SQLException {
+      final IConverter<IResult, T, SQLException> function)
+      throws SQLException {
     return results(connection, statementString, (IProcedure<PreparedStatement, SQLException>) statement -> {
       // nothing to do
     }, function);
@@ -368,7 +374,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IResult, T, SQLException> resultProcedure) throws SQLException {
+      final IConverter<IResult, T, SQLException> resultProcedure)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
       prepareProcedure.execute(statement);
@@ -395,7 +402,8 @@ public class DatabaseUtilities {
       final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
       final Connection connection,
       final String statementString,
-      final IConverter<IResult, T, SQLException> resultFunction) throws SQLException {
+      final IConverter<IResult, T, SQLException> resultFunction)
+      throws SQLException {
     return results(cancelWatcherFactory, connection, statementString, s -> {
     }, resultFunction);
   }
@@ -405,7 +413,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IResult, T, SQLException> resultConverter) throws SQLException {
+      final IConverter<IResult, T, SQLException> resultConverter)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
       try (final ICloseable<RuntimeException> cancler = cancelWatcherFactory.create(() -> {
@@ -444,7 +453,8 @@ public class DatabaseUtilities {
   public static <T> ResultSet resultSet(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     try {
       logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
       final PreparedStatement statement = connection.prepareStatement(statementString);
@@ -462,7 +472,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return stringResult(connection, statementString, prepareProcedure);
     }
@@ -476,7 +487,8 @@ public class DatabaseUtilities {
   public static String stringResult(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     final IFunction<IResult, String, SQLException> resultFunction = new IFunction<IResult, String, SQLException>() {
 
       @Override
@@ -494,7 +506,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IOptional<IResult, SQLException>, String, SQLException> resultFunction) throws SQLException {
+      final IConverter<IOptional<IResult, SQLException>, String, SQLException> resultFunction)
+      throws SQLException {
     return result(connection, statementString, prepareProcedure, resultFunction);
   }
 
@@ -502,7 +515,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return longResult(connection, statementString, prepareProcedure);
     }
@@ -516,7 +530,8 @@ public class DatabaseUtilities {
   public static Long longResult(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     final IConverter<IResult, Long, SQLException> resultFunction = new IConverter<IResult, Long, SQLException>() {
 
       @Override
@@ -534,7 +549,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IOptional<IResult, SQLException>, Long, SQLException> resultFunction) throws SQLException {
+      final IConverter<IOptional<IResult, SQLException>, Long, SQLException> resultFunction)
+      throws SQLException {
     return result(connection, statementString, prepareProcedure, resultFunction);
   }
 
@@ -542,7 +558,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return booleanResult(connection, statementString, prepareProcedure);
     }
@@ -556,7 +573,8 @@ public class DatabaseUtilities {
   public static boolean booleanResult(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     return result(
         connection,
         statementString,
@@ -575,7 +593,8 @@ public class DatabaseUtilities {
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction) throws SQLException {
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return result(connection, statementString, prepareProcedure, resultFunction);
     }
@@ -585,7 +604,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction) throws SQLException {
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription);) {
       return result(connection, statementString, resultFunction);
     }
@@ -594,7 +614,8 @@ public class DatabaseUtilities {
   public static <T> T result(
       final Connection connection,
       final String statementString,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> function) throws SQLException {
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> function)
+      throws SQLException {
     return result(connection, statementString, (IProcedure<PreparedStatement, SQLException>) statement -> {
       // nothing to do
     }, function);
@@ -604,7 +625,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction) throws SQLException {
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
       prepareProcedure.execute(statement);
@@ -629,7 +651,9 @@ public class DatabaseUtilities {
   public static <T> List<T> results(
       final Connection connection,
       final String statementString,
-      final IInterruptableFunction<IResult, T, SQLException> resultFunction) throws SQLException, InterruptedException {
+      final IInterruptableFunction<IResult, T, SQLException> resultFunction)
+      throws SQLException,
+      InterruptedException {
     return results(b -> () -> {
     }, connection, statementString, s -> {
     }, resultFunction);
@@ -639,7 +663,9 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IInterruptableFunction<IResult, T, SQLException> resultFunction) throws SQLException, InterruptedException {
+      final IInterruptableFunction<IResult, T, SQLException> resultFunction)
+      throws SQLException,
+      InterruptedException {
     try (Connection connection = connector.connectWritable(connectionDescription);) {
       return results(b -> () -> {
       }, connection, statementString, s -> {
@@ -651,7 +677,9 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IInterruptableProcedure<PreparedStatement, SQLException> prepareClosure,
-      final IInterruptableFunction<IResult, T, SQLException> resultFunction) throws SQLException, InterruptedException {
+      final IInterruptableFunction<IResult, T, SQLException> resultFunction)
+      throws SQLException,
+      InterruptedException {
     return results(b -> () -> {
     }, connection, statementString, prepareClosure, resultFunction);
   }
@@ -697,7 +725,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IConverter<Iterable<IResult>, T, SQLException> function) throws SQLException {
+      final IConverter<Iterable<IResult>, T, SQLException> function)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription);) {
       return aggregate(connection, statementString, function);
     }
@@ -706,7 +735,8 @@ public class DatabaseUtilities {
   public static <T> T aggregate(
       final Connection connection,
       final String statementString,
-      final IConverter<Iterable<IResult>, T, SQLException> function) throws SQLException {
+      final IConverter<Iterable<IResult>, T, SQLException> function)
+      throws SQLException {
     return aggregate(connection, statementString, statement -> {
       // nothing to do
     }, function);
@@ -716,7 +746,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<Iterable<IResult>, T, SQLException> resultProcedure) throws SQLException {
+      final IConverter<Iterable<IResult>, T, SQLException> resultProcedure)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
       prepareProcedure.execute(statement);
@@ -762,7 +793,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IProcedure<ResultSet, SQLException> resultProcedure) throws SQLException {
+      final IProcedure<ResultSet, SQLException> resultProcedure)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
       prepareProcedure.execute(statement);
@@ -795,7 +827,8 @@ public class DatabaseUtilities {
   public static final boolean call(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> procedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> procedure)
+      throws SQLException {
     return call(connection, statementString, procedure, each -> {
       // nothing to do
     });
@@ -805,7 +838,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IProcedure<ResultSet, SQLException> resultProcedure) throws SQLException {
+      final IProcedure<ResultSet, SQLException> resultProcedure)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (CallableStatement statement = connection.prepareCall(statementString)) {
       prepareProcedure.execute(statement);
@@ -855,7 +889,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final Object... values) throws SQLException {
+      final Object... values)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription);) {
       return count(connection, statementString, values);
     }
@@ -889,7 +924,8 @@ public class DatabaseUtilities {
   public static int count(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
       prepareProcedure.execute(statement);
@@ -914,7 +950,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final String columnName,
-      final Object value) throws SQLException {
+      final Object value)
+      throws SQLException {
     final Boolean count = aggregate(connection, statementString, results -> {
       for (final IResult result : results) {
         final Object object = result.getObject(columnName);
@@ -936,7 +973,8 @@ public class DatabaseUtilities {
   public static final boolean execute(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> procedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> procedure)
+      throws SQLException {
     return execute(connection, statementString, procedure, each -> {
       // nothing to do
     });
@@ -945,7 +983,8 @@ public class DatabaseUtilities {
   public static void execute(
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
-      final IProcedure<Connection, SQLException> procedure) throws SQLException {
+      final IProcedure<Connection, SQLException> procedure)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription);) {
       procedure.execute(connection);
     }
@@ -966,7 +1005,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final String[] returnColumns,
-      final Object... values) throws SQLException {
+      final Object... values)
+      throws SQLException {
     return update(connection, statementString, returnColumns, setterProcedur(values));
   }
 
@@ -975,7 +1015,8 @@ public class DatabaseUtilities {
       final IJdbcConnectionDescription connectionDescription,
       final String updatetStatement,
       final String[] returnColumns,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return update(connection, updatetStatement, returnColumns, prepareProcedure);
     }
@@ -985,7 +1026,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String statementString,
       final String[] returnColumns,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString, returnColumns)) {
       prepareProcedure.execute(statement);
@@ -1016,7 +1058,8 @@ public class DatabaseUtilities {
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String updatetStatement,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     try (Connection connection = connector.connectWritable(connectionDescription)) {
       return update(connection, updatetStatement, prepareProcedure);
     }
@@ -1025,7 +1068,8 @@ public class DatabaseUtilities {
   public static List<Object> update(
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure) throws SQLException {
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString, Statement.RETURN_GENERATED_KEYS)) {
       prepareProcedure.execute(statement);
@@ -1272,7 +1316,8 @@ public class DatabaseUtilities {
       final Connection connection,
       final String schemaName,
       final String tableName,
-      final String createStatementString) throws SQLException {
+      final String createStatementString)
+      throws SQLException {
     if (exists(connection, schemaName, tableName)) {
       return;
     }
@@ -1333,6 +1378,56 @@ public class DatabaseUtilities {
       logger.log(ILevel.WARNING, exception.getMessage());
     }
     return null;
+  }
+
+  public static String createSelectStatement(
+      final String tableName,
+      final Iterable<String> columnNames,
+      final Iterable<String> valueColumnNames) {
+    return createSelectStatement(tableName, columnNames, null, valueColumnNames);
+  }
+
+  @SuppressWarnings("nls")
+  public static String createSelectStatement(
+      final String tableName,
+      final Iterable<String> columnNames,
+      final String orderByColumnName,
+      final Iterable<String> valueColumnNames) {
+    boolean flag = false;
+    final StringBuilder builder = new StringBuilder();
+    for (final String columnName : valueColumnNames) {
+      if (!flag) {
+        builder.append("select ");
+        builder.append(columnName);
+        builder.append("\n");
+        flag = true;
+        continue;
+      }
+      builder.append("     , ");
+      builder.append(columnName);
+      builder.append("\n");
+    }
+    builder.append("  from ");
+    builder.append(tableName);
+    builder.append("\n");
+    boolean clauseFlag = false;
+    for (final String columnName : columnNames) {
+      if (!clauseFlag) {
+        builder.append(" where ");
+        clauseFlag = true;
+      } else {
+        builder.append(" and ");
+      }
+      builder.append(columnName);
+      builder.append(" = ?");
+    }
+    builder.append("\n");
+    if (!StringUtilities.isNullOrEmpty(orderByColumnName)) {
+      builder.append(" order by ");
+      builder.append(orderByColumnName);
+      builder.append("\n");
+    }
+    return builder.toString();
   }
 
   public static String createIdentifierSelectStatement(

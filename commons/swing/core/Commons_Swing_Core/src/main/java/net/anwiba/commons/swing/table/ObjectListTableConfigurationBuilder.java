@@ -33,6 +33,9 @@ import net.anwiba.commons.swing.table.action.EditTableActionFactory;
 import net.anwiba.commons.swing.table.action.ITableActionClosure;
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
 import net.anwiba.commons.swing.table.action.ITableActionFactory;
+import net.anwiba.commons.swing.table.action.ITableTextFieldActionConfiguration;
+import net.anwiba.commons.swing.table.action.ITableTextFieldActionFactory;
+import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.action.MoveTableRowDownActionFactory;
 import net.anwiba.commons.swing.table.action.MoveTableRowUpActionFactory;
 import net.anwiba.commons.swing.table.action.RemoveTableRowActionFactory;
@@ -43,6 +46,8 @@ public class ObjectListTableConfigurationBuilder<T> {
   private int selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
   private final List<IObjectListColumnConfiguration<T>> columnConfigurations = new ArrayList<>();
   private final List<ITableActionFactory<T>> actionFactories = new ArrayList<>();
+  private final List<ITableTextFieldActionFactory<T>> textFieldActionFactories = new ArrayList<>();
+  private ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory;
   private int preferredVisibleRowCount = 10;
   private IMouseListenerFactory<T> mouseListenerFactory;
   private IKeyListenerFactory<T> keyListenerFactory;
@@ -70,6 +75,12 @@ public class ObjectListTableConfigurationBuilder<T> {
     return this;
   }
 
+  public ObjectListTableConfigurationBuilder<T> addTextFieldActionFactory(
+      final ITableTextFieldActionFactory<T> factory) {
+    this.textFieldActionFactories.add(factory);
+    return this;
+  }
+
   public ObjectListTableConfigurationBuilder<T> setPreferredVisibleRowCount(final int preferredVisibleRowCount) {
     this.preferredVisibleRowCount = preferredVisibleRowCount;
     return this;
@@ -77,6 +88,8 @@ public class ObjectListTableConfigurationBuilder<T> {
 
   public IObjectListTableConfiguration<T> build() {
     final ITableActionConfiguration<T> actionConfiguration = new TableActionConfiguration<>(this.actionFactories);
+    final ITableTextFieldActionConfiguration<T> textFieldActionConfiguration = new TableTextFieldActionConfiguration<>(
+        this.textFieldActionFactories);
     return new ObjectListTableConfiguration<>(
         this.columnToStringConverter,
         this.autoRizeMode,
@@ -85,7 +98,9 @@ public class ObjectListTableConfigurationBuilder<T> {
         this.columnConfigurations,
         this.mouseListenerFactory,
         this.keyListenerFactory,
-        actionConfiguration);
+        actionConfiguration,
+        textFieldActionConfiguration,
+        this.textFieldKeyListenerFactory);
   }
 
   public ObjectListTableConfigurationBuilder<T> setMouseListenerFactory(
@@ -166,6 +181,12 @@ public class ObjectListTableConfigurationBuilder<T> {
 
   public ObjectListTableConfigurationBuilder<T> setAutoResizeModeOff() {
     this.autoRizeMode = JTable.AUTO_RESIZE_OFF;
+    return this;
+  }
+
+  public ObjectListTableConfigurationBuilder<T> setTextFieldKeyListenerFactory(
+      final ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory) {
+    this.textFieldKeyListenerFactory = textFieldKeyListenerFactory;
     return this;
   }
 

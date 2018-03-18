@@ -33,6 +33,8 @@ public interface IRequest {
 
   String getUriString();
 
+  IAuthentication getAuthentication();
+
   IParameters getParameters();
 
   long getContentLength();
@@ -46,5 +48,9 @@ public interface IRequest {
   String getUserAgent();
 
   IParameters getProperties();
+
+  String getHost();
+
+  int getPort();
 
 }

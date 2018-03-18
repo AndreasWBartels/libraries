@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -22,13 +22,16 @@
 package net.anwiba.commons.swing.object;
 
 import java.awt.Color;
+import java.util.Collections;
 import java.util.List;
 
+import net.anwiba.commons.lang.functional.ICharFilter;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.object.IObjectContainer;
 import net.anwiba.commons.lang.object.IObjectProvider;
 import net.anwiba.commons.lang.object.IObjectReceiver;
 import net.anwiba.commons.lang.object.ObjectContainer;
+import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.utilities.validation.AllwaysValidStringValidator;
 import net.anwiba.commons.utilities.validation.IValidationResult;
@@ -73,6 +76,7 @@ public class ObjectFieldConfiguration extends AbstractObjectTextFieldConfigurati
 
   private final IConverter<String, Object, RuntimeException> stringToObjectConverter;
   private final IConverter<Object, String, RuntimeException> objectToStringConverter;
+  private final ICharFilter characterFilter;
 
   public ObjectFieldConfiguration(
       final IObjectModel<Object> model,
@@ -81,8 +85,20 @@ public class ObjectFieldConfiguration extends AbstractObjectTextFieldConfigurati
       final int columns,
       final List<IActionFactory<Object>> actionFactorys,
       final Color backgroundColor) {
-    super(model, validStateModel, null, isEditable, columns, actionFactorys, null, backgroundColor);
+    super(
+        model,
+        validStateModel,
+        null,
+        new BooleanModel(true),
+        isEditable,
+        columns,
+        actionFactorys,
+        Collections.emptyList(),
+        null,
+        backgroundColor,
+        false);
     final IObjectContainer<Object> broker = new ObjectContainer<>();
+    this.characterFilter = c -> true;
     this.stringToObjectConverter = new StringToObjectConverter(broker);
     this.objectToStringConverter = new ObjectToStringConverter(broker);
   }
@@ -100,6 +116,11 @@ public class ObjectFieldConfiguration extends AbstractObjectTextFieldConfigurati
   @Override
   public IValidator<String> getValidator() {
     return new AllwaysValidStringValidator();
+  }
+
+  @Override
+  public ICharFilter getCharacterFilter() {
+    return this.characterFilter;
   }
 
 }

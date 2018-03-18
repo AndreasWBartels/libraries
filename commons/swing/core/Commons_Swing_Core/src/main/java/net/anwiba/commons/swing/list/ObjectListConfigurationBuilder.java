@@ -53,6 +53,7 @@ public class ObjectListConfigurationBuilder<T> {
   private TransferHandler transferHandler;
   private boolean isDragEnabled = false;
   private DropMode dropMode = DropMode.USE_SELECTION;
+  private T prototype = null;
 
   IObjectUiCellRendererConfiguration objectUiCellRendererConfiguration = new IObjectUiCellRendererConfiguration() {
 
@@ -227,6 +228,11 @@ public class ObjectListConfigurationBuilder<T> {
     return this;
   }
 
+  public ObjectListConfigurationBuilder<T> setPrototype(final T prototype) {
+    this.prototype = prototype;
+    return this;
+  }
+
   public IObjectListConfiguration<T> build() {
     return new IObjectListConfiguration<T>() {
 
@@ -280,6 +286,11 @@ public class ObjectListConfigurationBuilder<T> {
       @Override
       public boolean isDragEnabled() {
         return ObjectListConfigurationBuilder.this.isDragEnabled;
+      }
+
+      @Override
+      public T getPrototype() {
+        return ObjectListConfigurationBuilder.this.prototype;
       }
     };
   }

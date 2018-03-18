@@ -28,11 +28,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import net.anwiba.commons.lang.io.FilteringInputStream;
+import net.anwiba.commons.lang.io.filter.IFilteringInputStreamValidator;
+import net.anwiba.commons.lang.io.filter.PatternFilter;
+import net.anwiba.commons.lang.queue.IntValueQueue;
 import net.anwiba.commons.resource.utilities.IoUtilities;
-import net.anwiba.commons.utilities.io.FilteringInputStream;
-import net.anwiba.commons.utilities.io.filter.IFilteringInputStreamValidator;
-import net.anwiba.commons.utilities.io.filter.PatternFilter;
-import net.anwiba.commons.utilities.queue.IntValueQueue;
 
 import org.junit.Test;
 

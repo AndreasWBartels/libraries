@@ -21,18 +21,30 @@
  */
 package net.anwiba.commons.swing.dialog.tabbed;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.html.HTMLDocument;
 
+import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.swing.icon.GuiIcons;
 
 public class TextDialogTab extends AbstractNoneEditTabbedDialogTab {
+
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(TextDialogTab.class);
 
   public TextDialogTab(final String header, final String text) {
     this(header, null, GuiIcons.INFORMATION_ICON.getLargeIcon(), header, text);
@@ -53,6 +65,33 @@ public class TextDialogTab extends AbstractNoneEditTabbedDialogTab {
     textArea.setMinimumSize(new Dimension(200, 100));
     textArea.setPreferredSize(new Dimension(200, 100));
     textArea.setEditable(false);
+
+    if (Desktop.isDesktopSupported() && textArea.getDocument() instanceof HTMLDocument) {
+      final Desktop desktop = Desktop.getDesktop();
+      if (desktop.isSupported(Desktop.Action.OPEN)) {
+        textArea.addHyperlinkListener(hyperlinkEvent -> {
+          if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            final String description = hyperlinkEvent.getDescription();
+            logger.log(ILevel.DEBUG, "href '" + description + "'"); //$NON-NLS-1$//$NON-NLS-2$
+            try {
+              final URL url = hyperlinkEvent.getURL();
+              if (url != null) {
+                logger.log(ILevel.DEBUG, "href '" + url + "'"); //$NON-NLS-1$//$NON-NLS-2$
+                desktop.browse(url.toURI());
+              } else if (description != null) {
+                final File file = new File(description);
+                final URI uri = file.getAbsoluteFile().toURI();
+                desktop.browse(uri);
+              }
+            } catch (final IOException | URISyntaxException exception) {
+              logger.log(ILevel.WARNING, "Couldn't browse '" + description + "'"); //$NON-NLS-1$//$NON-NLS-2$
+              logger.log(ILevel.WARNING, exception.getMessage(), exception);
+            }
+          }
+        });
+      }
+    }
+
     final JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setPreferredSize(new Dimension(200, 100));
     component.add(scrollPane);

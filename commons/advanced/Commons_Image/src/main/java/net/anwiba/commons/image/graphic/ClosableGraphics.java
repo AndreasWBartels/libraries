@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels 
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -70,49 +70,49 @@ class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
   public void close() throws RuntimeException {
     Optional
         .of(this.antiAliasing)
-        .consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, value));
-    Optional.of(this.textAntialiasing).consum(
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, value));
+    Optional.of(this.textAntialiasing).consume(
         value -> this.graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, value));
     Optional
         .of(this.alphaInterpolation)
-        .consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, value))
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, value))
         .or(
             () -> this.graphics.setRenderingHint(
                 RenderingHints.KEY_ALPHA_INTERPOLATION,
                 RenderingHints.VALUE_ALPHA_INTERPOLATION_DEFAULT));
     Optional
         .of(this.colorRendering)
-        .consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, value))
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, value))
         .or(
             () -> this.graphics
                 .setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_DEFAULT));
     Optional
         .of(this.interpolation)
-        .consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, value))
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, value))
         .or(
             () -> this.graphics.setRenderingHint(
                 RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
     Optional //
         .of(this.dithering)
-        .consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_DITHERING, value))
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_DITHERING, value))
         .or(() -> this.graphics.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DEFAULT));
     Optional //
         .of(this.fractionalmetrics)
-        .consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, value))
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, value))
         .or(
             () -> this.graphics.setRenderingHint(
                 RenderingHints.KEY_FRACTIONALMETRICS,
                 RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT));
-    Optional.of(this.textLcdContrast).consum(
+    Optional.of(this.textLcdContrast).consume(
         value -> this.graphics.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, value));
     Optional
         .of(this.strokeControl)
-        .consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, value))
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, value))
         .or(
             () -> this.graphics
                 .setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT));
-    Optional.of(this.rendering).consum(value -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, value)).or(
+    Optional.of(this.rendering).consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, value)).or(
         () -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT));
     this.graphics.dispose();
   }

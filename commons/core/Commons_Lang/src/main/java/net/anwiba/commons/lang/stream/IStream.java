@@ -74,4 +74,6 @@ public interface IStream<T, E extends Exception> {
 
   public IStream<T, E> revert() throws E;
 
+  public <O> IStream<O, E> instanceOf(Class<O> clazz);
+
 }

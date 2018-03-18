@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -66,6 +67,7 @@ public class DialogConfigurationBuilder {
   private IMessage message = null;
   private IGuiIcon icon = null;
   private ModalityType modality = ModalityType.APPLICATION_MODAL;
+  private ModalExclusionType modalExclusionType;
   private boolean isMessagePanelEnabled = false;
   private boolean isResizeable = true;
   private int dialogCloseKeyEvent = KeyEvent.KEY_LOCATION_UNKNOWN;
@@ -140,6 +142,7 @@ public class DialogConfigurationBuilder {
         this.icon,
         this.image,
         this.modality,
+        this.modalExclusionType,
         this.dialogType,
         this.actionButtonTextFactory,
         this.isResizeable,
@@ -160,6 +163,11 @@ public class DialogConfigurationBuilder {
 
   public DialogConfigurationBuilder setPreferdSize(final Dimension preferdSize) {
     this.preferdSize = preferdSize;
+    return this;
+  }
+
+  public DialogConfigurationBuilder setModalExclusionType(final ModalExclusionType modalExclusionType) {
+    this.modalExclusionType = modalExclusionType;
     return this;
   }
 }

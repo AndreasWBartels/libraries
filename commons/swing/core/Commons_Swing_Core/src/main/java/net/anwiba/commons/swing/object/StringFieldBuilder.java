@@ -22,12 +22,6 @@
 
 package net.anwiba.commons.swing.object;
 
-import java.util.regex.Pattern;
-
-import net.anwiba.commons.utilities.string.StringUtilities;
-import net.anwiba.commons.utilities.validation.IValidationResult;
-import net.anwiba.commons.utilities.validation.IValidator;
-
 public class StringFieldBuilder
     extends
     AbstractObjectFieldBuilder<String, StringObjectFieldConfigurationBuilder, StringFieldBuilder> {
@@ -41,36 +35,8 @@ public class StringFieldBuilder
     return new StringField(configuration);
   }
 
-  public AbstractObjectFieldBuilder<String, StringObjectFieldConfigurationBuilder, StringFieldBuilder> setRegularExpressionValidator(
-      final String patternString,
-      final String message) {
-    final Pattern pattern = Pattern.compile(patternString);
-
-    getConfigurationBuilder().setValidator(new IValidator<String>() {
-
-      @Override
-      public IValidationResult validate(final String value) {
-        if (StringUtilities.isNullOrTrimmedEmpty(value)) {
-          return IValidationResult.inValid(message);
-        }
-        pattern.matcher(value).matches();
-        if (!value.matches(patternString)) {
-          return IValidationResult.inValid(message);
-        }
-        return IValidationResult.valid();
-      }
-    });
+  public StringFieldBuilder enableDisguise() {
+    getConfigurationBuilder().setDisguise(true);
     return this;
   }
-
-  public StringFieldBuilder setToolTip(final String tooltipText) {
-    getConfigurationBuilder().setToolTipFactory((validationResult, text) -> {
-      if (!validationResult.isValid()) {
-        return validationResult.getMessage();
-      }
-      return tooltipText;
-    });
-    return this;
-  }
-
 }

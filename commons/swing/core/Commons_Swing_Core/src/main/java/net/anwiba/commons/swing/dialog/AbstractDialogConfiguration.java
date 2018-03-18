@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -51,6 +52,7 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
   private final List<IAdditionalActionFactory> additionalActionFactories = new ArrayList<>();
   private final Dimension preferdSize;
   private final IGuiIcon image;
+  private final ModalExclusionType modalExclusionType;
 
   public AbstractDialogConfiguration(
       final IPreferences preferences,
@@ -61,6 +63,7 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
       final IGuiIcon icon,
       final IGuiIcon image,
       final ModalityType modality,
+      final ModalExclusionType modalExclusionType,
       final DialogType dialogType,
       final IFunction<String, String, RuntimeException> actionButtonTextFactory,
       final boolean isResizeable,
@@ -69,6 +72,7 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
     this.preferdSize = preferdSize;
     this.title = title;
     this.image = image;
+    this.modalExclusionType = modalExclusionType;
     this.actionButtonTextFactory = actionButtonTextFactory;
     this.dialogCloseKeyEvent = dialogCloseKeyEvent;
     this.additionalActionFactories.addAll(additionalActionFactories);
@@ -102,6 +106,11 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
   @Override
   public final boolean isMessagePanelEnabled() {
     return this.isMessagePanelEnabled;
+  }
+
+  @Override
+  public ModalExclusionType getModalExclusionType() {
+    return this.modalExclusionType;
   }
 
   @Override

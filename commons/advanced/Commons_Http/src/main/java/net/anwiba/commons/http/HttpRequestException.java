@@ -23,6 +23,9 @@
 package net.anwiba.commons.http;
 
 import java.io.IOException;
+import java.io.InputStream;
+
+import net.anwiba.commons.resource.utilities.IoUtilities;
 
 public class HttpRequestException extends IOException {
 
@@ -68,6 +71,14 @@ public class HttpRequestException extends IOException {
     return this.content;
   }
 
+  public String getContentAsString() {
+    try {
+      return new String(this.content, this.contentEncoding);
+    } catch (final IOException exception) {
+      return new String(this.content);
+    }
+  }
+
   public String getContentType() {
     return this.contentType;
   }
@@ -82,6 +93,18 @@ public class HttpRequestException extends IOException {
 
   public String getStatusText() {
     return this.statusText;
+  }
+
+  public static HttpRequestException create(final String message, final IResponse response) throws IOException {
+    try (InputStream inputStream = response.getInputStream()) {
+      return new HttpRequestException(
+          message,
+          response.getStatusCode(),
+          response.getStatusText(),
+          IoUtilities.toByteArray(inputStream),
+          response.getContentType(),
+          response.getContentEncoding());
+    }
   }
 
 }

@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,8 +23,11 @@ package net.anwiba.commons.swing.table;
 
 import java.util.List;
 
+import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.swing.table.action.ITableActionFactory;
+import net.anwiba.commons.swing.table.action.ITableTextFieldActionFactory;
+import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 
 public interface IObjectTableBuilder<T> {
@@ -34,6 +37,8 @@ public interface IObjectTableBuilder<T> {
   IObjectTableBuilder<T> setSelectionMode(int selectionMode);
 
   IObjectTableBuilder<T> addColumnConfiguration(IObjectListColumnConfiguration<T> columnConfiguration);
+
+  IObjectTableBuilder<T> addTextFieldActionFactory(ITableTextFieldActionFactory<T> factory);
 
   IObjectTableBuilder<T> addActionFactory(ITableActionFactory<T> factory);
 
@@ -77,5 +82,14 @@ public interface IObjectTableBuilder<T> {
       String title,
       IFunction<T, Boolean, RuntimeException> provider,
       int size);
+
+  IObjectTableBuilder<T> addSortableStringConfiguration(
+      String title,
+      IFunction<T, String, RuntimeException> provider,
+      IAggregator<T, String, T, RuntimeException> adaptor,
+      int size);
+
+  IObjectTableBuilder<T> setTextFieldKeyListenerFactory(
+      ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory);
 
 }

@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.message.Message;
+import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
@@ -94,12 +95,17 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
 
     @Override
     public void objectChanged() {
-      setMessage(ComboBoxChooserDialog.this.chooserPanel.getMessage());
       if (!ComboBoxChooserDialog.this.validStateModel.get().isValid()) {
+        setMessage(
+            new MessageBuilder()
+                .setText(ComboBoxChooserDialog.this.validStateModel.get().getMessage())
+                .setError()
+                .build());
         setTryEnabled(false);
         setOkEnabled(false);
         return;
       }
+      setMessage(ComboBoxChooserDialog.this.chooserPanel.getMessage());
       setTryEnabled(!(ComboBoxChooserDialog.this.chooserPanelConfiguration.getTryTaskFactory() == null));
       setOkEnabled(true);
     }
@@ -122,7 +128,6 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
         true);
     this.valueModel.set(configuration.getPresetValue());
     createGui(configuration);
-    locate();
   }
 
   private void createGui(final IChooserDialogConfiguration<T> configuration) {
@@ -195,11 +200,10 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
         setMessage(Message.create(this.chooserPanel.getMessage().getText(), "successful")); //$NON-NLS-1$
         return true;
       }
-      setMessage(
-          Message.create(
-              this.chooserPanel.getMessage().getText(),
-              "The connection attempt failed.", //$NON-NLS-1$
-              MessageType.ERROR));
+      setMessage(Message.create(
+          this.chooserPanel.getMessage().getText(),
+          "The connection attempt failed.", //$NON-NLS-1$
+          MessageType.ERROR));
       setOkEnabled(false);
       return false;
     } catch (final InterruptedException exception) {
@@ -219,7 +223,6 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
   void update(final JPanel contentComponent, final IObjectModel<IChooserPanelConfiguration<T>> selectionModel) {
     if (this.validStateModel != null) {
       this.validStateModel.removeChangeListener(this.validateStateListener);
-
     }
     if (this.valueModel != null) {
       this.valueModel.removeChangeListener(this.valueChangeListener);

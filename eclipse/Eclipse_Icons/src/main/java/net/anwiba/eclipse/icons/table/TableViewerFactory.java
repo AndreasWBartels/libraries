@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-// Copyright (c) 2010 by Andreas W. Bartels (bartels@anwiba.de)
+// Copyright (c) 2010 by Andreas W. Bartels
 package net.anwiba.eclipse.icons.table;
 
 import net.anwiba.commons.model.IChangeableObjectListener;

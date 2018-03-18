@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -65,5 +65,7 @@ public interface IDatabaseFacade {
   boolean isTable(IDatabaseTableName table);
 
   Iterable<INamedTableFilter> getTableFilters();
+
+  List<String> getSchemaNames(Connection connection, String catalog) throws SQLException;
 
 }

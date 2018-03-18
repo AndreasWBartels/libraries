@@ -39,6 +39,6 @@ public interface IObjectTableConfiguration<T> {
 
   IKeyListenerFactory<T> getKeyListenerFactory();
 
-  int getAutoizeMode();
+  int getAutoResizeMode();
 
 }

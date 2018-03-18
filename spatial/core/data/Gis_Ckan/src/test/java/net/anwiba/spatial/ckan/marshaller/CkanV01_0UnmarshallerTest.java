@@ -33,6 +33,14 @@ public class CkanV01_0UnmarshallerTest {
   }
 
   @Test
+  public void resourceI18() throws IOException, CkanJsonMapperException {
+    final Resource response = this.objectFactory.create(Resource.class).unmarshal(CkanV01_0TestResources.resourceI18);
+    assertThat(response, notNullValue());
+    final String string = JsonObjectUtilities.marshall(response);
+    assertThat(string, notNullValue());
+  }
+
+  @Test
   public void resourceSearch() throws IOException, CkanJsonMapperException {
     final ResourceSearchResultResponse response = this.objectFactory
         .create(ResourceSearchResultResponse.class)
@@ -42,9 +50,8 @@ public class CkanV01_0UnmarshallerTest {
 
   @Test
   public void packageSearch() throws IOException, CkanJsonMapperException {
-    final PackageSearchResultResponse response = this.objectFactory
-        .create(PackageSearchResultResponse.class)
-        .unmarshal(CkanV01_0TestResources.packageSearchResponse);
+    final PackageSearchResultResponse response = this.objectFactory.create(PackageSearchResultResponse.class).unmarshal(
+        CkanV01_0TestResources.packageSearchResponse);
     assertThat(response, notNullValue());
   }
 

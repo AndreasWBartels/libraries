@@ -22,9 +22,9 @@
 package net.anwiba.commons.swing.object;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.event.DocumentEvent;
@@ -32,12 +32,17 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import net.anwiba.commons.lang.functional.IBlock;
+import net.anwiba.commons.lang.functional.ICharFilter;
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanDistributor;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
-import net.anwiba.commons.swing.action.IActionProcedure;
 import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.commons.utilities.validation.AggregatingStringValidator;
 import net.anwiba.commons.utilities.validation.AllwaysValidStringValidator;
@@ -47,8 +52,10 @@ import net.anwiba.commons.utilities.validation.IValidator;
 public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends AbstractObjectFieldConfigurationBuilder<T, C>> {
 
   private boolean isEditable = true;
+  private boolean isDisguise = false;
   private int columns = 10;
-  private final List<IValidator<String>> validators = new ArrayList<>();
+  private final List<IFactory<IConverter<String, T, RuntimeException>, IValidator<String>, RuntimeException>> validatorFactories = new ArrayList<>();
+  private ICharFilter characterFilter = c -> true;
   private IConverter<String, T, RuntimeException> toObjectConverter;
   private IConverter<T, String, RuntimeException> toStringConverter;
   private IToolTipFactory toolTipFactory = new IToolTipFactory() {
@@ -67,34 +74,54 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
   private IObjectModel<IValidationResult> validStateModel = new ObjectModel<>(IValidationResult.valid());
   private IObjectModel<T> model = new ObjectModel<>();
   private final List<IActionFactory<T>> actionFactorys = new ArrayList<>();
+  private final List<IButtonFactory<T>> buttonFactorys = new ArrayList<>();
   private Color background;
   private IKeyListenerFactory<T> keyListenerFactory;
+  private IBooleanModel enabledModel = new BooleanModel(true);
 
   public AbstractObjectFieldConfigurationBuilder(
       final IValidator<String> validator,
       final IConverter<String, T, RuntimeException> toObjectConverter,
       final IConverter<T, String, RuntimeException> toStringConverter) {
-    this.validators.add(validator);
+    this.validatorFactories.add(c -> validator);
     this.toObjectConverter = toObjectConverter;
     this.toStringConverter = toStringConverter;
   }
 
   public IObjectFieldConfiguration<T> build() {
-    final IValidator<String> validator = this.validators.isEmpty()
+    final IValidator<String> validator = this.validatorFactories.isEmpty()
         ? new AllwaysValidStringValidator()
-        : this.validators.size() == 1 ? this.validators.get(0) : new AggregatingStringValidator(this.validators);
+        : this.validatorFactories.size() == 1
+            ? this.validatorFactories.get(0).create(this.toObjectConverter)
+            : new AggregatingStringValidator(
+                this.validatorFactories.stream().map(f -> f.create(this.toObjectConverter)).collect(
+                    Collectors.toList()));
     return new DefaultObjectFieldConfiguration<>(
         this.model,
         this.validStateModel,
         validator,
+        this.characterFilter,
         this.toObjectConverter,
         this.toStringConverter,
         this.toolTipFactory,
+        this.enabledModel,
         this.isEditable,
         this.columns,
         this.actionFactorys,
+        this.buttonFactorys,
         this.keyListenerFactory,
-        this.background);
+        this.background,
+        this.isDisguise);
+  }
+
+  public void setDisguise(final boolean isDisguise) {
+    this.isDisguise = isDisguise;
+  }
+
+  @SuppressWarnings("unchecked")
+  public C setCharacterFilter(final ICharFilter characterFilter) {
+    this.characterFilter = characterFilter;
+    return (C) this;
   }
 
   @SuppressWarnings("unchecked")
@@ -123,14 +150,26 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
 
   @SuppressWarnings("unchecked")
   public C setValidator(final IValidator<String> validator) {
-    this.validators.clear();;
-    this.validators.add(validator);
+    this.validatorFactories.clear();
+    this.validatorFactories.add(c -> validator);
     return (C) this;
   }
 
   @SuppressWarnings("unchecked")
   public C addValidator(final IValidator<String> validator) {
-    this.validators.add(validator);
+    this.validatorFactories.add(c -> validator);
+    return (C) this;
+  }
+
+  public C setEnabledModel(final IBooleanModel enabledModel) {
+    this.enabledModel = enabledModel;
+    return (C) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public C addValidatorFactory(
+      final IFactory<IConverter<String, T, RuntimeException>, IValidator<String>, RuntimeException> factory) {
+    this.validatorFactories.add(factory);
     return (C) this;
   }
 
@@ -165,6 +204,12 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
   }
 
   @SuppressWarnings("unchecked")
+  public C addButtonFactory(final IButtonFactory<T> actionFactory) {
+    this.buttonFactorys.add(actionFactory);
+    return (C) this;
+  }
+
+  @SuppressWarnings("unchecked")
   public C setBackgroundColor(final Color background) {
     this.background = background;
     return (C) this;
@@ -178,38 +223,42 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
       public AbstractAction create(
           final IObjectModel<T> context,
           final Document document,
-          final IBlock<RuntimeException> clearBlock) throws RuntimeException {
+          final IBooleanDistributor enabledDistributor,
+          final IBlock<RuntimeException> clearBlock)
+          throws RuntimeException {
         final ConfigurableActionBuilder builder = new ConfigurableActionBuilder();
         final AbstractAction action = builder
             .setIcon(GuiIcons.EDIT_CLEAR_LOCATIONBAR_ICON)
             .setTooltip(tooltip)
-            .setProcedure(new IActionProcedure() {
-
-              @Override
-              public void execute(final Component value) throws RuntimeException {
-                clearBlock.execute();
-              }
-            })
+            .setProcedure(value -> clearBlock.execute())
             .build();
-        action.setEnabled(document.getLength() != 0);
+        setEnabled(document, enabledDistributor, action);
+        enabledDistributor.addChangeListener(() -> setEnabled(document, enabledDistributor, action));
         document.addDocumentListener(new DocumentListener() {
 
           @Override
           public void removeUpdate(final DocumentEvent e) {
-            action.setEnabled(document.getLength() != 0);
+            setEnabled(document, enabledDistributor, action);
           }
 
           @Override
           public void insertUpdate(final DocumentEvent e) {
-            action.setEnabled(document.getLength() != 0);
+            setEnabled(document, enabledDistributor, action);
           }
 
           @Override
           public void changedUpdate(final DocumentEvent e) {
-            action.setEnabled(document.getLength() != 0);
+            setEnabled(document, enabledDistributor, action);
           }
         });
         return action;
+      }
+
+      public void setEnabled(
+          final Document document,
+          final IBooleanDistributor enabledDistributor,
+          final AbstractAction action) {
+        GuiUtilities.invokeLater(() -> action.setEnabled(document.getLength() != 0 && enabledDistributor.get()));
       }
     });
 

@@ -23,6 +23,7 @@
 package net.anwiba.commons.swing.dialog;
 
 import java.awt.Component;
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -47,7 +48,7 @@ import net.anwiba.commons.swing.dialog.progress.ProgressDialogLauncher;
 import net.anwiba.commons.swing.icon.GuiIcon;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
-public class ConfigurableDialogLauncher {
+public class ConfigurableDialogLauncher implements IDialogLauncher {
 
   private final DialogConfigurationBuilder dialogConfigurationBuilder = new DialogConfigurationBuilder();
   private final List<IBlock<RuntimeException>> onCloseExecutables = new ArrayList<>();
@@ -110,7 +111,7 @@ public class ConfigurableDialogLauncher {
     return this;
   }
 
-  public ConfigurableDialogLauncher setUnresizeable() {
+  public IDialogLauncher setUnresizeable() {
     this.dialogConfigurationBuilder.setResizeable(false);
     return this;
   }
@@ -138,10 +139,12 @@ public class ConfigurableDialogLauncher {
     return this;
   }
 
+  @Override
   public IDialogResult launch(final Component component) {
     return launch(component == null ? (Window) null : SwingUtilities.windowForComponent(component));
   }
 
+  @Override
   public IDialogResult launch(final Window owner) {
     final IObjectModel<IDialogResult> model = new ObjectModel<>();
 
@@ -180,6 +183,16 @@ public class ConfigurableDialogLauncher {
       }
     });
     return model.get();
+  }
+
+  public ConfigurableDialogLauncher setApplicationModalExclusionType() {
+    this.dialogConfigurationBuilder.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+    return this;
+  }
+
+  public ConfigurableDialogLauncher setNoModalExclusionType() {
+    this.dialogConfigurationBuilder.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+    return this;
   }
 
   public ConfigurableDialogLauncher setModelessModality() {

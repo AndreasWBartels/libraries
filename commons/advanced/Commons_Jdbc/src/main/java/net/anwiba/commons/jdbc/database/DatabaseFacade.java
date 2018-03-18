@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,9 +22,11 @@
 package net.anwiba.commons.jdbc.database;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.anwiba.commons.jdbc.name.IDatabaseConstraintName;
@@ -116,6 +118,19 @@ public class DatabaseFacade implements IDatabaseFacade {
   @Override
   public Iterable<INamedTableFilter> getTableFilters() {
     return Collections.emptyList();
+  }
+
+  @Override
+  public List<String> getSchemaNames(final Connection connection, final String catalog) throws SQLException {
+    final DatabaseMetaData metaData = connection.getMetaData();
+    final LinkedList<String> result = new LinkedList<>();
+    try (final ResultSet resultSet = metaData.getSchemas()) {
+      while (resultSet.next()) {
+        final String schemaName = resultSet.getString(1);
+        result.add(schemaName);
+      }
+    }
+    return result;
   }
 
 }

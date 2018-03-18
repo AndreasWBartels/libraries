@@ -1,19 +1,19 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.0.76
+Bundle-Version: 1.0.126
 Bundle-Name: Libaries
 Bundle-SymbolicName: net.anwiba.eclipse.libraries;singleton:=true
 Bundle-Vendor: Andreas Bartels
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Bundle-ClassPath: lib/anwiba-commons-ensure-1.0.76.jar,
- lib/anwiba-commons-lang-1.0.76.jar,
- lib/anwiba-commons-logging-1.0.76.jar,
- lib/anwiba-commons-message-1.0.76.jar,
- lib/anwiba-commons-model-1.0.76.jar,
- lib/anwiba-commons-thread-1.0.76.jar,
- lib/anwiba-commons-reflaction-1.0.76.jar,
- lib/anwiba-commons-resource-1.0.76.jar,
- lib/anwiba-commons-utilities-1.0.76.jar, 
+Bundle-ClassPath: lib/anwiba-commons-ensure-1.0.126.jar,
+ lib/anwiba-commons-lang-1.0.126.jar,
+ lib/anwiba-commons-logging-1.0.126.jar,
+ lib/anwiba-commons-message-1.0.126.jar,
+ lib/anwiba-commons-model-1.0.126.jar,
+ lib/anwiba-commons-thread-1.0.126.jar,
+ lib/anwiba-commons-reflaction-1.0.126.jar,
+ lib/anwiba-commons-resource-1.0.126.jar,
+ lib/anwiba-commons-utilities-1.0.126.jar, 
  lib/commons-lang-2.6.jar
  lib/commons-logging-1.2.jar
 Eclipse-BuddyPolicy: dependent

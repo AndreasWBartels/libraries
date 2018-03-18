@@ -24,8 +24,13 @@ package net.anwiba.commons.thread.cancel;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anwiba.commons.logging.ILevel;
+
 public class Canceler implements ICanceler {
-  private static final long serialVersionUID = -6572684647148227471L;
+
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(Canceler.class);
+  private static final long serialVersionUID = -1L;
   private boolean isCanceled;
   private final boolean isEnabled;
 
@@ -48,13 +53,17 @@ public class Canceler implements ICanceler {
   }
 
   @Override
-  public synchronized boolean isCanceled() {
-    return this.isCanceled && isEnabled();
+  public boolean isCanceled() {
+    synchronized (this) {
+      return this.isCanceled && this.isEnabled;
+    }
   }
 
   @Override
-  public synchronized boolean isEnabled() {
-    return this.isEnabled;
+  public boolean isEnabled() {
+    synchronized (this) {
+      return this.isEnabled;
+    }
   }
 
   @Override
@@ -80,13 +89,18 @@ public class Canceler implements ICanceler {
     }
   }
 
-  protected final synchronized void fireCanceled() {
+  protected final void fireCanceled() {
     final List<ICancelerListener> currentListeners;
     synchronized (this.listeners) {
       currentListeners = new ArrayList<>(this.listeners);
     }
     for (final ICancelerListener listener : currentListeners) {
-      listener.canceled();
+      try {
+        listener.canceled();
+      } catch (final IllegalStateException exception) {
+        logger.log(ILevel.DEBUG, exception.getMessage());
+        logger.log(ILevel.ALL, exception.getMessage(), exception);
+      }
     }
   }
 

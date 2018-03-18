@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.0.76
+Bundle-Version: 1.0.126
 Bundle-Name: Dependencies
 Bundle-SymbolicName: net.anwiba.eclipse.project.dependencies;singleton:=true
 Bundle-Activator: net.anwiba.eclipse.project.dependency.plugin.DependenciesPlugin
@@ -9,8 +9,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,
  org.eclipse.jface.databinding,
- net.anwiba.eclipse.commons;bundle-version="1.0.76",
- net.anwiba.eclipse.libraries;bundle-version="1.0.76"
+ net.anwiba.eclipse.commons;bundle-version="1.0.126",
+ net.anwiba.eclipse.libraries;bundle-version="1.0.126"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: 
@@ -35,4 +35,4 @@ Import-Package:
  net.anwiba.commons.thread.cancel,
  net.anwiba.commons.utilities.program
 Bundle-ClassPath: .,
- lib/anwiba-tools-graphml-1.0.76.jar
+ lib/anwiba-tools-graphml-1.0.126.jar

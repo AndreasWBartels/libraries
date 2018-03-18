@@ -21,6 +21,9 @@ public class CkanV01_0TestResources extends AbstractResourceFactory {
   @Location("license.json")
   public static String license;
 
+  @Location("resourceI18.json")
+  public static String resourceI18;
+
   @Location("resource.json")
   public static String resource;
 

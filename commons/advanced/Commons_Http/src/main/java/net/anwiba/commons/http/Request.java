@@ -38,9 +38,15 @@ public final class Request implements IRequest {
   private final String mimeType;
   private final String userAgent;
   private final IParameters properties;
+  private final IAuthentication authentication;
+  private final String host;
+  private final int port;
 
-  public Request(
+  Request(
       final HttpMethodType methodType,
+      final String host,
+      final int port,
+      final IAuthentication authentication,
       final String urlString,
       final IParameters parameters,
       final IParameters properties,
@@ -51,7 +57,10 @@ public final class Request implements IRequest {
       final String mimeType) {
     super();
     this.methodType = methodType;
+    this.host = host;
+    this.port = port;
     this.urlString = urlString;
+    this.authentication = authentication;
     this.parameters = parameters;
     this.properties = properties;
     this.userAgent = userAgent;
@@ -63,7 +72,12 @@ public final class Request implements IRequest {
 
   @Override
   public String getUriString() {
-    return this.urlString.replace(" ", "%20"); //$NON-NLS-1$//$NON-NLS-2$
+    return this.urlString;
+  }
+
+  @Override
+  public IAuthentication getAuthentication() {
+    return this.authentication;
   }
 
   @Override
@@ -104,5 +118,15 @@ public final class Request implements IRequest {
   @Override
   public IParameters getProperties() {
     return this.properties;
+  }
+
+  @Override
+  public String getHost() {
+    return this.host;
+  }
+
+  @Override
+  public int getPort() {
+    return this.port;
   }
 }

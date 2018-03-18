@@ -9,7 +9,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
-    <version>1.0.76</version>
+    <version>1.0.126</version>
   </parent>
 
   <scm>
@@ -28,19 +28,23 @@
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-resource</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-utilities</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-logging</artifactId>
+    </dependency>
+
+    <dependency>
+      <artifactId>anwiba-commons-http</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-resource</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
@@ -103,7 +107,7 @@
             </goals>
             <configuration>
               <pakkage>net.anwiba.spatial.ckan.json.schema.v1_0</pakkage>
-              <comment>Copyright (c) 2017 by Andreas W. Bartels (bartels@anwiba.de)</comment>
+              <comment>Copyright (c) 2017 by Andreas W. Bartels</comment>
             </configuration>
           </execution>
         </executions>

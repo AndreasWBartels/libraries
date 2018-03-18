@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels 
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -139,13 +139,13 @@ public class ProgramLauncher {
         command.add("/c"); //$NON-NLS-1$
       }
       final String commandString = create(this.command, this.arguments);
-      Optional.of(commandString).consum(c -> command.add(c));
+      Optional.of(commandString).consume(c -> command.add(c));
       final ProcessBuilder processBuilder = new ProcessBuilder(command);
-      Optional.of(this.inputStreamConsumer).consum(consumer -> processBuilder.redirectError(Redirect.PIPE));
-      Optional.of(this.errorStreamConsumer).consum(consumer -> processBuilder.redirectInput(Redirect.PIPE));
+      Optional.of(this.inputStreamConsumer).consume(consumer -> processBuilder.redirectError(Redirect.PIPE));
+      Optional.of(this.errorStreamConsumer).consume(consumer -> processBuilder.redirectInput(Redirect.PIPE));
       final Process process = processBuilder.start();
-      Optional.of(this.inputStreamConsumer).consum(consumer -> consumer.consume(process.getInputStream()));
-      Optional.of(this.errorStreamConsumer).consum(consumer -> consumer.consume(process.getErrorStream()));
+      Optional.of(this.inputStreamConsumer).consume(consumer -> consumer.consume(process.getInputStream()));
+      Optional.of(this.errorStreamConsumer).consume(consumer -> consumer.consume(process.getErrorStream()));
       if (this.isWaitFor) {
         process.waitFor();
       }
@@ -162,7 +162,7 @@ public class ProgramLauncher {
       return null;
     }
     final StringBuilder builder = new StringBuilder();
-    Optional.of(command).consum(c -> {
+    Optional.of(command).consume(c -> {
       builder.append(c);
       builder.append(" "); //$NON-NLS-1$
     });

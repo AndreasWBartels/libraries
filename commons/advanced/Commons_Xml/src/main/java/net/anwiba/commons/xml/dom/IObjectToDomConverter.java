@@ -45,9 +45,9 @@ public interface IObjectToDomConverter<T> {
     return DocumentHelper.createText(string);
   }
 
-  default void addTo(final Element parent, final Element child) {
+  default Element addTo(final Element parent, final Element child) {
     if (child == null) {
-      return;
+      return child;
     }
     parent.add(child);
     final List<Namespace> namespaces = child.declaredNamespaces();
@@ -57,6 +57,7 @@ public interface IObjectToDomConverter<T> {
     for (final Namespace namespace : namespaces) {
       parent.add(namespace);
     }
+    return child;
   }
 
   default String value(final int value) {

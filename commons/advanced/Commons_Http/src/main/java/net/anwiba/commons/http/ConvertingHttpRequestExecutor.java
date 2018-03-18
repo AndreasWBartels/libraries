@@ -108,4 +108,9 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
       throw interruptedException;
     }
   }
+
+  @Override
+  public void close() throws IOException {
+    this.httpRequestExecutor.close();
+  }
 }

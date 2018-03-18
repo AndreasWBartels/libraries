@@ -131,7 +131,6 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
     setContentPane(this.contentPane);
     this.progressMonitor = new ProgressMonitor(this, message.getText());
     setResizable(false);
-    locate();
   }
 
   @Override

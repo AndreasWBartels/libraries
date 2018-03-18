@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import net.anwiba.commons.lang.collection.IObjectIterable;
 import net.anwiba.commons.lang.collection.ObjectList;
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.utilities.ArrayUtilities;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 import net.anwiba.commons.utilities.interval.IntegerInterval;
@@ -132,7 +133,7 @@ public abstract class AbstractObjectListModel<T> extends AbstractListChangedNoti
       final Set<Integer> indexes = new HashSet<>();
       for (final T object : objects) {
         final Set<Integer> objectIndexes = this.indexByObjectMap.get(object);
-        indexes.addAll(objectIndexes);
+        Optional.of(objectIndexes).consume(values -> indexes.addAll(values));
       }
       return ArrayUtilities.primitives(indexes.toArray(new Integer[indexes.size()]));
     }

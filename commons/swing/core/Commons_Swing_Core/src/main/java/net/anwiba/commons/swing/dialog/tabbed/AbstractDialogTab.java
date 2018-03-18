@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -25,7 +25,7 @@ import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,22 +133,7 @@ public abstract class AbstractDialogTab implements IDialogTab {
     }
   }
 
-  private final KeyListener keyListener = new KeyListener() {
-
-    @Override
-    public void keyPressed(final KeyEvent event) {
-      // nothing todo
-    }
-
-    @Override
-    public void keyReleased(final KeyEvent event) {
-      checkFieldValues();
-    }
-
-    @Override
-    public void keyTyped(final KeyEvent event) {
-      // nothing todo
-    }
+  private final KeyListener keyListener = new KeyAdapter() {
   };
 
   private final ActionListener actionListener = new ActionListener() {

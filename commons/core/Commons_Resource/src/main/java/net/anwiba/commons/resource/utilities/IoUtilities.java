@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.CharBuffer;
 
 import net.anwiba.commons.logging.ILevel;
@@ -59,15 +61,20 @@ public class IoUtilities {
     }
   }
 
-  public static void pipe(final Readable reader, final Appendable writer) throws IOException {
+  public static void pipe(final Readable reader, final Writer writer) throws IOException {
     pipe(reader, writer, BUFFER_SIZE);
   }
 
-  public static void pipe(final Readable in, final Appendable out, final int bufferSize) throws IOException {
+  public static void pipe(final Readable in, final Writer out, final int bufferSize) throws IOException {
     final CharBuffer buffer = CharBuffer.allocate(bufferSize);
-    int numChars;
-    while ((numChars = in.read(buffer)) > -1) {
-      out.append(buffer, 0, numChars);
+    while ((in.read(buffer)) > 0) {
+      buffer.flip();
+      while (buffer.hasRemaining()) {
+        final char c = buffer.get();
+        out.append(c);
+      }
+      out.flush();
+      buffer.clear();
     }
   }
 
@@ -78,6 +85,12 @@ public class IoUtilities {
       } catch (final IOException exception) {
         logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       }
+    }
+  }
+
+  public static void toss(final IOException exception) throws IOException {
+    if (exception != null) {
+      throw exception;
     }
   }
 
@@ -129,9 +142,9 @@ public class IoUtilities {
   }
 
   public static String toString(final Reader reader) throws IOException {
-    final StringBuffer buffer = new StringBuffer();
-    pipe(reader, buffer);
-    return buffer.toString();
+    final StringWriter writer = new StringWriter();
+    pipe(reader, writer);
+    return writer.toString();
   }
 
   public static void pipe(final InputStream inputStream, final File file) throws IOException {

@@ -43,14 +43,14 @@ public class JTextComponentUtilities {
   public static void setTextAndMoveToTop(final JTextComponent textPane, final String text) {
     final Document document = textPane.getDocument();
     if (document instanceof PlainDocument) {
-      setTextAndMoveToTop((PlainDocument) document, text);
+      setTextToDocument((PlainDocument) document, text);
     } else {
       GuiUtilities.invokeLater(() -> textPane.setText(text));
     }
     GuiUtilities.invokeLater(() -> textPane.setCaretPosition(0));
   }
 
-  public static void setTextAndMoveToTop(final PlainDocument document, final String text) {
+  public static void setTextToDocument(final PlainDocument document, final String text) {
     GuiUtilities.invokeLater(() -> {
       try {
         ((AbstractDocument) document).replace(0, document.getLength(), text, null);

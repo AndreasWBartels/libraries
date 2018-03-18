@@ -37,6 +37,15 @@ import net.anwiba.commons.swing.preferences.tree.IPreferenceNode;
 @RunWith(DemoAsTestRunner.class)
 public class PreferencesPaneDemo extends SwingDemoCase {
 
+  public PreferencesPaneDemo() {
+    super("Preferences"); //$NON-NLS-1$
+  }
+
+  @Override
+  protected String getFrameTitle() {
+    return "Preferences"; //$NON-NLS-1$
+  }
+
   @Demo
   public void demo() {
     final UserPreferencesFactory factory = new UserPreferencesFactory();

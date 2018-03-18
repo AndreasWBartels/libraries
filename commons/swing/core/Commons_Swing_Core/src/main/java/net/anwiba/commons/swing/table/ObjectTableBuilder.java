@@ -25,11 +25,16 @@ package net.anwiba.commons.swing.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import net.anwiba.commons.lang.comparable.NumberComparator;
+import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.swing.table.action.ITableActionFactory;
+import net.anwiba.commons.swing.table.action.ITableTextFieldActionFactory;
+import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.swing.table.renderer.BooleanRenderer;
 import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
@@ -60,7 +65,6 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
 
   @Override
   public IObjectTableBuilder<T> addSortableStringConfiguration(
-
       final String title,
       final IFunction<T, String, RuntimeException> provider,
       final int size) {
@@ -75,6 +79,40 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
         return provider.execute(object);
       }
     }, new ObjectTableCellRenderer(), size, String.class, true, null));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addSortableStringConfiguration(
+      final String title,
+      final IFunction<T, String, RuntimeException> provider,
+      final IAggregator<T, String, T, RuntimeException> adaptor,
+      final int size) {
+
+    final DefaultCellEditor cellEditor = new DefaultCellEditor(new JTextField());
+    cellEditor.setClickCountToStart(2);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, //
+        new ObjectTableCellRenderer(),
+        new IColumnValueAdaptor<T>() {
+
+          @Override
+          public T adapt(final T object, final Object value) {
+            return adaptor.aggregate(object, (String) value);
+          }
+        },
+        cellEditor,
+        size,
+        true,
+        null));
     return this;
   }
 
@@ -117,6 +155,12 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   @Override
   public IObjectTableBuilder<T> addActionFactory(final ITableActionFactory<T> factory) {
     this.builder.addActionFactory(factory);
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addTextFieldActionFactory(final ITableTextFieldActionFactory<T> factory) {
+    this.builder.addTextFieldActionFactory(factory);
     return this;
   }
 
@@ -196,6 +240,13 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   @Override
   public IObjectTableBuilder<T> setAutoResizeModeOff() {
     this.builder.setAutoResizeModeOff();
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> setTextFieldKeyListenerFactory(
+      final ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory) {
+    this.builder.setTextFieldKeyListenerFactory(textFieldKeyListenerFactory);
     return this;
   }
 }

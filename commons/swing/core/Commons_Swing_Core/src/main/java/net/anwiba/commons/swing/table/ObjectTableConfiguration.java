@@ -30,13 +30,14 @@ import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
 
 public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T> {
+
   private final List<? extends IColumnConfiguration> columnConfigurations;
   private final int selectionMode;
   private final ITableActionConfiguration<T> actionConfiguration;
   private final int preferredVisibleRowCount;
   private final IMouseListenerFactory<T> mouseListenerFactory;
   private final IKeyListenerFactory<T> keyListenerFactory;
-  private final int autoizeMode;
+  private final int autoResizeMode;
 
   ObjectTableConfiguration(
       final int autoizeMode,
@@ -46,7 +47,7 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
       final IMouseListenerFactory<T> mouseListenerFactory,
       final IKeyListenerFactory<T> keyListenerFactory,
       final ITableActionConfiguration<T> actionConfiguration) {
-    this.autoizeMode = autoizeMode;
+    this.autoResizeMode = autoizeMode;
     this.selectionMode = selectionMode;
     this.preferredVisibleRowCount = preferredVisibleRowCount;
     this.columnConfigurations = columnConfigurations;
@@ -84,8 +85,8 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
   }
 
   @Override
-  public int getAutoizeMode() {
-    return this.autoizeMode;
+  public int getAutoResizeMode() {
+    return this.autoResizeMode;
   }
 
   @Override

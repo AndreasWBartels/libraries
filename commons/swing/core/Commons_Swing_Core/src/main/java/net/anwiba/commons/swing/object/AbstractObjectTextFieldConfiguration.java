@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 
@@ -39,23 +40,32 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
   private final List<IActionFactory<T>> actionFactorys = new ArrayList<>();
   private final Color backgroundColor;
   private final IKeyListenerFactory<T> keyListenerFactory;
+  private final IBooleanModel enabledModel;
+  private final List<IButtonFactory<T>> buttonFactorys;
+  private final boolean isDisguise;
 
   public AbstractObjectTextFieldConfiguration(
       final IObjectModel<T> model,
       final IObjectModel<IValidationResult> validStateModel,
       final IToolTipFactory toolTipFactory,
+      final IBooleanModel enabledModel,
       final boolean isEditable,
       final int columns,
       final List<IActionFactory<T>> actionFactorys,
+      final List<IButtonFactory<T>> buttonFactorys,
       final IKeyListenerFactory<T> keyListenerFactory,
-      final Color backgroundColor) {
+      final Color backgroundColor,
+      final boolean isDisguise) {
     this.model = model;
     this.validStateModel = validStateModel;
     this.factory = toolTipFactory;
+    this.enabledModel = enabledModel;
     this.isEditable = isEditable;
     this.columns = columns;
+    this.buttonFactorys = buttonFactorys;
     this.keyListenerFactory = keyListenerFactory;
     this.backgroundColor = backgroundColor;
+    this.isDisguise = isDisguise;
     this.actionFactorys.addAll(actionFactorys);
   }
 
@@ -67,6 +77,11 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
   @Override
   public int getColumns() {
     return this.columns;
+  }
+
+  @Override
+  public IBooleanModel getEnabledModel() {
+    return this.enabledModel;
   }
 
   @Override
@@ -95,7 +110,17 @@ public abstract class AbstractObjectTextFieldConfiguration<T> implements IObject
   }
 
   @Override
+  public Collection<IButtonFactory<T>> getButtonFactorys() {
+    return this.buttonFactorys;
+  }
+
+  @Override
   public IKeyListenerFactory<T> getKeyListenerFactory() {
     return this.keyListenerFactory;
+  }
+
+  @Override
+  public boolean isDisguise() {
+    return this.isDisguise;
   }
 }

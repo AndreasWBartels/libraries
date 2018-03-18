@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-// Copyright (c) 2010 by Andreas W. Bartels (bartels@anwiba.de)
+// Copyright (c) 2010 by Andreas W. Bartels
 package net.anwiba.eclipse.project.dependency.relation;
 
 import net.anwiba.eclipse.project.dependency.object.IDependencyRelation;

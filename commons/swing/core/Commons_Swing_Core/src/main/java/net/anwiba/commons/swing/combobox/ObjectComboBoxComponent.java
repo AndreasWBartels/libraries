@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -28,7 +28,7 @@ import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.component.IComponentProvider;
 import net.anwiba.commons.swing.list.IObjectListConfiguration;
 import net.anwiba.commons.swing.list.ObjectListConfigurationBuilder;
-import net.anwiba.commons.swing.ui.ObjectUiCellRenderer;
+import net.anwiba.commons.swing.ui.ObjectUiListCellRenderer;
 
 public class ObjectComboBoxComponent<T> implements IComponentProvider {
 
@@ -42,8 +42,12 @@ public class ObjectComboBoxComponent<T> implements IComponentProvider {
   public ObjectComboBoxComponent(final IObjectListConfiguration<T> configuration, final IComboBoxModel<T> listModel) {
     this.objectModel = listModel;
     final JComboBox<T> list = new JComboBox<>(listModel);
-    list.setRenderer(new ObjectUiCellRenderer<>(configuration.getObjectUiCellRendererConfiguration(), configuration
-        .getObjectUi()));
+    list.setRenderer(
+        new ObjectUiListCellRenderer<>(
+            configuration.getObjectUiCellRendererConfiguration(),
+            configuration.getObjectUi()));
+    list.setPrototypeDisplayValue(configuration.getPrototype());
+    list.setMaximumRowCount(configuration.getVisibleRowCount());
     this.component = list;
   }
 

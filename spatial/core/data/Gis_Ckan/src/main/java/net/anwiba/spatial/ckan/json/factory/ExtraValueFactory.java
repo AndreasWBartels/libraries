@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,6 +22,7 @@
 package net.anwiba.spatial.ckan.json.factory;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.logging.ILevel;
@@ -34,9 +35,9 @@ import net.anwiba.spatial.ckan.json.schema.v1_0.ExtraLicense;
 import net.anwiba.spatial.ckan.json.schema.v1_0.ExtraSpatialReference;
 import net.anwiba.spatial.ckan.json.schema.v1_0.ExtraString;
 import net.anwiba.spatial.ckan.json.schema.v1_0.License;
-import net.anwiba.spatial.ckan.json.schema.v1_0.RoledDateString;
 import net.anwiba.spatial.ckan.json.schema.v1_0.SpatialGeometryString;
 import net.anwiba.spatial.ckan.json.schema.v1_0.SpatialReference;
+import net.anwiba.spatial.ckan.json.types.DateString;
 import net.anwiba.spatial.ckan.marshaller.CkanJsonObjectUnmarshallerFactory;
 import net.anwiba.spatial.ckan.marshaller.CkanJsonObjectsUnmarshallerFactory;
 import net.anwiba.spatial.geo.json.marshal.GeoJsonObjectUnmarshallerFactory;
@@ -70,14 +71,16 @@ public class ExtraValueFactory {
             }
             case "dates": { //$NON-NLS-1$
               final ExtraDates object = new ExtraDates();
-              object.setValue(new RoledDateString(value));
+              object.setValue(new DateString(value));
               return object;
             }
             case "spatial_reference": { //$NON-NLS-1$
               final ExtraSpatialReference object = new ExtraSpatialReference();
-              final SpatialReference result = this.objectUnmarshallerFactory
-                  .create(SpatialReference.class)
-                  .unmarshal(value);
+              if (Objects.equals(value.trim(), "{}")) { //$NON-NLS-1$
+                return object;
+              }
+              final SpatialReference result = this.objectUnmarshallerFactory.create(SpatialReference.class).unmarshal(
+                  value);
               object.setValue(result);
               return object;
             }

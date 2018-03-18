@@ -76,11 +76,11 @@ public class VisitorTest {
     assertThat(classSwitch.switchTo(5000f), equalTo("5,000"));
 
     final int value = 5;
-    final FunctionSwitch<VisitorTestEnum, VisitorTestEnum, Integer, Exception> enumSwitch = EnumSwitches.create();
+    final EnumSwitch<VisitorTestEnum, Integer, Exception> enumSwitch = EnumSwitches.create();
     enumSwitch
-        .ifCase(i -> value, ONE) //
-        .ifCase(i -> value * 2, TWO, THREE)
-        .defaultCase(i -> 0);
+        .ifCase(() -> value, ONE) //
+        .ifCase(() -> value * 2, TWO, THREE)
+        .defaultCase(() -> 0);
 
     assertThat(enumSwitch.switchTo(ONE), equalTo(5));
     assertThat(enumSwitch.switchTo(TWO), equalTo(10));

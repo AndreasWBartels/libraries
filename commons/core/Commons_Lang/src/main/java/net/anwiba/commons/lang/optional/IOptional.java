@@ -30,6 +30,8 @@ import net.anwiba.commons.lang.functional.ISupplier;
 
 public interface IOptional<T, E extends Exception> {
 
+  public IOptional<T, E> or(T value) throws E;
+
   public IOptional<T, E> or(IBlock<E> block) throws E;
 
   public IOptional<T, E> or(ISupplier<T, E> supplier) throws E;
@@ -38,7 +40,7 @@ public interface IOptional<T, E extends Exception> {
 
   public IOptional<T, E> accept(IAcceptor<T> acceptor) throws E;
 
-  public IOptional<T, E> consum(IConsumer<T, E> converter) throws E;
+  public IOptional<T, E> consume(IConsumer<T, E> converter) throws E;
 
   public <O> IOptional<O, E> convert(IConverter<T, O, E> converter) throws E;
 
@@ -49,5 +51,7 @@ public interface IOptional<T, E extends Exception> {
   T getOr(ISupplier<T, E> supplier) throws E;
 
   boolean isAccepted();
+
+  public <O> IOptional<O, E> cast(Class<O> clazz);
 
 }

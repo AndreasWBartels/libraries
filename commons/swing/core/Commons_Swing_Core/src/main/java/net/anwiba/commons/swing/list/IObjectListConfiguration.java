@@ -52,4 +52,6 @@ public interface IObjectListConfiguration<T> {
 
   boolean isDragEnabled();
 
+  T getPrototype();
+
 }

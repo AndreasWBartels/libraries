@@ -26,11 +26,34 @@ import java.util.Comparator;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import net.anwiba.commons.swing.ui.IObjectUi;
+import net.anwiba.commons.swing.ui.ObjectUiTableCellRenderer;
+
 public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implements IObjectListColumnConfiguration<T> {
 
   private final IColumnValueProvider<T> columnValueProvider;
   private IColumnValueAdaptor<T> columnValueAdaptor;
   private Class<?> clazz;
+
+  public ObjectListColumnConfiguration(
+      final Object headerValue,
+      final IColumnValueProvider<T> columnValueProvider,
+      final IObjectUi<T> objectUi,
+      final int preferredWidth,
+      final Class<?> clazz,
+      final boolean isSortable,
+      @SuppressWarnings("rawtypes") final Comparator comparator) {
+    this(
+        headerValue,
+        columnValueProvider,
+        new ObjectUiTableCellRenderer<>(objectUi),
+        null,
+        null,
+        preferredWidth,
+        clazz,
+        isSortable,
+        comparator);
+  }
 
   public ObjectListColumnConfiguration(
       final Object headerValue,
@@ -41,6 +64,28 @@ public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implem
       final boolean isSortable,
       @SuppressWarnings("rawtypes") final Comparator comparator) {
     this(headerValue, columnValueProvider, cellRenderer, null, null, preferredWidth, clazz, isSortable, comparator);
+  }
+
+  public ObjectListColumnConfiguration(
+      final Object headerValue,
+      final IColumnValueProvider<T> columnValueProvider,
+      final IObjectUi<T> objectUi,
+      final IColumnValueAdaptor<T> columnValueAdaptor,
+      final TableCellEditor cellEditor,
+      final int preferredWidth,
+      final Class<?> clazz,
+      final boolean isSortable,
+      @SuppressWarnings("rawtypes") final Comparator comparator) {
+    this(
+        headerValue,
+        columnValueProvider,
+        new ObjectUiTableCellRenderer<>(objectUi),
+        columnValueAdaptor,
+        cellEditor,
+        preferredWidth,
+        clazz,
+        isSortable,
+        comparator);
   }
 
   public ObjectListColumnConfiguration(

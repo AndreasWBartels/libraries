@@ -73,7 +73,7 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
                 .setTitle(this.title)
                 .setDescription(this.description)
                 .launch(owner);
-        Optional.<IActionConsumer<O>, InvocationTargetException> create(this.consumer).consum(
+        Optional.<IActionConsumer<O>, InvocationTargetException> create(this.consumer).consume(
             c -> c.consume(component, result));
       } catch (final InvocationTargetException exception) {
         final Throwable throwable = exception.getCause();

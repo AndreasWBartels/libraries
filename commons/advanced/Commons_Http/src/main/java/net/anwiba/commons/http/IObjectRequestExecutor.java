@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,8 +25,11 @@ import java.io.IOException;
 
 import net.anwiba.commons.thread.cancel.ICanceler;
 
-public interface IObjectRequestExecutor<T> {
+public interface IObjectRequestExecutor<T> extends AutoCloseable {
 
   T execute(ICanceler cancelable, IRequest request) throws InterruptedException, IOException;
+
+  @Override
+  void close() throws IOException;
 
 }

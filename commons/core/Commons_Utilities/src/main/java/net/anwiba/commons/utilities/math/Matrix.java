@@ -226,7 +226,7 @@ public class Matrix {
 
   static public double trace(final int n, final int m, final double[][] matrix) {
     double result = 0.0;
-    for (int i = 0; i < Math.min(n, m); i++) {
+    for (int i = 0; i < MathWrapper.min(n, m); i++) {
       result += matrix[i][i];
     }
     return (result);
@@ -315,7 +315,7 @@ public class Matrix {
       g = scale = 0.0;
       if (i < m) {
         for (int k = i; k < m; k++) {
-          scale += Math.abs(p[k][i]);
+          scale += MathWrapper.abs(p[k][i]);
         }
         if (scale > 0) {
           for (int k = i; k < m; k++) {
@@ -323,7 +323,7 @@ public class Matrix {
             s += p[k][i] * p[k][i];
           }
           double f = p[i][i];
-          g = -Matrix.sign(Math.sqrt(s), f);
+          g = -Matrix.sign(MathWrapper.sqrt(s), f);
           final double h = f * g - s;
           p[i][i] = f - g;
           if (i != n - 1) {
@@ -347,7 +347,7 @@ public class Matrix {
       g = s = scale = 0.0;
       if (i < m && i != n - 1) {
         for (int k = l; k < n; k++) {
-          scale += Math.abs(p[i][k]);
+          scale += MathWrapper.abs(p[i][k]);
         }
         if (scale != 0) {
           for (int k = l; k < n; k++) {
@@ -355,7 +355,7 @@ public class Matrix {
             s += p[i][k] * p[i][k];
           }
           final double f = p[i][l];
-          g = -Matrix.sign(Math.sqrt(s), f);
+          g = -Matrix.sign(MathWrapper.sqrt(s), f);
           final double h = f * g - s;
           p[i][l] = f - g;
           for (int k = l; k < n; k++) {
@@ -377,27 +377,27 @@ public class Matrix {
           }
         }
       }
-      anorm = Math.max(anorm, Math.abs(d[i]) + Math.abs(r[i]));
+      anorm = MathWrapper.max(anorm, MathWrapper.abs(d[i]) + MathWrapper.abs(r[i]));
     }
     return anorm;
   }
 
   static double radius(final double u, final double v) {
-    final double absU = Math.abs(u);
-    final double absV = Math.abs(v);
+    final double absU = MathWrapper.abs(u);
+    final double absV = MathWrapper.abs(v);
     if (absU > absV) {
       final double w = absV / absU;
-      return (absU * Math.sqrt(1. + w * w));
+      return (absU * MathWrapper.sqrt(1. + w * w));
     }
     if (absV > 0) {
       final double w = absU / absV;
-      return (absV * Math.sqrt(1. + w * w));
+      return (absV * MathWrapper.sqrt(1. + w * w));
     }
     return 0.0;
   }
 
   static double sign(final double u, final double v) {
-    return (v) >= 0.0 ? Math.abs(u) : -Math.abs(u);
+    return (v) >= 0.0 ? MathWrapper.abs(u) : -MathWrapper.abs(u);
   }
 
   public static void diagonalization(
@@ -417,11 +417,11 @@ public class Matrix {
         flag = true;
         for (l = k; l >= 0; l--) { /* test for splitting */
           nm = l - 1; /* note that r[l] is always zero */
-          if (Math.abs(r[l]) + anorm == anorm) {
+          if (MathWrapper.abs(r[l]) + anorm == anorm) {
             flag = false;
             break;
           }
-          if (Math.abs(d[nm]) + anorm == anorm) {
+          if (MathWrapper.abs(d[nm]) + anorm == anorm) {
             break;
           }
         }
@@ -430,7 +430,7 @@ public class Matrix {
           double s = 1.0;
           for (int i = l; i <= k; i++) {
             final double f = s * r[i];
-            if (Math.abs(f) + anorm != anorm) {
+            if (MathWrapper.abs(f) + anorm != anorm) {
               final double g = d[i];
               double h = radius(f, g);
               d[i] = h;
@@ -543,7 +543,7 @@ public class Matrix {
   }
 
   public static double[][] fill(final double[][] ds) {
-    final int dim = Math.max(ds.length, ds[0].length);
+    final int dim = MathWrapper.max(ds.length, ds[0].length);
     final double[][] result = new double[dim][dim];
     for (int i = 0; i < ds.length; i++) {
       for (int j = 0; j < ds[i].length; j++) {

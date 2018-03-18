@@ -49,9 +49,23 @@ public class PlanarImageContainer extends AbstractRenderedImageContainer {
             "image dimensions (width=" + getWidth() + " height=" + getHeight() + ") are too large"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
         return null;
       }
+      //
+      //      final Object object = this.image.getProperty("tiff_directory"); //$NON-NLS-1$
+      //      if (object instanceof TIFFDirectory) {
+      //        final TIFFDirectory tiffDirectory = (TIFFDirectory) object;
+      //        final TIFFField[] fields = tiffDirectory.getFields();
+      //        for (final TIFFField tiffField : fields) {
+      //          System.out.println(tiffField.getTag());
+      //        }
+      //      }
+      //      final String[] propertyNames = this.image.getPropertyNames();
+      //      for (final String string : propertyNames) {
+      //        System.out.println(string);
+      //      }
       return this.image.getAsBufferedImage();
     } catch (final RuntimeException exception) {
-      logger.log(ILevel.WARNING, exception.getMessage(), exception);
+      logger.log(ILevel.DEBUG, "Couldn't create image, " + exception.getMessage());
+      logger.log(ILevel.ALL, exception.getMessage(), exception);
       return null;
     }
   }

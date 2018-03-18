@@ -43,6 +43,7 @@ import de.jdemo.extensions.SwingDemoCase;
 import de.jdemo.junit.DemoAsTestRunner;
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.functional.IProcedure;
+import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.swing.component.search.ISearchEngine;
 import net.anwiba.commons.swing.component.search.SearchComponent;
@@ -168,6 +169,8 @@ public class SearchComponentDemo extends SwingDemoCase {
     final IFactory<String, String, RuntimeException> stringToConditionFactory = new StringConditonFactory();
 
     final SearchComponent<String, IStringPart> searchComponent = new SearchComponent<>(
+        new BooleanModel(true),
+        (validationResult, context) -> "search condition",
         engine,
         stringToConditionFactory);
     final JToolBar toolbar = new JToolBar();

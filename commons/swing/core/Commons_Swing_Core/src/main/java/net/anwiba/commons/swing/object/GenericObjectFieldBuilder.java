@@ -22,12 +22,7 @@
 
 package net.anwiba.commons.swing.object;
 
-import java.util.regex.Pattern;
-
 import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.utilities.string.StringUtilities;
-import net.anwiba.commons.utilities.validation.IValidationResult;
-import net.anwiba.commons.utilities.validation.IValidator;
 
 public class GenericObjectFieldBuilder<T>
     extends
@@ -40,51 +35,6 @@ public class GenericObjectFieldBuilder<T>
   @Override
   protected AbstractObjectTextField<T> create(final IObjectFieldConfiguration<T> configuration) {
     return new GenericObjectField<>(configuration);
-  }
-
-  @Override
-  public GenericObjectFieldBuilder<T> setNotEmptyValidator(final String message) {
-    getConfigurationBuilder().setValidator(new IValidator<String>() {
-
-      @Override
-      public IValidationResult validate(final String value) {
-        if (StringUtilities.isNullOrTrimmedEmpty(value)) {
-          return IValidationResult.inValid(message);
-        }
-        return IValidationResult.valid();
-      }
-    });
-    return this;
-  }
-
-  public GenericObjectFieldBuilder<T> setRegularExpressionValidator(final String patternString, final String message) {
-    final Pattern pattern = Pattern.compile(patternString);
-
-    getConfigurationBuilder().setValidator(new IValidator<String>() {
-
-      @Override
-      public IValidationResult validate(final String value) {
-        if (StringUtilities.isNullOrTrimmedEmpty(value)) {
-          return IValidationResult.inValid(message);
-        }
-        pattern.matcher(value).matches();
-        if (!value.matches(patternString)) {
-          return IValidationResult.inValid(message);
-        }
-        return IValidationResult.valid();
-      }
-    });
-    return this;
-  }
-
-  public GenericObjectFieldBuilder<T> setToolTip(final String tooltipText) {
-    getConfigurationBuilder().setToolTipFactory((validationResult, text) -> {
-      if (!validationResult.isValid()) {
-        return validationResult.getMessage();
-      }
-      return tooltipText;
-    });
-    return this;
   }
 
 }

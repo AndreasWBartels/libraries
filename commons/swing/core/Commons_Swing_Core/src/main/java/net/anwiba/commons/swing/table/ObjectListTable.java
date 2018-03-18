@@ -22,17 +22,21 @@
 package net.anwiba.commons.swing.table;
 
 import java.awt.BorderLayout;
+import java.awt.event.KeyListener;
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.text.PlainDocument;
 
+import net.anwiba.commons.lang.functional.IBlock;
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.swing.object.StringField;
-import net.anwiba.commons.swing.object.StringObjectFieldConfigurationBuilder;
+import net.anwiba.commons.swing.object.IKeyListenerFactory;
+import net.anwiba.commons.swing.object.IObjectField;
+import net.anwiba.commons.swing.object.StringFieldBuilder;
 import net.anwiba.commons.swing.table.filter.ContainsFilter;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.utilities.string.StringUtilities;
@@ -78,29 +82,51 @@ public class ObjectListTable<T> extends ObjectTable<T> {
 
   @Override
   public JComponent getComponent() {
-    if (this.configuration.isFilterable()) {
-      final StringField stringField = new StringField(
-          new StringObjectFieldConfigurationBuilder().addClearAction("clear filter").build());
-      final IObjectModel<String> model = stringField.getModel();
-      final IObjectModel<IRowFilter> rowFilterModel = getRowFilterModel();
-      final IColumToStringConverter filterToStringConverter = this.configuration.getRowFilterToStringConverter();
-      model.addChangeListener(new IChangeableObjectListener() {
+    if (this.configuration.isTextFieldEnable() || !this.configuration.getTextFieldActionConfiguration().isEmpty()) {
+      final StringFieldBuilder builder = new StringFieldBuilder().addClearAction("clear");
 
-        @Override
-        public void objectChanged() {
+      this.configuration.getTextFieldActionConfiguration().getFactories().forEach(
+          f -> builder.addActionFactory(
+              (model, document, enabledDistributor, clearBlock) -> f.create(
+                  getTableModel(),
+                  getSelectionIndexModel(),
+                  getSelectionModel(),
+                  enabledDistributor,
+                  model,
+                  clearBlock)));
+
+      Optional.of(this.configuration.getTextFieldKeyListenerFactory()).consume(
+          f -> builder.setKeyListenerFactory(new IKeyListenerFactory<String>() {
+
+            @Override
+            public KeyListener create(
+                final IObjectModel<String> model,
+                final PlainDocument document,
+                final IBlock<RuntimeException> clearBlock) {
+              return f.create(getTableModel(), getSelectionIndexModel(), getSelectionModel(), model, clearBlock);
+            }
+          }));
+
+      final IObjectField<String> stringField = builder.build();
+      final IObjectModel<String> model = stringField.getModel();
+
+      if (this.configuration.isFilterable()) {
+        final IObjectModel<IRowFilter> rowFilterModel = getRowFilterModel();
+        final IColumToStringConverter filterToStringConverter = this.configuration.getRowFilterToStringConverter();
+        model.addChangeListener(() -> {
           final String value = model.get();
           if (StringUtilities.isNullOrTrimmedEmpty(value)) {
             rowFilterModel.set(null);
             return;
           }
           rowFilterModel.set(new ContainsFilter(value, filterToStringConverter));
-        }
-      });
+        });
+      }
       final JPanel contentPane = new JPanel();
       contentPane.setLayout(new BorderLayout());
       contentPane.add(stringField.getComponent(), BorderLayout.NORTH);
       // contentPane.add(BorderLayout.NORTH, toolBar);
-      contentPane.add(BorderLayout.CENTER, new JScrollPane(super.getComponent()));
+      contentPane.add(BorderLayout.CENTER, super.getComponent());
       return contentPane;
     }
     return super.getComponent();

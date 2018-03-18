@@ -85,7 +85,15 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
   }
 
   @Override
-  public IOptional<T, E> consum(final IConsumer<T, E> consumer) throws E {
+  public <O> IOptional<O, E> cast(final Class<O> clazz) {
+    if (isAccepted() && clazz.isInstance(this.value)) {
+      return create((O) this.value);
+    }
+    return create(null);
+  }
+
+  @Override
+  public IOptional<T, E> consume(final IConsumer<T, E> consumer) throws E {
     if (isAccepted()) {
       consumer.consume(this.value);
     }
@@ -138,6 +146,14 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
       return this.value;
     }
     return supplier.supply();
+  }
+
+  @Override
+  public IOptional<T, E> or(final T value) throws E {
+    if (isAccepted()) {
+      return this;
+    }
+    return new Optional<>(this.acceptor, value);
   }
 
 }

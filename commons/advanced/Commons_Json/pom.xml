@@ -10,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-advanced</artifactId>
-    <version>1.0.76</version>
+    <version>1.0.126</version>
   </parent>
 
   <scm>
@@ -112,7 +112,7 @@
             </goals>
             <configuration>
               <pakkage>net.anwiba.commons.json.schema.v1_0</pakkage>
-              <comment>Copyright (c) 2016 by Andreas W. Bartels (bartels@anwiba.de)</comment>
+              <comment>Copyright (c) 2016 by Andreas W. Bartels</comment>
             </configuration>
           </execution>
         </executions>

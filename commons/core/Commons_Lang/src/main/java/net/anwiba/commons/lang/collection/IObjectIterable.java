@@ -30,7 +30,7 @@ public interface IObjectIterable<T> extends Iterable<T> {
   @Override
   public IObjectIterator<T> iterator();
 
-  default <E extends Exception> void forEach(final IConsumer<? super T, E> consumer) throws E {
+  default <E extends Exception> void foreach(final IConsumer<? super T, E> consumer) throws E {
     Objects.requireNonNull(consumer);
     for (final T t : this) {
       consumer.consume(t);;

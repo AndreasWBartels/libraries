@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.action;
 
-import net.anwiba.commons.model.IBooleanModel;
+import net.anwiba.commons.model.IBooleanDistributor;
 
 public interface IActionConfiguration {
 
   IActionCustomization getCustomization();
 
-  IBooleanModel getEnabledModel();
+  IBooleanDistributor getEnabledDistributor();
 
   IActionProcedure getProcedure();
 

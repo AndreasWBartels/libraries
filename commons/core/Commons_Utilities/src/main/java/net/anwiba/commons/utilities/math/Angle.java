@@ -23,10 +23,10 @@ package net.anwiba.commons.utilities.math;
 
 public final class Angle {
 
-  public static final double TWO_PI = 2. * Math.PI;
-  public static final double RHO_DEGREE = 180. / Math.PI;
-  public static final double RHO_GON = 200. / Math.PI;
-  public static final double RHO_SEMI_CIRCLE = 1. / Math.PI;
+  public static final double TWO_PI = 2. * MathWrapper.PI;
+  public static final double RHO_DEGREE = 180. / MathWrapper.PI;
+  public static final double RHO_GON = 200. / MathWrapper.PI;
+  public static final double RHO_SEMI_CIRCLE = 1. / MathWrapper.PI;
 
   private double value;
 
@@ -91,10 +91,10 @@ public final class Angle {
   }
 
   public static double sin(final Angle value) {
-    return Math.sin(value.radian());
+    return MathWrapper.sin(value.radian());
   }
 
   public static double cos(final Angle value) {
-    return Math.cos(value.radian());
+    return MathWrapper.cos(value.radian());
   }
 }

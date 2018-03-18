@@ -37,7 +37,7 @@ import net.anwiba.commons.model.ISelectionListener;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.SelectionEvent;
 import net.anwiba.commons.swing.component.IComponentProvider;
-import net.anwiba.commons.swing.ui.ObjectUiCellRenderer;
+import net.anwiba.commons.swing.ui.ObjectUiListCellRenderer;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 
@@ -151,7 +151,7 @@ public class ObjectListComponent<T> implements IComponentProvider {
     this.list.setSelectionMode(configuration.getSelectionMode());
     this.list.setLayoutOrientation(configuration.getLayoutOrientation());
     this.list.setCellRenderer(
-        new ObjectUiCellRenderer<>(configuration.getObjectUiCellRendererConfiguration(), configuration.getObjectUi()));
+        new ObjectUiListCellRenderer<>(configuration.getObjectUiCellRendererConfiguration(), configuration.getObjectUi()));
     final ListSelectionModel tableSelectionModel = this.list.getSelectionModel();
     this.selectionModel = configuration.getSelectionModel();
     tableSelectionModel

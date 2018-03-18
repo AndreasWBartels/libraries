@@ -62,7 +62,7 @@ public class FilterableObjectTableModel<T> extends AbstractTableModel implements
     setRowFilter(new NeutralFilter());
   }
 
-  IObjectTableModel<T> getObjectTableModel() {
+  public IObjectTableModel<T> getObjectTableModel() {
     return this.objectTableModel;
   }
 

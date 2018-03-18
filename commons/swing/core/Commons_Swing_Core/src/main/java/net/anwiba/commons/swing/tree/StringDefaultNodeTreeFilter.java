@@ -42,23 +42,24 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
 
       @Override
       public boolean accept(final TreeNode value) {
-        if (StringUtilities.isNullOrTrimmedEmpty(string)) {
+        if (StringUtilities.isNullOrEmpty(string)) {
           return true;
         }
         return evaluate(value);
       }
 
       private boolean evaluate(final TreeNode node) {
+        final String upperCase = string.toUpperCase();
         if (node instanceof DefaultMutableTreeNode) {
           boolean flag = false;
           for (final IToStringConverter toStringConverter : converters) {
             if (toStringConverter.isApplicable(((DefaultMutableTreeNode) node).getUserObject())) {
-              flag |= contains(toStringConverter.toString(((DefaultMutableTreeNode) node).getUserObject()), string);
+              flag |= contains(toStringConverter.toString(((DefaultMutableTreeNode) node).getUserObject()), upperCase);
             }
           }
           return flag || evaluate(iterable(node));
         }
-        return contains(node.toString(), string) || evaluate(iterable(node));
+        return contains(node.toString(), upperCase) || evaluate(iterable(node));
       }
 
       private boolean evaluate(final Iterable<TreeNode> nodes) {
@@ -70,11 +71,7 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
         return false;
       }
 
-      private boolean contains(final String string, final String value) {
-        if (string == null) {
-          return false;
-        }
-        final String upperCase = string.toUpperCase();
+      private boolean contains(final String upperCase, final String value) {
         return value == null ? false : upperCase.contains(value.toUpperCase());
       }
     };

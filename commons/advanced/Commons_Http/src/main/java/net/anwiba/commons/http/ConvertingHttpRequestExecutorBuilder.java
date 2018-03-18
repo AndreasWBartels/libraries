@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,45 +21,30 @@
  */
 package net.anwiba.commons.http;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-
 public class ConvertingHttpRequestExecutorBuilder implements IConvertingHttpRequestExecutorBuilder {
 
-  final List<IApplicableHttpResponseExceptionFactory> applicableHttpResponseExceptionFactories = new ArrayList<>();
-  private IHttpClientConnectionManagerProvider connectionManagerProvider;
+  IHttpRequestExecutorFactoryBuilder builder = new HttpRequestExecutorFactoryBuilder();
 
   @Override
-  public IConvertingHttpRequestExecutorBuilder setConnectionManagerProvider(
-      final IHttpClientConnectionManagerProvider connectionManagerProvider) {
-    this.connectionManagerProvider = connectionManagerProvider;
-    return this;
-  }
-
-  @Override
-  @SuppressWarnings("resource")
   public IConvertingHttpRequestExecutorBuilder useAlwaysTheSameConnection() {
-    this.connectionManagerProvider = new HttpClientConnectionManagerProvider(new BasicHttpClientConnectionManager());
+    this.builder.useAlwaysTheSameConnection();
     return this;
   }
 
   @Override
   public IConvertingHttpRequestExecutorBuilder useAlwaysANewConnection() {
-    this.connectionManagerProvider = new HttpClientConnectionManagerProvider();
+    this.builder.useAlwaysANewConnection();
+    return this;
+  }
+
+  @Override
+  public IConvertingHttpRequestExecutorBuilder usePoolingConnection() {
     return this;
   }
 
   @Override
   public IConvertingHttpRequestExecutor build() {
-
-    final IHttpClientConnectionManagerProvider provider = Optional
-        .ofNullable(this.connectionManagerProvider)
-        .orElseGet(() -> new HttpClientConnectionManagerProvider());
-
-    final IHttpRequestExecutor executor = new HttpRequestExcecutorFactory(provider).create();
+    final IHttpRequestExecutor executor = this.builder.build().create();
     return new ConvertingHttpRequestExecutor(executor);
   }
 

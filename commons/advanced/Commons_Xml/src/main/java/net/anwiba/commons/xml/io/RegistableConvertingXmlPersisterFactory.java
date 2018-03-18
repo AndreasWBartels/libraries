@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -43,6 +44,7 @@ import net.anwiba.commons.lang.functional.IApplicable;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.io.NoneClosingInputStream;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.utilities.parameter.Parameters;
 import net.anwiba.commons.xml.jaxb.JaxbTransformer;
 
 public class RegistableConvertingXmlPersisterFactory {
@@ -95,7 +97,7 @@ public class RegistableConvertingXmlPersisterFactory {
         @Override
         public T read(final InputStream inputStream) throws IOException {
           try {
-            return jaxbTransformer.unmarshall(inputStream);
+            return jaxbTransformer.unmarshall(inputStream, new Parameters(Collections.emptyList()));
           } catch (JAXBException | TransformerException exception) {
             throw new IOException(exception);
           }

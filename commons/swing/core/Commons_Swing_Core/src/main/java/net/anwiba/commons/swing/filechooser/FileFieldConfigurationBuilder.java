@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -35,6 +35,7 @@ import javax.swing.text.Document;
 
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
 import net.anwiba.commons.swing.action.IActionProcedure;
@@ -163,8 +164,8 @@ public class FileFieldConfigurationBuilder
       public AbstractAction create(
           final IObjectModel<File> context,
           final Document document,
+          final IBooleanDistributor enabledDistributor,
           final IBlock<RuntimeException> clearBlock) throws RuntimeException {
-        final ConfigurableActionBuilder builder = new ConfigurableActionBuilder();
         final IActionProcedure procedure = new IActionProcedure() {
 
           @Override
@@ -182,7 +183,11 @@ public class FileFieldConfigurationBuilder
             context.set(result.getSelectedFile());
           }
         };
-        return builder.setIcon(GuiIcons.OPEN_ICON).setProcedure(procedure).build();
+        return new ConfigurableActionBuilder()
+            .setEnabledDistributor(enabledDistributor)
+            .setIcon(GuiIcons.OPEN_ICON)
+            .setProcedure(procedure)
+            .build();
       }
     });
     return this;
@@ -195,26 +200,26 @@ public class FileFieldConfigurationBuilder
       public AbstractAction create(
           final IObjectModel<File> context,
           final Document document,
+          final IBooleanDistributor enabledDistributor,
           final IBlock<RuntimeException> clearBlock) throws RuntimeException {
-        final ConfigurableActionBuilder builder = new ConfigurableActionBuilder();
-        final IActionProcedure procedure = new IActionProcedure() {
-
-          @Override
-          public void execute(final Component value) throws RuntimeException {
-            final ISaveFileChooserConfiguration configuration = new SaveFileChooserConfiguration(
-                context.get(),
-                Arrays.asList(),
-                JFileChooser.DIRECTORIES_ONLY,
-                false,
-                false);
-            final IFileChooserResult result = FileChoosers.show(owner, configuration);
-            if (result.getReturnState() != JFileChooser.APPROVE_OPTION) {
-              return;
-            }
-            context.set(result.getSelectedFile());
+        final IActionProcedure procedure = value -> {
+          final ISaveFileChooserConfiguration configuration = new SaveFileChooserConfiguration(
+              context.get(),
+              Arrays.asList(),
+              JFileChooser.DIRECTORIES_ONLY,
+              false,
+              false);
+          final IFileChooserResult result = FileChoosers.show(owner, configuration);
+          if (result.getReturnState() != JFileChooser.APPROVE_OPTION) {
+            return;
           }
+          context.set(result.getSelectedFile());
         };
-        return builder.setIcon(GuiIcons.FOLDER_ICON).setProcedure(procedure).build();
+        return new ConfigurableActionBuilder()
+            .setEnabledDistributor(enabledDistributor)
+            .setIcon(GuiIcons.FOLDER_ICON)
+            .setProcedure(procedure)
+            .build();
       }
     });
     return this;
@@ -232,25 +237,25 @@ public class FileFieldConfigurationBuilder
       public AbstractAction create(
           final IObjectModel<File> context,
           final Document document,
+          final IBooleanDistributor enabledDistributor,
           final IBlock<RuntimeException> clearBlock) throws RuntimeException {
-        final ConfigurableActionBuilder builder = new ConfigurableActionBuilder();
-        final IActionProcedure procedure = new IActionProcedure() {
-
-          @Override
-          public void execute(final Component value) throws RuntimeException {
-            final IOpenFileChooserConfiguration configuration = new OpenFileChooserConfiguration(
-                context.get(),
-                FileFieldConfigurationBuilder.this.fileFilters,
-                JFileChooser.FILES_ONLY,
-                false);
-            final IFileChooserResult result = FileChoosers.show(owner, configuration);
-            if (result.getReturnState() != JFileChooser.APPROVE_OPTION) {
-              return;
-            }
-            context.set(result.getSelectedFile());
+        final IActionProcedure procedure = value -> {
+          final IOpenFileChooserConfiguration configuration = new OpenFileChooserConfiguration(
+              context.get(),
+              FileFieldConfigurationBuilder.this.fileFilters,
+              JFileChooser.FILES_ONLY,
+              false);
+          final IFileChooserResult result = FileChoosers.show(owner, configuration);
+          if (result.getReturnState() != JFileChooser.APPROVE_OPTION) {
+            return;
           }
+          context.set(result.getSelectedFile());
         };
-        return builder.setIcon(GuiIcons.OPEN_ICON).setProcedure(procedure).build();
+        return new ConfigurableActionBuilder()
+            .setEnabledDistributor(enabledDistributor)
+            .setIcon(GuiIcons.OPEN_ICON)
+            .setProcedure(procedure)
+            .build();
       }
     });
     return this;
@@ -263,25 +268,25 @@ public class FileFieldConfigurationBuilder
       public AbstractAction create(
           final IObjectModel<File> context,
           final Document document,
+          final IBooleanDistributor enabledDistributor,
           final IBlock<RuntimeException> clearBlock) throws RuntimeException {
-        final ConfigurableActionBuilder builder = new ConfigurableActionBuilder();
-        final IActionProcedure procedure = new IActionProcedure() {
-
-          @Override
-          public void execute(final Component value) throws RuntimeException {
-            final IOpenFileChooserConfiguration configuration = new OpenFileChooserConfiguration(
-                context.get(),
-                FileFieldConfigurationBuilder.this.fileFilters,
-                JFileChooser.DIRECTORIES_ONLY,
-                false);
-            final IFileChooserResult result = FileChoosers.show(owner, configuration);
-            if (result.getReturnState() != JFileChooser.APPROVE_OPTION) {
-              return;
-            }
-            context.set(result.getSelectedFile());
+        final IActionProcedure procedure = value -> {
+          final IOpenFileChooserConfiguration configuration = new OpenFileChooserConfiguration(
+              context.get(),
+              FileFieldConfigurationBuilder.this.fileFilters,
+              JFileChooser.DIRECTORIES_ONLY,
+              false);
+          final IFileChooserResult result = FileChoosers.show(owner, configuration);
+          if (result.getReturnState() != JFileChooser.APPROVE_OPTION) {
+            return;
           }
+          context.set(result.getSelectedFile());
         };
-        return builder.setIcon(GuiIcons.FOLDER_ICON).setProcedure(procedure).build();
+        return new ConfigurableActionBuilder()
+            .setEnabledDistributor(enabledDistributor)
+            .setIcon(GuiIcons.FOLDER_ICON)
+            .setProcedure(procedure)
+            .build();
       }
     });
     return this;

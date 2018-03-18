@@ -82,7 +82,6 @@ public class TabbedDialog extends MessageDialog {
       final boolean modal) {
     super(owner, title, message, icon, dialogType, modal);
     createTabbedView(i -> new ArrayList<>());
-    locate();
   }
 
   public TabbedDialog(
@@ -156,7 +155,6 @@ public class TabbedDialog extends MessageDialog {
       final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {
     super(owner, preferences, title, message, icon, dialogType, actionFactories, dataStateModel, modal);
     createTabbedView(tabsFactory);
-    locate();
   }
 
   private void createTabbedView(final IFunction<Void, Iterable<IDialogTab>, RuntimeException> tabsFactory) {

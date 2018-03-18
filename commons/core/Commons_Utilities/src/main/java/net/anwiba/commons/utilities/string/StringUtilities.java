@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -204,6 +205,15 @@ public class StringUtilities {
   public static boolean containsIgnoreCase(final String value, final String... strings) {
     for (final String string : strings) {
       if (StringUtilities.equalsIgnoreCase(value, string)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean contains(final String value, final String... strings) {
+    for (final String string : strings) {
+      if (Objects.equals(value, string)) {
         return true;
       }
     }
@@ -425,21 +435,6 @@ public class StringUtilities {
     }
     builder.append("</html>"); //$NON-NLS-1$
     return builder.toString();
-  }
-
-  public static boolean inIgnoreCase(final String value, final String... values) {
-    if (value == null) {
-      return false;
-    }
-    return in(value.toLowerCase(), toLowerCase(values));
-  }
-
-  private static String[] toLowerCase(final String[] values) {
-    final String[] result = new String[values.length];
-    for (int i = 0; i < values.length; i++) {
-      result[i] = values[i].toLowerCase();
-    }
-    return result;
   }
 
   public static boolean in(final String value, final String... values) {

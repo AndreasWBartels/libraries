@@ -181,7 +181,7 @@ public class PreferencesPane implements IComponentProvider {
     toolbar.addSeparator();
     toolbar.add(new ConfigurableActionBuilder()//
         .setIcon(ContrastHightIcons.EDIT_DELETE)
-        .setEnabledModel(isNodeDeleteEnabledModel)
+        .setEnabledDistributor(isNodeDeleteEnabledModel)
         .setTooltip("Remove selected preference")
         .setTask(() -> {
           final PreferenceNode preferenceNode = getPreferenceNode(selectionModel.getLeadSelectionPath());
@@ -189,7 +189,7 @@ public class PreferencesPane implements IComponentProvider {
               .of(preferenceNode)
               .convert(node -> node.getParent())
               .accept(node -> node != treeModel.getRoot())
-              .consum(node -> selectionModel.setSelectionPath(getTreePath(treeModel.getRoot(), node)))
+              .consume(node -> selectionModel.setSelectionPath(getTreePath(treeModel.getRoot(), node)))
               .or(() -> selectionModel.setSelectionPath(new TreePath(new PreferenceNode[]{ treeModel.getRoot() })));
           treeModel.removeFromParent(preferenceNode);
         })

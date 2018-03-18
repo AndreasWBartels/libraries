@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -38,6 +38,11 @@ public class ObjectComboBoxComponentBuilder<T> {
 
   public ObjectComboBoxComponentBuilder<T> setObjectUi(final IObjectUi<T> objectUi) {
     this.configurationBuilder.setObjectUi(objectUi);
+    return this;
+  }
+
+  public ObjectComboBoxComponentBuilder<T> setPrototype(final T prototype) {
+    this.configurationBuilder.setPrototype(prototype);
     return this;
   }
 
@@ -102,9 +107,8 @@ public class ObjectComboBoxComponentBuilder<T> {
   }
 
   public ObjectComboBoxComponent<T> build() {
-    this.model = Optional
-        .ofNullable(this.model)
-        .orElseGet(() -> new ObjectComboBoxComponentModel<>(new ArrayList<T>()));
+    this.model = Optional.ofNullable(this.model).orElseGet(
+        () -> new ObjectComboBoxComponentModel<>(new ArrayList<T>()));
     this.model.setSelectedItem(null);
     return new ObjectComboBoxComponent<>(this.configurationBuilder.build(), this.model);
   }

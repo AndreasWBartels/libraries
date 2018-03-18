@@ -37,6 +37,7 @@ import javax.swing.SwingConstants;
 import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.message.Message;
+import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
@@ -77,14 +78,13 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
     @Override
     public void objectChanged() {
       if (!ListChooserDialog.this.validStateModel.get().isValid()) {
-        return;
-      }
-      final T object = ListChooserDialog.this.valueModel.get();
-      if (object == null) {
+        setMessage(
+            new MessageBuilder().setText(ListChooserDialog.this.validStateModel.get().getMessage()).setError().build());
         setTryEnabled(false);
         setOkEnabled(false);
         return;
       }
+      setMessage(ListChooserDialog.this.chooserPanel.getMessage());
       setTryEnabled(!(ListChooserDialog.this.chooserPanelConfiguration.getTryTaskFactory() == null));
       setOkEnabled(true);
     }
@@ -115,7 +115,6 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
         true);
     this.valueModel.set(configuration.getPresetValue());
     createGui(configuration);
-    locate();
   }
 
   private void createGui(final IChooserDialogConfiguration<T> configuration) {
@@ -189,11 +188,10 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
         setMessage(Message.create(this.chooserPanel.getMessage().getText(), "successful")); //$NON-NLS-1$
         return true;
       }
-      setMessage(
-          Message.create(
-              this.chooserPanel.getMessage().getText(),
-              "The connection attempt failed.", //$NON-NLS-1$
-              MessageType.ERROR));
+      setMessage(Message.create(
+          this.chooserPanel.getMessage().getText(),
+          "The connection attempt failed.", //$NON-NLS-1$
+          MessageType.ERROR));
       setOkEnabled(false);
       return false;
     } catch (final InterruptedException exception) {

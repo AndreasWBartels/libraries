@@ -70,6 +70,11 @@ public class ObjectComboBoxComponentModel<T> extends ObjectListComponentModel<T>
   }
 
   @Override
+  public void removeChangeListeners() {
+    this.model.removeChangeListeners();
+  }
+
+  @Override
   public T get() {
     return this.model.get();
   }

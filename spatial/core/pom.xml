@@ -7,14 +7,13 @@
   <description>anwiba spatial core libraries project</description>
   <url>${scm.url.net.anwiba.master}/spatial/core</url>
 
-  <groupId>net.anwiba.spatial</groupId>
   <artifactId>anwiba-spatial-maven-core</artifactId>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-default</artifactId>
-    <version>1.0.76</version>
+    <version>1.0.126</version>
   </parent>
 
   <scm>

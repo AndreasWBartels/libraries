@@ -10,7 +10,7 @@
   <parent>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
     <groupId>net.anwiba.spatial</groupId>
-    <version>1.0.76</version>
+    <version>1.0.126</version>
   </parent>
 
   <scm>
@@ -74,7 +74,7 @@
             </goals>
             <configuration>
               <pakkage>net.anwiba.spatial.gps.gpsd.response</pakkage>
-              <comment>// Copyright (c) 2017 by Andreas W. Bartels (bartels@anwiba.de)</comment>
+              <comment>// Copyright (c) 2017 by Andreas W. Bartels</comment>
             </configuration>
           </execution>
         </executions>

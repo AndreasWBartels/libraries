@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels 
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,7 +22,6 @@
 package net.anwiba.commons.swing.preferences;
 
 import java.awt.Component;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -36,7 +35,6 @@ import net.anwiba.commons.swing.dialog.ConfigurableDialogLauncher;
 import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.IContentPaneFactory;
 import net.anwiba.commons.swing.dialog.pane.AbstractContentPane;
-import net.anwiba.commons.swing.dialog.pane.IContentPanel;
 import net.anwiba.commons.swing.preferences.editor.IPreferenceNodeEditorFactoryRegistry;
 import net.anwiba.commons.swing.preferences.editor.ParametersEditorFactoryRegistry;
 import net.anwiba.commons.swing.preferences.tree.IPreferenceNode;
@@ -92,17 +90,11 @@ public final class PreferencesDialogAction extends AbstractAction {
       final IPreferences preferences,
       final PreferencesPane preferencesPane,
       final IFunction<IPreferenceNode, Boolean, RuntimeException> storeFunction) {
-    final IContentPaneFactory contentPaneFactory = new IContentPaneFactory() {
+    final IContentPaneFactory contentPaneFactory = (owner, node) -> new AbstractContentPane() {
 
       @Override
-      public IContentPanel create(final Window owner, final IPreferences preferences) {
-        return new AbstractContentPane() {
-
-          @Override
-          public JComponent getComponent() {
-            return preferencesPane.getComponent();
-          }
-        };
+      public JComponent getComponent() {
+        return preferencesPane.getComponent();
       }
     };
     new ConfigurableDialogLauncher()

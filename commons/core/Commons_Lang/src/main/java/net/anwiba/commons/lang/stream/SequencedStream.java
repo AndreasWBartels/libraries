@@ -82,7 +82,12 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
 
   @Override
   public IStream<T, E> notNull() {
-    return new SequencedStream<>(new FilteringIterableIterable<>(this.iterable, v -> v != null));
+    return filter(v -> v != null);
+  }
+
+  @Override
+  public <O> IStream<O, E> instanceOf(final Class<O> clazz) {
+    return filter(i -> clazz.isInstance(i)).convert(i -> clazz.cast(i));
   }
 
   @Override

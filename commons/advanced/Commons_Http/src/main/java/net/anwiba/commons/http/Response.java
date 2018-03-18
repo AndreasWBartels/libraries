@@ -22,77 +22,125 @@
 
 package net.anwiba.commons.http;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
-import org.apache.http.Header;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParameterList;
+import javax.activation.MimeTypeParseException;
+
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.resource.utilities.IoUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.commons.utilities.string.StringUtilities;
 
 public final class Response implements IResponse {
-  private final HttpClient client;
+
   private final HttpResponse response;
   private final ICanceler cancelable;
+  private final HttpUriRequest request;
+  private final Closeable client;
 
-  public Response(final ICanceler cancelable, final HttpClient client, final HttpResponse response) {
+  public Response(
+      final ICanceler cancelable,
+      final Closeable client,
+      final HttpUriRequest request,
+      final HttpResponse response) {
     this.cancelable = cancelable;
     this.client = client;
+    this.request = request;
     this.response = response;
   }
 
   @Override
+  public URI getUri() {
+    return this.request.getURI();
+  }
+
+  @Override
   public String getBody() throws IOException {
-    try (InputStream inputStream = getInputStream();) {
+    try (InputStream inputStream = getInputStream()) {
       return IoUtilities.toString(inputStream, getContentEncoding());
     }
   }
 
   @Override
   public int getStatusCode() {
-    return this.response.getStatusLine().getStatusCode();
+    return Optional.of(this.response).convert(r -> r.getStatusLine()).convert(l -> l.getStatusCode()).getOr(() -> 404);
   }
 
   @Override
   public String getStatusText() {
-    return this.response.getStatusLine().getReasonPhrase();
+    return Optional.of(this.response).convert(r -> r.getStatusLine()).convert(l -> l.getReasonPhrase()).getOr(() -> ""); //$NON-NLS-1$
   }
 
   @Override
   public InputStream getInputStream() throws IOException {
-    return new CancelableInputStream(this.cancelable, this.response.getEntity().getContent());
+    return new CancelableInputStream(
+        this.cancelable,
+        Optional
+            .<HttpResponse, IOException> create(this.response)
+            .convert(r -> r.getEntity())
+            .convert(e -> e.getContent())
+            .getOrThrow(() -> new IOException()));
   }
 
   @Override
   public long getContentLength() {
-    return this.response.getEntity().getContentLength();
+    return Optional.of(this.response).convert(r -> r.getEntity()).convert(e -> e.getContentLength()).getOr(() -> 0l);
   }
 
   @Override
   public String getContentType() {
-    final Header contentType = this.response.getEntity().getContentType();
-    if (contentType == null) {
-      return null;
-    }
-    return contentType.getValue();
+    return Optional
+        .of(this.response)
+        .convert(r -> r.getEntity())
+        .convert(e -> e.getContentType())
+        .convert(h -> h.getValue())
+        .get();
   }
 
   @Override
   public String getContentEncoding() {
-    final Header contentEncoding = this.response.getEntity().getContentEncoding();
-    if (contentEncoding == null) {
+    return Optional
+        .of(this.response)
+        .convert(r -> r.getEntity())
+        .convert(e -> e.getContentEncoding())
+        .convert(h -> h.getValue())
+        .getOr(() -> getContentEncodingfromContentType());
+  }
+
+  private String getContentEncodingfromContentType() {
+    try {
+      final String contentType = getContentType();
+      if (StringUtilities.isNullOrTrimmedEmpty(contentType)) {
+        return "UTF-8"; //$NON-NLS-1$
+      }
+      final MimeType mimeType = new MimeType(contentType);
+      final MimeTypeParameterList parameters = mimeType.getParameters();
+      final String charset = parameters.get("charset"); //$NON-NLS-1$
+      if (StringUtilities.isNullOrTrimmedEmpty(charset)) {
+        return "UTF-8"; //$NON-NLS-1$
+      }
+      return charset;
+    } catch (final MimeTypeParseException exception) {
       return "UTF-8"; //$NON-NLS-1$
     }
-    return contentEncoding.getValue();
   }
 
   @Override
   public void close() throws IOException {
+    IOException exception = null;
     if (this.response instanceof CloseableHttpResponse) {
-      ((CloseableHttpResponse) this.response).close();
+      exception = IoUtilities.close(() -> ((CloseableHttpResponse) this.response).close(), exception);
     }
+    exception = IoUtilities.close(this.client, exception);
+    IoUtilities.toss(exception);
   }
 }

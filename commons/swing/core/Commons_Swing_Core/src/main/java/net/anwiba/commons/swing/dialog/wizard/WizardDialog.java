@@ -109,7 +109,6 @@ public class WizardDialog extends MessageDialog {
       }
     });
     updateState();
-    locate();
   }
 
   @Override

@@ -27,13 +27,13 @@ import java.lang.reflect.InvocationTargetException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.model.BooleanModel;
-import net.anwiba.commons.model.IBooleanModel;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public class ActionConfigurationBuilder {
 
-  private IBooleanModel enabledModel = new BooleanModel(true);
+  private IBooleanDistributor enabledDistributor = new BooleanModel(true);
   private String tooltip = null;
   private IGuiIcon icon = null;
   private String name = null;
@@ -61,8 +61,8 @@ public class ActionConfigurationBuilder {
     return this;
   }
 
-  public ActionConfigurationBuilder setEnabledModel(final IBooleanModel enabledModel) {
-    this.enabledModel = enabledModel;
+  public ActionConfigurationBuilder setEnabledDistributor(final IBooleanDistributor enabledModel) {
+    this.enabledDistributor = enabledModel;
     return this;
   }
 
@@ -84,14 +84,14 @@ public class ActionConfigurationBuilder {
 
   @SuppressWarnings("hiding")
   public IActionConfiguration build() {
-    final IBooleanModel enabledModel = this.enabledModel;
+    final IBooleanDistributor enabledDistributor = this.enabledDistributor;
     final IActionCustomization customization = new ActionCustomization(this.name, this.icon, this.tooltip);
     final IActionProcedure procedure = createProcedure();
     return new IActionConfiguration() {
 
       @Override
-      public IBooleanModel getEnabledModel() {
-        return enabledModel;
+      public IBooleanDistributor getEnabledDistributor() {
+        return enabledDistributor;
       }
 
       @Override

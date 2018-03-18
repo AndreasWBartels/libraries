@@ -2,7 +2,7 @@
  * #%L
  * *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels 
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,6 +27,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.lang.functional.ICharFilter;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.primativ.IBooleanProvider;
 import net.anwiba.commons.logging.ILevel;
@@ -51,12 +52,21 @@ public final class FieldValueController<T> {
     @Override
     public String convert(final PlainDocument plainDocument) throws RuntimeException {
       try {
-        return plainDocument.getText(0, plainDocument.getLength());
+        final String text = plainDocument.getText(0, plainDocument.getLength());
+        final StringBuilder builder = new StringBuilder();
+        for (final char character : text.toCharArray()) {
+          if (!FieldValueController.this.characterFilter.accept(character)) {
+            continue;
+          }
+          builder.append(character);
+        }
+        return text;
       } catch (final BadLocationException exception) {
         return ""; //$NON-NLS-1$
       }
     }
   };
+  private final ICharFilter characterFilter;
 
   public FieldValueController(
       final PlainDocument document,
@@ -65,6 +75,7 @@ public final class FieldValueController<T> {
       final IConverter<String, T, RuntimeException> toObjectConverter,
       final IConverter<T, String, RuntimeException> toStringConverter,
       final IObjectModel<IValidationResult> validStateModel,
+      final ICharFilter characterFilter,
       final IValidator<String> validator) {
     this.document = document;
     this.model = model;
@@ -72,6 +83,7 @@ public final class FieldValueController<T> {
     this.toObjectConverter = toObjectConverter;
     this.toStringConverter = toStringConverter;
     this.validStateModel = validStateModel;
+    this.characterFilter = characterFilter;
     this.validator = validator;
   }
 

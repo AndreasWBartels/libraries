@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 
 import net.anwiba.commons.lang.functional.IBlock;
-import net.anwiba.commons.model.IBooleanModel;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.utilities.factory.IFactory;
 
@@ -54,8 +54,8 @@ public class ConfigurableActionBuilder {
     return this;
   }
 
-  public ConfigurableActionBuilder setEnabledModel(final IBooleanModel enabledModel) {
-    this.configurationBuilder.setEnabledModel(enabledModel);
+  public ConfigurableActionBuilder setEnabledDistributor(final IBooleanDistributor enabledModel) {
+    this.configurationBuilder.setEnabledDistributor(enabledModel);
     return this;
   }
 

@@ -24,7 +24,9 @@ package net.anwiba.commons.swing.object;
 import java.awt.Color;
 import java.util.Collection;
 
+import net.anwiba.commons.lang.functional.ICharFilter;
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 import net.anwiba.commons.utilities.validation.IValidator;
@@ -52,5 +54,13 @@ public interface IObjectFieldConfiguration<T> {
   Color getBackgroundColor();
 
   IKeyListenerFactory<T> getKeyListenerFactory();
+
+  ICharFilter getCharacterFilter();
+
+  IBooleanModel getEnabledModel();
+
+  Collection<IButtonFactory<T>> getButtonFactorys();
+
+  boolean isDisguise();
 
 }

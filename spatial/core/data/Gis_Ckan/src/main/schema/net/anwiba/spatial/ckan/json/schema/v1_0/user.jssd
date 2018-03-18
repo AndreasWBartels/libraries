@@ -1,9 +1,10 @@
+@JssdUnknownMember
 {
   "openid": <String> null,
   "about": <String> null,
   "display_name": <String> null,
   "name": <String> null,
-  "created": <dateString> null,
+  "created": <net.anwiba.spatial.ckan.json.types.DateString> null,
   "email_hash": <String> null,
   "sysadmin": <boolean> false,
   "activity_streams_email_notifications": <boolean> false,

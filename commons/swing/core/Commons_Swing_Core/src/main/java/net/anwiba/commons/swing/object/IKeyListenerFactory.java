@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels (bartels@anwiba.de)
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,10 +25,11 @@ import java.awt.event.KeyListener;
 
 import javax.swing.text.PlainDocument;
 
+import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.model.IObjectModel;
 
 public interface IKeyListenerFactory<T> {
 
-  KeyListener create(IObjectModel<T> model, PlainDocument document);
+  KeyListener create(IObjectModel<T> model, PlainDocument document, IBlock<RuntimeException> clearBlock);
 
 }

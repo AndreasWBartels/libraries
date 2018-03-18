@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -64,5 +65,7 @@ public interface IDialogConfiguration {
   Dimension getPreferdSize();
 
   Image getImage();
+
+  ModalExclusionType getModalExclusionType();
 
 }

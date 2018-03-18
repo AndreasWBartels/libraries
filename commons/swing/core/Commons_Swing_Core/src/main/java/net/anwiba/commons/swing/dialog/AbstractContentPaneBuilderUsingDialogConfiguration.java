@@ -56,6 +56,7 @@ public abstract class AbstractContentPaneBuilderUsingDialogConfiguration<T> exte
         icon,
         null,
         modality,
+        null,
         dialogType,
         s -> s,
         isResizeable,

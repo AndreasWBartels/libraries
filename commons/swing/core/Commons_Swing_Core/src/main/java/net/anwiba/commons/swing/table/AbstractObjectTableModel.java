@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,7 @@ import net.anwiba.commons.utilities.interval.IntegerInterval;
 public abstract class AbstractObjectTableModel<T> extends AbstractTableModel implements IObjectTableModel<T> {
 
   private static final long serialVersionUID = -9054338041837561007L;
-  private final Map<T, Set<Integer>> indexByobjectMap = new HashMap<>();
+  private final Map<T, Set<Integer>> indexByObjectMap = new HashMap<>();
   private final List<T> objects = new ArrayList<>();
   private final IColumnClassProvider columnClassProvider;
 
@@ -68,68 +69,79 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
     return getRowCount();
   }
 
-  private synchronized void refreshIndex() {
-    this.indexByobjectMap.clear();
-    for (int i = 0; i < this.objects.size(); i++) {
-      if (!this.indexByobjectMap.containsKey(get(i))) {
-        this.indexByobjectMap.put(get(i), new HashSet<Integer>());
+  private void refreshIndex() {
+    synchronized (this) {
+      this.indexByObjectMap.clear();
+      for (int i = 0; i < this.objects.size(); i++) {
+        if (!this.indexByObjectMap.containsKey(get(i))) {
+          this.indexByObjectMap.put(get(i), new HashSet<Integer>());
+        }
+        this.indexByObjectMap.get(get(i)).add(Integer.valueOf(i));
       }
-      this.indexByobjectMap.get(get(i)).add(Integer.valueOf(i));
     }
   }
 
   @Override
-  public synchronized void set(@SuppressWarnings("unchecked") final T... objects) {
+  public void set(@SuppressWarnings("unchecked") final T... objects) {
     set(Arrays.asList(objects));
   }
 
   @Override
-  public synchronized void set(final Iterable<T> objects) {
-    final List<T> oldObjects = IterableUtilities.asList(this.objects);
-    this.indexByobjectMap.clear();
-    this.objects.clear();
-    for (final T object : objects) {
-      if (!this.indexByobjectMap.containsKey(object)) {
-        this.indexByobjectMap.put(object, new HashSet<Integer>());
+  public void set(final Iterable<T> objects) {
+    final List<T> oldObjects;
+    synchronized (this) {
+      oldObjects = IterableUtilities.asList(this.objects);
+      this.indexByObjectMap.clear();
+      this.objects.clear();
+      for (final T object : objects) {
+        if (!this.indexByObjectMap.containsKey(object)) {
+          this.indexByObjectMap.put(object, new HashSet<Integer>());
+        }
+        final Integer index = Integer.valueOf(this.objects.size());
+        this.indexByObjectMap.get(object).add(index);
+        this.objects.add(object);
       }
-      final Integer index = Integer.valueOf(this.getObjects().size());
-      this.indexByobjectMap.get(object).add(index);
-      this.objects.add(object);
     }
     fireTableDataChanged();
     fireObjectsChanged(oldObjects, IterableUtilities.asList(objects));
   }
 
   @Override
-  public synchronized void add(@SuppressWarnings("unchecked") final T... objects) {
+  public void add(@SuppressWarnings("unchecked") final T... objects) {
     add(Arrays.asList(objects));
   }
 
   @Override
-  public synchronized void add(final Iterable<T> objects) {
-    final int rows = size();
-    for (final T object : objects) {
-      if (!this.indexByobjectMap.containsKey(object)) {
-        this.indexByobjectMap.put(object, new HashSet<Integer>());
+  public void add(final Iterable<T> objects) {
+    final int rows;
+    synchronized (this) {
+      rows = size();
+      for (final T object : objects) {
+        if (!this.indexByObjectMap.containsKey(object)) {
+          this.indexByObjectMap.put(object, new HashSet<Integer>());
+        }
+        final Integer index = Integer.valueOf(this.objects.size());
+        this.indexByObjectMap.get(object).add(index);
+        this.objects.add(object);
       }
-      final Integer index = Integer.valueOf(this.getObjects().size());
-      this.indexByobjectMap.get(object).add(index);
-      this.objects.add(object);
     }
     fireTableRowsInserted(rows, this.size() - 1);
     fireObjectsAdded(new IntegerInterval(rows, this.size() - 1), objects);
   }
 
   @Override
-  public synchronized T set(final int index, final T object) {
-    if (!(index < getRowCount())) {
-      throw new IllegalArgumentException("index out of bounds"); //$NON-NLS-1$
+  public T set(final int index, final T object) {
+    final T oldObject;
+    synchronized (this) {
+      if (!(index < getRowCount())) {
+        throw new IllegalArgumentException("index out of bounds"); //$NON-NLS-1$
+      }
+      if (!this.indexByObjectMap.containsKey(object)) {
+        this.indexByObjectMap.put(object, new HashSet<Integer>());
+      }
+      this.indexByObjectMap.get(object).add(Integer.valueOf(this.objects.size()));
+      oldObject = this.objects.set(index, object);
     }
-    if (!this.indexByobjectMap.containsKey(object)) {
-      this.indexByobjectMap.put(object, new HashSet<Integer>());
-    }
-    this.indexByobjectMap.get(object).add(Integer.valueOf(this.getObjects().size()));
-    final T oldObject = this.objects.set(index, object);
     // fireTableDataChanged();
     fireTableRowsUpdated(index, index);
     fireObjectsUpdated(Arrays.asList(Integer.valueOf(index)), Arrays.asList(oldObject), Arrays.asList(object));
@@ -140,54 +152,61 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   public synchronized int[] indices(final Iterable<T> objects) {
     final Set<Integer> indexes = new HashSet<>();
     for (final T object : objects) {
-      final Set<Integer> objectIndexes = this.indexByobjectMap.get(object);
+      final Set<Integer> objectIndexes = this.indexByObjectMap.get(object);
       indexes.addAll(objectIndexes == null ? new HashSet<Integer>() : objectIndexes);
     }
     return ArrayUtilities.primitives(indexes.toArray(new Integer[indexes.size()]));
   }
 
   @Override
-  public synchronized void remove(@SuppressWarnings("unchecked") final T... objects) {
+  public void remove(@SuppressWarnings("unchecked") final T... objects) {
     final int[] indices = indices(Arrays.asList(objects));
     remove(indices);
   }
 
   @Override
-  public synchronized void remove(final Iterable<T> objects) {
+  public void remove(final Iterable<T> objects) {
     final int[] indices = indices(objects);
     remove(indices);
   }
 
   @Override
-  public synchronized void remove(final int... indices) {
-    if (indices.length == 0) {
-      return;
-    }
-    Arrays.sort(indices);
+  public void remove(final int... indices) {
+    final List<Integer> removedIndices = new ArrayList<>();
     final List<T> removedObjects = new ArrayList<>();
-    final Set<Integer> indexSet = new HashSet<>();
-    for (int i = indices.length - 1; i >= 0; i--) {
-      final int index = indices[i];
-      final T object = get(index);
-      final T removedObject = this.objects.remove(index);
-      if (removedObject != null) {
-        final Set<Integer> indizes = this.indexByobjectMap.get(removedObject);
-        if (indizes.remove(Integer.valueOf(index)) && indizes.isEmpty()) {
-          this.indexByobjectMap.remove(object);
+    synchronized (this) {
+      if (indices.length == 0) {
+        return;
+      }
+      Arrays.sort(indices);
+      for (int i = indices.length - 1; i >= 0; i--) {
+        final int index = indices[i];
+        final T object = get(index);
+        final T removedObject = this.objects.remove(index);
+        if (removedObject != null) {
+          final Set<Integer> indizes = this.indexByObjectMap.get(removedObject);
+          if (indizes.remove(Integer.valueOf(index)) && indizes.isEmpty()) {
+            this.indexByObjectMap.remove(object);
+          }
+          removedIndices.add(index);
+          removedObjects.add(object);
         }
-        removedObjects.add(object);
-        fireTableRowsDeleted(index, index);
       }
     }
-    fireObjectsRemoved(indexSet, removedObjects);
+    removedIndices.forEach(i -> fireTableRowsDeleted(i, i));
+    fireObjectsRemoved(removedIndices, removedObjects);
   }
 
   @Override
-  public synchronized void removeAll() {
-    final int rows = getRowCount();
-    final List<T> objects = new ArrayList<>(this.objects);
-    this.objects.clear();
-    this.indexByobjectMap.clear();
+  public void removeAll() {
+    final int rows;
+    final List<T> objects;
+    synchronized (this) {
+      rows = getRowCount();
+      objects = new ArrayList<>(this.objects);
+      this.objects.clear();
+      this.indexByObjectMap.clear();
+    }
     fireTableRowsDeleted(0, rows - 1);
     fireObjectsRemoved(new IntegerInterval(0, rows - 1), objects);
   }
@@ -199,76 +218,104 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
 
   @Override
   public boolean isEmpty() {
-    return this.objects.isEmpty();
+    synchronized (this) {
+      return this.objects.isEmpty();
+    }
   }
 
   @Override
-  public synchronized final int getRowCount() {
-    return this.objects.size();
+  public final int getRowCount() {
+    synchronized (this) {
+      return this.objects.size();
+    }
   }
 
   @Override
-  public synchronized Collection<T> get(final int... indices) {
-    final List<T> result = new ArrayList<>();
-    for (final int index : indices) {
-      result.add(get(index));
+  public Collection<T> get(final int... indices) {
+    synchronized (this) {
+      final List<T> result = new ArrayList<>();
+      for (final int index : indices) {
+        result.add(get(index));
+      }
+      return result;
     }
-    return result;
   }
 
   @Override
-  public synchronized T get(final int rowIndex) {
-    if (rowIndex < 0) {
-      return null;
+  public T get(final int rowIndex) {
+    synchronized (this) {
+      if (rowIndex < 0) {
+        return null;
+      }
+      if (!(rowIndex < this.objects.size())) {
+        return null;
+      }
+      return this.objects.get(rowIndex);
     }
-    if (!(rowIndex < this.objects.size())) {
-      return null;
-    }
-    return this.objects.get(rowIndex);
   }
 
   protected List<T> getObjects() {
-    return this.objects;
+    synchronized (this) {
+      final LinkedList<T> result = new LinkedList<>();
+      this.objects.forEach(o -> result.add(o));
+      return result;
+    }
   }
 
   private final List<IChangeableListListener<T>> listModelListeners = new ArrayList<>();
 
   @Override
-  public final synchronized void addListModelListener(final IChangeableListListener<T> listener) {
-    this.listModelListeners.add(listener);
+  public final void addListModelListener(final IChangeableListListener<T> listener) {
+    synchronized (this.listModelListeners) {
+      this.listModelListeners.add(listener);
+    }
   }
 
   @Override
-  public final synchronized void removeListModelListener(final IChangeableListListener<T> listener) {
-    this.listModelListeners.remove(listener);
+  public final void removeListModelListener(final IChangeableListListener<T> listener) {
+    synchronized (this.listModelListeners) {
+      this.listModelListeners.remove(listener);
+    }
   }
 
-  protected final synchronized void fireObjectsAdded(final Iterable<Integer> indeces, final Iterable<T> objects) {
-    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>(this.listModelListeners);
+  protected final void fireObjectsAdded(final Iterable<Integer> indeces, final Iterable<T> objects) {
+    final List<IChangeableListListener<T>> currentListModelListeners;
+    synchronized (this.listModelListeners) {
+      currentListModelListeners = new ArrayList<>(this.listModelListeners);
+    }
     for (final IChangeableListListener<T> listener : currentListModelListeners) {
       listener.objectsAdded(indeces, objects);
     }
   }
 
   protected void fireObjectsChanged(final List<T> oldObjects, final List<T> newObjects) {
-    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>(this.listModelListeners);
+    final List<IChangeableListListener<T>> currentListModelListeners;
+    synchronized (this.listModelListeners) {
+      currentListModelListeners = new ArrayList<>(this.listModelListeners);
+    }
     for (final IChangeableListListener<T> listener : currentListModelListeners) {
       listener.objectsChanged(oldObjects, newObjects);
     }
   }
 
-  protected final synchronized void fireObjectsUpdated(
+  protected final void fireObjectsUpdated(
       final Iterable<Integer> indeces,
       final List<T> oldObjects,
       final List<T> newObjects) {
-    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>(this.listModelListeners);
+    final List<IChangeableListListener<T>> currentListModelListeners;
+    synchronized (this.listModelListeners) {
+      currentListModelListeners = new ArrayList<>(this.listModelListeners);
+    }
     for (final IChangeableListListener<T> listener : currentListModelListeners) {
       listener.objectsUpdated(indeces, oldObjects, newObjects);
     }
   }
 
-  protected final synchronized void fireObjectsRemoved(final Iterable<Integer> indeces, final Iterable<T> objects) {
-    final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>(this.listModelListeners);
+  protected final void fireObjectsRemoved(final Iterable<Integer> indeces, final Iterable<T> objects) {
+    final List<IChangeableListListener<T>> currentListModelListeners;
+    synchronized (this.listModelListeners) {
+      currentListModelListeners = new ArrayList<>(this.listModelListeners);
+    }
     for (final IChangeableListListener<T> listener : currentListModelListeners) {
       listener.objectsRemoved(indeces, objects);
     }

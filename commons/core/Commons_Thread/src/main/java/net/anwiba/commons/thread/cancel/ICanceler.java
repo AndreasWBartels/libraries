@@ -29,7 +29,7 @@ import net.anwiba.commons.lang.functional.IWatcher;
 
 public interface ICanceler extends Serializable {
 
-  public ICanceler DummyCancler = new ICanceler() {
+  public ICanceler DummyCanceler = new ICanceler() {
 
     private static final long serialVersionUID = 1L;
 
@@ -78,13 +78,22 @@ public interface ICanceler extends Serializable {
 
   default <T, E extends Exception> IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> watcherFactory() {
     return closure -> {
-      final ICancelerListener listener = () -> closure.execute();
+      final ICancelerListener listener = new ICancelerListener() {
+        @Override
+        public void canceled() {
+          removeCancelerListener(this);
+          closure.execute();
+        }
+      };
       addCancelerListener(listener);
       return new IWatcher() {
 
         @Override
         public void check() throws InterruptedException {
-          ICanceler.this.check();
+          if (isCanceled()) {
+            removeCancelerListener(listener);
+            throw new InterruptedException();
+          }
         }
 
         @Override

@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.http;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,9 +36,9 @@ import net.anwiba.commons.thread.cancel.ICanceler;
 public final class HttpClientConnector implements IStreamConnector<URI> {
 
   private static ILogger logger = Logging.getLogger(HttpClientConnector.class.getName());
-  private final IHttpRequestExcecutorFactory httpRequestExcecutorFactory;
+  private final IHttpRequestExecutorFactory httpRequestExcecutorFactory;
 
-  public HttpClientConnector(final IHttpRequestExcecutorFactory httpRequestExcecutorFactory) {
+  public HttpClientConnector(final IHttpRequestExecutorFactory httpRequestExcecutorFactory) {
     this.httpRequestExcecutorFactory = httpRequestExcecutorFactory;
   }
 
@@ -54,13 +55,13 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
       }
       logger.log(
           ILevel.WARNING,
-          "connect to " + uri.toString() + "faild " + response.getStatusCode() + " " + response.getStatusText());
+          "connect to '" + uri.toString() + "' faild " + response.getStatusCode() + " " + response.getStatusText());
       if (logger.isLoggable(ILevel.DEBUG)) {
         logger.log(ILevel.DEBUG, response.getBody());
       }
       return false;
     } catch (InterruptedException | IOException exception) {
-      logger.log(ILevel.WARNING, "connect to " + uri.toString() + " faild " + exception.getMessage());
+      logger.log(ILevel.WARNING, "connect to '" + uri.toString() + "' faild " + exception.getMessage());
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       return false;
     }
@@ -68,7 +69,7 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
 
   private IResponse response(final URI uri) throws InterruptedException, IOException {
     final IRequest request = request(uri);
-    return requestExecutor().execute(ICanceler.DummyCancler, request);
+    return requestExecutor().execute(ICanceler.DummyCanceler, request);
   }
 
   private IRequest request(final URI uri) {
@@ -96,17 +97,23 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
     try {
       final IResponse response = response(uri);
       if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-        return response.getInputStream();
+        return new FilterInputStream(response.getInputStream()) {
+
+          @Override
+          public void close() throws IOException {
+            response.close();
+          }
+        };
       }
       logger.log(
           ILevel.DEBUG,
-          "connect to " + uri.toString() + "faild " + response.getStatusCode() + " " + response.getStatusText());
+          "connect to '" + uri.toString() + "' faild " + response.getStatusCode() + " " + response.getStatusText());
       if (logger.isLoggable(ILevel.DEBUG)) {
         logger.log(ILevel.DEBUG, response.getBody());
       }
       throw new IOException(response.getStatusText());
     } catch (InterruptedException | IOException exception) {
-      logger.log(ILevel.DEBUG, "connect to " + uri.toString() + " faild " + exception.getMessage());
+      logger.log(ILevel.DEBUG, "connect to '" + uri.toString() + "' faild " + exception.getMessage());
       throw new IOException(exception);
     }
   }

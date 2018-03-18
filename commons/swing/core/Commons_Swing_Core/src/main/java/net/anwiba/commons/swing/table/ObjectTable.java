@@ -24,7 +24,6 @@ package net.anwiba.commons.swing.table;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -34,6 +33,7 @@ import javax.swing.SpringLayout;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
@@ -50,6 +50,7 @@ public class ObjectTable<T> implements IComponentProvider {
   final private JComponent component;
   private final IObjectTableModel<T> tableModel;
   private final IBooleanDistributor sortStateModel;
+  private ISelectionIndexModel<T> selectionIndexModel;
 
   public ObjectTable(final IObjectTableConfiguration<T> configuration, final IObjectTableModel<T> tableModel) {
     this.tableModel = tableModel;
@@ -57,7 +58,7 @@ public class ObjectTable<T> implements IComponentProvider {
     final ISortedRowMapper sortedRowMapper = new SortedRowMapper<>(tableRowSorter);
     final Table table = new Table(tableModel);
     table.setRowSorter(tableRowSorter);
-    table.setAutoResizeMode(configuration.getAutoizeMode());
+    table.setAutoResizeMode(configuration.getAutoResizeMode());
     table.setSelectionMode(configuration.getSelectionMode());
     table.setAutoCreateColumnsFromModel(false);
     table.setPreferredScrollableViewportSize(
@@ -73,17 +74,15 @@ public class ObjectTable<T> implements IComponentProvider {
         new TableSelectionListener<>(tableModel, tableSelectionModel, this.selectionModel, sortedRowMapper));
     this.selectionModel.addSelectionListener(
         new SelectionListener<>(tableModel, tableSelectionModel, this.selectionModel, sortedRowMapper));
-    final ISelectionIndexModel<T> selectionIndexModel = new SelectionIndexModel<>(
-        tableSelectionModel,
-        sortedRowMapper,
-        this.selectionModel);
+    this.selectionIndexModel = new SelectionIndexModel<>(tableSelectionModel, sortedRowMapper, this.selectionModel);
     this.sortStateModel = tableRowSorter == null ? new BooleanModel(false) : tableRowSorter.getSortStateModel();
     final IMouseListenerFactory<T> mouseListenerFactory = configuration.getMouseListenerFactory();
     table.addMouseListener(
-        mouseListenerFactory.create(tableModel, selectionIndexModel, this.getSelectionModel(), this.sortStateModel));
+        mouseListenerFactory
+            .create(tableModel, this.selectionIndexModel, this.getSelectionModel(), this.sortStateModel));
     final IKeyListenerFactory<T> keyListenerFactory = configuration.getKeyListenerFactory();
     table.addKeyListener(
-        keyListenerFactory.create(tableModel, selectionIndexModel, this.selectionModel, this.sortStateModel));
+        keyListenerFactory.create(tableModel, this.selectionIndexModel, this.selectionModel, this.sortStateModel));
     if (configuration.getTableActionConfiguration().isEmpty()) {
       this.component = new JScrollPane(table);
       return;
@@ -91,9 +90,12 @@ public class ObjectTable<T> implements IComponentProvider {
     final Iterable<ITableActionFactory<T>> factories = configuration.getTableActionConfiguration().getFactories();
     final JPanel buttonPanel = new JPanel(new SpringLayout());
     for (final ITableActionFactory<T> factory : factories) {
-      final Action action = factory.create(tableModel, selectionIndexModel, this.selectionModel, this.sortStateModel);
-      final JButton button = new JButton(action);
-      buttonPanel.add(button);
+      Optional
+          .of(factory.create(tableModel, this.selectionIndexModel, this.selectionModel, this.sortStateModel))
+          .convert(
+              a -> new JButton(
+                  factory.create(tableModel, this.selectionIndexModel, this.selectionModel, this.sortStateModel)))
+          .consume(b -> buttonPanel.add(b));
     }
     SpringLayoutUtilities.makeCompactGrid(buttonPanel, 1, buttonPanel.getComponentCount(), 6, 6, 6, 6);
     this.component = new JPanel(new BorderLayout());
@@ -132,6 +134,10 @@ public class ObjectTable<T> implements IComponentProvider {
   @Override
   public JComponent getComponent() {
     return this.component;
+  }
+
+  public ISelectionIndexModel<T> getSelectionIndexModel() {
+    return this.selectionIndexModel;
   }
 
   public ISelectionModel<T> getSelectionModel() {

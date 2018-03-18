@@ -23,6 +23,8 @@ package net.anwiba.commons.swing.table;
 
 import java.util.List;
 
+import net.anwiba.commons.swing.table.action.ITableTextFieldActionConfiguration;
+import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 
 public interface IObjectListTableConfiguration<T> extends IObjectTableConfiguration<T> {
@@ -36,5 +38,13 @@ public interface IObjectListTableConfiguration<T> extends IObjectTableConfigurat
   public IColumToStringConverter getRowFilterToStringConverter();
 
   public IColumnClassProvider getColumnClassProvider();
+
+  public ITableTextFieldActionConfiguration<T> getTextFieldActionConfiguration();
+
+  public ITableTextFieldKeyListenerFactory<T> getTextFieldKeyListenerFactory();
+
+  default boolean isTextFieldEnable() {
+    return isFilterable() || getTextFieldKeyListenerFactory() != null || !getTextFieldActionConfiguration().isEmpty();
+  }
 
 }

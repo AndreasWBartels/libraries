@@ -23,6 +23,7 @@
 package net.anwiba.commons.lang.stream;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 
 import net.anwiba.commons.lang.functional.IIterable;
@@ -99,26 +100,44 @@ public class Streams {
   }
 
   public static <T> IStream<T, RuntimeException> of(final IIterable<T, RuntimeException> input) {
+    if (input == null) {
+      return create(Collections.emptyList());
+    }
     return new SequencedStream<>(new FilteringIterableIterable<>(input, i -> i != null));
   }
 
   public static <T> IStream<T, RuntimeException> of(final Iterable<T> input) {
+    if (input == null) {
+      return create(Collections.emptyList());
+    }
     return new SequencedStream<>(new FilteredJavaUtilIterableIterable<>(input, i -> i != null));
   }
 
   public static <T> IStream<T, RuntimeException> of(final T[] input) {
+    if (input == null) {
+      return create(Collections.emptyList());
+    }
     return create(Arrays.asList(input));
   }
 
   public static <T, E extends Exception> IStream<T, E> create(final IIterable<T, E> input) {
+    if (input == null) {
+      return create(Collections.emptyList());
+    }
     return new SequencedStream<>(new FilteringIterableIterable<>(input, i -> i != null));
   }
 
   public static <T, E extends Exception> IStream<T, E> create(final Iterable<T> input) {
+    if (input == null) {
+      return create(Collections.emptyList());
+    }
     return new SequencedStream<>(new FilteredJavaUtilIterableIterable<>(input, i -> i != null));
   }
 
   public static <T, E extends Exception> IStream<T, E> create(final T[] input) {
+    if (input == null) {
+      return create(Collections.emptyList());
+    }
     return create(Arrays.asList(input));
   }
 

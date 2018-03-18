@@ -23,8 +23,11 @@
 package net.anwiba.commons.swing.object;
 
 import java.awt.Color;
+import java.util.regex.Pattern;
 
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
@@ -77,7 +80,28 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
     return field;
   }
 
+  public B setRegularExpressionValidator(final String patternString, final String message) {
+    final Pattern pattern = Pattern.compile(patternString);
+
+    this.builder.setValidator(value -> {
+      if (StringUtilities.isNullOrTrimmedEmpty(value)) {
+        return IValidationResult.inValid(message);
+      }
+      pattern.matcher(value).matches();
+      if (!value.matches(patternString)) {
+        return IValidationResult.inValid(message);
+      }
+      return IValidationResult.valid();
+    });
+    return (B) this;
+  }
+
   protected abstract AbstractObjectTextField<O> create(IObjectFieldConfiguration<O> configuration);
+
+  public B setEnabledModel(final IBooleanModel enabledModel) {
+    this.builder.setEnabledModel(enabledModel);
+    return (B) this;
+  }
 
   public B setModel(final IObjectModel<O> model) {
     this.builder.setModel(model);
@@ -104,6 +128,12 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
     return (B) this;
   }
 
+  public B addValidatorFactory(
+      final IFactory<IConverter<String, O, RuntimeException>, IValidator<String>, RuntimeException> factory) {
+    this.builder.addValidatorFactory(factory);
+    return (B) this;
+  }
+
   public B setValidator(final IValidator<String> validator) {
     this.builder.setValidator(validator);
     return (B) this;
@@ -114,7 +144,7 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
     return (B) this;
   }
 
-  public B setNotEmptyValidator(final String message) {
+  public B addNotEmptyValidator(final String message) {
     addValidator(new IValidator<String>() {
 
       @Override
@@ -138,6 +168,16 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
     return (B) this;
   }
 
+  public B setToolTip(final String tooltipText) {
+    getConfigurationBuilder().setToolTipFactory((validationResult, text) -> {
+      if (!validationResult.isValid()) {
+        return validationResult.getMessage();
+      }
+      return tooltipText;
+    });
+    return (B) this;
+  }
+
   public B addClearAction(final String tooltip) {
     this.builder.addClearAction(tooltip);
     return (B) this;
@@ -148,8 +188,18 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
     return (B) this;
   }
 
+  public B addButtonFactory(final IButtonFactory<O> actionFactory) {
+    this.builder.addButtonFactory(actionFactory);
+    return (B) this;
+  }
+
   public B setBackgroundColor(final Color background) {
     this.builder.setBackgroundColor(background);
+    return (B) this;
+  }
+
+  public B setKeyListenerFactory(final IKeyListenerFactory<O> keyListenerFactory) {
+    this.builder.setKeyListenerFactory(keyListenerFactory);
     return (B) this;
   }
 }

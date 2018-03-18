@@ -34,6 +34,10 @@ public interface IDomToObjectConverter<T> {
     return element.elements(name);
   }
 
+  default List<Element> elements(final Element element, final String name) {
+    return element.elements(name);
+  }
+
   default String value(final Element element, final String attributeName, final String defaultValue) {
     if (element == null) {
       return defaultValue;
@@ -45,7 +49,21 @@ public interface IDomToObjectConverter<T> {
     return attributeValue;
   }
 
+  default String value(final Element element, final String attributeName) throws DomConverterException {
+    if (element == null) {
+      throw new DomConverterException("Missing element for attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+    final String attributeValue = element.attributeValue(attributeName);
+    if (attributeValue == null) {
+      throw new DomConverterException("Missing attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+    return attributeValue;
+  }
+
   default boolean booleanValue(final Element element, final String attributeName) throws DomConverterException {
+    if (element == null) {
+      throw new DomConverterException("Missing element for attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
     final String attributeValue = element.attributeValue(attributeName);
     if (attributeValue == null) {
       throw new DomConverterException("Missing attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -65,6 +83,9 @@ public interface IDomToObjectConverter<T> {
   }
 
   default int intValue(final Element element, final String attributeName) throws DomConverterException {
+    if (element == null) {
+      throw new DomConverterException("Missing element for attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
     final String attributeValue = element.attributeValue(attributeName);
     if (attributeValue == null) {
       throw new DomConverterException("Missing attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -73,6 +94,9 @@ public interface IDomToObjectConverter<T> {
   }
 
   default int intValue(final Element element, final String attributeName, final int defaultValue) {
+    if (element == null) {
+      return defaultValue;
+    }
     final String attributeValue = element.attributeValue(attributeName);
     if (attributeValue == null) {
       return defaultValue;
@@ -81,6 +105,9 @@ public interface IDomToObjectConverter<T> {
   }
 
   default double doubleValue(final Element element, final String attributeName) throws DomConverterException {
+    if (element == null) {
+      throw new DomConverterException("Missing element for attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
     final String attributeValue = element.attributeValue(attributeName);
     if (attributeValue == null) {
       throw new DomConverterException("Missing attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$

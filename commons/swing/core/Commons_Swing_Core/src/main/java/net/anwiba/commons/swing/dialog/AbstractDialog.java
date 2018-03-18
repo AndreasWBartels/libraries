@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
@@ -133,7 +134,8 @@ public abstract class AbstractDialog extends JDialog {
         s -> s,
         actionFactories,
         dataStateModel,
-        modal ? DEFAULT_MODALITY_TYPE : ModalityType.MODELESS);
+        modal ? DEFAULT_MODALITY_TYPE : ModalityType.MODELESS,
+        null);
   }
 
   public AbstractDialog(
@@ -148,8 +150,10 @@ public abstract class AbstractDialog extends JDialog {
       final IFunction<String, String, RuntimeException> actionButtonTextFactory,
       final List<IAdditionalActionFactory> additionalActionFactories,
       final IObjectModel<DataState> dataStateModel,
-      final ModalityType modalityType) {
+      final ModalityType modalityType,
+      final ModalExclusionType modalExclusionType) {
     super(owner, title, modalityType);
+    Optional.ofNullable(modalExclusionType).ifPresent(t -> setModalExclusionType(modalExclusionType));
     this.preferdSize = preferdSize;
     Ensure.ensureArgumentNotNull(windowPreferences);
     this.windowPreferences = windowPreferences;
@@ -159,6 +163,14 @@ public abstract class AbstractDialog extends JDialog {
     setIcon(icon);
     createView(dialogType, additionalActionFactories, dataStateModel);
     setMessage(message);
+  }
+
+  @Override
+  public void setVisible(final boolean value) {
+    if (value) {
+      locate();
+    }
+    super.setVisible(value);
   }
 
   public void locate() {
@@ -207,6 +219,11 @@ public abstract class AbstractDialog extends JDialog {
     });
   }
 
+  final protected void setChangeButtonsEnabled(final boolean isApplyEnabled, final boolean isOkEnabled) {
+    setApplyEnabled(isApplyEnabled);
+    setOkEnabled(isOkEnabled);
+  }
+
   final protected void createView(
       final DialogType dialogType,
       final List<IAdditionalActionFactory> additionalActionFactories,
@@ -227,7 +244,7 @@ public abstract class AbstractDialog extends JDialog {
     final JPanel mainPanel = new JPanel();
     mainPanel.setLayout(new BorderLayout());
     if (this.messagePanel != null) {
-      this.messagePanel.setMinimumSize(new Dimension(0, 40));
+      this.messagePanel.setMinimumSize(new Dimension(0, 60));
       mainPanel.add(BorderLayout.NORTH, this.messagePanel);
     }
     mainPanel.add(BorderLayout.CENTER, panel);
@@ -490,11 +507,6 @@ public abstract class AbstractDialog extends JDialog {
     if (this.applyAction != null) {
       GuiUtilities.invokeLater(new ActionEnableRunner(this.applyAction, isEnabled));
     }
-  }
-
-  final protected void setChangeButtonsEnabled(final boolean isApplyEnabled, final boolean isOkEnabled) {
-    setApplyEnabled(isApplyEnabled);
-    setOkEnabled(isOkEnabled);
   }
 
   @Override

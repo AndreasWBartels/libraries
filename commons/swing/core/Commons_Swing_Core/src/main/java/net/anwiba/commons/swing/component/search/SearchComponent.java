@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectModel;
@@ -45,6 +46,7 @@ import net.anwiba.commons.swing.component.search.action.IAdvancedSearchActionFac
 import net.anwiba.commons.swing.component.search.action.NextAction;
 import net.anwiba.commons.swing.component.search.action.PreviousAction;
 import net.anwiba.commons.swing.object.IObjectFieldConfiguration;
+import net.anwiba.commons.swing.object.IToolTipFactory;
 import net.anwiba.commons.swing.object.StringField;
 import net.anwiba.commons.swing.object.StringObjectFieldConfigurationBuilder;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
@@ -58,19 +60,27 @@ public class SearchComponent<C, R> implements IComponentProvider {
   private final JComponent[] components;
   private final IAdvancedSearchActionFactory<C> advancedSearchActionFactory;
   private final IFactory<String, C, RuntimeException> stringConditionFactory;
+  private IBooleanModel enabledDistributor;
+  private IToolTipFactory toolTipFactory;
 
   public SearchComponent(
+      final IBooleanModel enabledDistributor,
+      final IToolTipFactory toolTipFactory,
       final ISearchEngine<C, R> engine,
       final IFactory<String, C, RuntimeException> stringConditionFactory,
       final JComponent... components) {
-    this(engine, stringConditionFactory, null, components);
+    this(enabledDistributor, toolTipFactory, engine, stringConditionFactory, null, components);
   }
 
   public SearchComponent(
+      final IBooleanModel enabledDistributor,
+      final IToolTipFactory toolTipFactory,
       final ISearchEngine<C, R> engine,
       final IFactory<String, C, RuntimeException> stringConditionFactory,
       final IAdvancedSearchActionFactory<C> advancedSearchActionFactory,
       final JComponent... components) {
+    this.enabledDistributor = enabledDistributor;
+    this.toolTipFactory = toolTipFactory;
     this.engine = engine;
     this.stringConditionFactory = stringConditionFactory;
     this.advancedSearchActionFactory = advancedSearchActionFactory;
@@ -92,11 +102,12 @@ public class SearchComponent<C, R> implements IComponentProvider {
 
       final ObjectModel<String> searchStringModel = new ObjectModel<>();
       final StringObjectFieldConfigurationBuilder builder = new StringObjectFieldConfigurationBuilder()
-          .setToolTipFactory((validationResult, context) -> "feature search condition")
+          .setToolTipFactory(this.toolTipFactory)
           .setColumns(24)
           .setModel(searchStringModel);
       final IObjectModel<C> searchFeatureAcceptorModel = new ObjectModel<>();
       final AbstractAction searchAction = new ConfigurableActionBuilder()
+          .setEnabledDistributor(this.enabledDistributor)
           .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.MEDIA_PLAYBACK_START)
           .setTooltip("search")
           .setTask(() -> {
@@ -110,25 +121,25 @@ public class SearchComponent<C, R> implements IComponentProvider {
       final AbstractAction resetAction = new ConfigurableActionBuilder()
           .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.EDIT_DELETE)
           .setTooltip("reset")
-          .setEnabledModel(resetActionEnabledModel)
+          .setEnabledDistributor(resetActionEnabledModel)
           .setTask(() -> {
             engine.reset();
           })
           .build();
-      builder.addActionFactory((c, d, b) -> searchAction);
+      builder.addActionFactory((c, d, e, b) -> searchAction);
       if (this.advancedSearchActionFactory != null) {
         builder.addActionFactory(
-            (context, document, clearBlock) -> SearchComponent.this.advancedSearchActionFactory
+            (context, document, enabled, clearBlock) -> SearchComponent.this.advancedSearchActionFactory
                 .create(searchStringModel, searchFeatureAcceptorModel, engine));
       }
       builder.addClearAction("clear");
-      builder.addActionFactory((c, d, b) -> previousAction);
-      builder.addActionFactory((c, d, b) -> nextAction);
-      builder.addActionFactory((c, d, b) -> resetAction);
-      final IObjectFieldConfiguration<String> configuration = builder.build();
-      final StringField stringField = new StringField(configuration);
-      this.stringField = stringField;
-      final IFactory<String, C, RuntimeException> stringConditionFactory = this.stringConditionFactory;
+      builder.addActionFactory((c, d, e, b) -> previousAction);
+      builder.addActionFactory((c, d, e, b) -> nextAction);
+      builder.addActionFactory((c, d, e, b) -> resetAction);
+      final IObjectFieldConfiguration<String> configuration = builder.setEnabledModel(this.enabledDistributor).build();
+      final StringField field = new StringField(configuration);
+      this.stringField = field;
+      final IFactory<String, C, RuntimeException> conditionFactory = this.stringConditionFactory;
       engine.getSearchResultsModel().addListModelListener(new IChangeableListListener<R>() {
 
         @Override
@@ -162,7 +173,7 @@ public class SearchComponent<C, R> implements IComponentProvider {
           if (StringUtilities.isNullOrEmpty(searchStringModel.get())) {
             return;
           }
-          engine.search(stringConditionFactory.create(searchStringModel.get()));
+          engine.search(conditionFactory.create(searchStringModel.get()));
         }
       });
       engine.getSearchResultsModel().addListModelListener(new IChangeableListListener<R>() {
@@ -198,8 +209,8 @@ public class SearchComponent<C, R> implements IComponentProvider {
 
             @Override
             public void run() {
-              stringField.getComponent().setBackground(isValid ? Color.WHITE : Color.RED);
-              stringField.getComponent().setForeground(isValid ? Color.BLACK : Color.WHITE);
+              field.getComponent().setBackground(isValid ? Color.WHITE : Color.RED);
+              field.getComponent().setForeground(isValid ? Color.BLACK : Color.WHITE);
               previousAction.setEnabled(hasPrevious);
               nextAction.setEnabled(hasNext);
             }
@@ -225,16 +236,16 @@ public class SearchComponent<C, R> implements IComponentProvider {
       for (final JComponent component : this.components) {
         controllPane.add(component);
       }
-      this.contentPane.add(createSearchField(stringField), BorderLayout.NORTH);
+      this.contentPane.add(createSearchField(field), BorderLayout.NORTH);
       this.contentPane.add(controllPane, BorderLayout.CENTER);
     }
     return this.contentPane;
   }
 
-  private Component createSearchField(final StringField stringField) {
+  private Component createSearchField(final StringField field) {
     final JPanel searchPanel = new JPanel(new GridLayout(1, 1));
     searchPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-    searchPanel.add(stringField.getComponent());
+    searchPanel.add(field.getComponent());
     return searchPanel;
   }
 

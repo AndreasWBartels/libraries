@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.util.List;
@@ -44,6 +45,7 @@ public final class DialogConfiguration extends AbstractDialogConfiguration {
       final IGuiIcon icon,
       final IGuiIcon image,
       final ModalityType modality,
+      final ModalExclusionType modalExclusionType,
       final DialogType dialogType,
       final IFunction<String, String, RuntimeException> actionButtonTextFactory,
       final boolean isResizeable,
@@ -59,6 +61,7 @@ public final class DialogConfiguration extends AbstractDialogConfiguration {
         icon,
         image,
         modality,
+        modalExclusionType,
         dialogType,
         actionButtonTextFactory,
         isResizeable,
