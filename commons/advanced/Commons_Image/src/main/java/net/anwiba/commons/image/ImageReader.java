@@ -37,15 +37,16 @@ import net.anwiba.commons.http.IResponse;
 import net.anwiba.commons.http.RequestBuilder;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.resource.reference.IResourceReference;
-import net.anwiba.commons.resource.reference.IResourceReferenceHandler;
-import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.IResourceReferenceHandler;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.utilities.io.url.IUrl;
 import net.anwiba.commons.utilities.io.url.UrlBuilder;
 import net.anwiba.commons.utilities.io.url.parser.UrlParser;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
+@SuppressWarnings("nls")
 public final class ImageReader implements IImageReader {
 
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
@@ -126,7 +127,7 @@ public final class ImageReader implements IImageReader {
     try {
       final IUrl url = new UrlParser().parse(string);
       if (url.getPassword() != null) {
-        return new UrlBuilder(url).setPassword("**********").build().toString(); //$NON-NLS-1$
+        return new UrlBuilder(url).setPassword("**********").build().toString();
       }
       return new UrlBuilder(url).build().toString();
     } catch (final CreationException exception) {
@@ -145,6 +146,6 @@ public final class ImageReader implements IImageReader {
   @SuppressWarnings("resource")
   private RenderedOp createRenderOp(final InputStream inputStream) {
     final MemoryCacheSeekableStream memoryCacheSeekableStream = new MemoryCacheSeekableStream(inputStream);
-    return JAI.create("Stream", memoryCacheSeekableStream); //$NON-NLS-1$
+    return JAI.create("Stream", memoryCacheSeekableStream);
   }
 }

@@ -24,6 +24,20 @@ package net.anwiba.commons.reflection;
 
 public interface IReflectionValueProviderBuilder {
 
+  public abstract <T, S extends T> IReflectionValueProviderBuilder set(IBinding<T> clazz, S object);
+
+  public abstract <T, S extends T> IReflectionValueProviderBuilder add(IBinding<T> clazz, S object);
+
+  public abstract <T> IReflectionValueProviderBuilder set(IBinding<T> clazz, Class<? extends T> objectClass);
+
+  public abstract <T> IReflectionValueProviderBuilder add(IBinding<T> clazz, Class<? extends T> objectClass);
+
+  public abstract <T> IReflectionValueProviderBuilder set(IBinding<T> clazz, IInjectingFactory<T> objectFactory);
+
+  public abstract <T> IReflectionValueProviderBuilder add(IBinding<T> clazz, IInjectingFactory<T> objectFactory);
+
+  public abstract <T> IReflectionValueProviderBuilder link(IBinding<T> clazz, IBinding<? extends T> link);
+
   public abstract <T, S extends T> IReflectionValueProviderBuilder set(Class<T> clazz, S object);
 
   public abstract <T, S extends T> IReflectionValueProviderBuilder add(Class<T> clazz, S object);

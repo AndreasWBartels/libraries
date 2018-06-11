@@ -21,20 +21,18 @@
  */
 package net.anwiba.commons.swing.preferences.editor;
 
-import net.anwiba.commons.swing.parameter.ParameterTable;
-import net.anwiba.commons.swing.parameter.ParameterTableModel;
-import net.anwiba.commons.swing.preferences.tree.IPreferenceNode;
-import net.anwiba.commons.swing.preferences.tree.PreferenceNode;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameters;
-
 import java.awt.Dimension;
-import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import net.anwiba.commons.swing.parameter.ParameterTable;
+import net.anwiba.commons.swing.parameter.ParameterTableModel;
+import net.anwiba.commons.swing.preferences.tree.IPreferenceNode;
+import net.anwiba.commons.swing.preferences.tree.PreferenceNode;
+import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.utilities.parameter.ParametersBuilder;
 
 public class DefaultPreferenceNodeEditor implements IPreferenceNodeEditor {
 
@@ -45,8 +43,7 @@ public class DefaultPreferenceNodeEditor implements IPreferenceNodeEditor {
   public DefaultPreferenceNodeEditor(final boolean isEditable, final PreferenceNode node) {
     this.isEditable = isEditable;
     this.node = node;
-    this.parameterTableModel.setParameters(node == null ? new Parameters(new ArrayList<IParameter>()) : node
-        .getParameters());
+    this.parameterTableModel.setParameters(node == null ? new ParametersBuilder().build() : node.getParameters());
   }
 
   @Override

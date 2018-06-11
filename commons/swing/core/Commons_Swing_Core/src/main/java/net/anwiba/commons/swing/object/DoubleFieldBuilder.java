@@ -76,11 +76,11 @@ public class DoubleFieldBuilder
     return this;
   }
 
-  public DoubleFieldBuilder addSliderActions(final double minimum, final double maximum, final double step) {
-    return addSliderActions(minimum, maximum, step, 250, 100);
+  public DoubleFieldBuilder addSpinnerActions(final double minimum, final double maximum, final double step) {
+    return addSpinnerActions(minimum, maximum, step, 250, 100);
   }
 
-  public DoubleFieldBuilder addSliderActions(
+  public DoubleFieldBuilder addSpinnerActions(
       final double minimum,
       final double maximum,
       final double step,

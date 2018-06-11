@@ -57,30 +57,33 @@ public class BeanBuilder {
     return this;
   }
 
-  public BeanBuilder properties(final Properties properties) {
+  public BeanBuilder properties(@SuppressWarnings("hiding") final Properties properties) {
     this.properties = properties;
     return this;
   }
 
   public Bean build() {
     if (this.properties != null) {
-      member(new Member(
-      Builders.type( //
-          java.util.Map.class.getName(), //
-          java.lang.String.class.getName(), //
-          this.properties.type().name()//
-      ).build(), //
-          this.properties.name(), //
-          null, //
-          this.properties.isNullable(), //
-          this.properties.isImutable(), //
-          IterableUtilities.asList(this.properties.annotations()), //
-          this.properties.getSetterConfiguration(), //
-          this.properties.getGetterConfiguration(), //
-          (model, instance, field) -> {
-          },
-          (model, instance, field) -> {
-          }));
+      member(
+          new Member(
+              Builders
+                  .type( //
+                      java.util.Map.class.getName(), //
+                      java.lang.String.class.getName(), //
+                      this.properties.type().name()//
+                  )
+                  .build(), //
+              this.properties.name(), //
+              null, //
+              this.properties.isNullable(), //
+              this.properties.isImutable(), //
+              IterableUtilities.asList(this.properties.annotations()), //
+              this.properties.getSetterConfiguration(), //
+              this.properties.getGetterConfiguration(), //
+              (model, instance, field) -> {
+              },
+              (model, instance, field) -> {
+              }));
       if (this.properties.isNamedValueProviderEnabled()) {
         namedValueProviders(this.properties.getNamedValueProvider());
       }
@@ -113,11 +116,11 @@ public class BeanBuilder {
     this.isEnableBuilder = isEnableBuilder;
   }
 
-  public void extend(final String extend) {
+  public void extend(@SuppressWarnings("hiding") final String extend) {
     this.extend = extend;
   }
 
-  public void comment(final String comment) {
+  public void comment(@SuppressWarnings("hiding") final String comment) {
     this.comment = comment;
   }
 
@@ -129,7 +132,7 @@ public class BeanBuilder {
     this.isCollectionNullable = isCollectionNullable;
   }
 
-  public void creator(final Creator creator) {
+  public void creator(@SuppressWarnings("hiding") final Creator creator) {
     this.creator = creator;
   }
 

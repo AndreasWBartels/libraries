@@ -33,15 +33,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.IResourceReferenceHandler;
+import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.reference.ResourceReferenceHandler;
+import net.anwiba.commons.reference.ResourceReferenceUtilities;
 import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
-import net.anwiba.commons.resource.reference.IResourceReference;
-import net.anwiba.commons.resource.reference.IResourceReferenceHandler;
-import net.anwiba.commons.resource.reference.ResourceReferenceFactory;
-import net.anwiba.commons.resource.reference.ResourceReferenceHandler;
-import net.anwiba.commons.resource.reference.ResourceReferenceUtilities;
 
 public final class FieldValueFactory {
 
@@ -67,23 +68,25 @@ public final class FieldValueFactory {
         return createArray(charBuffer.toString());
       }
       return charBuffer.toString();
-    } catch (final ClassNotFoundException exception) {
+    } catch (final ClassNotFoundException | CreationException exception) {
       throw new InvocationTargetException(exception);
     }
   }
 
-  private IResourceReference createResource(final boolean isStatic, final String resourceUrl) {
+  private IResourceReference createResource(final boolean isStatic, final String resourceUrl) throws CreationException {
     if (isStatic) {
       final IResourceReference resourceReference = createResourceReference(resourceUrl);
       final byte[] buffer = read(resourceReference);
-      return resourceReferenceFactory.create(buffer, ResourceReferenceUtilities.getExtension(resourceReference));
+      return resourceReferenceFactory
+          .create(buffer, ResourceReferenceUtilities.getExtension(resourceReference), Charset.defaultCharset().name());
     }
     return createResourceReference(resourceUrl);
   }
 
   private Object createResourceProvider(
       final Class<? extends IResourceProvider> clazz,
-      final IResourceReference resourceReference) throws InvocationTargetException {
+      final IResourceReference resourceReference)
+      throws InvocationTargetException {
     if (clazz.equals(IByteArrayResourceProvider.class)) {
       return new ByteArrayResourceProvider(resourceReference);
     }
@@ -115,8 +118,8 @@ public final class FieldValueFactory {
     try (InputStream input = this.resourceReferenceHandler.openInputStream(resourceReference);) {
       return read(input);
     } catch (final Exception e) {
-      final String message = MessageFormat.format(
-          "Error loading text resource ''{0}''", ResourceReferenceUtilities.toString(resourceReference)); //$NON-NLS-1$
+      final String message = MessageFormat
+          .format("Error loading text resource ''{0}''", ResourceReferenceUtilities.toString(resourceReference)); //$NON-NLS-1$
       logger.log(ILevel.ERROR, message, e);
       throw new RuntimeException(message, e);
     }
@@ -132,7 +135,7 @@ public final class FieldValueFactory {
     return buffer;
   }
 
-  private IResourceReference createResourceReference(final String resourceUrl) {
+  private IResourceReference createResourceReference(final String resourceUrl) throws CreationException {
     if (resourceUrl.toLowerCase().startsWith("file:") || resourceUrl.toLowerCase().startsWith("http:")) { //$NON-NLS-1$ //$NON-NLS-2$
       return resourceReferenceFactory.create(resourceUrl);
     }

@@ -26,6 +26,12 @@ import java.util.Collection;
 
 public interface IReflectionValueProvider {
 
+  boolean contains(IBinding<?> binding);
+
+  <T> T get(IBinding<T> binding);
+
+  <T> Collection<T> getAll(IBinding<T> binding);
+
   boolean contains(Class<?> clazz);
 
   <T> T get(Class<T> clazz);

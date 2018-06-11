@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -60,7 +60,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
     }
   }
 
-  public void add(@SuppressWarnings("unchecked") final T... objects) {
+  public void add(@SuppressWarnings({ "unchecked", "hiding" }) final T... objects) {
 
     if (objects.length == 0) {
       return;
@@ -77,7 +77,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
     fireObjectAdded(Arrays.asList(objects));
   }
 
-  public void remove(@SuppressWarnings("unchecked") final T... objects) {
+  public void remove(@SuppressWarnings({ "unchecked", "hiding" }) final T... objects) {
     if (objects.length == 0) {
       return;
     }
@@ -106,6 +106,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
 
   public void removeAll() {
     int rows = 0;
+    @SuppressWarnings("hiding")
     final List<T> objects;
     synchronized (this) {
       rows = getSize();
@@ -131,7 +132,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
   }
 
   @Override
-  public int[] getIndicesOf(final List<T> objects) {
+  public int[] getIndicesOf(@SuppressWarnings("hiding") final List<T> objects) {
     final List<Integer> indexes = new ArrayList<>();
     for (final T object : objects) {
       final Integer index = this.indexByobjectMap.get(object);
@@ -159,7 +160,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
     }
   }
 
-  protected final void fireObjectAdded(final Iterable<T> objects) {
+  protected final void fireObjectAdded(@SuppressWarnings("hiding") final Iterable<T> objects) {
     final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>();
     synchronized (this.listModelListeners) {
       currentListModelListeners.addAll(this.listModelListeners);
@@ -169,7 +170,7 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
     }
   }
 
-  protected final void fireObjectRemoved(final Iterable<T> objects) {
+  protected final void fireObjectRemoved(@SuppressWarnings("hiding") final Iterable<T> objects) {
     final List<IChangeableListListener<T>> currentListModelListeners = new ArrayList<>();
     synchronized (this.listModelListeners) {
       currentListModelListeners.addAll(this.listModelListeners);

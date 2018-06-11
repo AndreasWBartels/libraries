@@ -21,13 +21,12 @@
  */
 package net.anwiba.commons.lang.comparable;
 
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.*;
-
 import static org.junit.Assert.*;
 
-@SuppressWarnings({ "boxing", "nls" })
+import org.junit.Test;
+
+@SuppressWarnings({ "nls" })
 public class SortItemIteratorTest {
 
   @Test

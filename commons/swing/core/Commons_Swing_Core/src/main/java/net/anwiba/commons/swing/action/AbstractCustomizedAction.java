@@ -33,6 +33,7 @@ public abstract class AbstractCustomizedAction extends AbstractAction {
   public AbstractCustomizedAction(final IActionCustomization customization) {
     super(customization.getName(), customization.getIcon());
     putValue(Action.SHORT_DESCRIPTION, customization.getTooltipText());
+
   }
 
   @Override

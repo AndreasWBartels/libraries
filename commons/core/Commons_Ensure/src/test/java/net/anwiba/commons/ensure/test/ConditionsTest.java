@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons core
  * %%
- * Copyright (C) 2007 - 2016 Andreas W. Bartels 
+ * Copyright (C) 2007 - 2016 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,15 +21,15 @@
  */
 package net.anwiba.commons.ensure.test;
 
-import net.anwiba.commons.ensure.Conditions;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import net.anwiba.commons.ensure.Conditions;
 
-@SuppressWarnings({ "nls", "boxing" })
+@SuppressWarnings({ "nls" })
 public class ConditionsTest {
 
   @Test
@@ -60,21 +60,23 @@ public class ConditionsTest {
   @Test
   public void anyOfTest() {
     assertTrue(Conditions.anyOf(Conditions.isNull(), Conditions.not(Conditions.isNull())).accept(Integer.valueOf(11)));
-    assertTrue(Conditions.anyOf(Conditions.isNull(), Conditions.equalTo(Integer.valueOf(11))).accept(
-        Integer.valueOf(11)));
-    assertFalse(Conditions.anyOf(Conditions.isNull(), Conditions.equalTo(Integer.valueOf(10))).accept(
-        Integer.valueOf(11)));
+    assertTrue(
+        Conditions.anyOf(Conditions.isNull(), Conditions.equalTo(Integer.valueOf(11))).accept(Integer.valueOf(11)));
+    assertFalse(
+        Conditions.anyOf(Conditions.isNull(), Conditions.equalTo(Integer.valueOf(10))).accept(Integer.valueOf(11)));
   }
 
   @Test
   public void allOfTest() {
-    assertTrue(Conditions.allOf(Conditions.not(Conditions.isNull()), Conditions.equalTo(Integer.valueOf(11))).accept(
-        Integer.valueOf(11)));
-    assertFalse(Conditions.allOf(Conditions.isNull(), Conditions.equalTo(Integer.valueOf(11))).accept(
-        Integer.valueOf(11)));
-    assertFalse(Conditions.allOf(
-        Conditions.not(Conditions.isNull()),
-        Conditions.not(Conditions.equalTo(Integer.valueOf(11)))).accept(Integer.valueOf(11)));
+    assertTrue(
+        Conditions.allOf(Conditions.not(Conditions.isNull()), Conditions.equalTo(Integer.valueOf(11))).accept(
+            Integer.valueOf(11)));
+    assertFalse(
+        Conditions.allOf(Conditions.isNull(), Conditions.equalTo(Integer.valueOf(11))).accept(Integer.valueOf(11)));
+    assertFalse(
+        Conditions
+            .allOf(Conditions.not(Conditions.isNull()), Conditions.not(Conditions.equalTo(Integer.valueOf(11))))
+            .accept(Integer.valueOf(11)));
     assertTrue(Conditions.contains("a").accept("a"));
   }
 
@@ -145,9 +147,9 @@ public class ConditionsTest {
   public void IsEmptyTest() {
     assertTrue(Conditions.isEmpty().accept(Arrays.asList()));
     assertFalse(Conditions.isEmpty().accept(Arrays.asList("")));
-    assertTrue(Conditions.allOf(
-        Conditions.notNull(),
-        Conditions.not(Conditions.isEmpty()),
-        Conditions.containsAll("a", "b")).accept(Arrays.asList("a", "b", "c")));
+    assertTrue(
+        Conditions
+            .allOf(Conditions.notNull(), Conditions.not(Conditions.isEmpty()), Conditions.containsAll("a", "b"))
+            .accept(Arrays.asList("a", "b", "c")));
   }
 }

@@ -26,10 +26,6 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 
-import net.anwiba.commons.lang.hashable.HashableIdentifier;
-import net.anwiba.commons.lang.hashable.HashableMap;
-import net.anwiba.commons.lang.hashable.MapEntry;
-
 import org.junit.Test;
 
 public class HashableMapTest {
@@ -54,7 +50,7 @@ public class HashableMapTest {
         });
   }
 
-  @SuppressWarnings("boxing")
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   public void equals() {
     final MapEntry<HashableIdentifier, Object> entry = new MapEntry<>(new HashableIdentifier(), new Object());

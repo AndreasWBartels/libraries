@@ -15,9 +15,12 @@ public interface IInjektionAnalyserValueResult {
 
   boolean isNullable();
 
-  @SuppressWarnings("rawtypes")
-  Class getType();
-
+  //  @SuppressWarnings("rawtypes")
+  //  Class getType();
+  //
   boolean isIterable();
+
+  @SuppressWarnings("rawtypes")
+  IBinding getBinding();
 
 }

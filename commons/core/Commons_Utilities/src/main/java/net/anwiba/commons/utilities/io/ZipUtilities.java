@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -29,11 +29,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 
 public class ZipUtilities {
 
@@ -44,7 +49,7 @@ public class ZipUtilities {
       final ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
       ZipEntry entry;
       while ((entry = zis.getNextEntry()) != null) {
-        final File file = new File(folder, entry.getName());
+        final File file = new File(folder, resolveSpecialPathNames(entry.getName()));
         if (entry.isDirectory()) {
           file.mkdir();
           continue;
@@ -65,6 +70,17 @@ public class ZipUtilities {
           "extract of resource '" + resource + "' faild", //$NON-NLS-1$//$NON-NLS-2$
           exception);
     }
+  }
+
+  @SuppressWarnings("nls")
+  static String resolveSpecialPathNames(final String name) throws IOException {
+    final Path normalize = new File(name).toPath().normalize();
+    final List<Path> items = new ArrayList<>();
+    normalize.forEach(p -> Optional.of(p).filter(i -> !i.equals(Paths.get(".."))).ifPresent(i -> items.add(i)));
+    if (items.size() != normalize.getNameCount()) {
+      throw new IOException("Entry is outside of the target folder '" + name + "'");
+    }
+    return items.stream().map(p -> p.toString()).reduce(null, (i, s) -> i == null ? s : i + File.separator + s);
   }
 
   public static void zipFile(final File sourceFile, final File destinationFile) throws IOException {

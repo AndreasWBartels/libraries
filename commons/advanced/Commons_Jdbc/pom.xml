@@ -8,7 +8,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-advanced</artifactId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <scm>
@@ -21,7 +21,27 @@
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-crypto</artifactId>
+      <artifactId>anwiba-commons-lang</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-nls</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-ensure</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-logging</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-utilities</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
 

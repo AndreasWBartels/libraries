@@ -1,6 +1,6 @@
 /*
  * #%L
- *
+ * *
  * %%
  * Copyright (C) 2007 - 2018 Andreas W. Bartels (bartels@anwiba.de)
  * %%
@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -38,7 +38,6 @@ public class TagRequestBuilder {
     private final String url;
     private String key = null;
     private IAuthentication authentication = null;
-    private final int limit = -1;
     private boolean allFields = false;
 
     TagListRequestBuilder(final String url) {
@@ -102,7 +101,7 @@ public class TagRequestBuilder {
       return this;
     }
 
-    public TagSearchRequestBuilder query(final String query) {
+    public TagSearchRequestBuilder query(@SuppressWarnings("hiding") final String query) {
       this.query = query;
       return this;
     }

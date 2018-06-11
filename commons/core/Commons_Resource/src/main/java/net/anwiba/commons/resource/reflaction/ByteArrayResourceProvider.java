@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.resource.reflaction;
 
-import net.anwiba.commons.resource.reference.IResourceReference;
+import net.anwiba.commons.reference.IResourceReference;
 
 public class ByteArrayResourceProvider extends AbstractTextResourceProvider {
 

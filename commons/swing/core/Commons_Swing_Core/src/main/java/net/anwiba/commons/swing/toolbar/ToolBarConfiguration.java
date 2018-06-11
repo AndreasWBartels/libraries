@@ -34,6 +34,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.JToolBar;
 
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.swing.action.IActionContainerProvider;
 import net.anwiba.commons.utilities.registry.KeyValueRegistry;
 
@@ -108,11 +109,9 @@ public class ToolBarConfiguration {
         final List<Action> actions = new ArrayList<>();
         final ActionListener listener = new ActionDisabler(actions);
         for (final ToolBarItemConfiguration toolBarItemConfiguration : toolBarItemConfigurations) {
-          final AbstractButton button = addToToolBar(toolBar, toolBarItemConfiguration);
-          actions.add(toolBarItemConfiguration.getAction());
-          if (button != null) {
-            button.addActionListener(listener);
-          }
+          Optional.of(addToToolBar(toolBar, toolBarItemConfiguration)).consume(
+              button -> button.addActionListener(listener));
+          Optional.of(toolBarItemConfiguration.getAction()).consume(a -> actions.add(a));
         }
       } else {
         for (final ToolBarItemConfiguration toolBarItemConfiguration : toolBarItemConfigurations) {

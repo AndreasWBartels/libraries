@@ -37,10 +37,17 @@ public class ToolBarItemConfiguration extends AbstractActionConfiguration<ToolBa
   }
 
   public ToolBarItemConfiguration(
-    final ToolBarItemDescription toolBarItemDescription,
-    final IActionContainerProvider<? extends Container> actionContainerProvider,
-    final Action action) {
+      final ToolBarItemDescription toolBarItemDescription,
+      final IActionContainerProvider<? extends Container> actionContainerProvider,
+      final Action action) {
     super(toolBarItemDescription, action);
+    this.actionContainerProvider = actionContainerProvider;
+  }
+
+  public ToolBarItemConfiguration(
+      final ToolBarItemDescription toolBarItemDescription,
+      final IActionContainerProvider<? extends Container> actionContainerProvider) {
+    super(toolBarItemDescription, null);
     this.actionContainerProvider = actionContainerProvider;
   }
 

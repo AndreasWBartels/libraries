@@ -27,6 +27,7 @@ import javax.swing.AbstractAction;
 
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.swing.component.search.SearchComponentMessages;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
@@ -36,7 +37,7 @@ public final class CleanAction extends AbstractAction {
 
   public CleanAction(final IObjectModel<String> stringFieldModel) {
     super(null, GuiIcons.EDIT_CLEAR_ICON.getSmallIcon());
-    putValue(SHORT_DESCRIPTION, "clear search string field");
+    putValue(SHORT_DESCRIPTION, SearchComponentMessages.ClearCearchStringField);
     this.stringFieldModel = stringFieldModel;
     stringFieldModel.addChangeListener(new IChangeableObjectListener() {
 

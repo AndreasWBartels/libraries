@@ -21,12 +21,6 @@
  */
 package net.anwiba.commons.swing.frame;
 
-import net.anwiba.commons.swing.frame.view.IView;
-import net.anwiba.commons.swing.frame.view.ViewManager;
-import net.anwiba.commons.swing.menu.MenuManager;
-import net.anwiba.commons.swing.statebar.StateBarManager;
-import net.anwiba.commons.swing.toolbar.ToolBarManager;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -38,6 +32,12 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+
+import net.anwiba.commons.swing.frame.view.IView;
+import net.anwiba.commons.swing.frame.view.ViewManager;
+import net.anwiba.commons.swing.menu.MenuManager;
+import net.anwiba.commons.swing.statebar.StateBarManager;
+import net.anwiba.commons.swing.toolbar.ToolBarManager;
 
 @SuppressWarnings("serial")
 public class ApplicationFrame extends JFrame {
@@ -58,11 +58,11 @@ public class ApplicationFrame extends JFrame {
   private final KeyActionManager keyActionManager;
 
   public ApplicationFrame(
-    final MenuManager menuManager,
-    final ToolBarManager toolBarManager,
-    final ViewManager viewManager,
-    final StateBarManager stateBarManager,
-    final KeyActionManager keyActionManager) {
+      final MenuManager menuManager,
+      final ToolBarManager toolBarManager,
+      final ViewManager viewManager,
+      final StateBarManager stateBarManager,
+      final KeyActionManager keyActionManager) {
     this.menuManager = menuManager;
     this.toolBarManager = toolBarManager;
     this.viewManager = viewManager;
@@ -129,9 +129,9 @@ public class ApplicationFrame extends JFrame {
   }
 
   private void addKeyAction(final IKeyActionConfiguration configuration) {
-    getLayeredPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-        configuration.getKeyStroke(),
-        configuration.getActionKey());
+    getLayeredPane()
+        .getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        .put(configuration.getKeyStroke(), configuration.getActionKey());
     getLayeredPane().getActionMap().put(configuration.getActionKey(), configuration.getAction());
   }
 
@@ -148,7 +148,8 @@ public class ApplicationFrame extends JFrame {
   private synchronized void resetToolBar() {
     final JToolBar[] toolBars = this.toolBarManager.getJToolBars();
     this.toolBar.removeAll();
-    for (final JToolBar toolBar : toolBars) {
+    for (@SuppressWarnings("hiding")
+    final JToolBar toolBar : toolBars) {
       this.toolBar.add(toolBar);
     }
     this.toolBar.revalidate();

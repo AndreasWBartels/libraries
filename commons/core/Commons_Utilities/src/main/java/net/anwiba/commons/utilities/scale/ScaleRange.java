@@ -39,14 +39,14 @@ public class ScaleRange implements IScaleRange {
     this.max = getMax(max);
   }
 
-  private IScaleValue getMin(final IScaleValue min) {
+  private IScaleValue getMin(@SuppressWarnings("hiding") final IScaleValue min) {
     if (min.equals(ScaleValue.NULL_VALUE) || min.getFactor() < ScaleRange.MIN_VALUE.getFactor()) {
       return ScaleRange.MIN_VALUE;
     }
     return min;
   }
 
-  private IScaleValue getMax(final IScaleValue max) {
+  private IScaleValue getMax(@SuppressWarnings("hiding") final IScaleValue max) {
     if (max.getFactor() > ScaleRange.MAX_VALUE.getFactor() || max.equals(ScaleValue.NULL_VALUE)) {
       return ScaleRange.MAX_VALUE;
     }
@@ -85,7 +85,6 @@ public class ScaleRange implements IScaleRange {
   @Override
   public boolean contains(final IScaleValue scaleValue) {
     return equals(NEUTRAL_RANGE)
-        || this.min.getFactor() <= scaleValue.getFactor()
-        && scaleValue.getFactor() <= this.max.getFactor();
+        || this.min.getFactor() <= scaleValue.getFactor() && scaleValue.getFactor() <= this.max.getFactor();
   }
 }

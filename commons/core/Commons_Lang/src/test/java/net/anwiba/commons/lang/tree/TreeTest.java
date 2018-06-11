@@ -21,18 +21,8 @@
  */
 package net.anwiba.commons.lang.tree;
 
-import net.anwiba.commons.lang.comparable.AlpaNumericStringComparator;
-import net.anwiba.commons.lang.comparable.ComparableComparator;
-import net.anwiba.commons.lang.counter.IntCounter;
-import net.anwiba.commons.lang.random.IIsNullDecider;
-import net.anwiba.commons.lang.random.RandomObjectGenerator;
-import net.anwiba.commons.lang.tree.ITree;
-import net.anwiba.commons.lang.tree.Tree;
-import net.anwiba.commons.lang.tree.TreeItemChooser;
-import net.anwiba.commons.lang.tree.converter.ItemToStringConverter;
-import net.anwiba.commons.lang.tree.converter.TreeToStringConverter;
-import net.anwiba.commons.lang.tree.distance.IntegerDistanceCalculator;
-import net.anwiba.commons.lang.tree.distance.LevenshteinStringDistanceCalculator;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,11 +37,17 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.*;
+import net.anwiba.commons.lang.comparable.AlpaNumericStringComparator;
+import net.anwiba.commons.lang.comparable.ComparableComparator;
+import net.anwiba.commons.lang.counter.IntCounter;
+import net.anwiba.commons.lang.random.IIsNullDecider;
+import net.anwiba.commons.lang.random.RandomObjectGenerator;
+import net.anwiba.commons.lang.tree.converter.ItemToStringConverter;
+import net.anwiba.commons.lang.tree.converter.TreeToStringConverter;
+import net.anwiba.commons.lang.tree.distance.IntegerDistanceCalculator;
+import net.anwiba.commons.lang.tree.distance.LevenshteinStringDistanceCalculator;
 
-import static org.junit.Assert.*;
-
-@SuppressWarnings({ "boxing", "nls" })
+@SuppressWarnings({ "nls" })
 public class TreeTest {
 
   final Comparator<Integer> intergerComparator = new ComparableComparator<>();
@@ -62,9 +58,19 @@ public class TreeTest {
 
   @Test
   public void verteilung() throws Exception {
-    final Tree<Integer, Integer> tree =
-        _initializeWithKeyEqualValue(new Tree<>(this.intergerComparator, 11, new TreeItemChooser<Integer, Integer>(
-            this.integerdistanceCalculator)), 1, 101, 102, 103, 104, 105, 106, 107, 108, 109, 1000);
+    final Tree<Integer, Integer> tree = _initializeWithKeyEqualValue(
+        new Tree<>(this.intergerComparator, 11, new TreeItemChooser<Integer, Integer>(this.integerdistanceCalculator)),
+        1,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        1000);
     assertThat(tree.getFirst().getKey(), equalTo(1));
     assertThat(tree.getLast().getKey(), equalTo(1000));
     assertEqualTo(tree.getValues(), 1, 101, 102, 103, 104, 105, 106, 107, 108, 109, 1000);
@@ -85,8 +91,10 @@ public class TreeTest {
   @Test
   public void address() throws Exception {
     final List<String> values = read("addressen.txt");
-    final Tree<String, String> stringTree =
-        new Tree<>(this.stringComparator, 2000, new TreeItemChooser<String, String>(this.stringDistanceCalculator));
+    final Tree<String, String> stringTree = new Tree<>(
+        this.stringComparator,
+        2000,
+        new TreeItemChooser<String, String>(this.stringDistanceCalculator));
     insert(stringTree, values, 0, 16);
     insert(stringTree, values, 16, values.size() - 16);
     final Map<String, Integer> map = new HashMap<>();
@@ -94,8 +102,10 @@ public class TreeTest {
     for (final String string : stringTree.getValues()) {
       map.put(string, counter.next());
     }
-    final Tree<Integer, String> integerTree =
-        new Tree<>(this.intergerComparator, 16, new TreeItemChooser<Integer, String>(this.integerdistanceCalculator));
+    final Tree<Integer, String> integerTree = new Tree<>(
+        this.intergerComparator,
+        16,
+        new TreeItemChooser<Integer, String>(this.integerdistanceCalculator));
     for (final String string : values) {
       integerTree.insert(map.get(string), string);
     }
@@ -174,9 +184,18 @@ public class TreeTest {
 
   @Test
   public void maximumSize() throws Exception {
-    final Tree<Integer, Integer> tree =
-        _initializeWithKeySequencer(new Tree<>(this.intergerComparator, 10, new TreeItemChooser<Integer, Integer>(
-            this.integerdistanceCalculator)), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    final Tree<Integer, Integer> tree = _initializeWithKeySequencer(
+        new Tree<>(this.intergerComparator, 10, new TreeItemChooser<Integer, Integer>(this.integerdistanceCalculator)),
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9);
     assertThat(tree.size(), equalTo(10));
     insert(tree, 18);
     assertThat(tree.size(), equalTo(10));
@@ -190,8 +209,10 @@ public class TreeTest {
 
   @Test
   public void maximumSizeStringTree() throws Exception {
-    final Tree<String, String> tree =
-        new Tree<>(this.stringComparator, 10, new TreeItemChooser<String, String>(this.stringDistanceCalculator));
+    final Tree<String, String> tree = new Tree<>(
+        this.stringComparator,
+        10,
+        new TreeItemChooser<String, String>(this.stringDistanceCalculator));
     final RandomObjectGenerator generator = new RandomObjectGenerator(4711, new IIsNullDecider() {
 
       @Override
@@ -203,12 +224,8 @@ public class TreeTest {
     String max = "";
     for (int i = 0; i < 100000; i++) {
       final String value = generator.generateString();
-      min = this.stringComparator.compare(min, value) < 0
-          ? min
-          : value;
-      max = this.stringComparator.compare(max, value) > 0
-          ? max
-          : value;
+      min = this.stringComparator.compare(min, value) < 0 ? min : value;
+      max = this.stringComparator.compare(max, value) > 0 ? max : value;
       insert(tree, value);
     }
     // print(tree);
@@ -221,9 +238,16 @@ public class TreeTest {
 
   @Test
   public void distanceMin() throws Exception {
-    final Tree<Integer, Integer> tree =
-        _initializeWithKeyEqualValue(new Tree<>(this.intergerComparator, 8, new TreeItemChooser<Integer, Integer>(
-            this.integerdistanceCalculator)), 1, 2, 3, 4, 5, 6, 7, 8);
+    final Tree<Integer, Integer> tree = _initializeWithKeyEqualValue(
+        new Tree<>(this.intergerComparator, 8, new TreeItemChooser<Integer, Integer>(this.integerdistanceCalculator)),
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8);
     // print(tree);
     insert(tree, 0);
     // print(tree);
@@ -234,9 +258,16 @@ public class TreeTest {
 
   @Test
   public void distanceMax() throws Exception {
-    final Tree<Integer, Integer> tree =
-        _initializeWithKeyEqualValue(new Tree<>(this.intergerComparator, 8, new TreeItemChooser<Integer, Integer>(
-            this.integerdistanceCalculator)), 0, 1, 2, 3, 4, 5, 6, 7);
+    final Tree<Integer, Integer> tree = _initializeWithKeyEqualValue(
+        new Tree<>(this.intergerComparator, 8, new TreeItemChooser<Integer, Integer>(this.integerdistanceCalculator)),
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7);
     // print(tree);
     insert(tree, 8);
     // print(tree);
@@ -248,9 +279,8 @@ public class TreeTest {
   @Test
   public void distance() throws Exception {
     final Random random = new Random(4711);
-    final Tree<Integer, Integer> tree =
-        _initializeWithKeySequencer(new Tree<>(this.intergerComparator, 10, new TreeItemChooser<Integer, Integer>(
-            this.integerdistanceCalculator)));
+    final Tree<Integer, Integer> tree = _initializeWithKeySequencer(
+        new Tree<>(this.intergerComparator, 10, new TreeItemChooser<Integer, Integer>(this.integerdistanceCalculator)));
     int min = Integer.MAX_VALUE;
     int max = Integer.MIN_VALUE;
     for (int i = 0; i < 10000; i++) {

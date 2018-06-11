@@ -21,14 +21,14 @@
  */
 package net.anwiba.commons.utilities.string;
 
+import java.util.regex.Pattern;
+
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.functional.ResolvingException;
 import net.anwiba.commons.utilities.provider.IContextValueProvider;
 import net.anwiba.commons.utilities.regex.DoNothingStringConverter;
 import net.anwiba.commons.utilities.regex.tokenizer.IRegExpTokenConverter;
 import net.anwiba.commons.utilities.regex.tokenizer.RegExpTokenizingConverter;
-
-import java.util.regex.Pattern;
 
 public class AbstractStringResolver implements IStringResolver {
 
@@ -37,9 +37,9 @@ public class AbstractStringResolver implements IStringResolver {
   private final Pattern pattern;
 
   public AbstractStringResolver(
-    final IStringAppender errorHandler,
-    final Pattern pattern,
-    final IContextValueProvider<String, String, RuntimeException> contextValueProvider) {
+      final IStringAppender errorHandler,
+      final Pattern pattern,
+      final IContextValueProvider<String, String, RuntimeException> contextValueProvider) {
     this.errorHandler = errorHandler;
     this.pattern = pattern;
     this.provider = contextValueProvider;
@@ -50,6 +50,7 @@ public class AbstractStringResolver implements IStringResolver {
     return resolve(value, this.errorHandler);
   }
 
+  @SuppressWarnings("hiding")
   private String resolve(final String value, final IStringAppender errorHandler) throws ResolvingException {
     try {
       if (value == null) {
@@ -60,9 +61,7 @@ public class AbstractStringResolver implements IStringResolver {
         @Override
         public String convert(final String[] groups) {
           final String name = groups[1];
-          final String defaultValue = groups.length > 2
-              ? groups[2]
-              : null;
+          final String defaultValue = groups.length > 2 ? groups[2] : null;
           return getValue(name, defaultValue, errorHandler);
         }
 
@@ -78,15 +77,14 @@ public class AbstractStringResolver implements IStringResolver {
     }
   }
 
+  @SuppressWarnings("hiding")
   String getValue(final String name, final String defaultValue, final IStringAppender errorHandler) {
     final String value = this.provider.getValue(name);
     if (defaultValue == null && value == null) {
       errorHandler.append(name);
       return ""; //$NON-NLS-1$
     }
-    return value != null
-        ? value
-        : defaultValue;
+    return value != null ? value : defaultValue;
   }
 
 }

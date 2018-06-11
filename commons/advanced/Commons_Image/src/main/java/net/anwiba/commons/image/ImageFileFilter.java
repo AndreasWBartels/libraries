@@ -26,7 +26,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 import net.anwiba.commons.image.codec.ImageCodec;
-import net.anwiba.commons.resource.utilities.FileUtilities;
+import net.anwiba.commons.reference.utilities.FileUtilities;
 
 public class ImageFileFilter extends FileFilter {
   @Override

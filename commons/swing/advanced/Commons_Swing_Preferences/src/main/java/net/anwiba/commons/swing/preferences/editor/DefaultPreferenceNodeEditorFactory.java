@@ -21,7 +21,6 @@
  */
 package net.anwiba.commons.swing.preferences.editor;
 
-
 public class DefaultPreferenceNodeEditorFactory implements IPreferenceNodeEditorFactory {
 
   @Override
@@ -29,6 +28,7 @@ public class DefaultPreferenceNodeEditorFactory implements IPreferenceNodeEditor
     return true;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public IPreferenceNodeEditor create(final IPreferenceNodeEditorContext node) {
     return new DefaultPreferenceNodeEditor(node.isEditable(), node.getPreferenceNode());

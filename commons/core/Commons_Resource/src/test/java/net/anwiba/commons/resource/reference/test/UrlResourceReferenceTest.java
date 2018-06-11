@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.resource.reference.test;
 
-import net.anwiba.commons.resource.reference.UrlResourceReference;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.junit.Test;
+
+import net.anwiba.commons.reference.UrlResourceReference;
 
 import static org.junit.Assert.*;
 

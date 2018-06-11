@@ -21,14 +21,24 @@
  */
 package net.anwiba.commons.image;
 
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
+import javax.media.jai.ImageLayout;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
+import javax.media.jai.OpImage;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.ScaleDescriptor;
 
+@SuppressWarnings("nls")
 public class ImageContainerUtilities {
 
   public static RenderedOp crop(
@@ -43,7 +53,7 @@ public class ImageContainerUtilities {
     pb.add(y);
     pb.add(width);
     pb.add(height);
-    return JAI.create("Crop", pb); //$NON-NLS-1$
+    return JAI.create("Crop", pb);
   }
 
   public static RenderedOp translate(final RenderedImage renderedImage, final float x, final float y) {
@@ -51,7 +61,7 @@ public class ImageContainerUtilities {
     params.addSource(renderedImage);
     params.add(x);
     params.add(y);
-    return JAI.create("Translate", params); //$NON-NLS-1$
+    return JAI.create("Translate", params);
   }
 
   public static RenderedOp scale(final RenderedImage renderedOp, final float factor) {
@@ -60,5 +70,50 @@ public class ImageContainerUtilities {
 
   public static RenderedOp scale(final RenderedImage renderedImage, final float xFactor, final float yFactor) {
     return ScaleDescriptor.create(renderedImage, xFactor, yFactor, 0.0f, 0.0f, new InterpolationNearest(), null);
+  }
+
+  public static PlanarImage toGrayScale(final RenderedImage image) {
+
+    final ColorModel colorModel = new ComponentColorModel(
+        ColorSpace.getInstance(ColorSpace.CS_GRAY),
+        false,
+        false,
+        Transparency.OPAQUE,
+        DataBuffer.TYPE_BYTE);
+    final ImageLayout imageLayout = new ImageLayout(image);
+    imageLayout.setColorModel(colorModel);
+    imageLayout.setSampleModel(colorModel.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
+    final RenderingHints renderingHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, imageLayout);
+
+    final int expandedNumBands = OpImage.getExpandedNumBands(image.getSampleModel(), image.getColorModel()) + 1;
+
+    final double[][] matrix;
+    switch (expandedNumBands) {
+      case 5: {
+        matrix = new double[][]{ { .114D, 0.587D, 0.299D, 0.0D, 0.0D } };
+        break;
+      }
+      case 4: {
+        matrix = new double[][]{ { .114D, 0.587D, 0.299D, 0.0D } };
+        break;
+      }
+      case 3: {
+        matrix = new double[][]{ { .114D, 0.587D, 0.299D } };
+        break;
+      }
+      case 2: {
+        matrix = new double[][]{ { 1D, 0.0D } };
+        break;
+      }
+      default: {
+        matrix = new double[][]{ { 1D } };
+      }
+    }
+
+    final ParameterBlock pb = new ParameterBlock();
+    pb.addSource(image);
+    pb.add(matrix);
+
+    return JAI.create("BandCombine", pb, renderingHints);
   }
 }

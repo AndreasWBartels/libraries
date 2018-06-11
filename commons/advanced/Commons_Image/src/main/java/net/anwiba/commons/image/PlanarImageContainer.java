@@ -28,6 +28,7 @@ import javax.media.jai.PlanarImage;
 
 import net.anwiba.commons.logging.ILevel;
 
+@SuppressWarnings("nls")
 public class PlanarImageContainer extends AbstractRenderedImageContainer {
 
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
@@ -46,10 +47,9 @@ public class PlanarImageContainer extends AbstractRenderedImageContainer {
       if (size >= Integer.MAX_VALUE) {
         logger.log(
             ILevel.WARNING,
-            "image dimensions (width=" + getWidth() + " height=" + getHeight() + ") are too large"); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+            "image dimensions (width=" + getWidth() + " height=" + getHeight() + ") are too large");
         return null;
       }
-      //
       //      final Object object = this.image.getProperty("tiff_directory"); //$NON-NLS-1$
       //      if (object instanceof TIFFDirectory) {
       //        final TIFFDirectory tiffDirectory = (TIFFDirectory) object;
@@ -78,5 +78,10 @@ public class PlanarImageContainer extends AbstractRenderedImageContainer {
   @Override
   public BufferedImage asBufferImage(final int x, final int y, final int w, final int h) {
     return this.image.getAsBufferedImage(new Rectangle(x, y, w, h), null);
+  }
+
+  @Override
+  public int getNumberOfBands() {
+    return this.image.getNumBands();
   }
 }

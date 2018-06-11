@@ -21,14 +21,14 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Window;
+
+import javax.swing.JComponent;
+
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.component.IComponentProvider;
 import net.anwiba.commons.swing.dialog.pane.AbstractContentPane;
 import net.anwiba.commons.swing.dialog.pane.IContentPanel;
-
-import java.awt.Window;
-
-import javax.swing.JComponent;
 
 public final class ComponentProviderUsingContentPaneBuilder extends AbstractContentPaneBuilder {
   final IComponentProvider componentProvider;
@@ -39,6 +39,7 @@ public final class ComponentProviderUsingContentPaneBuilder extends AbstractCont
 
   @Override
   protected IContentPanel create(final Window owner, final IPreferences preferences) {
+    @SuppressWarnings("hiding")
     final IComponentProvider componentProvider = this.componentProvider;
     return new AbstractContentPane() {
 

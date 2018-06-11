@@ -30,7 +30,7 @@ public class ViewManager implements IViewRegistry {
   private final List<IView> views = new ArrayList<>();
 
   @Override
-  public void add(final IView... views) {
+  public void add(@SuppressWarnings("hiding") final IView... views) {
     this.views.addAll(Arrays.asList(views));
   }
 

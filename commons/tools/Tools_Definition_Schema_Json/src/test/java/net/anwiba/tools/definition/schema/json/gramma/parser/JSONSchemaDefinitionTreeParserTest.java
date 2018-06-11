@@ -16,25 +16,26 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
 import net.anwiba.tools.definition.schema.json.gramma.element.JAnnotation;
 import net.anwiba.tools.definition.schema.json.gramma.element.JField;
 import net.anwiba.tools.definition.schema.json.gramma.element.JObject;
 import net.anwiba.tools.definition.schema.json.gramma.element.JParameter;
 import net.anwiba.tools.definition.schema.json.gramma.element.JType;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
-@SuppressWarnings({ "boxing", "nls" })
+@SuppressWarnings({ "nls" })
 public class JSONSchemaDefinitionTreeParserTest extends AbstractJSONTest {
 
   @Test
   public void testObject() throws RecognitionException, JssdParserException, IOException {
-    assertObjects("{\"one\":<int>2,\"two\":<int>3}",//
-        1,//
-        new String[]{},//
-        new String[]{ "one", "two" },//
-        new String[]{ "int", "int" },//
+    assertObjects(
+        "{\"one\":<int>2,\"two\":<int>3}", //
+        1, //
+        new String[]{}, //
+        new String[]{ "one", "two" }, //
+        new String[]{ "int", "int" }, //
         new Object[]{ 2L, 3L });
   }
 
@@ -42,14 +43,16 @@ public class JSONSchemaDefinitionTreeParserTest extends AbstractJSONTest {
   public void testObjectArray() throws RecognitionException, JssdParserException, IOException {
     final Iterable<JObject> objects = getObjects("[{\"text\": <String> \"one\"},{\"value\": <int> 2}]");
     final Iterator<JObject> iterator = objects.iterator();
-    assertObject(iterator.next(),//
-        new String[]{},//
-        new String[]{ "text" },//
-        new String[]{ "String" },//
+    assertObject(
+        iterator.next(), //
+        new String[]{}, //
+        new String[]{ "text" }, //
+        new String[]{ "String" }, //
         new Object[]{ "one" });
-    assertObject(iterator.next(),//
-        new String[]{},//
-        new String[]{ "value" },//
+    assertObject(
+        iterator.next(), //
+        new String[]{}, //
+        new String[]{ "value" }, //
         new String[]{ "int" },
         new Object[]{ 2L }//
     );
@@ -57,21 +60,23 @@ public class JSONSchemaDefinitionTreeParserTest extends AbstractJSONTest {
 
   @Test
   public void testObjectWithAnnotations() throws RecognitionException, JssdParserException, IOException {
-    assertObjects("@test() @type {\"one\":<int>2,\"two\":<int>3}", //
-        1,//
-        new String[]{ "test", "type" },//
-        new String[]{ "one", "two" },//
-        new String[]{ "int", "int" },//
+    assertObjects(
+        "@test() @type {\"one\":<int>2,\"two\":<int>3}", //
+        1, //
+        new String[]{ "test", "type" }, //
+        new String[]{ "one", "two" }, //
+        new String[]{ "int", "int" }, //
         new Object[]{ 2L, 3L });
   }
 
   @Test
   public void testEmptyObjectWithAnnotations() throws RecognitionException, JssdParserException, IOException {
-    assertObjects("@type {}", //
-        1,//
-        new String[]{ "type" },//
-        new String[]{},//
-        new String[]{},//
+    assertObjects(
+        "@type {}", //
+        1, //
+        new String[]{ "type" }, //
+        new String[]{}, //
+        new String[]{}, //
         new Object[]{});
   }
 
@@ -79,10 +84,10 @@ public class JSONSchemaDefinitionTreeParserTest extends AbstractJSONTest {
   public void testObjectWithArray() throws RecognitionException, JssdParserException, IOException {
     final Iterable<JObject> objects = assertObjects(
         "{\"one\":<java.util.Map<java.lang.String,java.lang.Object>>\"eins\",\"two\":<java.lang.String[][]>null}", //
-        1,//
+        1, //
         new String[]{}, //
         new String[]{ "one", "two" }, //
-        new String[]{ "java.util.Map", "java.lang.String" },//
+        new String[]{ "java.util.Map", "java.lang.String" }, //
         new Object[]{ "eins", null });
     final JObject object = objects.iterator().next();
     assertField(object, "one", false, "java.lang.String", "java.lang.Object");
@@ -99,11 +104,12 @@ public class JSONSchemaDefinitionTreeParserTest extends AbstractJSONTest {
 
   @Test
   public void testObjectWithParametrizedAnnotation() throws RecognitionException, JssdParserException, IOException {
-    final Iterable<JObject> objects = assertObjects("@test(name=4) {\"one\":<int>2,\"two\":<int>3}",//
-        1,//
+    final Iterable<JObject> objects = assertObjects(
+        "@test(name=4) {\"one\":<int>2,\"two\":<int>3}", //
+        1, //
         new String[]{ "test" }, //
-        new String[]{ "one", "two" },//
-        new String[]{ "int", "int" },//
+        new String[]{ "one", "two" }, //
+        new String[]{ "int", "int" }, //
         new Object[]{ 2L, 3L });//
     final JObject object = objects.iterator().next();
     final JAnnotation annotation = object.annotations().iterator().next();

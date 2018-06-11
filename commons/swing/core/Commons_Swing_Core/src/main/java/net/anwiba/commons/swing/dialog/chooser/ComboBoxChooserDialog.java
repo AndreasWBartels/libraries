@@ -44,8 +44,8 @@ import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.preferences.IPreferences;
-import net.anwiba.commons.swing.combobox.ObjectComboBoxComponent;
-import net.anwiba.commons.swing.combobox.ObjectComboBoxComponentModel;
+import net.anwiba.commons.swing.combobox.ObjectComboBox;
+import net.anwiba.commons.swing.combobox.ObjectComboBoxModel;
 import net.anwiba.commons.swing.component.IInputListener;
 import net.anwiba.commons.swing.dialog.IValueDialog;
 import net.anwiba.commons.swing.dialog.MessageDialog;
@@ -143,9 +143,9 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
         return Integer.compare(o1.order(), o2.order());
       }
     });
-    final ObjectComboBoxComponent<IChooserPanelConfiguration<T>> list = new ObjectComboBoxComponent<>(
+    final ObjectComboBox<IChooserPanelConfiguration<T>> list = new ObjectComboBox<>(
         builder.build(),
-        new ObjectComboBoxComponentModel<>(optionPanelConfigurations));
+        new ObjectComboBoxModel<>(optionPanelConfigurations));
     final JComponent comboBoxComponent = list.getComponent();
     final JPanel contentComponent = new JPanel(new GridLayout(1, 1));
     final Dimension minimumSize = new Dimension(300, 50);
@@ -164,7 +164,8 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
     if (!optionPanelConfigurations.isEmpty()) {
       selectionModel.set(optionPanelConfigurations.get(0));
       if (this.valueModel.get() != null) {
-        for (final IChooserPanelConfiguration<T> chooserPanelConfiguration : optionPanelConfigurations) {
+        for (@SuppressWarnings("hiding")
+        final IChooserPanelConfiguration<T> chooserPanelConfiguration : optionPanelConfigurations) {
           if (!chooserPanelConfiguration.getOptionPanelFactory().isApplicable(this.valueModel.get())) {
             continue;
           }
@@ -200,10 +201,11 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
         setMessage(Message.create(this.chooserPanel.getMessage().getText(), "successful")); //$NON-NLS-1$
         return true;
       }
-      setMessage(Message.create(
-          this.chooserPanel.getMessage().getText(),
-          "The connection attempt failed.", //$NON-NLS-1$
-          MessageType.ERROR));
+      setMessage(
+          Message.create(
+              this.chooserPanel.getMessage().getText(),
+              "The connection attempt failed.", //$NON-NLS-1$
+              MessageType.ERROR));
       setOkEnabled(false);
       return false;
     } catch (final InterruptedException exception) {

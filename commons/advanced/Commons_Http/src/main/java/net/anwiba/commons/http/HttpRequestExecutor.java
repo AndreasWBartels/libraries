@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -22,7 +22,6 @@
 package net.anwiba.commons.http;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Objects;
@@ -63,7 +62,7 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
   private static ILogger logger = Logging.getLogger(HttpRequestExecutor.class.getName());
   private CloseableHttpClient client;
   private IHttpClientFactory httpClientFactory;
-  private final boolean isClosed = false;
+  private boolean isClosed = false;
   private final HttpConnectionMode httpConnectionMode;
 
   HttpRequestExecutor(final HttpConnectionMode httpConnectionMode, final IHttpClientFactory httpClientFactory) {
@@ -153,7 +152,7 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
 
   private void addToQuery(final IRequest request, final RequestBuilder requestBuilder) {
     for (final IParameter parameter : request.getParameters().parameters()) {
-      requestBuilder.addParameter(parameter.getName(), URLDecoder.decode(parameter.getValue()));
+      requestBuilder.addParameter(parameter.getName(), parameter.getValue());
     }
   }
 
@@ -188,6 +187,7 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
       }
       this.client.close();
     } finally {
+      this.isClosed = true;
       this.httpClientFactory = null;
       this.client = null;
     }

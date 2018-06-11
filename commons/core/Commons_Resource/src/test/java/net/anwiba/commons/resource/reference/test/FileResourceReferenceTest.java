@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.resource.reference.test;
 
-import net.anwiba.commons.resource.reference.FileResourceReference;
-
 import java.io.File;
 
 import org.junit.Test;
+
+import net.anwiba.commons.reference.FileResourceReference;
 
 import static org.junit.Assert.*;
 

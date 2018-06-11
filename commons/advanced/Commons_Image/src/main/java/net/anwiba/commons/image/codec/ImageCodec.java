@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.image.codec;
 
-import net.anwiba.commons.resource.utilities.IFileExtensions;
+import net.anwiba.commons.reference.utilities.IFileExtensions;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 public enum ImageCodec {

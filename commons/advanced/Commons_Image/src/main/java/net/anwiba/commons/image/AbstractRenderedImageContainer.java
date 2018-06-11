@@ -25,7 +25,9 @@ package net.anwiba.commons.image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 
+import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
 public abstract class AbstractRenderedImageContainer implements IImageContainer {
@@ -78,6 +80,37 @@ public abstract class AbstractRenderedImageContainer implements IImageContainer 
   //  }
 
   @Override
+  public IImageContainer mapBands(final int[] mapping) {
+    if (mapping == null || mapping.length == 0 || isSorted(mapping)) {
+      return this;
+    }
+    final RenderedOp renderedOp = JAI.create("bandselect", this.image, mapping); //$NON-NLS-1$
+    return new PlanarImageContainer(renderedOp);
+  }
+
+  @Override
+  public IImageContainer invert() {
+    final ParameterBlock pb = new ParameterBlock();
+    pb.addSource(this.image);
+    final RenderedOp renderedOp = JAI.create("invert", pb, null); //$NON-NLS-1$
+    return new PlanarImageContainer(renderedOp);
+  }
+
+  @Override
+  public IImageContainer toGrayScale() {
+    return new PlanarImageContainer(ImageContainerUtilities.toGrayScale(this.image));
+  }
+
+  private boolean isSorted(final int[] mapping) {
+    for (int i = 0; i < mapping.length; i++) {
+      if (i != mapping[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public IImageContainer fit(final int width, final int height) {
     final float factor = fitFactor(width, height);
     return scale(factor);
@@ -98,4 +131,8 @@ public abstract class AbstractRenderedImageContainer implements IImageContainer 
     return (float) numerator / (float) denominator;
   }
 
+  @Override
+  public int getColorSpaceType() {
+    return this.image.getColorModel().getColorSpace().getType();
+  }
 }

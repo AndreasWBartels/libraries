@@ -27,7 +27,6 @@ import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Window;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -66,12 +65,12 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
   }
 
   public ConfigurableDialogLauncher setCloseButtonDialog() {
-    this.dialogConfigurationBuilder.setDialogType(DialogType.CLOSE);
+    this.dialogConfigurationBuilder.setCloseButtonDialog();
     return this;
   }
 
   public ConfigurableDialogLauncher setCancleOkButtonDialog() {
-    this.dialogConfigurationBuilder.setDialogType(DialogType.CANCEL_OK);
+    this.dialogConfigurationBuilder.setCancleOkButtonDialog();
     return this;
   }
 
@@ -102,7 +101,7 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
   }
 
   public ConfigurableDialogLauncher enableCloseOnEscape() {
-    this.dialogConfigurationBuilder.setDialogCloseKeyEvent(KeyEvent.VK_ESCAPE);
+    this.dialogConfigurationBuilder.enableCloseOnEscape();
     return this;
   }
 
@@ -171,8 +170,11 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
               return closure.execute();
             });
         final ConfigurableDialog dialog = this.isProgressDialogEnabled
-            ? progressDialogLauncher.setTitle(configuration.getTitle()).setText("Initialize").setDescription("").launch(
-                owner)
+            ? progressDialogLauncher
+                .setTitle(configuration.getTitle())
+                .setText(DialogMessages.Initialize)
+                .setDescription(DialogMessages.Empty)
+                .launch(owner)
             : closure.execute();
 
         dialog.toFront();

@@ -26,11 +26,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
-import net.anwiba.commons.lang.functional.IClosure;
-
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
 
+import net.anwiba.commons.lang.functional.IClosure;
+
+@SuppressWarnings("nls")
 public class InputStreamEntity extends AbstractHttpEntity {
 
   private final IClosure<InputStream, IOException> content;
@@ -68,7 +69,7 @@ public class InputStreamEntity extends AbstractHttpEntity {
 
   @Override
   public void writeTo(final OutputStream outstream) throws IOException {
-    Objects.requireNonNull(outstream, "no content"); //$NON-NLS-1$
+    Objects.requireNonNull(outstream, "no content");
     try (final InputStream instream = this.content.execute();) {
       final byte[] buffer = new byte[OUTPUT_BUFFER_SIZE];
       int size;

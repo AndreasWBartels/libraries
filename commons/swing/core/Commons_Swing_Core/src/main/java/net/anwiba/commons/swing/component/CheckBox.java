@@ -28,11 +28,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 
 import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IChangeableObjectListener;
 
 public class CheckBox implements IComponentProvider {
 
-  private final BooleanModel model;
+  private final IBooleanModel model;
   private JCheckBox checkBox;
   private final String label;
 
@@ -40,11 +41,11 @@ public class CheckBox implements IComponentProvider {
     this(new BooleanModel(false));
   }
 
-  public CheckBox(final BooleanModel model) {
+  public CheckBox(final IBooleanModel model) {
     this(null, model);
   }
 
-  public CheckBox(final String label, final BooleanModel model) {
+  public CheckBox(final String label, final IBooleanModel model) {
     this.label = label;
     this.model = model;
     this.model.addChangeListener(new IChangeableObjectListener() {
@@ -94,7 +95,7 @@ public class CheckBox implements IComponentProvider {
     this.checkBox.setEnabled(isEditable);
   }
 
-  public BooleanModel getModel() {
+  public IBooleanModel getModel() {
     return this.model;
   }
 

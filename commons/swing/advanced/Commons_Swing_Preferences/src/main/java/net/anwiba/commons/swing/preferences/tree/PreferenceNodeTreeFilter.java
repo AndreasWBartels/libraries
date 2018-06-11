@@ -21,14 +21,14 @@
  */
 package net.anwiba.commons.swing.preferences.tree;
 
+import java.util.List;
+
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.swing.tree.ITreeNodeFilter;
 import net.anwiba.commons.utilities.collection.ListUtilities;
 import net.anwiba.commons.utilities.parameter.IParameter;
 import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.string.StringUtilities;
-
-import java.util.List;
 
 public class PreferenceNodeTreeFilter implements ITreeNodeFilter<PreferenceNode> {
 
@@ -58,7 +58,7 @@ public class PreferenceNodeTreeFilter implements ITreeNodeFilter<PreferenceNode>
         return false;
       }
 
-      private boolean contains(final String string, final String value) {
+      private boolean contains(@SuppressWarnings("hiding") final String string, final String value) {
         return value == null ? false : string.toString().toUpperCase().contains(value.toUpperCase());
       }
 

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -48,6 +48,7 @@ public class ObjectListComponent<T> implements IComponentProvider {
   private final JComponent component;
   private final ISelectionModel<T> selectionModel;
   private JList<T> list;
+  private IObjectListConfiguration<T> configuration;
 
   public static final class JListSelectionListener<T> implements ListSelectionListener {
     private final IListModel<T> listModel;
@@ -127,7 +128,9 @@ public class ObjectListComponent<T> implements IComponentProvider {
       });
     }
 
-    private List<T> getObjects(final IListModel<T> tableModel, final ListSelectionModel tableSelectionModel) {
+    private List<T> getObjects(
+        final IListModel<T> tableModel,
+        @SuppressWarnings("hiding") final ListSelectionModel tableSelectionModel) {
       final List<T> objects = new ArrayList<>();
       if (tableSelectionModel.isSelectionEmpty()) {
         return objects;
@@ -146,12 +149,15 @@ public class ObjectListComponent<T> implements IComponentProvider {
   }
 
   public ObjectListComponent(final IObjectListConfiguration<T> configuration, final IListModel<T> listModel) {
+    this.configuration = configuration;
     this.list = new JList<>(listModel);
     this.list.setVisibleRowCount(configuration.getVisibleRowCount());
     this.list.setSelectionMode(configuration.getSelectionMode());
     this.list.setLayoutOrientation(configuration.getLayoutOrientation());
     this.list.setCellRenderer(
-        new ObjectUiListCellRenderer<>(configuration.getObjectUiCellRendererConfiguration(), configuration.getObjectUi()));
+        new ObjectUiListCellRenderer<>(
+            configuration.getObjectUiCellRendererConfiguration(),
+            configuration.getObjectUi()));
     final ListSelectionModel tableSelectionModel = this.list.getSelectionModel();
     this.selectionModel = configuration.getSelectionModel();
     tableSelectionModel
@@ -174,6 +180,26 @@ public class ObjectListComponent<T> implements IComponentProvider {
         this.list.ensureIndexIsVisible(selectedIndex);
       });
     }
+  }
+
+  public void setVerticalLayout() {
+    GuiUtilities.invokeLater(() -> {
+      this.list.setCellRenderer(
+          new ObjectUiListCellRenderer<>(
+              new ObjectUiCellRendererConfigurationBuilder().build(),
+              this.configuration.getObjectUi()));
+      this.list.setLayoutOrientation(JList.VERTICAL);
+    });
+  }
+
+  public void setHorizontalWrapLayout() {
+    GuiUtilities.invokeLater(() -> {
+      this.list.setCellRenderer(
+          new ObjectUiListCellRenderer<>(
+              this.configuration.getObjectUiCellRendererConfiguration(),
+              this.configuration.getObjectUi()));
+      this.list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+    });
   }
 
   @Override

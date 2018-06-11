@@ -38,7 +38,6 @@ import net.anwiba.commons.preferences.DummyPreferences;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.dialog.pane.AbstractContentPane;
 import net.anwiba.commons.swing.dialog.pane.IContentPaneBuilder;
-import net.anwiba.commons.swing.dialog.pane.IContentPanel;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 
 public class DialogConfigurationBuilder {
@@ -47,11 +46,9 @@ public class DialogConfigurationBuilder {
   private IFunction<String, String, RuntimeException> actionButtonTextFactory = s -> s;
   private IPreferences preferences = new DummyPreferences();
   private DialogType dialogType = DialogType.NONE;
-  private IContentPaneFactory contentPaneFactory = new IContentPaneFactory() {
-
-    @Override
-    public IContentPanel create(final Window owner, final IPreferences preferences) {
-      return new AbstractContentPane() {
+  private IContentPaneFactory contentPaneFactory = (
+      final Window owner,
+      @SuppressWarnings("hiding") final IPreferences preferences) -> new AbstractContentPane() {
 
         @Override
         public JComponent getComponent() {
@@ -61,9 +58,7 @@ public class DialogConfigurationBuilder {
           return panel;
         }
       };
-    }
-  };
-  private String title = "Dialog";
+  private String title = DialogMessages.Dialog;
   private IMessage message = null;
   private IGuiIcon icon = null;
   private ModalityType modality = ModalityType.APPLICATION_MODAL;
@@ -168,6 +163,21 @@ public class DialogConfigurationBuilder {
 
   public DialogConfigurationBuilder setModalExclusionType(final ModalExclusionType modalExclusionType) {
     this.modalExclusionType = modalExclusionType;
+    return this;
+  }
+
+  public DialogConfigurationBuilder setCloseButtonDialog() {
+    setDialogType(DialogType.CLOSE);
+    return this;
+  }
+
+  public DialogConfigurationBuilder setCancleOkButtonDialog() {
+    setDialogType(DialogType.CANCEL_OK);
+    return this;
+  }
+
+  public DialogConfigurationBuilder enableCloseOnEscape() {
+    setDialogCloseKeyEvent(KeyEvent.VK_ESCAPE);
     return this;
   }
 }

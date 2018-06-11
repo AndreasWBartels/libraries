@@ -21,8 +21,31 @@
  */
 package net.anwiba.commons.jdbc.connection;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import net.anwiba.commons.lang.functional.IApplicable;
+import net.anwiba.commons.lang.functional.IProcedure;
+
 public interface IDatabaseConnectorRegistry extends IDatabaseConnector {
 
   void add(IRegisterableDatabaseConnector connector);
+
+  void add(IPostConnectionProcedure procedure);
+
+  default void add(final IApplicable<Connection> applicable, final IProcedure<Connection, SQLException> procedure) {
+    add(new IPostConnectionProcedure() {
+
+      @Override
+      public boolean isApplicable(final Connection context) {
+        return applicable.isApplicable(context);
+      }
+
+      @Override
+      public void execute(final Connection connection) throws SQLException {
+        procedure.execute(connection);
+      }
+    });
+  }
 
 }

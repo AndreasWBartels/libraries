@@ -153,6 +153,7 @@ public class GuiIconsGeneratorTask extends Task {
       }
       final Class targetClazz = reader.getClazz();
       this.output.info("class:   " + targetClazz.getName());
+      @SuppressWarnings("hiding")
       final File targetFile = createTargetFile(projectPath, targetClazz);
       if (!targetFile.exists()) {
         this.output.info(MessageFormat.format("create file: {0}", targetFile.getCanonicalPath())); //$NON-NLS-1$

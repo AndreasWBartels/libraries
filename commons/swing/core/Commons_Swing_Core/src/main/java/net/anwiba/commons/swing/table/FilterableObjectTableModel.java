@@ -74,9 +74,9 @@ public class FilterableObjectTableModel<T> extends AbstractTableModel implements
   void update() {
     synchronized (this.semaphor) {
       try {
+        @SuppressWarnings("hiding")
         final IRowMapper mapper = this.filter.filter(this.objectTableModel);
         this.mapper = mapper;
-
       } finally {
         this.updateFlag = false;
       }
@@ -226,6 +226,7 @@ public class FilterableObjectTableModel<T> extends AbstractTableModel implements
   public IObjectIterable<T> values() {
     final List<T> values = new ArrayList<>();
     synchronized (this.semaphor) {
+      @SuppressWarnings("hiding")
       final IRowMapper mapper = getMapper();
       final Iterable<Integer> indeces = mapper.indeces();
       final List<Integer> asList = IterableUtilities.asList(indeces);
@@ -241,6 +242,7 @@ public class FilterableObjectTableModel<T> extends AbstractTableModel implements
   public Collection<T> get(final int... indices) {
     final List<T> values = new ArrayList<>();
     synchronized (this.semaphor) {
+      @SuppressWarnings("hiding")
       final IRowMapper mapper = getMapper();
       final int[] result = new int[indices.length];
       for (int i = 0; i < result.length; i++) {

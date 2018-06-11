@@ -21,15 +21,14 @@
  */
 package net.anwiba.commons.lang.comparable;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.util.Comparator;
 
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.*;
-
-import static org.junit.Assert.*;
-
-@SuppressWarnings({ "boxing", "nls" })
+@SuppressWarnings({ "nls" })
 public class AlpaNumericStringComparatorTest {
 
   final Comparator<String> stringComparator = new AlpaNumericStringComparator();
@@ -37,29 +36,36 @@ public class AlpaNumericStringComparatorTest {
   @Test
   public void test() throws Exception {
 
-    assertThat(this.stringComparator.compare(
-        "68766 Hockenheim, Ludwigshafener Straße 10",
-        "68766 Hockenheim, Ludwigshafener Straße 10"), equalTo(0));
+    assertThat(
+        this.stringComparator
+            .compare("68766 Hockenheim, Ludwigshafener Straße 10", "68766 Hockenheim, Ludwigshafener Straße 10"),
+        equalTo(0));
 
-    assertThat(this.stringComparator.compare(
-        "68766 Hockenheim, Ludwigshafener Straße 9",
-        "68766 Hockenheim, Ludwigshafener Straße 10"), equalTo(-1));
-    assertThat(this.stringComparator.compare(
-        "68765 Hockenheim, Ludwigshafener Straße 10",
-        "68766 Hockenheim, Ludwigshafener Straße 10"), equalTo(-1));
-    assertThat(this.stringComparator.compare(
-        "68765 Hockenheim, Ludwigshafener Straße 11",
-        "68766 Hockenheim, Ludwigshafener Straße 10"), equalTo(-1));
+    assertThat(
+        this.stringComparator
+            .compare("68766 Hockenheim, Ludwigshafener Straße 9", "68766 Hockenheim, Ludwigshafener Straße 10"),
+        equalTo(-1));
+    assertThat(
+        this.stringComparator
+            .compare("68765 Hockenheim, Ludwigshafener Straße 10", "68766 Hockenheim, Ludwigshafener Straße 10"),
+        equalTo(-1));
+    assertThat(
+        this.stringComparator
+            .compare("68765 Hockenheim, Ludwigshafener Straße 11", "68766 Hockenheim, Ludwigshafener Straße 10"),
+        equalTo(-1));
 
-    assertThat(this.stringComparator.compare(
-        "68766 Hockenheim, Ludwigshafener Straße 11",
-        "68766 Hockenheim, Ludwigshafener Straße 10"), equalTo(1));
-    assertThat(this.stringComparator.compare(
-        "68767 Hockenheim, Ludwigshafener Straße 10",
-        "68766 Hockenheim, Ludwigshafener Straße 10"), equalTo(1));
-    assertThat(this.stringComparator.compare(
-        "68767 Hockenheim, Ludwigshafener Straße 9",
-        "68766 Hockenheim, Ludwigshafener Straße 10"), equalTo(1));
+    assertThat(
+        this.stringComparator
+            .compare("68766 Hockenheim, Ludwigshafener Straße 11", "68766 Hockenheim, Ludwigshafener Straße 10"),
+        equalTo(1));
+    assertThat(
+        this.stringComparator
+            .compare("68767 Hockenheim, Ludwigshafener Straße 10", "68766 Hockenheim, Ludwigshafener Straße 10"),
+        equalTo(1));
+    assertThat(
+        this.stringComparator
+            .compare("68767 Hockenheim, Ludwigshafener Straße 9", "68766 Hockenheim, Ludwigshafener Straße 10"),
+        equalTo(1));
   }
 
   @Test

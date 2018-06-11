@@ -4,6 +4,6 @@
   "transform" : <transform> null,
   "bbox" : <double[]> null,
   @JssdProperties
-  "objects": <geometryCollection> null,
+  "objects": <geometry> null,
   "arcs": <double[][][]> null
 }

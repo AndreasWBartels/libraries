@@ -161,6 +161,7 @@ public abstract class AbstractObjectFieldConfigurationBuilder<T, C extends Abstr
     return (C) this;
   }
 
+  @SuppressWarnings("unchecked")
   public C setEnabledModel(final IBooleanModel enabledModel) {
     this.enabledModel = enabledModel;
     return (C) this;

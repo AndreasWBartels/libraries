@@ -42,7 +42,7 @@ public class ProgressDialogDemo extends SwingDemoCase {
   public void demo() {
     final ProgressDialog dialog = new ProgressDialog(
         createJFrame(),
-        "Progess Dialog Demo",
+        "Progess Dialog Demo", //$NON-NLS-1$
         Message.create("Progess Dialog Demo", "", MessageType.DEFAULT)); //$NON-NLS-1$ //$NON-NLS-2$
     final AbstractProgressTask task = new AbstractProgressTask() {
 

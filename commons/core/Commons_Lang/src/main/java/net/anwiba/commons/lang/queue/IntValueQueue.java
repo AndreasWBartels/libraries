@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.lang.queue;
 
+import java.util.NoSuchElementException;
+
 public class IntValueQueue {
 
   static class Node {
@@ -28,19 +30,19 @@ public class IntValueQueue {
     private Node successor = null;
     private final int value;
 
-    public Node(final int value) {
+    Node(final int value) {
       this.value = value;
     }
 
-    public int getValue() {
+    int getValue() {
       return this.value;
     }
 
-    public void setSuccessor(final Node successor) {
+    void setSuccessor(final Node successor) {
       this.successor = successor;
     }
 
-    public Node getSuccessor() {
+    Node getSuccessor() {
       return this.successor;
     }
   }
@@ -58,6 +60,9 @@ public class IntValueQueue {
   }
 
   public synchronized int poll() {
+    if (isEmpty()) {
+      throw new NoSuchElementException();
+    }
     final int value = this.first.getValue();
     this.first = this.first.getSuccessor();
     if (this.first == null) {

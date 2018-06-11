@@ -22,6 +22,8 @@
 package net.anwiba.commons.swing.action;
 
 import net.anwiba.commons.model.IBooleanDistributor;
+import net.anwiba.commons.model.IObjectDistributor;
+import net.anwiba.commons.swing.icon.IGuiIcon;
 
 public interface IActionConfiguration {
 
@@ -30,5 +32,9 @@ public interface IActionConfiguration {
   IBooleanDistributor getEnabledDistributor();
 
   IActionProcedure getProcedure();
+
+  IObjectDistributor<IGuiIcon> getIconDistributor();
+
+  IObjectDistributor<String> getToolTipTextDistributor();
 
 }

@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.resource.utilities.test;
 
-import net.anwiba.commons.resource.utilities.UriUtilities;
-
 import java.net.URI;
 
 import org.junit.Test;
+
+import net.anwiba.commons.reference.utilities.UriUtilities;
 
 import static org.hamcrest.CoreMatchers.*;
 

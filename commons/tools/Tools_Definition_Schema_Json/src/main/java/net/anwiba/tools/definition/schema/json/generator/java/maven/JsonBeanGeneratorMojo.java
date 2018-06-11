@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.commons.resource.utilities.FileUtilities;
+import net.anwiba.commons.reference.utilities.FileUtilities;
 import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
 import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
 

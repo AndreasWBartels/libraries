@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import net.anwiba.commons.reflection.binding.ClassBinding;
 import net.anwiba.commons.reflection.utilities.IValueHolder;
 import net.anwiba.commons.reflection.utilities.ListValueHolder;
 import net.anwiba.commons.reflection.utilities.SingleValueHolder;
@@ -36,15 +37,15 @@ import net.anwiba.commons.reflection.utilities.SingleValueHolder;
 public final class ReflectionValueProvider implements IReflectionValueProvider {
 
   @SuppressWarnings("rawtypes")
-  private final Map<Class, IValueHolder> services;
+  private final Map<IBinding, IValueHolder> services;
   @SuppressWarnings("rawtypes")
-  private final Map<Class, Class> links;
+  private final Map<IBinding, IBinding> links;
   private final IReflectionValueProvider valueProvider;
 
   public ReflectionValueProvider(
       final IReflectionValueProvider valueProvider,
-      @SuppressWarnings("rawtypes") final Map<Class, IValueHolder> services,
-      @SuppressWarnings("rawtypes") final Map<Class, Class> links) {
+      @SuppressWarnings("rawtypes") final Map<IBinding, IValueHolder> services,
+      @SuppressWarnings("rawtypes") final Map<IBinding, IBinding> links) {
     this.valueProvider = valueProvider;
     this.services = services;
     this.links = links;
@@ -52,23 +53,24 @@ public final class ReflectionValueProvider implements IReflectionValueProvider {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> Collection<T> getAll(final Class<T> componentType) {
-    if (this.links.containsKey(componentType)) {
-      return getAll(this.links.get(componentType));
+  public <T> Collection<T> getAll(final IBinding<T> binding) {
+    if (this.links.containsKey(binding)) {
+      return getAll(this.links.get(binding));
     }
-    final IValueHolder holder = this.services.get(componentType);
+    final IValueHolder holder = this.services.get(binding);
     if (holder == null) {
-      return this.valueProvider.getAll(componentType);
+      return this.valueProvider.getAll(binding);
     }
     if (holder instanceof SingleValueHolder) {
       final Object value = ((SingleValueHolder) holder).getValue();
       final ArrayList<T> values = new ArrayList<>(Arrays.asList((T) value));
-      values.addAll(this.valueProvider.getAll(componentType));
+      values.addAll(this.valueProvider.getAll(binding));
       return values;
     }
     if (holder instanceof ListValueHolder) {
-      List<T> values = ((ListValueHolder) holder).getValue().stream().map(v -> (T) v).collect(Collectors.toList());
-      values.addAll(this.valueProvider.getAll(componentType));
+      final List<T> values = ((ListValueHolder) holder).getValue().stream().map(v -> (T) v).collect(
+          Collectors.toList());
+      values.addAll(this.valueProvider.getAll(binding));
       return values;
     }
     throw new IllegalStateException();
@@ -76,15 +78,15 @@ public final class ReflectionValueProvider implements IReflectionValueProvider {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T get(final Class<T> componentType) {
-    if (this.links.containsKey(componentType)) {
-      final Object object = get(this.links.get(componentType));
+  public <T> T get(final IBinding<T> binding) {
+    if (this.links.containsKey(binding)) {
+      final Object object = get(this.links.get(binding));
       return (T) object;
     }
-    if (!this.services.containsKey(componentType)) {
-      return this.valueProvider.get(componentType);
+    if (!this.services.containsKey(binding)) {
+      return this.valueProvider.get(binding);
     }
-    final IValueHolder holder = this.services.get(componentType);
+    final IValueHolder holder = this.services.get(binding);
     if (holder == null) {
       return null;
     }
@@ -96,11 +98,31 @@ public final class ReflectionValueProvider implements IReflectionValueProvider {
   }
 
   @Override
-  public boolean contains(final Class<?> clazz) {
-    if (this.links.containsKey(clazz)) {
-      final Class<?> link = this.links.get(clazz);
+  public boolean contains(final IBinding<?> binding) {
+    if (this.links.containsKey(binding)) {
+      final IBinding<?> link = this.links.get(binding);
       return this.services.containsKey(link) || this.valueProvider.contains(link);
     }
-    return this.services.containsKey(clazz) || this.valueProvider.contains(clazz);
+    return this.services.containsKey(binding) || this.valueProvider.contains(binding);
+  }
+
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public boolean contains(final Class clazz) {
+    return contains(binding(clazz));
+  }
+
+  @Override
+  public <T> T get(final Class<T> clazz) {
+    return get(binding(clazz));
+  }
+
+  @Override
+  public <T> Collection<T> getAll(final Class<T> clazz) {
+    return getAll(binding(clazz));
+  }
+
+  private <T> IBinding<T> binding(final Class<T> clazz) {
+    return new ClassBinding<>(clazz);
   }
 }

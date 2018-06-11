@@ -21,21 +21,21 @@
  */
 package net.anwiba.commons.swing.configuration.demo;
 
-import net.anwiba.commons.swing.configuration.Configuration;
-import net.anwiba.commons.swing.configuration.ConfigurationPanel;
-import net.anwiba.commons.swing.configuration.IConfiguration;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.Parameter;
-import net.anwiba.commons.utilities.parameter.Parameters;
-
-import de.jdemo.annotation.Demo;
-import de.jdemo.extensions.SwingDemoCase;
-import de.jdemo.junit.DemoAsTestRunner;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.runner.RunWith;
+
+import de.jdemo.annotation.Demo;
+import de.jdemo.extensions.SwingDemoCase;
+import de.jdemo.junit.DemoAsTestRunner;
+import net.anwiba.commons.swing.configuration.Configuration;
+import net.anwiba.commons.swing.configuration.ConfigurationPanel;
+import net.anwiba.commons.swing.configuration.IConfiguration;
+import net.anwiba.commons.utilities.parameter.IParameter;
+import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.utilities.parameter.Parameter;
+import net.anwiba.commons.utilities.parameter.ParametersBuilder;
 
 @RunWith(DemoAsTestRunner.class)
 public class ConfigurationPanelDemo extends SwingDemoCase {
@@ -53,11 +53,11 @@ public class ConfigurationPanelDemo extends SwingDemoCase {
     return configurations;
   }
 
-  private Parameters createParameters(final int number) {
+  private IParameters createParameters(final int number) {
     final ArrayList<IParameter> parameters = new ArrayList<>();
     for (int i = 0; i < number; i++) {
       parameters.add(new Parameter("Name" + i, "Value" + 1)); //$NON-NLS-1$//$NON-NLS-2$
     }
-    return new Parameters(parameters);
+    return new ParametersBuilder().add(parameters).build();
   }
 }

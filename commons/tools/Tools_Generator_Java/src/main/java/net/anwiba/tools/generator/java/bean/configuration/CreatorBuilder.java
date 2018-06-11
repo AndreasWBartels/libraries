@@ -36,7 +36,7 @@ public class CreatorBuilder {
     this.name = name;
   }
 
-  public CreatorBuilder annotation(final Annotation annotations) {
+  public CreatorBuilder annotation(@SuppressWarnings("hiding") final Annotation annotations) {
     if (annotations == null) {
       return this;
     }
@@ -53,6 +53,7 @@ public class CreatorBuilder {
     return this;
   }
 
+  @SuppressWarnings("hiding")
   public CreatorBuilder addArgument(final Type type, final String name, final List<Annotation> annotations) {
     addArgument(new Argument(name, annotations, type));
     return this;

@@ -38,7 +38,7 @@ import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JVar;
 
 import net.anwiba.commons.lang.functional.ConversionException;
-import net.anwiba.commons.resource.utilities.StringUtilities;
+import net.anwiba.commons.reference.utilities.StringUtilities;
 import net.anwiba.tools.definition.schema.json.gramma.element.IJsonTypeVisitor;
 import net.anwiba.tools.definition.schema.json.gramma.element.JAnnotation;
 import net.anwiba.tools.definition.schema.json.gramma.element.JField;

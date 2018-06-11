@@ -1,0 +1,14 @@
+CREATE {5} TABLESPACE {0} DATAFILE '{2}' SIZE {3} REUSE AUTOEXTEND ON NEXT {3} MAXSIZE {4};
+create user {0} identified by {1} default tablespace {0} temporary tablespace temp;
+grant CREATE SESSION to {0};
+grant CREATE TABLE to {0};
+grant CREATE PROCEDURE to {0};
+grant CREATE SEQUENCE to {0};
+grant CREATE TRIGGER to {0};
+grant CREATE TYPE to {0};
+grant CREATE LIBRARY to {0};
+grant CREATE OPERATOR to {0};
+grant CREATE INDEXTYPE to {0};
+grant CREATE PUBLIC SYNONYM to {0};
+grant DROP PUBLIC SYNONYM to {0};
+grant UNLIMITED TABLESPACE to {0};

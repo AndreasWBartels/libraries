@@ -16,15 +16,14 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.antlr.v4.runtime.RecognitionException;
+
 import net.anwiba.commons.lang.counter.Counter;
 import net.anwiba.tools.definition.schema.json.JSSDReader;
 import net.anwiba.tools.definition.schema.json.gramma.element.JAnnotation;
 import net.anwiba.tools.definition.schema.json.gramma.element.JField;
 import net.anwiba.tools.definition.schema.json.gramma.element.JObject;
 
-import org.antlr.v4.runtime.RecognitionException;
-
-@SuppressWarnings({ "boxing" })
 public abstract class AbstractJSONTest {
 
   public Iterable<JObject> assertObjects(
@@ -33,7 +32,10 @@ public abstract class AbstractJSONTest {
       final String[] annotations,
       final String[] names,
       final Object[] types,
-      final Object[] values) throws RecognitionException, JssdParserException, IOException {
+      final Object[] values)
+      throws RecognitionException,
+      JssdParserException,
+      IOException {
     assertNotNull(names);
     assertNotNull(values);
     assertThat(names.length, equalTo(values.length));

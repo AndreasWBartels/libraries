@@ -8,7 +8,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-swing-advanced</artifactId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <scm>
@@ -20,7 +20,43 @@
   <dependencies>
     <dependency>
       <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-swing-icon</artifactId>
+      <artifactId>anwiba-commons-message</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-preferences</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-model</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-lang</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-utilities</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-nls</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-core</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
 
@@ -28,12 +64,6 @@
       <groupId>net.anwiba.commons.swing.icons</groupId>
       <artifactId>org.gnome.gtk-contrast-high-icons</artifactId>
       <version>3.22.1-${net.anwiba.commons.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-swing-core</artifactId>
-      <version>${net.anwiba.commons.version}</version>
     </dependency>
 
     <dependency>

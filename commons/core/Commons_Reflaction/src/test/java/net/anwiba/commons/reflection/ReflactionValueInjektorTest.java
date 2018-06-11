@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -32,34 +32,56 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import net.anwiba.commons.reflection.binding.ClassBinding;
+
 public class ReflactionValueInjektorTest {
 
   private IReflectionValueInjector createInjector(final Object... objects) {
     @SuppressWarnings("rawtypes")
-    final Map<Class, Object> values = new HashMap<>();
+    final Map<IBinding, Object> values = new HashMap<>();
     for (final Object object : objects) {
-      values.put(object.getClass(), object);
+      values.put(new ClassBinding<>(object.getClass()), object);
     }
     final IReflectionValueInjector injektor = new ReflectionValueInjector(new IReflectionValueProvider() {
 
       @SuppressWarnings("unchecked")
       @Override
-      public <T> T get(final Class<T> clazz) {
+      public <T> T get(final IBinding<T> clazz) {
         return (T) values.get(clazz);
       }
 
       @Override
-      public boolean contains(@SuppressWarnings("rawtypes") final Class clazz) {
+      public boolean contains(@SuppressWarnings("rawtypes") final IBinding clazz) {
         return values.containsKey(clazz);
       }
 
       @Override
-      public <T> Collection<T> getAll(final Class<T> clazz) {
+      public <T> Collection<T> getAll(final IBinding<T> clazz) {
         final T value = get(clazz);
         if (value == null) {
           return new ArrayList<>();
         }
         return Arrays.asList(value);
+      }
+
+      @Override
+      @SuppressWarnings({ "unchecked", "rawtypes" })
+      public boolean contains(final Class clazz) {
+        return contains(binding(clazz));
+      }
+
+      @Override
+      public <T> T get(final Class<T> clazz) {
+        return get(binding(clazz));
+      }
+
+      @Override
+      public <T> Collection<T> getAll(final Class<T> clazz) {
+        return getAll(binding(clazz));
+      }
+
+      private <T> IBinding<T> binding(final Class<T> clazz) {
+        return new ClassBinding<>(clazz);
       }
     });
     return injektor;

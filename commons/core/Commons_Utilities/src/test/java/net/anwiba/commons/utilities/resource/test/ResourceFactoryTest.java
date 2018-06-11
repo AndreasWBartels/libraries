@@ -29,12 +29,12 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import net.anwiba.commons.resource.reference.FileResourceReference;
-import net.anwiba.commons.resource.reference.IResourceReference;
-import net.anwiba.commons.resource.reference.ResourceReferenceFactory;
-import net.anwiba.commons.resource.reference.ResourceReferenceUtilities;
-import net.anwiba.commons.resource.reference.UrlResourceReference;
-import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.reference.FileResourceReference;
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.reference.ResourceReferenceUtilities;
+import net.anwiba.commons.reference.UrlResourceReference;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.utilities.OperationSystemUtilities;
 
 import org.junit.Ignore;

@@ -25,13 +25,13 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class KeyValueRegistry<K, V> implements IKeyValueRegistry<K, V> {
   private final List<V> list = new ArrayList<>();
-  private final Map<K, V> map = new HashMap<>();
+  private final Map<K, V> map = new LinkedHashMap<>();
 
   @Override
   public synchronized void register(final K key, final V value) {

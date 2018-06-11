@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -137,18 +137,13 @@ public class ProcessStateBarPanel extends JPanel implements IBasicProgessBar {
 
   @Override
   public final synchronized void setIndeterminate(final boolean value) {
-    final JProgressBar progressBar = this.progressBar;
-    GuiUtilities.invokeLater(new Runnable() {
-
-      @Override
-      public void run() {
-        if (progressBar.isIndeterminate() != value) {
-          progressBar.setIndeterminate(value);
-        }
-        if (progressBar.isVisible() != value) {
-          progressBar.setVisible(value);
-          progressBar.revalidate();
-        }
+    GuiUtilities.invokeLater(() -> {
+      if (this.progressBar.isIndeterminate() != value) {
+        this.progressBar.setIndeterminate(value);
+      }
+      if (this.progressBar.isVisible() != value) {
+        this.progressBar.setVisible(value);
+        this.progressBar.revalidate();
       }
     });
   }

@@ -141,6 +141,32 @@ public abstract class AbstractDialog extends JDialog {
   public AbstractDialog(
       final Window owner,
       final IWindowPreferences windowPreferences,
+      final String title,
+      final IMessage message,
+      final Icon icon,
+      final DialogType dialogType,
+      final List<IAdditionalActionFactory> actionFactories,
+      final IObjectModel<DataState> dataStateModel,
+      final ModalityType modalityType) {
+    this(
+        owner,
+        windowPreferences,
+        null,
+        title,
+        message,
+        icon,
+        true,
+        dialogType,
+        s -> s,
+        actionFactories,
+        dataStateModel,
+        modalityType,
+        null);
+  }
+
+  public AbstractDialog(
+      final Window owner,
+      final IWindowPreferences windowPreferences,
       final Dimension preferdSize,
       final String title,
       final IMessage message,

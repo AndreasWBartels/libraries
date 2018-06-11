@@ -18,13 +18,14 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <modules>
     <module>core</module>
     <module>tools</module>
     <module>advanced</module>
+    <module>database</module>
     <module>swing</module>
   </modules>
 

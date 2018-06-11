@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -54,8 +54,8 @@ import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.resource.reference.IResourceReference;
-import net.anwiba.commons.resource.reference.ResourceReferenceUtilities;
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.ResourceReferenceUtilities;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.thread.cancel.Canceler;
 
@@ -141,7 +141,7 @@ public class ImagePanel extends JComponent implements Scrollable {
                   try {
                     g.drawImage(image, 50 - (image.getWidth(null) / 2), 0, null);
                     g.setColor(Color.BLACK);
-                    final String errorMessage = "reading faild";
+                    final String errorMessage = ImagePanelMessages.ReadingFaild;
                     final Rectangle2D bounds = getFontMetrics(getFont()).getStringBounds(errorMessage, g);
                     g.drawString(errorMessage, (int) (50 - bounds.getWidth() / 2), (int) (60 - bounds.getHeight() - 2));
                   } finally {

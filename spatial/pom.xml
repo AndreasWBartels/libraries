@@ -17,7 +17,7 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <dependencyManagement>
@@ -31,6 +31,18 @@
 
       <dependency>
         <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-crypto</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-datasource</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-json</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
@@ -38,6 +50,42 @@
       <dependency>
         <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-lang</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-nls</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-message</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-thread</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-model</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-preferences</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-reference</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
@@ -76,6 +124,7 @@
 
   <modules>
     <module>core</module>
+    <module>swing</module>
   </modules>
 
   <build>

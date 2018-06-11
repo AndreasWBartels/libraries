@@ -58,13 +58,9 @@ public abstract class NLS {
       load(bundleName, clazz);
       return;
     }
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      @SuppressWarnings("synthetic-access")
-      public Object run() {
-        load(bundleName, clazz);
-        return null;
-      }
+    AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+      load(bundleName, clazz);
+      return null;
     });
   }
 
@@ -149,8 +145,9 @@ public abstract class NLS {
     final String[] variants = buildVariants(bundleName);
     for (final String element : variants) {
       @SuppressWarnings("resource")
-      final InputStream input = loader == null ? ClassLoader.getSystemResourceAsStream(element) : loader
-          .getResourceAsStream(element);
+      final InputStream input = loader == null
+          ? ClassLoader.getSystemResourceAsStream(element)
+          : loader.getResourceAsStream(element);
       if (input == null) {
         continue;
       }

@@ -21,10 +21,6 @@
  */
 package net.anwiba.commons.resource.reflaction;
 
-import net.anwiba.commons.resource.reference.IResourceReference;
-import net.anwiba.commons.resource.reference.IResourceReferenceHandler;
-import net.anwiba.commons.resource.reference.ResourceReferenceHandler;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +28,10 @@ import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.IResourceReferenceHandler;
+import net.anwiba.commons.reference.ResourceReferenceHandler;
 
 public abstract class AbstractTextResourceProvider extends AbstractResourceProvider implements
     IByteArrayResourceProvider {

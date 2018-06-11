@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.reflection;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -31,11 +32,15 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.anwiba.commons.reflection.annotation.Injection;
+import net.anwiba.commons.reflection.annotation.Named;
 import net.anwiba.commons.reflection.annotation.Nullable;
+import net.anwiba.commons.reflection.binding.ClassBinding;
+import net.anwiba.commons.reflection.binding.NamedClassBinding;
 import net.anwiba.commons.reflection.privileged.PrivilegedActionInvoker;
 import net.anwiba.commons.reflection.privileged.PrivilegedFieldSetterAction;
 
@@ -77,13 +82,17 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
       final Object[] methodValues = getValues(method.getParameters());
       return methodInvoker.invoke(factory, methodValues);
     } catch (final IllegalStateException exception) {
-      throw new CreationException("Couldn't invoke method create instance of class '" //$NON-NLS-1$
-          + factory.getClass().getName()
-          + "'", exception); //$NON-NLS-1$
+      throw new CreationException(
+          "Couldn't invoke method create instance of class '" //$NON-NLS-1$
+              + factory.getClass().getName()
+              + "'", //$NON-NLS-1$
+          exception);
     } catch (final InvocationTargetException exception) {
-      throw new CreationException("Couldn't invoke method create instance of class '" //$NON-NLS-1$
-          + factory.getClass().getName()
-          + "'", exception.getCause()); //$NON-NLS-1$
+      throw new CreationException(
+          "Couldn't invoke method create instance of class '" //$NON-NLS-1$
+              + factory.getClass().getName()
+              + "'", //$NON-NLS-1$
+          exception.getCause());
     }
   }
 
@@ -99,13 +108,17 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
       inject(object);
       return object;
     } catch (final InvocationTargetException exception) {
-      throw new CreationException("Couldn't create instance for class '" //$NON-NLS-1$
-          + clazz.getName()
-          + "'", exception.getCause()); //$NON-NLS-1$
+      throw new CreationException(
+          "Couldn't create instance for class '" //$NON-NLS-1$
+              + clazz.getName()
+              + "'", //$NON-NLS-1$
+          exception.getCause());
     } catch (final InjectionException | IllegalArgumentException | IllegalStateException exception) {
-      throw new CreationException("Couldn't create instance for class '" //$NON-NLS-1$
-          + clazz.getName()
-          + "'", exception); //$NON-NLS-1$
+      throw new CreationException(
+          "Couldn't create instance for class '" //$NON-NLS-1$
+              + clazz.getName()
+              + "'", //$NON-NLS-1$
+          exception);
     }
   }
 
@@ -126,17 +139,21 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
       try {
         setValue(field, object);
       } catch (final InvocationTargetException exception) {
-        throw new InjectionException("Couldn't inject value to field '" //$NON-NLS-1$
-            + field.getName()
-            + "' of class '" //$NON-NLS-1$
-            + object.getClass().getName()
-            + "'", exception.getCause()); //$NON-NLS-1$
+        throw new InjectionException(
+            "Couldn't inject value to field '" //$NON-NLS-1$
+                + field.getName()
+                + "' of class '" //$NON-NLS-1$
+                + object.getClass().getName()
+                + "'", //$NON-NLS-1$
+            exception.getCause());
       } catch (final IllegalStateException exception) {
-        throw new InjectionException("Couldn't inject value to field '" //$NON-NLS-1$
-            + field.getName()
-            + "' of class '" //$NON-NLS-1$
-            + object.getClass().getName()
-            + "'", exception); //$NON-NLS-1$
+        throw new InjectionException(
+            "Couldn't inject value to field '" //$NON-NLS-1$
+                + field.getName()
+                + "' of class '" //$NON-NLS-1$
+                + object.getClass().getName()
+                + "'", //$NON-NLS-1$
+            exception);
       }
     }
   }
@@ -149,18 +166,19 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
     this.invoker.invoke(new PrivilegedFieldSetterAction(object, field.getName(), value));
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private Object getValue(final Field field) {
+    final IBinding binding = createBnding(field);
     final Class<?> clazz = field.getType();
     if (clazz.isAssignableFrom(Iterable.class)) {
-      final Class<?> genericType = getIterableType(field);
-      final Collection<?> value = this.values.getAll(genericType);
+      final Collection<?> value = this.values.getAll(binding);
       if (value != null) {
         return value;
       }
       return new ArrayList<>();
     }
-    if (this.values.contains(clazz)) {
-      return this.values.get(clazz);
+    if (this.values.contains(binding)) {
+      return this.values.get(binding);
     }
     final Nullable nullable = field.getAnnotation(Nullable.class);
     if (nullable != null && nullable.value()) {
@@ -169,27 +187,63 @@ public class ReflectionValueInjector implements IReflectionValueInjector {
     throw new IllegalStateException("missing injektion value for field '" + field.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
+  @SuppressWarnings("rawtypes")
+  private IBinding createBnding(final Field field) {
+    final Class<?> clazz = field.getType();
+    final String name = getName(field.getName(), field);
+    if (clazz.isAssignableFrom(Iterable.class)) {
+      final Class<?> genericType = getIterableType(field);
+      return binding(genericType, name);
+    }
+    return binding(clazz, name);
+  }
+
+  private <T> IBinding<T> binding(final Class<T> clazz, final String name) {
+    return Optional.ofNullable(name).map(n -> (IBinding<T>) new NamedClassBinding<>(clazz, n)).orElseGet(
+        () -> new ClassBinding<>(clazz));
+  }
+
+  private String getName(final String name, final AnnotatedElement annotatedElement) {
+    return Optional
+        .ofNullable(annotatedElement.getAnnotation(Named.class))
+        .map(a -> a.value())
+        .map(s -> s.trim().isEmpty() ? name : s)
+        .orElseGet(() -> null);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private Object getValue(final Parameter parameter) {
     final Class<?> clazz = parameter.getType();
     if (clazz.isAssignableFrom(IReflectionValueInjector.class)) {
       return this;
     }
-    if (this.values.contains(clazz)) {
-      return this.values.get(clazz);
-    }
+    final IBinding binding = createBnding(parameter);
     if (clazz.isAssignableFrom(Iterable.class)) {
-      final Class<?> genericType = getIterableType(parameter);
-      final Collection<?> value = this.values.getAll(genericType);
+      final Collection<?> value = this.values.getAll(binding);
       if (value != null) {
         return value;
       }
       return new ArrayList<>();
+    }
+    if (this.values.contains(binding)) {
+      return this.values.get(binding);
     }
     final Nullable nullable = parameter.getAnnotation(Nullable.class);
     if (nullable != null && nullable.value()) {
       return null;
     }
     throw new IllegalStateException("missing injektion value for field '" + parameter.getType().getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  @SuppressWarnings("rawtypes")
+  private IBinding createBnding(final Parameter parameter) {
+    final Class<?> clazz = parameter.getType();
+    final String name = getName(parameter.getName(), parameter);
+    if (clazz.isAssignableFrom(Iterable.class)) {
+      final Class<?> genericType = getIterableType(parameter);
+      return binding(genericType, name);
+    }
+    return binding(clazz, name);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

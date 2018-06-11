@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>anwiba-spatial-maven-swing-data</artifactId>
+  <packaging>pom</packaging>
+  <parent>
+    <groupId>net.anwiba.spatial</groupId>
+    <artifactId>anwiba-spatial-maven-swing</artifactId>
+    <version>1.0.140</version>
+  </parent>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>de.jdemo</groupId>
+      <artifactId>jdemo-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <modules>
+    <module>Gis_Swing_Ckan_Search</module>
+  </modules>
+
+</project>

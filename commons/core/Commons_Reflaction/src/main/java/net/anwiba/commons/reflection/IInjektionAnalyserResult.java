@@ -25,17 +25,17 @@ package net.anwiba.commons.reflection;
 public interface IInjektionAnalyserResult extends IInjektionObjectDescription {
 
   @SuppressWarnings("rawtypes")
-  Iterable<Class> getTypes();
+  Iterable<IBinding> getTypes();
 
   @SuppressWarnings("rawtypes")
-  boolean isIterable(Class clazz);
+  boolean isIterable(IBinding clazz);
 
   boolean hasIterable();
 
   boolean hasNullable();
 
   @SuppressWarnings("rawtypes")
-  boolean isNullable(Class clazz);
+  boolean isNullable(IBinding clazz);
 
   boolean isIndependent();
 

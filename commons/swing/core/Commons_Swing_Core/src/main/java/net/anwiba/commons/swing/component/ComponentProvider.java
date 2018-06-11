@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.component;
 
-import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
-
 import java.awt.BorderLayout;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
 
 @SuppressWarnings("serial")
 public final class ComponentProvider implements IComponentProvider {
@@ -41,6 +41,7 @@ public final class ComponentProvider implements IComponentProvider {
   @Override
   public JComponent getComponent() {
     if (this.panel == null) {
+      @SuppressWarnings("hiding")
       final IComponentContainer container = this.container;
       final JPanel component = new JPanel(new SpringLayout());
       this.panel = new JPanel(new BorderLayout()) {

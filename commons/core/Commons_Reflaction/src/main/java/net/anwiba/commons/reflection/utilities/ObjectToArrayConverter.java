@@ -1,19 +1,19 @@
 /*
  * #%L
- *
+ * *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels 
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,7 +26,7 @@ import java.util.Collection;
 
 public class ObjectToArrayConverter {
 
-  public static Object toPrimativArray(final Collection object, final Class<?> componentType) {
+  public static Object toPrimativArray(final Collection<?> object, final Class<?> componentType) {
     if (componentType.isAssignableFrom(double.class)) {
       return toDoubleArray(object);
     }
@@ -81,7 +81,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  public static double[] toDoubleArray(final Collection collection) {
+  public static double[] toDoubleArray(final Collection<?> collection) {
     final double[] array = new double[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -90,7 +90,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  private static float[] toFloatArray(final Collection collection) {
+  private static float[] toFloatArray(final Collection<?> collection) {
     final float[] array = new float[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -99,7 +99,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  public static long[] toLongArray(final Collection collection) {
+  public static long[] toLongArray(final Collection<?> collection) {
     final long[] array = new long[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -108,7 +108,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  public static int[] toIntArray(final Collection collection) {
+  public static int[] toIntArray(final Collection<?> collection) {
     final int[] array = new int[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -117,7 +117,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  public static short[] toShortArray(final Collection collection) {
+  public static short[] toShortArray(final Collection<?> collection) {
     final short[] array = new short[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -126,7 +126,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  private static boolean[] toBooleanArray(final Collection collection) {
+  private static boolean[] toBooleanArray(final Collection<?> collection) {
     final boolean[] array = new boolean[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -135,7 +135,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  public static byte[] toByteArray(final Collection collection) {
+  public static byte[] toByteArray(final Collection<?> collection) {
     final byte[] array = new byte[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -144,7 +144,7 @@ public class ObjectToArrayConverter {
     return array;
   }
 
-  private static char[] toCharArray(final Collection collection) {
+  private static char[] toCharArray(final Collection<?> collection) {
     final char[] array = new char[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {

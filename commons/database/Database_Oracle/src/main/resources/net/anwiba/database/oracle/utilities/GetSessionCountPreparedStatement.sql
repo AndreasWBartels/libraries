@@ -1,0 +1,1 @@
+SELECT count(*) FROM gv$session s WHERE  s.username = ?

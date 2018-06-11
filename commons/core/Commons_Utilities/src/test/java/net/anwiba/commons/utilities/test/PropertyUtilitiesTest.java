@@ -26,7 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
-import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.utilities.property.PropertyUtilities;
 
 import org.hamcrest.BaseMatcher;

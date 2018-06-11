@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.resource.utilities.test;
 
-import net.anwiba.commons.resource.utilities.FileUtilities;
-import net.anwiba.commons.resource.utilities.IFileExtensions;
-
 import java.io.File;
 
 import org.junit.Test;
+
+import net.anwiba.commons.reference.utilities.FileUtilities;
+import net.anwiba.commons.reference.utilities.IFileExtensions;
 
 import static org.hamcrest.CoreMatchers.*;
 

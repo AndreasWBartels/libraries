@@ -1,19 +1,19 @@
 /*
  * #%L
- *
+ * *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels 
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -33,17 +33,20 @@ public class ObjectUiBuilder<T> {
   private IConverter<T, String, RuntimeException> toToolTipConverter;
   private IConverter<T, Icon, RuntimeException> toIconConverter;
 
-  public ObjectUiBuilder<T> text(final IConverter<T, String, RuntimeException> toTextConverter) {
+  public ObjectUiBuilder<T> text(
+      @SuppressWarnings("hiding") final IConverter<T, String, RuntimeException> toTextConverter) {
     this.toTextConverter = toTextConverter;
     return this;
   }
 
-  public ObjectUiBuilder<T> tooltip(final IConverter<T, String, RuntimeException> toToolTipConverter) {
+  public ObjectUiBuilder<T> tooltip(
+      @SuppressWarnings("hiding") final IConverter<T, String, RuntimeException> toToolTipConverter) {
     this.toToolTipConverter = toToolTipConverter;
     return this;
   }
 
-  public ObjectUiBuilder<T> icon(final IConverter<T, Icon, RuntimeException> toIconConverter) {
+  public ObjectUiBuilder<T> icon(
+      @SuppressWarnings("hiding") final IConverter<T, Icon, RuntimeException> toIconConverter) {
     this.toIconConverter = toIconConverter;
     return this;
   }

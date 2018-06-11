@@ -27,6 +27,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import net.anwiba.commons.swing.ui.IObjectUi;
+import net.anwiba.commons.swing.ui.IObjectUiCellRendererConfiguration;
 import net.anwiba.commons.swing.ui.ObjectUiTableCellRenderer;
 
 public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implements IObjectListColumnConfiguration<T> {
@@ -38,7 +39,8 @@ public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implem
   public ObjectListColumnConfiguration(
       final Object headerValue,
       final IColumnValueProvider<T> columnValueProvider,
-      final IObjectUi<T> objectUi,
+      final IObjectUiCellRendererConfiguration configuration,
+      final IObjectUi<?> objectUi,
       final int preferredWidth,
       final Class<?> clazz,
       final boolean isSortable,
@@ -46,7 +48,7 @@ public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implem
     this(
         headerValue,
         columnValueProvider,
-        new ObjectUiTableCellRenderer<>(objectUi),
+        new ObjectUiTableCellRenderer<>(configuration, objectUi),
         null,
         null,
         preferredWidth,
@@ -69,7 +71,8 @@ public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implem
   public ObjectListColumnConfiguration(
       final Object headerValue,
       final IColumnValueProvider<T> columnValueProvider,
-      final IObjectUi<T> objectUi,
+      final IObjectUiCellRendererConfiguration configuration,
+      final IObjectUi<?> objectUi,
       final IColumnValueAdaptor<T> columnValueAdaptor,
       final TableCellEditor cellEditor,
       final int preferredWidth,
@@ -79,7 +82,7 @@ public class ObjectListColumnConfiguration<T> extends ColumnConfiguration implem
     this(
         headerValue,
         columnValueProvider,
-        new ObjectUiTableCellRenderer<>(objectUi),
+        new ObjectUiTableCellRenderer<>(configuration, objectUi),
         columnValueAdaptor,
         cellEditor,
         preferredWidth,

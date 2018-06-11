@@ -27,6 +27,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import net.anwiba.commons.swing.component.search.ISearchEngine;
+import net.anwiba.commons.swing.component.search.SearchComponentMessages;
 import net.anwiba.commons.swing.icon.GuiIcons;
 
 public final class PreviousAction<C, R> extends AbstractAction {
@@ -35,7 +36,7 @@ public final class PreviousAction<C, R> extends AbstractAction {
 
   public PreviousAction(final ISearchEngine<C, R> engine) {
     super(null, GuiIcons.PREVIOUS_ICON.getSmallIcon());
-    putValue(Action.SHORT_DESCRIPTION, "zoom to previous selected feature");
+    putValue(Action.SHORT_DESCRIPTION, SearchComponentMessages.ZoomToPreviousSelectedFeature);
     this.engine = engine;
   }
 

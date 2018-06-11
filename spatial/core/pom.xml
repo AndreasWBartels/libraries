@@ -13,7 +13,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-default</artifactId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <scm>
@@ -23,6 +23,7 @@
   </scm>
 
   <modules>
+    <module>commons</module>
     <module>data</module>
   </modules>
 </project>

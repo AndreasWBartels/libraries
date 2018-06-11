@@ -88,7 +88,7 @@ public class MemberBuilder {
         } : this.asObjectMethodFactory);
   }
 
-  public MemberBuilder value(final String value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final String value) {
     this.value = value;
     return this;
   }
@@ -98,7 +98,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final short value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final short value) {
     this.value = Short.valueOf(value);
     return this;
   }
@@ -108,7 +108,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final int value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final int value) {
     this.value = Integer.valueOf(value);
     return this;
   }
@@ -118,7 +118,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final long value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final long value) {
     this.value = Long.valueOf(value);
     return this;
   }
@@ -128,7 +128,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final float value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final float value) {
     this.value = Float.valueOf(value);
     return this;
   }
@@ -138,7 +138,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final double value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final double value) {
     this.value = Double.valueOf(value);
     return this;
   }
@@ -148,7 +148,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final char value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final char value) {
     this.value = Character.valueOf(value);
     return this;
   }
@@ -158,7 +158,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final byte value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final byte value) {
     this.value = Byte.valueOf(value);
     return this;
   }
@@ -168,7 +168,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder value(final boolean value) {
+  public MemberBuilder value(@SuppressWarnings("hiding") final boolean value) {
     this.value = Boolean.valueOf(value);
     return this;
   }
@@ -178,22 +178,22 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder isMultiValue(final boolean isMultiValue) {
+  public MemberBuilder isMultiValue(@SuppressWarnings("hiding") final boolean isMultiValue) {
     this.isMultiValue = isMultiValue;
     return this;
   }
 
-  public MemberBuilder isSetterEnabled(final boolean isSetterEnabled) {
+  public MemberBuilder isSetterEnabled(@SuppressWarnings("hiding") final boolean isSetterEnabled) {
     this.isSetterEnabled = isSetterEnabled;
     return this;
   }
 
-  public MemberBuilder isGetterEnabled(final boolean isGetterEnabled) {
+  public MemberBuilder isGetterEnabled(@SuppressWarnings("hiding") final boolean isGetterEnabled) {
     this.isGetterEnabled = isGetterEnabled;
     return this;
   }
 
-  public MemberBuilder isNullable(final boolean isNullable) {
+  public MemberBuilder isNullable(@SuppressWarnings("hiding") final boolean isNullable) {
     this.isNullable = isNullable;
     return this;
   }
@@ -203,12 +203,12 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder isImutable(final boolean isImutable) {
+  public MemberBuilder isImutable(@SuppressWarnings("hiding") final boolean isImutable) {
     this.isImutable = isImutable;
     return this;
   }
 
-  public MemberBuilder annotation(final Annotation annotations) {
+  public MemberBuilder annotation(@SuppressWarnings("hiding") final Annotation annotations) {
     if (annotations == null) {
       return this;
     }
@@ -224,7 +224,7 @@ public class MemberBuilder {
     return this;
   }
 
-  public MemberBuilder getterAnnotation(final Annotation annotations) {
+  public MemberBuilder getterAnnotation(@SuppressWarnings("hiding") final Annotation annotations) {
     if (annotations == null) {
       return this;
     }
@@ -261,12 +261,12 @@ public class MemberBuilder {
     return builder.toString();
   }
 
-  public void addValueOf(final IValueOfMethodFactory valueOfMethodFactory) {
+  public void addValueOf(@SuppressWarnings("hiding") final IValueOfMethodFactory valueOfMethodFactory) {
     this.valueOfMethodFactory = valueOfMethodFactory;
 
   }
 
-  public void asObject(final IAsObjectMethodFactory asObjectMethodFactory) {
+  public void asObject(@SuppressWarnings("hiding") final IAsObjectMethodFactory asObjectMethodFactory) {
     this.asObjectMethodFactory = asObjectMethodFactory;
   }
 

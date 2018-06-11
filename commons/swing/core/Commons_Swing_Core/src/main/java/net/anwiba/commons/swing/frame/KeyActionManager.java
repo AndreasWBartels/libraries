@@ -30,7 +30,7 @@ public class KeyActionManager implements IKeyActionRegistry {
   private final List<IKeyActionConfiguration> configurations = new ArrayList<>();
 
   @Override
-  public void add(final IKeyActionConfiguration... configurations) {
+  public void add(@SuppressWarnings("hiding") final IKeyActionConfiguration... configurations) {
     this.configurations.addAll(Arrays.asList(configurations));
   }
 

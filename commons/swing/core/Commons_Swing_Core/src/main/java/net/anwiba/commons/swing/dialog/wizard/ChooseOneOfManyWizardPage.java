@@ -22,6 +22,8 @@
 package net.anwiba.commons.swing.dialog.wizard;
 
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,6 +37,7 @@ import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ISelectionListener;
 import net.anwiba.commons.model.SelectionEvent;
+import net.anwiba.commons.model.SelectionModel;
 import net.anwiba.commons.swing.dialog.DataState;
 import net.anwiba.commons.swing.list.IObjectListConfiguration;
 import net.anwiba.commons.swing.list.ObjectListComponent;
@@ -50,6 +53,7 @@ public class ChooseOneOfManyWizardPage<T> extends AbstractWizardPage {
   private final IObjectUi<T> objectUi;
   private final T originalValue;
   private JPanel component;
+  private final IObjectModel<IWizardAction> wizardActionModel;
 
   public ChooseOneOfManyWizardPage(
       final String title,
@@ -60,12 +64,14 @@ public class ChooseOneOfManyWizardPage<T> extends AbstractWizardPage {
       final IObjectUi<T> objectUi,
       final List<T> values,
       final IObjectModel<T> mobel,
+      final IObjectModel<IWizardAction> wizardActionModel,
       final IApplicable<IWizardPage> applicable) {
     super(title, message, icon, applicable);
     this.finishable = finishable;
     this.objectUi = objectUi;
     this.values = values;
     this.mobel = mobel;
+    this.wizardActionModel = wizardActionModel;
     this.originalValue = mobel.get();
     getNextEnabledModel().set(this.originalValue != null);
     getDataStateModel().set(this.originalValue == null ? DataState.UNKNOWN : state);
@@ -79,14 +85,36 @@ public class ChooseOneOfManyWizardPage<T> extends AbstractWizardPage {
     }
     this.component = new JPanel(new GridLayout(1, 1, 5, 5));
     this.component.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    final SelectionModel<T> selectionModel = new SelectionModel<>();
     final IObjectListConfiguration<T> configuration = new ObjectListConfigurationBuilder<T>()
         .setObjectUi(this.objectUi)
+        .setSelectionModel(selectionModel)
+        .setMouseListener(new MouseAdapter() {
+
+          @Override
+          public void mouseReleased(final MouseEvent event) {
+            if (selectionModel.isEmpty()) {
+              return;
+            }
+            if (event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() == 2) {
+              ChooseOneOfManyWizardPage.this.wizardActionModel.set(new IWizardAction() {
+
+                @Override
+                public void execute(final IWizardController controller) {
+                  if (controller.hasNext() && controller.getNextEnabledDistributor().get()) {
+                    controller.next();
+                  }
+                }
+              });
+            }
+          }
+        })
         .setSingleSelectionMode()
         .build();
     final ObjectListComponent<T> listComponent = new ObjectListComponent<>(
         configuration,
         new ObjectListComponentModel<>(this.values));
-    listComponent.getSelectionModel().addSelectionListener(new ISelectionListener<T>() {
+    selectionModel.addSelectionListener(new ISelectionListener<T>() {
 
       @Override
       public void selectionChanged(final SelectionEvent<T> event) {
@@ -102,7 +130,7 @@ public class ChooseOneOfManyWizardPage<T> extends AbstractWizardPage {
         getNextEnabledModel().set(DataState.VALIDE.equals(state) || DataState.MODIFIED.equals(state));
       }
     });
-    listComponent.getSelectionModel().setSelectedObject(this.originalValue);
+    selectionModel.setSelectedObject(this.originalValue);
     this.component.add(listComponent.getComponent());
     return this.component;
   }

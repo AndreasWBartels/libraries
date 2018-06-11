@@ -21,19 +21,17 @@
  */
 package net.anwiba.commons.lang.hashable;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.*;
-
-import static org.junit.Assert.*;
-
 public class CollectionTestUtilities {
 
-  @SuppressWarnings("boxing")
   public static <K, V, E extends Entry<K, V>, M extends Map<K, V>> void assertMap(
       final M map,
       final M otherMap,
@@ -111,7 +109,6 @@ public class CollectionTestUtilities {
     assertThat(map.remove(null), equalTo(entry.getValue()));
   }
 
-  @SuppressWarnings({ "boxing" })
   public static <T, S extends Set<T>> void assertSet(
       final S set,
       final S otherSet,

@@ -21,22 +21,20 @@
  */
 package net.anwiba.commons.swing.parameter;
 
+import javax.swing.table.AbstractTableModel;
+
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.swing.dialog.DialogMessages;
 import net.anwiba.commons.utilities.parameter.IParameter;
 import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.parameter.Parameter;
-import net.anwiba.commons.utilities.parameter.Parameters;
-
-import java.util.ArrayList;
-
-import javax.swing.table.AbstractTableModel;
+import net.anwiba.commons.utilities.parameter.ParametersBuilder;
 
 public class ParameterTableModel extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
-  private IParameters parameters = new Parameters(new ArrayList<IParameter>());
+  private IParameters parameters = new ParametersBuilder().build();
   private final boolean isEditable;
 
   public ParameterTableModel() {
@@ -48,9 +46,7 @@ public class ParameterTableModel extends AbstractTableModel {
   }
 
   public void setParameters(final IParameters parameters) {
-    this.parameters = parameters == null
-        ? new Parameters(new ArrayList<IParameter>())
-        : parameters;
+    this.parameters = parameters == null ? new ParametersBuilder().build() : parameters;
     fireTableDataChanged();
   }
 
@@ -108,8 +104,8 @@ public class ParameterTableModel extends AbstractTableModel {
       throw new IllegalArgumentException();
     }
     final IParameter parameter = this.parameters.getParameter(rowIndex);
-    this.parameters =
-        this.parameters.adapt(rowIndex, new Parameter(parameter.getName(), ObjectUtilities.toString(value)));
+    this.parameters = this.parameters
+        .adapt(rowIndex, new Parameter(parameter.getName(), ObjectUtilities.toString(value)));
     fireTableCellUpdated(rowIndex, columnIndex);
   }
 

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.resource.utilities.FileUtilities;
+import net.anwiba.commons.reference.utilities.FileUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.tools.definition.schema.json.gramma.parser.JssdParserException;
 

@@ -26,43 +26,66 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import net.anwiba.commons.reflection.binding.ClassBinding;
 
 @SuppressWarnings("rawtypes")
 public final class DefaultReflectionValueProvider implements IReflectionValueProvider {
 
-  private final HashMap<Class, List<Object>> values = new HashMap<>();
+  private final HashMap<IBinding, List<Object>> values = new HashMap<>();
 
   public DefaultReflectionValueProvider() {
-    this(new HashMap<Class, List<Object>>());
+    this(new HashMap<IBinding, List<Object>>());
   }
 
-  private DefaultReflectionValueProvider(final HashMap<Class, List<Object>> values) {
+  public DefaultReflectionValueProvider(final Map<IBinding, List<Object>> values) {
     this.values.putAll(values);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> Collection<T> getAll(final Class<T> clazz) {
-    return Optional
-        .ofNullable(this.values.get(clazz))
-        .map(l -> l.stream().map(o -> (T) o).collect(Collectors.toList()))
-        .orElseGet(() -> new ArrayList<>());
+  public boolean contains(final IBinding<?> binding) {
+    return this.values.containsKey(binding);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T get(final Class<T> clazz) {
-    final List<Object> list = this.values.get(clazz);
+  public <T> T get(final IBinding<T> binding) {
+    final List<Object> list = this.values.get(binding);
     if (list.size() != 1) {
       throw new IllegalStateException();
     }
     return (T) list.get(0);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public boolean contains(final Class<?> clazz) {
-    return this.values.containsKey(clazz);
+  public <T> Collection<T> getAll(final IBinding<T> binding) {
+    return Optional
+        .ofNullable(this.values.get(binding))
+        .map(l -> l.stream().map(o -> (T) o).collect(Collectors.toList()))
+        .orElseGet(() -> new ArrayList<>());
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public boolean contains(final Class clazz) {
+    return contains(binding(clazz));
+  }
+
+  @Override
+  public <T> T get(final Class<T> clazz) {
+    return get(binding(clazz));
+  }
+
+  @Override
+  public <T> Collection<T> getAll(final Class<T> clazz) {
+    return getAll(binding(clazz));
+  }
+
+  private <T> IBinding<T> binding(final Class<T> clazz) {
+    return new ClassBinding<>(clazz);
   }
 }

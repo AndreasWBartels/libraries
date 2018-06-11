@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -59,7 +59,7 @@ public class FileFieldConfigurationBuilder
       @Override
       public IValidationResult validate(final String value) {
         if (!isValid(value)) {
-          return IValidationResult.inValid("Invalid file name");
+          return IValidationResult.inValid(FileChooserMessages.InvalidFileName);
         }
         return IValidationResult.valid();
       }
@@ -110,18 +110,18 @@ public class FileFieldConfigurationBuilder
           return IValidationResult.valid();
         }
         if (!isValid(value)) {
-          return IValidationResult.inValid("Invalid file name");
+          return IValidationResult.inValid(FileChooserMessages.InvalidFileName);
         }
         final File file = new File(value);
         if (!file.isFile()) {
-          return IValidationResult.inValid("Invalid file name");
+          return IValidationResult.inValid(FileChooserMessages.InvalidFileName);
         }
         boolean flag = FileFieldConfigurationBuilder.this.fileFilters.isEmpty();
         for (final FileFilter fileFilter : FileFieldConfigurationBuilder.this.fileFilters) {
           flag |= fileFilter.accept(file);
         }
         if (!flag) {
-          return IValidationResult.inValid("Invalid folder name");
+          return IValidationResult.inValid(FileChooserMessages.InvalidFolderName);
         }
         return IValidationResult.valid();
       }
@@ -138,18 +138,18 @@ public class FileFieldConfigurationBuilder
           return IValidationResult.valid();
         }
         if (!isValid(value)) {
-          return IValidationResult.inValid("Invalid file name");
+          return IValidationResult.inValid(FileChooserMessages.InvalidFolderName);
         }
         final File file = new File(value);
         if (!file.isDirectory()) {
-          return IValidationResult.inValid("Invalid folder name");
+          return IValidationResult.inValid(FileChooserMessages.InvalidFolderName);
         }
         boolean flag = FileFieldConfigurationBuilder.this.fileFilters.isEmpty();
         for (final FileFilter fileFilter : FileFieldConfigurationBuilder.this.fileFilters) {
           flag |= fileFilter.accept(file);
         }
         if (!flag) {
-          return IValidationResult.inValid("Invalid folder name");
+          return IValidationResult.inValid(FileChooserMessages.InvalidFolderName);
         }
         return IValidationResult.valid();
       }
@@ -165,7 +165,8 @@ public class FileFieldConfigurationBuilder
           final IObjectModel<File> context,
           final Document document,
           final IBooleanDistributor enabledDistributor,
-          final IBlock<RuntimeException> clearBlock) throws RuntimeException {
+          final IBlock<RuntimeException> clearBlock)
+          throws RuntimeException {
         final IActionProcedure procedure = new IActionProcedure() {
 
           @Override
@@ -201,7 +202,8 @@ public class FileFieldConfigurationBuilder
           final IObjectModel<File> context,
           final Document document,
           final IBooleanDistributor enabledDistributor,
-          final IBlock<RuntimeException> clearBlock) throws RuntimeException {
+          final IBlock<RuntimeException> clearBlock)
+          throws RuntimeException {
         final IActionProcedure procedure = value -> {
           final ISaveFileChooserConfiguration configuration = new SaveFileChooserConfiguration(
               context.get(),
@@ -238,7 +240,8 @@ public class FileFieldConfigurationBuilder
           final IObjectModel<File> context,
           final Document document,
           final IBooleanDistributor enabledDistributor,
-          final IBlock<RuntimeException> clearBlock) throws RuntimeException {
+          final IBlock<RuntimeException> clearBlock)
+          throws RuntimeException {
         final IActionProcedure procedure = value -> {
           final IOpenFileChooserConfiguration configuration = new OpenFileChooserConfiguration(
               context.get(),
@@ -269,7 +272,8 @@ public class FileFieldConfigurationBuilder
           final IObjectModel<File> context,
           final Document document,
           final IBooleanDistributor enabledDistributor,
-          final IBlock<RuntimeException> clearBlock) throws RuntimeException {
+          final IBlock<RuntimeException> clearBlock)
+          throws RuntimeException {
         final IActionProcedure procedure = value -> {
           final IOpenFileChooserConfiguration configuration = new OpenFileChooserConfiguration(
               context.get(),

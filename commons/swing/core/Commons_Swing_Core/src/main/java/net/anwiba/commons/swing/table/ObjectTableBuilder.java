@@ -22,23 +22,33 @@
 
 package net.anwiba.commons.swing.table;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableCellEditor;
 
+import net.anwiba.commons.lang.comparable.ComparableComparator;
 import net.anwiba.commons.lang.comparable.NumberComparator;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IFunction;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.swing.list.ObjectUiCellRendererConfigurationBuilder;
 import net.anwiba.commons.swing.table.action.ITableActionFactory;
+import net.anwiba.commons.swing.table.action.ITableCheckActionEnabledValidator;
 import net.anwiba.commons.swing.table.action.ITableTextFieldActionFactory;
 import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.swing.table.renderer.BooleanRenderer;
+import net.anwiba.commons.swing.table.renderer.LocalDateTimeTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.ObjectTableCellRenderer;
+import net.anwiba.commons.swing.ui.ObjectUiBuilder;
 
 public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
 
@@ -58,13 +68,13 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   }
 
   @Override
-  public IObjectTableBuilder<T> addColumnConfiguration(final IObjectListColumnConfiguration<T> columnConfiguration) {
+  public IObjectTableBuilder<T> addColumn(final IObjectListColumnConfiguration<T> columnConfiguration) {
     this.builder.addColumnConfiguration(columnConfiguration);
     return this;
   }
 
   @Override
-  public IObjectTableBuilder<T> addSortableStringConfiguration(
+  public IObjectTableBuilder<T> addStringColumn(
       final String title,
       final IFunction<T, String, RuntimeException> provider,
       final int size) {
@@ -83,7 +93,26 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   }
 
   @Override
-  public IObjectTableBuilder<T> addSortableStringConfiguration(
+  public IObjectTableBuilder<T> addSortableStringColumn(
+      final String title,
+      final IFunction<T, String, RuntimeException> provider,
+      final int size) {
+
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new ObjectTableCellRenderer(), size, String.class, true, null));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addEditableStringColumn(
       final String title,
       final IFunction<T, String, RuntimeException> provider,
       final IAggregator<T, String, T, RuntimeException> adaptor,
@@ -111,7 +140,7 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
         },
         cellEditor,
         size,
-        true,
+        false,
         null));
     return this;
   }
@@ -135,7 +164,94 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   }
 
   @Override
-  public IObjectTableBuilder<T> addSortableBooleanConfiguration(
+  public IObjectTableBuilder<T> addEditableIntegerColumn(
+      final String title,
+      final IFunction<T, Integer, RuntimeException> provider,
+      final IAggregator<T, Integer, T, RuntimeException> aggregator,
+      final JComponent component,
+      final int size) {
+    final TableCellEditor editor;
+    if (component instanceof JComboBox) {
+      @SuppressWarnings("unchecked")
+      final JComboBox<Integer> comboBox = (JComboBox<Integer>) component;
+      editor = new DefaultCellEditor(comboBox);
+    } else if (component instanceof JTextField) {
+      final JTextField textField = (JTextField) component;
+      editor = new DefaultCellEditor(textField);
+    } else {
+      throw new IllegalArgumentException("Unsupported component implementation"); //$NON-NLS-1$
+    }
+    this.builder.addColumnConfiguration(
+        new ObjectListColumnConfiguration<>(
+            title,
+            (IColumnValueProvider<T>) object -> Optional.of(object).convert(o -> provider.execute(o)).get(),
+            new ObjectUiCellRendererConfigurationBuilder().setHorizontalAlignmentRight().build(),
+            new ObjectUiBuilder<Integer>().text(v -> v.toString()).build(),
+            (IColumnValueAdaptor<T>) (object, value) -> aggregator.aggregate(object, (Integer) value),
+            editor,
+            size,
+            Integer.class,
+            false,
+            null));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addIntegerColumn(
+      final String title,
+      final IFunction<T, Integer, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new NumberTableCellRenderer("0"), size, Integer.class, false, new NumberComparator())); //$NON-NLS-1$
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addSortableIntegerColumn(
+      final String title,
+      final IFunction<T, Integer, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new NumberTableCellRenderer("0"), size, Integer.class, true, new NumberComparator())); //$NON-NLS-1$
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addSortableLocalTimeDateColumn(
+      final String title,
+      final IFunction<T, LocalDateTime, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new LocalDateTimeTableCellRenderer(), size, Double.class, true, new ComparableComparator<>()));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addSortableBooleanColumn(
       final String title,
       final IFunction<T, Boolean, RuntimeException> provider,
       final int size) {
@@ -155,6 +271,14 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   @Override
   public IObjectTableBuilder<T> addActionFactory(final ITableActionFactory<T> factory) {
     this.builder.addActionFactory(factory);
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addActionFactory(
+      final ITableActionFactory<T> factory,
+      final ITableCheckActionEnabledValidator<T> validator) {
+    this.builder.addActionFactory(factory, validator);
     return this;
   }
 
@@ -249,4 +373,5 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
     this.builder.setTextFieldKeyListenerFactory(textFieldKeyListenerFactory);
     return this;
   }
+
 }

@@ -31,8 +31,8 @@ import java.util.Map;
 public final class InjektionAnalyserResult implements IInjektionAnalyserResult {
 
   private final List<IInjektionAnalyserValueResult> results;
-  private final List<Class> types;
-  private final Map<Class, IInjektionAnalyserValueResult> map;
+  private final List<IBinding> bindings;
+  private final Map<IBinding, IInjektionAnalyserValueResult> map;
   private final Class type;
   private final IInjectingFactory factory;
 
@@ -44,11 +44,11 @@ public final class InjektionAnalyserResult implements IInjektionAnalyserResult {
       final Class type,
       final List<IInjektionAnalyserValueResult> results,
       final IInjectingFactory factory) {
-    final List<Class> types = new ArrayList<>();
-    final Map<Class, IInjektionAnalyserValueResult> map = new HashMap<>();
+    final List<IBinding> types = new ArrayList<>();
+    final Map<IBinding, IInjektionAnalyserValueResult> map = new HashMap<>();
     for (final IInjektionAnalyserValueResult result : results) {
-      types.add(result.getType());
-      map.put(result.getType(), result);
+      types.add(result.getBinding());
+      map.put(result.getBinding(), result);
     }
     return new InjektionAnalyserResult(type, results, types, map, factory);
   }
@@ -56,23 +56,23 @@ public final class InjektionAnalyserResult implements IInjektionAnalyserResult {
   private InjektionAnalyserResult(
       final Class type,
       final List<IInjektionAnalyserValueResult> results,
-      final List<Class> types,
-      final Map<Class, IInjektionAnalyserValueResult> map,
+      final List<IBinding> types,
+      final Map<IBinding, IInjektionAnalyserValueResult> map,
       final IInjectingFactory factory) {
     this.type = type;
     this.results = results;
-    this.types = types;
+    this.bindings = types;
     this.map = map;
     this.factory = factory;
   }
 
   @Override
-  public Iterable<Class> getTypes() {
-    return this.types;
+  public Iterable<IBinding> getTypes() {
+    return this.bindings;
   }
 
   @Override
-  public boolean isNullable(final Class clazz) {
+  public boolean isNullable(final IBinding clazz) {
     final IInjektionAnalyserValueResult result = this.map.get(clazz);
     if (result == null) {
       throw new IllegalStateException();
@@ -81,7 +81,7 @@ public final class InjektionAnalyserResult implements IInjektionAnalyserResult {
   }
 
   @Override
-  public boolean isIterable(final Class clazz) {
+  public boolean isIterable(final IBinding clazz) {
     final IInjektionAnalyserValueResult result = this.map.get(clazz);
     if (result == null) {
       throw new IllegalStateException();
@@ -101,7 +101,7 @@ public final class InjektionAnalyserResult implements IInjektionAnalyserResult {
 
   @Override
   public boolean isIndependent() {
-    return this.types.isEmpty();
+    return this.bindings.isEmpty();
   }
 
   @Override

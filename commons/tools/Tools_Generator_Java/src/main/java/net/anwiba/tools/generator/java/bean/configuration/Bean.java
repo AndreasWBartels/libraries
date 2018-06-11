@@ -97,14 +97,14 @@ public class Bean {
     return this.isBuilderEnabled;
   }
 
-  public Member member(final String name) {
+  public Member member(@SuppressWarnings("hiding") final String name) {
     if (name.startsWith("_") && this.membersByName.containsKey(name.substring(1, name.length()))) { //$NON-NLS-1$
       return this.membersByName.get(name.substring(1, name.length()));
     }
     return this.membersByName.get(name);
   }
 
-  public NamedValueProvider namedValueProvider(final String name) {
+  public NamedValueProvider namedValueProvider(@SuppressWarnings("hiding") final String name) {
     return this.namedValueProviders.get(name);
   }
 

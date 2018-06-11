@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -66,7 +66,8 @@ public class SetterFactory extends AbstractSourceFactory {
       final JType nameType,
       final String nameVar,
       final JType valueType,
-      final String value) throws CreationException {
+      final String value)
+      throws CreationException {
     mapSetter(
         instance,
         field,
@@ -94,7 +95,8 @@ public class SetterFactory extends AbstractSourceFactory {
       final JType nameVariableType,
       final String nameVariableName,
       final JType valueVariableType,
-      final String valueVariableName) throws CreationException {
+      final String valueVariableName)
+      throws CreationException {
     if (isInjection) {
       addInject(instance, injectionAnnotation);
     }
@@ -140,7 +142,8 @@ public class SetterFactory extends AbstractSourceFactory {
       final boolean isNullable,
       final boolean isArrayNullable,
       final boolean isCollectionNullable,
-      final List<Annotation> annotations) throws CreationException {
+      final List<Annotation> annotations)
+      throws CreationException {
     final JMethod method = instance.method(JMod.PUBLIC, returnInstance ? instance : _void(), name);
     annotate(method, annotations);
     final JVar variable = addParameter(
@@ -229,7 +232,7 @@ public class SetterFactory extends AbstractSourceFactory {
     return addObjectParameter(method, field, createEnsureArgumentNotNullClosure(this.ensurePredicateFactory, method));
   }
 
-  public JMethod addInject(final JDefinedClass bean, final String injectionAnnotation) {
+  public JMethod addInject(final JDefinedClass bean, @SuppressWarnings("unused") final String injectionAnnotation) {
     final JMethod method = bean.method(JMod.PRIVATE, _void(), "_inject"); //$NON-NLS-1$
     final JVar name = method.param(_classByNames(java.lang.String.class.getName()), "name"); //$NON-NLS-1$
     final JVar value = method.param(_classByNames(java.lang.Object.class.getName()), "value"); //$NON-NLS-1$
@@ -247,8 +250,8 @@ public class SetterFactory extends AbstractSourceFactory {
         _classByNames("net.anwiba.commons.reflection.OptionalReflectionMethodInvoker") //$NON-NLS-1$
             .staticInvoke("createSetter") //$NON-NLS-1$
             .arg(JExpr._this().invoke("getClass")) //$NON-NLS-1$
-            .arg("JsonProperty")
-            .arg("value")
+            .arg("JsonProperty") //$NON-NLS-1$
+            .arg("value") //$NON-NLS-1$
             .arg(name));
     body.invoke(methodInvoke, "invoke").arg(JExpr._this()).arg(value); //$NON-NLS-1$
 

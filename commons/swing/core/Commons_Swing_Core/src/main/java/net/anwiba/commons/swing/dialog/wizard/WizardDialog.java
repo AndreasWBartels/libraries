@@ -97,6 +97,7 @@ public class WizardDialog extends MessageDialog {
 
       @Override
       public void objectChanged() {
+        setMessage(controller.getMessage());
         setIcon(controller.getIcon());
         updateOkAction();
       }

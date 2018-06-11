@@ -47,4 +47,9 @@ public class BufferedImageContainer extends AbstractRenderedImageContainer {
     // nothing to do
   }
 
+  @Override
+  public int getNumberOfBands() {
+    return this.image.getColorModel().getColorSpace().getNumComponents();
+  }
+
 }

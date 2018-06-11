@@ -22,33 +22,32 @@
 package net.anwiba.commons.swing.table.action;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 
 import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
+import net.anwiba.commons.swing.table.ObjectListTableMessages;
 
 public final class MoveTableRowUpActionFactory<T> extends AbstractTableActionFactory<T> {
 
   @Override
   protected AbstractAction createAction(
       final IObjectTableModel<T> tableModel,
+      final ISelectionIndexModel<T> selectionIndexModel,
       final ISelectionModel<T> selectionModel,
-      final ISelectionIndexModel<T> selectionIndexModel) {
-    return new MoveTableRowUpAction<>(null, GuiIcons.UP_ICON.getSmallIcon(), "up", tableModel, selectionIndexModel);
+      final IBooleanDistributor sortStateProvider) {
+    return new MoveTableRowUpAction<>(null, GuiIcons.UP_ICON.getSmallIcon(), ObjectListTableMessages.up, tableModel, selectionIndexModel);
   }
 
   @Override
-  protected void checkEnabled(
-      final Action action,
+  protected boolean checkEnabled(
       final IObjectTableModel<T> tableModel,
       final ISelectionIndexModel<T> selectionIndexModel,
       final ISelectionModel<T> selectionModel,
       final IBooleanProvider sortStateProvider) {
-    action.setEnabled(!sortStateProvider.get()
-        && selectionIndexModel.getMinimum() > 0
-        && selectionIndexModel.size() == 1);
+    return !sortStateProvider.get() && selectionIndexModel.getMinimum() > 0 && selectionIndexModel.size() == 1;
   }
 }

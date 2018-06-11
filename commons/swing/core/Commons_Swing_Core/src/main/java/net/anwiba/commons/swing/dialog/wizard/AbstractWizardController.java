@@ -28,6 +28,7 @@ import java.util.Stack;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageType;
@@ -86,6 +87,13 @@ public abstract class AbstractWizardController implements IWizardController {
   private int index = -1;
 
   public AbstractWizardController(final List<IWizardPage> container, final IObjectModel<DataState> dataStateModel) {
+    this(container, dataStateModel, new ObjectModel<>());
+  }
+
+  public AbstractWizardController(
+      final List<IWizardPage> container,
+      final IObjectModel<DataState> dataStateModel,
+      final IObjectModel<IWizardAction> wizardActionModel) {
     this.container = container;
     this.dataStateModel = dataStateModel;
     this.dataStateListener = new IChangeableObjectListener() {
@@ -96,6 +104,7 @@ public abstract class AbstractWizardController implements IWizardController {
         AbstractWizardController.this.dataStateModel.set(page.getDataStateModel().get());
       }
     };
+    wizardActionModel.addChangeListener(() -> Optional.of(wizardActionModel.get()).consume(a -> a.execute(this)));
     next();
   }
 

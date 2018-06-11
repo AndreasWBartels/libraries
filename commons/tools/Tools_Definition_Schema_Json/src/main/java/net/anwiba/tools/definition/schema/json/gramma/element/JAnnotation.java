@@ -45,7 +45,7 @@ public class JAnnotation {
     return !this.parameters.isEmpty();
   }
 
-  public boolean hasParameter(final String name) {
+  public boolean hasParameter(@SuppressWarnings("hiding") final String name) {
     return this.parameterByName.containsKey(name);
   }
 }

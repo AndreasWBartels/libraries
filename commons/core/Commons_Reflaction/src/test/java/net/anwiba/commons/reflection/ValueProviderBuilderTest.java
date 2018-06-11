@@ -31,7 +31,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 
 import net.anwiba.commons.reflection.annotation.Injection;
+import net.anwiba.commons.reflection.annotation.Named;
+import net.anwiba.commons.reflection.binding.NamedClassBinding;
 
+@SuppressWarnings("nls")
 public class ValueProviderBuilderTest {
 
   public static interface IWow {
@@ -99,8 +102,62 @@ public class ValueProviderBuilderTest {
 
   };
 
+  public static interface IMau {
+
+    String getName();
+
+    Integer getValue();
+
+  };
+
+  public static class Mau implements IMau {
+
+    @Injection
+    @Named
+    private final Integer value = null;
+
+    @Injection
+    @Named("name")
+    private final String string = null;
+
+    @Override
+    public Integer getValue() {
+      return this.value;
+    }
+
+    @Override
+    public String getName() {
+      return this.string;
+    }
+
+  };
+
+  public static class Pau implements IMau {
+
+    private final Integer value;
+    private final String string;
+
+    @Injection
+    public Pau(@Named("value") final Integer value, @Named("name") final String string) {
+      this.value = value;
+      this.string = string;
+    }
+
+    @Override
+    public Integer getValue() {
+      return this.value;
+    }
+
+    @Override
+    public String getName() {
+      return this.string;
+    }
+
+  };
+
   public static interface IFoo {
   };
+
   public static interface IFoos extends IFoo {
   };
 
@@ -158,6 +215,30 @@ public class ValueProviderBuilderTest {
     builder.set(IFoo.class, FooB.class);
     final Collection<IFoo> foos = builder.build().getAll(IFoo.class);
     assertThat(foos.size(), equalTo(1));
+  }
+
+  @Test
+  public void injectMau() throws CreationException {
+    final ReflectionValueProviderBuilder builder = new ReflectionValueProviderBuilder();
+    builder.set(new NamedClassBinding<>(String.class, "name"), "Text");
+    builder.set(new NamedClassBinding<>(Integer.class, "value"), Integer.valueOf(20));
+    builder.set(IMau.class, Mau.class);
+    final IReflectionValueProvider provider = builder.build();
+    final IMau mau = provider.get(IMau.class);
+    assertThat(mau.getName(), equalTo("Text"));
+    assertThat(mau.getValue(), equalTo(Integer.valueOf(20)));
+  }
+
+  @Test
+  public void injectPau() throws CreationException {
+    final ReflectionValueProviderBuilder builder = new ReflectionValueProviderBuilder();
+    builder.set(new NamedClassBinding<>(String.class, "name"), "Text");
+    builder.set(new NamedClassBinding<>(Integer.class, "value"), Integer.valueOf(20));
+    builder.set(IMau.class, Pau.class);
+    final IReflectionValueProvider provider = builder.build();
+    final IMau mau = provider.get(IMau.class);
+    assertThat(mau.getName(), equalTo("Text"));
+    assertThat(mau.getValue(), equalTo(Integer.valueOf(20)));
   }
 
   @Test

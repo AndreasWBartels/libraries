@@ -27,6 +27,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import net.anwiba.commons.swing.component.search.ISearchEngine;
+import net.anwiba.commons.swing.component.search.SearchComponentMessages;
 import net.anwiba.commons.swing.icon.GuiIcons;
 
 public final class NextAction<C, R> extends AbstractAction {
@@ -35,7 +36,7 @@ public final class NextAction<C, R> extends AbstractAction {
 
   public NextAction(final ISearchEngine<C, R> engine) {
     super(null, GuiIcons.NEXT_ICON.getSmallIcon());
-    putValue(Action.SHORT_DESCRIPTION, "zoom to next selected feature");
+    putValue(Action.SHORT_DESCRIPTION, SearchComponentMessages.ZoomToNextSelectedFeature);
     this.engine = engine;
   }
 

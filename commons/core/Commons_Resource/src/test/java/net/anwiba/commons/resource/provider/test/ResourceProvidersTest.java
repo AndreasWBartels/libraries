@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.resource.provider.test;
 
-import net.anwiba.commons.resource.reference.ResourceReferenceHandler;
-
 import org.junit.Test;
+
+import net.anwiba.commons.reference.ResourceReferenceHandler;
 
 import static org.hamcrest.CoreMatchers.*;
 

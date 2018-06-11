@@ -46,6 +46,7 @@ public class DoubleIntervalFieldDemo extends AbstractObjectFieldDemo {
         new DoubleToStringConverter(format),
         0,
         100,
+        1,
         intervalModel,
         new ObjectModel<>(IValidationResult.valid()));
     show(createPanel(field));

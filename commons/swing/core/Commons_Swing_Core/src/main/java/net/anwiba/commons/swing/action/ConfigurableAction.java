@@ -24,11 +24,17 @@ package net.anwiba.commons.swing.action;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
+
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IBooleanModel;
+import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.swing.dialog.MessageDialogLauncher;
+import net.anwiba.commons.swing.icon.IGuiIcon;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 @SuppressWarnings("serial")
 public class ConfigurableAction extends AbstractCustomizedAction {
@@ -44,6 +50,15 @@ public class ConfigurableAction extends AbstractCustomizedAction {
     enabledDistributor.addChangeListener(() -> ConfigurableAction.super.setEnabled(enabledDistributor.get()));
     super.setEnabled(enabledDistributor.get());
     this.closure = configuration.getProcedure();
+    final IObjectDistributor<IGuiIcon> iconDistributor = configuration.getIconDistributor();
+    iconDistributor.addChangeListener(
+        () -> GuiUtilities.invokeLater(
+            () -> putValue(
+                Action.SMALL_ICON,
+                Optional.of(iconDistributor.get()).convert(i -> i.getSmallIcon()).get())));
+    final IObjectDistributor<String> toolTipTextDistributor = configuration.getToolTipTextDistributor();
+    toolTipTextDistributor.addChangeListener(
+        () -> GuiUtilities.invokeLater(() -> putValue(Action.SHORT_DESCRIPTION, toolTipTextDistributor.get())));
   }
 
   @Override

@@ -36,7 +36,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     LoggingUtilities.initialize();
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void typeInfoFactoryBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -51,7 +50,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(actual, equalTo(expected));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void typeInfoWithNameFactoryBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -66,7 +64,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(actual, equalTo(expected));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void valueBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -81,7 +78,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(actual, equalTo(expected));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void patternBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -96,7 +92,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(actual, equalTo(expected));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void reflactionFactoryWithConfiguredArgumentNameBuilder()
       throws CreationException,
@@ -115,7 +110,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
         equalTo(JsonBeanGeneratorTestResources.reflactionFactoryWithConfiguredArgumentNameBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void classMemberBuilder() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -130,7 +124,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(string, equalTo(JsonBeanGeneratorTestResources.classMemberBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void errorBeanAndBuilder() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, true);
@@ -143,7 +136,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.errorBeanAndBuilderSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void errorBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -156,7 +148,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.errorBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void featureBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -172,7 +163,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.featureBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void entityBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -185,7 +175,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.entityBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void factoryBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -198,7 +187,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.factoryBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void factoryWithUnknownMembersBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -211,7 +199,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.factoryWithUnknownMembersBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void factoryWithIgnoreUnknownMembersBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -227,7 +214,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
         equalTo(JsonBeanGeneratorTestResources.factoryWithIgnoreUnknownMembersBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void injectTypeFactoryBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -240,7 +226,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.injectTypeFactoryBeanSource));
   }
 
-  @SuppressWarnings({ "boxing" })
   @Test
   public void complexFactoryBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -253,7 +238,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.complexFactoryBeanSource));
   }
 
-  @SuppressWarnings("boxing")
   @Test
   public void pointBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
@@ -272,7 +256,6 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
     assertThat(ouputStream.toString(), equalTo(JsonBeanGeneratorTestResources.pointBeanSource));
   }
 
-  @SuppressWarnings("boxing")
   @Test
   public void moduleBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);

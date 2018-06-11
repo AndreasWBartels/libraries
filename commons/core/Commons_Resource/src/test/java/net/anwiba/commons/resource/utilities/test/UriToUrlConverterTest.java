@@ -21,14 +21,14 @@
  */
 package net.anwiba.commons.resource.utilities.test;
 
-import net.anwiba.commons.resource.utilities.UriToUrlConverter;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Test;
+
+import net.anwiba.commons.reference.utilities.UriToUrlConverter;
 
 import static org.hamcrest.CoreMatchers.*;
 

@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>anwiba-spatial-maven-swing</artifactId>
+  <packaging>pom</packaging>
+  <parent>
+    <groupId>net.anwiba.spatial</groupId>
+    <artifactId>anwiba-spatial-maven-default</artifactId>
+    <version>1.0.140</version>
+  </parent>
+
+  <modules>
+    <module>data</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-swing-core</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-swing-icon</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>

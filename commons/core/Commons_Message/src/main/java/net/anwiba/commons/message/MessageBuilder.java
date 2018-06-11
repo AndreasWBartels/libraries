@@ -73,6 +73,7 @@ public class MessageBuilder implements IMessageBuilder {
 
   @Override
   public IMessage build() {
+    @SuppressWarnings("hiding")
     final String description = getDescription(this.description, this.throwable);
     if (this.throwable != null && MessageType.ERROR.equals(this.type)) {
       return new ExceptionMessage(this.text, description, this.throwable);
@@ -80,6 +81,7 @@ public class MessageBuilder implements IMessageBuilder {
     return new Message(this.text, description, this.throwable, this.type);
   }
 
+  @SuppressWarnings("hiding")
   private String getDescription(final String description, final Throwable throwable) {
     if (description != null || throwable == null) {
       return description;

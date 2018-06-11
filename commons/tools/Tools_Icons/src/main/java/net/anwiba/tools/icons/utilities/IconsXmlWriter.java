@@ -35,8 +35,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import net.anwiba.commons.resource.utilities.FileIterableFactory;
-import net.anwiba.commons.resource.utilities.FileUtilities;
+import net.anwiba.commons.reference.utilities.FileIterableFactory;
+import net.anwiba.commons.reference.utilities.FileUtilities;
 import net.anwiba.tools.icons.configuration.IIconSizesConfiguration;
 import net.anwiba.tools.icons.configuration.IconSizeConfiguration;
 import net.anwiba.tools.icons.configuration.IconSizesConfiguration;
@@ -52,9 +52,8 @@ public class IconsXmlWriter {
   @SuppressWarnings("nls")
   public void write(final File sourceFolder, final IIconSizesConfiguration configuration) throws JAXBException {
     final String sourceFolderPath = sourceFolder.getAbsolutePath();
-    final Iterable<String> iterable = new FileIterableFactory().create(
-        file -> FileUtilities.hasExtension(file, "png"),
-        file -> {
+    final Iterable<String> iterable = new FileIterableFactory()
+        .create(file -> FileUtilities.hasExtension(file, "png"), file -> {
           final String path = file.getAbsolutePath();
           final String relativePath = path.substring(sourceFolderPath.length(), path.length());
           if (relativePath.startsWith(File.separator + configuration.small().path() + File.separator)) {
@@ -73,8 +72,7 @@ public class IconsXmlWriter {
                 relativePath.length());
           }
           return relativePath;
-        },
-        sourceFolder);
+        }, sourceFolder);
     final List<String> names = new ArrayList<>();
     final Map<String, Set<String>> images = new HashMap<>();
     for (final String string : iterable) {
@@ -160,6 +158,7 @@ public class IconsXmlWriter {
     return icons;
   }
 
+  @SuppressWarnings("nls")
   public static void main(final String[] args) {
     final IconSizeConfiguration small = new IconSizeConfiguration(16, "16x16"); //$NON-NLS-1$
     final IconSizeConfiguration medium = new IconSizeConfiguration(22, "22x22"); //$NON-NLS-1$
@@ -167,11 +166,10 @@ public class IconsXmlWriter {
     final IIconSizesConfiguration iconSizesConfiguration = new IconSizesConfiguration("gnome", small, medium, large);
 
     try {
-      new IconsXmlWriter()
-          .write(
-              new File(
-                  "/home/andreas/work/JGISShell/development/trunk/workspace/gnome-icons/src/main/resources/icons/gnome"),
-              iconSizesConfiguration);
+      new IconsXmlWriter().write(
+          new File(
+              "/home/andreas/work/JGISShell/development/trunk/workspace/gnome-icons/src/main/resources/icons/gnome"),
+          iconSizesConfiguration);
 
     } catch (final Exception exception) {
       // TODO_NOW: handle exception

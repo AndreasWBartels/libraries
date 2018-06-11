@@ -28,13 +28,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.junit.Test;
+
 import net.anwiba.commons.lang.io.FilteringInputStream;
 import net.anwiba.commons.lang.io.filter.IFilteringInputStreamValidator;
 import net.anwiba.commons.lang.io.filter.PatternFilter;
 import net.anwiba.commons.lang.queue.IntValueQueue;
-import net.anwiba.commons.resource.utilities.IoUtilities;
-
-import org.junit.Test;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 
 @SuppressWarnings("resource")
 public class FilteringInputStreamTest {
@@ -108,7 +108,6 @@ public class FilteringInputStreamTest {
     assertThat(read(inputStream), equalTo("012345789")); //$NON-NLS-1$
   }
 
-  @SuppressWarnings("boxing")
   @Test
   public void skipFiltering() throws IOException {
     final String value = "0123456789"; //$NON-NLS-1$

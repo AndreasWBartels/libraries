@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -65,16 +65,18 @@ public class CreatorFactory extends AbstractSourceFactory {
   public void creator(
       final Bean configuration,
       final JDefinedClass bean,
-      @SuppressWarnings("unused") final Iterable<JFieldVar> fields) throws CreationException {
+      @SuppressWarnings("unused") final Iterable<JFieldVar> fields)
+      throws CreationException {
     final Creator creator = configuration.creator();
     if (creator == null) {
       return;
     }
     final Member member = configuration.member(creator.parameter());
     if (member != null && !stringTypes.contains(member.type().name())) {
-      throw new CreationException(MessageFormat.format(
-          "parameter name ''{0}'' is not from type java.lang.String.", //$NON-NLS-1$
-          member.name()));
+      throw new CreationException(
+          MessageFormat.format(
+              "parameter name ''{0}'' is not from type java.lang.String.", //$NON-NLS-1$
+              member.name()));
     }
     if (creator.factory() != null) {
       createFactoryCreateMethod(creator, bean);
@@ -107,6 +109,7 @@ public class CreatorFactory extends AbstractSourceFactory {
     method.body()._return(invoke);
   }
 
+  @SuppressWarnings("unused")
   private void createTypeCreateMethod(final Bean configuration, final Creator creator, final JDefinedClass bean)
       throws CreationException {
     final JMethod method = bean.method(JMod.PUBLIC | JMod.STATIC, bean, creator.name());
@@ -213,11 +216,8 @@ public class CreatorFactory extends AbstractSourceFactory {
     final JVar value = method.param(java.lang.String.class, "value");
     final JBlock body = method.body();
     body._if(value.eq(JExpr._null()).cor(value.invoke("trim").invoke("isEmpty")))._then()._return(JExpr._null());
-    final JInvocation firstCharacter = value
-        .invoke("substring")
-        .arg(JExpr.lit(0))
-        .arg(JExpr.lit(1))
-        .invoke("toUpperCase");
+    final JInvocation firstCharacter = value.invoke("substring").arg(JExpr.lit(0)).arg(JExpr.lit(1)).invoke(
+        "toUpperCase");
     final JInvocation restCharacters = value.invoke("substring").arg(JExpr.lit(1)).arg(value.invoke("length"));
     body._return(firstCharacter.plus(restCharacters));
     return method;

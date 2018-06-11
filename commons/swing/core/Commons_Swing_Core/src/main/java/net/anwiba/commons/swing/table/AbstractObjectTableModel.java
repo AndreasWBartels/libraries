@@ -107,12 +107,12 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   }
 
   @Override
-  public void add(@SuppressWarnings("unchecked") final T... objects) {
+  public void add(@SuppressWarnings({ "unchecked", "hiding" }) final T... objects) {
     add(Arrays.asList(objects));
   }
 
   @Override
-  public void add(final Iterable<T> objects) {
+  public void add(@SuppressWarnings("hiding") final Iterable<T> objects) {
     final int rows;
     synchronized (this) {
       rows = size();
@@ -149,7 +149,7 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   }
 
   @Override
-  public synchronized int[] indices(final Iterable<T> objects) {
+  public synchronized int[] indices(@SuppressWarnings("hiding") final Iterable<T> objects) {
     final Set<Integer> indexes = new HashSet<>();
     for (final T object : objects) {
       final Set<Integer> objectIndexes = this.indexByObjectMap.get(object);
@@ -159,13 +159,13 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   }
 
   @Override
-  public void remove(@SuppressWarnings("unchecked") final T... objects) {
+  public void remove(@SuppressWarnings({ "unchecked", "hiding" }) final T... objects) {
     final int[] indices = indices(Arrays.asList(objects));
     remove(indices);
   }
 
   @Override
-  public void remove(final Iterable<T> objects) {
+  public void remove(@SuppressWarnings("hiding") final Iterable<T> objects) {
     final int[] indices = indices(objects);
     remove(indices);
   }
@@ -200,6 +200,7 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
   @Override
   public void removeAll() {
     final int rows;
+    @SuppressWarnings("hiding")
     final List<T> objects;
     synchronized (this) {
       rows = getRowCount();
@@ -278,7 +279,9 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
     }
   }
 
-  protected final void fireObjectsAdded(final Iterable<Integer> indeces, final Iterable<T> objects) {
+  protected final void fireObjectsAdded(
+      final Iterable<Integer> indeces,
+      @SuppressWarnings("hiding") final Iterable<T> objects) {
     final List<IChangeableListListener<T>> currentListModelListeners;
     synchronized (this.listModelListeners) {
       currentListModelListeners = new ArrayList<>(this.listModelListeners);
@@ -311,7 +314,9 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
     }
   }
 
-  protected final void fireObjectsRemoved(final Iterable<Integer> indeces, final Iterable<T> objects) {
+  protected final void fireObjectsRemoved(
+      final Iterable<Integer> indeces,
+      @SuppressWarnings("hiding") final Iterable<T> objects) {
     final List<IChangeableListListener<T>> currentListModelListeners;
     synchronized (this.listModelListeners) {
       currentListModelListeners = new ArrayList<>(this.listModelListeners);

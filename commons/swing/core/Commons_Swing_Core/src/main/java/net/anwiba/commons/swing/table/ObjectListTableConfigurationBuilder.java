@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -25,14 +25,20 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Action;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
+import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.model.IBooleanDistributor;
+import net.anwiba.commons.model.ISelectionModel;
+import net.anwiba.commons.swing.table.action.AbstractTableActionFactory;
 import net.anwiba.commons.swing.table.action.AddTableRowActionFactory;
 import net.anwiba.commons.swing.table.action.EditTableActionFactory;
 import net.anwiba.commons.swing.table.action.ITableActionClosure;
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
 import net.anwiba.commons.swing.table.action.ITableActionFactory;
+import net.anwiba.commons.swing.table.action.ITableCheckActionEnabledValidator;
 import net.anwiba.commons.swing.table.action.ITableTextFieldActionConfiguration;
 import net.anwiba.commons.swing.table.action.ITableTextFieldActionFactory;
 import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
@@ -72,6 +78,32 @@ public class ObjectListTableConfigurationBuilder<T> {
 
   public ObjectListTableConfigurationBuilder<T> addActionFactory(final ITableActionFactory<T> factory) {
     this.actionFactories.add(factory);
+    return this;
+  }
+
+  public ObjectListTableConfigurationBuilder<T> addActionFactory(
+      final ITableActionFactory<T> factory,
+      final ITableCheckActionEnabledValidator<T> validator) {
+    this.actionFactories.add(new AbstractTableActionFactory<T>() {
+
+      @Override
+      protected boolean checkEnabled(
+          final IObjectTableModel<T> tableModel,
+          final ISelectionIndexModel<T> selectionIndexModel,
+          final ISelectionModel<T> selectionModel,
+          final IBooleanProvider sortStateProvider) {
+        return validator.checkEnabled(tableModel, selectionIndexModel, selectionModel, sortStateProvider);
+      }
+
+      @Override
+      protected Action createAction(
+          final IObjectTableModel<T> tableModel,
+          final ISelectionIndexModel<T> selectionIndexModel,
+          final ISelectionModel<T> selectionModel,
+          final IBooleanDistributor sortStateProvider) {
+        return factory.create(tableModel, selectionIndexModel, selectionModel, sortStateProvider);
+      }
+    });
     return this;
   }
 

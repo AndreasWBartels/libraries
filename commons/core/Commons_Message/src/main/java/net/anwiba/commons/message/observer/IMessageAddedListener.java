@@ -23,11 +23,8 @@ package net.anwiba.commons.message.observer;
 
 import net.anwiba.commons.message.IMessage;
 
-public class IMessageAddedListener {
+public interface IMessageAddedListener {
 
-  public void messageAdded(final IMessage message) {
-    // TODO Auto-generated method stub
-
-  }
+  void messageAdded(final IMessage message);
 
 }

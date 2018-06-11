@@ -36,8 +36,8 @@ import javax.swing.ImageIcon;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
-import net.anwiba.commons.resource.utilities.IoUtilities;
-import net.anwiba.commons.resource.utilities.UriUtilities;
+import net.anwiba.commons.reference.utilities.IoUtilities;
+import net.anwiba.commons.reference.utilities.UriUtilities;
 import net.anwiba.commons.utilities.lang.ClassLoaderUtilities;
 
 public class GuiIcon implements IGuiIcon {

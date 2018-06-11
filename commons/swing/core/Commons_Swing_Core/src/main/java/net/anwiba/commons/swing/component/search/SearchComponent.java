@@ -93,6 +93,7 @@ public class SearchComponent<C, R> implements IComponentProvider {
       this.contentPane = new JPanel(new BorderLayout());
       this.contentPane.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 2));;
       final JPanel controllPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+      @SuppressWarnings("hiding")
       final ISearchEngine<C, R> engine = this.engine;
 
       final AbstractAction previousAction = new PreviousAction<>(engine);
@@ -109,7 +110,7 @@ public class SearchComponent<C, R> implements IComponentProvider {
       final AbstractAction searchAction = new ConfigurableActionBuilder()
           .setEnabledDistributor(this.enabledDistributor)
           .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.MEDIA_PLAYBACK_START)
-          .setTooltip("search")
+          .setTooltip(SearchComponentMessages.search)
           .setTask(() -> {
             engine.reset();
             engine.search(
@@ -120,7 +121,7 @@ public class SearchComponent<C, R> implements IComponentProvider {
       final BooleanModel resetActionEnabledModel = new BooleanModel(!engine.getSearchResultsModel().isEmpty());
       final AbstractAction resetAction = new ConfigurableActionBuilder()
           .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.EDIT_DELETE)
-          .setTooltip("reset")
+          .setTooltip(SearchComponentMessages.reset)
           .setEnabledDistributor(resetActionEnabledModel)
           .setTask(() -> {
             engine.reset();
@@ -132,7 +133,7 @@ public class SearchComponent<C, R> implements IComponentProvider {
             (context, document, enabled, clearBlock) -> SearchComponent.this.advancedSearchActionFactory
                 .create(searchStringModel, searchFeatureAcceptorModel, engine));
       }
-      builder.addClearAction("clear");
+      builder.addClearAction(SearchComponentMessages.clear);
       builder.addActionFactory((c, d, e, b) -> previousAction);
       builder.addActionFactory((c, d, e, b) -> nextAction);
       builder.addActionFactory((c, d, e, b) -> resetAction);

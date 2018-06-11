@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Window;
+
 import net.anwiba.commons.preferences.DummyPreferences;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.dialog.pane.IContentPaneBuilder;
 import net.anwiba.commons.swing.dialog.pane.IContentPanel;
-
-import java.awt.Window;
 
 public abstract class AbstractContentPaneBuilder implements IContentPaneBuilder {
 
@@ -54,6 +54,7 @@ public abstract class AbstractContentPaneBuilder implements IContentPaneBuilder 
     return create(this.owner, this.preferences);
   }
 
+  @SuppressWarnings("hiding")
   protected abstract IContentPanel create(Window owner, IPreferences preferences);
 
 }

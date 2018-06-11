@@ -42,7 +42,7 @@ public class GuiIconDecorator {
     this.icon = icon;
   }
 
-  public GuiIconDecorator add(final IAcceptor<Void> acceptor, final GuiIcon icon) {
+  public GuiIconDecorator add(final IAcceptor<Void> acceptor, @SuppressWarnings("hiding") final GuiIcon icon) {
     if (acceptor.accept(null)) {
       this.icon = decorate(this.size, this.icon, icon);
     }

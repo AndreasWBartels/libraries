@@ -21,8 +21,6 @@
  */
 package net.anwiba.commons.swing.menu;
 
-import net.anwiba.commons.utilities.registry.KeyValueRegistry;
-
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -30,9 +28,12 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
+import net.anwiba.commons.utilities.registry.KeyValueRegistry;
+
 public class MenuConfiguration {
 
-  public static final class MenuItemGroupDescriptionComarator implements
+  public static final class MenuItemGroupDescriptionComarator
+      implements
       Comparator<MenuItemGroupDescription>,
       Serializable {
 
@@ -47,8 +48,7 @@ public class MenuConfiguration {
   private final MenuType menuType;
   private final MenuDescription description;
 
-  private final KeyValueRegistry<MenuItemGroupDescription, MenuItemGroupConfiguration> registry =
-      new KeyValueRegistry<>();
+  private final KeyValueRegistry<MenuItemGroupDescription, MenuItemGroupConfiguration> registry = new KeyValueRegistry<>();
   final Comparator<MenuItemGroupDescription> comparator = new MenuItemGroupDescriptionComarator();
 
   public MenuConfiguration(final MenuDescription description) {
@@ -64,7 +64,7 @@ public class MenuConfiguration {
     return this.description;
   }
 
-  public MenuItemGroupConfiguration get(final MenuItemGroupDescription description) {
+  public MenuItemGroupConfiguration get(@SuppressWarnings("hiding") final MenuItemGroupDescription description) {
     return this.registry.get(description);
   }
 
@@ -77,8 +77,8 @@ public class MenuConfiguration {
   }
 
   public JMenu getJMenu() {
-    final MenuItemGroupConfiguration[] menuGroups =
-        this.registry.getItems(this.comparator, MenuItemGroupDescription.class, MenuItemGroupConfiguration.class);
+    final MenuItemGroupConfiguration[] menuGroups = this.registry
+        .getItems(this.comparator, MenuItemGroupDescription.class, MenuItemGroupConfiguration.class);
     final JMenu menu = createMenu();
     menu.setName(this.description.getId());
     for (int i = 0; i < menuGroups.length; i++) {

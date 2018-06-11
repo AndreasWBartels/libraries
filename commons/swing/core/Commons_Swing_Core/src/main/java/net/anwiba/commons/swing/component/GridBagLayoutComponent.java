@@ -59,7 +59,8 @@ public class GridBagLayoutComponent implements IGridBagLayoutComponent {
   @Override
   public GridBagConstraints getConstraints(final Insets insets) {
     final Insets componentInsets = this.column == 0 && this.row == 0 //
-    ? new Insets(0, 0, 0, 0) : //
+        ? new Insets(0, 0, 0, 0)
+        : //
         this.row == 0 //
             ? new Insets(0, insets.left, 0, 0)
             : this.column == 0 //
@@ -73,7 +74,13 @@ public class GridBagLayoutComponent implements IGridBagLayoutComponent {
     constraints.gridwidth = this.with;
     constraints.gridheight = this.height;
     if (this.anchor > 0) {
-      constraints.anchor = this.anchor;
+      if (this.column == 0 && this.row == 0) {
+        constraints.anchor = GridBagConstraints.FIRST_LINE_END;
+      } else if (this.column == 0) {
+        constraints.anchor = GridBagConstraints.LINE_START;
+      } else {
+        constraints.anchor = this.anchor;
+      }
     }
     return constraints;
   }

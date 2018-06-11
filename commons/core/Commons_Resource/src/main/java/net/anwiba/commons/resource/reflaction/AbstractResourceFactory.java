@@ -24,10 +24,10 @@ package net.anwiba.commons.resource.reflaction;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.resource.annotation.Encoding;
 import net.anwiba.commons.resource.annotation.Location;
 import net.anwiba.commons.resource.annotation.Static;
-import net.anwiba.commons.resource.reference.IResourceReference;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

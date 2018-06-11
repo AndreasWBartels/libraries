@@ -71,8 +71,18 @@ public class MessageDialog extends AbstractDialog {
       final String title,
       final IMessage message,
       final Icon icon,
-      final DialogType dialogType) {
-    this(owner, preferences, title, message, icon, dialogType, Collections.emptyList(), new ObjectModel<>(), true);
+      final DialogType dialogType,
+      final ModalityType modalityType) {
+    super(
+        owner,
+        preferences,
+        title,
+        message,
+        icon,
+        dialogType,
+        Collections.emptyList(),
+        new ObjectModel<>(),
+        modalityType);
   }
 
   public MessageDialog(
@@ -92,10 +102,34 @@ public class MessageDialog extends AbstractDialog {
       final IMessage message,
       final Icon icon,
       final DialogType dialogType,
+      final boolean modal) {
+    super(owner, preferences, title, message, icon, dialogType, Collections.emptyList(), new ObjectModel<>(), modal);
+  }
+
+  public MessageDialog(
+      final Window owner,
+      final IWindowPreferences preferences,
+      final String title,
+      final IMessage message,
+      final Icon icon,
+      final DialogType dialogType,
       final List<IAdditionalActionFactory> actionFactories,
       final IObjectModel<DataState> dataStateModel,
       final boolean modal) {
     super(owner, preferences, title, message, icon, dialogType, actionFactories, dataStateModel, modal);
+  }
+
+  public MessageDialog(
+      final Window owner,
+      final IWindowPreferences preferences,
+      final String title,
+      final IMessage message,
+      final Icon icon,
+      final DialogType dialogType,
+      final List<IAdditionalActionFactory> actionFactories,
+      final IObjectModel<DataState> dataStateModel,
+      final ModalityType modalityType) {
+    super(owner, preferences, title, message, icon, dialogType, actionFactories, dataStateModel, modalityType);
   }
 
   @Override

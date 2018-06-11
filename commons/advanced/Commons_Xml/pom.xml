@@ -8,7 +8,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-advanced</artifactId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <scm>
@@ -20,7 +20,25 @@
   <dependencies>
     <dependency>
       <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-logging</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-reference</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-utilities</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-lang</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
 
@@ -34,6 +52,30 @@
       <groupId>org.dom4j</groupId>
       <artifactId>dom4j</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-resource</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
-  
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

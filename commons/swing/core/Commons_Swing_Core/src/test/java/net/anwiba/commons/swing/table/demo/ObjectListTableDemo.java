@@ -207,10 +207,10 @@ public class ObjectListTableDemo extends SwingDemoCase {
     final IObjectTableBuilder<DemoObject> builder = new ObjectTableBuilder<>();
     builder.setValues(this.factory.createObjectList(20));
     final boolean isSortable = true;
-    builder.addColumnConfiguration(createNumberColumn(isSortable));
-    builder.addColumnConfiguration(createNameColumn(isSortable));
-    builder.addColumnConfiguration(createValueColumn(isSortable));
-    builder.addColumnConfiguration(createFlagColumn(isSortable));
+    builder.addColumn(createNumberColumn(isSortable));
+    builder.addColumn(createNameColumn(isSortable));
+    builder.addColumn(createValueColumn(isSortable));
+    builder.addColumn(createFlagColumn(isSortable));
     builder
         .addAddObjectAction(this.columnObjectFactory)
         .addEditObjectAction(this.columnObjectFactory)

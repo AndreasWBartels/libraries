@@ -36,15 +36,16 @@ public abstract class AbstractProcessAction extends AbstractAction {
   private final IProcessManager processManager;
 
   public AbstractProcessAction(
-    final String text,
-    final ImageIcon icon,
-    final Window owner,
-    final IProcessManager processManager) {
+      final String text,
+      final ImageIcon icon,
+      final Window owner,
+      final IProcessManager processManager) {
     super(text, icon);
     this.owner = owner;
     this.processManager = processManager;
   }
 
+  @SuppressWarnings("hiding")
   public abstract void execute(final Window owner, final IProcessManager processManager);
 
   @Override

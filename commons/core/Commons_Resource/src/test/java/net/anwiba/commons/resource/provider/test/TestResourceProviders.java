@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.resource.provider.test;
 
+import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.resource.annotation.Location;
 import net.anwiba.commons.resource.annotation.Static;
-import net.anwiba.commons.resource.reference.IResourceReference;
 import net.anwiba.commons.resource.reflaction.AbstractResourceFactory;
 import net.anwiba.commons.resource.reflaction.IByteArrayResourceProvider;
 

@@ -59,7 +59,10 @@ public final class Workflow<T> implements IWorkflow<T> {
     };
   }
 
-  private void launch(final IExecutable<T> executable, final IState<T> state, final ObjectModel<IState<T>> stateModel) {
+  private void launch(
+      final IExecutable<T> executable,
+      @SuppressWarnings("unused") final IState<T> state,
+      final ObjectModel<IState<T>> stateModel) {
     final IExecutable<T> delegatingClosure = this.procedureDelegatorFactory.create(executable);
     delegatingClosure.execute(new SingleUseObjectReceiver<>(stateModel));
   }

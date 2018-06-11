@@ -33,7 +33,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 
 public class RequestProcessorBuilder {
 
@@ -98,7 +98,9 @@ public class RequestProcessorBuilder {
         return getResponseBytes(file);
       }
 
-      private byte[] getResponseBytes(final File file) throws FileNotFoundException, IOException {
+      private byte[] getResponseBytes(@SuppressWarnings("hiding") final File file)
+          throws FileNotFoundException,
+          IOException {
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
           final byte[] responseBytes = getBytes(fileInputStream);
           return responseBytes;

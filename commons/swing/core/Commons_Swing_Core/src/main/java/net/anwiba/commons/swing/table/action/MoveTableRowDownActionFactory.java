@@ -22,36 +22,37 @@
 package net.anwiba.commons.swing.table.action;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 
 import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
+import net.anwiba.commons.swing.table.ObjectListTableMessages;
 
 public final class MoveTableRowDownActionFactory<T> extends AbstractTableActionFactory<T> {
   @Override
-  protected void checkEnabled(
-      final Action action,
+  protected boolean checkEnabled(
       final IObjectTableModel<T> tableModel,
       final ISelectionIndexModel<T> selectionIndexModel,
       final ISelectionModel<T> selectionModel,
       final IBooleanProvider sortStateProvider) {
     final int maximum = selectionIndexModel.getMaximum();
     final int rowCount = tableModel.getRowCount() - 1;
-    action.setEnabled(!sortStateProvider.get() && maximum < rowCount && selectionIndexModel.size() == 1);
+    return !sortStateProvider.get() && maximum < rowCount && selectionIndexModel.size() == 1;
   }
 
   @Override
   protected AbstractAction createAction(
       final IObjectTableModel<T> tableModel,
+      final ISelectionIndexModel<T> selectionIndexModel,
       final ISelectionModel<T> selectionModel,
-      final ISelectionIndexModel<T> selectionIndexModel) {
+      final IBooleanDistributor sortStateProvider) {
     return new MoveTableRowDownAction<>(
         null,
         GuiIcons.DOWN_ICON.getSmallIcon(),
-        "down",
+        ObjectListTableMessages.down,
         tableModel,
         selectionIndexModel);
   }

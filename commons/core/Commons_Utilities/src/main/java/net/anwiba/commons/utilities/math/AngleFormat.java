@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-// Copyright (c) 2007 by Andreas W. Bartels
+
 package net.anwiba.commons.utilities.math;
 
 import java.text.DecimalFormat;

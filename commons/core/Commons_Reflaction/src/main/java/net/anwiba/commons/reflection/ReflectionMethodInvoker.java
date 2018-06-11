@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -71,6 +71,7 @@ public class ReflectionMethodInvoker<C, R> {
     return result;
   }
 
+  @SuppressWarnings("rawtypes")
   private static Object convertValue(final Object object, final Class<?> clazz) {
     if (object == null || !clazz.isArray() || (object.getClass().isArray() && clazz.isArray())) {
       return object;
@@ -83,6 +84,7 @@ public class ReflectionMethodInvoker<C, R> {
     return null;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private static <C> C[] createArray(final Class<C> type, final Collection collection) {
     final C[] array = (C[]) Array.newInstance(type, collection.size());
     int counter = 0;
@@ -119,7 +121,7 @@ public class ReflectionMethodInvoker<C, R> {
       final String annotationName,
       final String parameterName,
       final String parameterValue,
-      final Class returnType) {
+      @SuppressWarnings("rawtypes") final Class returnType) {
     for (final Method method : methods) {
       if (!method.getReturnType().equals(returnType)) {
         continue;

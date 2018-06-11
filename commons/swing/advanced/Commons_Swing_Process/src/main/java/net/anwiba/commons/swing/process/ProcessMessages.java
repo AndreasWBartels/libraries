@@ -32,6 +32,7 @@ public class ProcessMessages extends NLS {
   public static String PROCESSES;
   public static String TYPE;
   public static String LOGGING;
+  public static String DATE;
   public static String DETAIL;
 
   static {

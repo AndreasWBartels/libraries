@@ -28,6 +28,9 @@ import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanDistributor;
+import net.anwiba.commons.model.IObjectDistributor;
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -38,16 +41,12 @@ public class ActionConfigurationBuilder {
   private IGuiIcon icon = null;
   private String name = null;
   private IActionProcedure procedure = null;
-  private IGuiIcon selectedIcon = null;
   private IBlock<InvocationTargetException> task;
+  private IObjectModel<IGuiIcon> iconModel = new ObjectModel<>();
+  private IObjectModel<String> toolTipModel = new ObjectModel<>();
 
   public ActionConfigurationBuilder setName(final String name) {
     this.name = name;
-    return this;
-  }
-
-  public ActionConfigurationBuilder setSelectedIcon(final IGuiIcon selectedIcon) {
-    this.selectedIcon = selectedIcon;
     return this;
   }
 
@@ -87,6 +86,12 @@ public class ActionConfigurationBuilder {
     final IBooleanDistributor enabledDistributor = this.enabledDistributor;
     final IActionCustomization customization = new ActionCustomization(this.name, this.icon, this.tooltip);
     final IActionProcedure procedure = createProcedure();
+    if (this.iconModel.get() == null) {
+      this.iconModel.set(this.icon);
+    }
+    if (this.toolTipModel.get() == null) {
+      this.toolTipModel.set(this.tooltip);
+    }
     return new IActionConfiguration() {
 
       @Override
@@ -97,6 +102,16 @@ public class ActionConfigurationBuilder {
       @Override
       public IActionCustomization getCustomization() {
         return customization;
+      }
+
+      @Override
+      public IObjectDistributor<IGuiIcon> getIconDistributor() {
+        return ActionConfigurationBuilder.this.iconModel;
+      }
+
+      @Override
+      public IObjectDistributor<String> getToolTipTextDistributor() {
+        return ActionConfigurationBuilder.this.toolTipModel;
       }
 
       @Override
@@ -129,6 +144,14 @@ public class ActionConfigurationBuilder {
         // nothing to do
       }
     };
+  }
+
+  public void setIconModel(final IObjectModel<IGuiIcon> iconModel) {
+    this.iconModel = iconModel;
+  }
+
+  public void setToolTipModel(final IObjectModel<String> toolTipModel) {
+    this.toolTipModel = toolTipModel;
   }
 
 }

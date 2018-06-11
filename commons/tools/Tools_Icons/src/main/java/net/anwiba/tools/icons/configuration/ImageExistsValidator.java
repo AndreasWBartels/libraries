@@ -26,7 +26,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
 
-import net.anwiba.commons.resource.utilities.FileUtilities;
+import net.anwiba.commons.reference.utilities.FileUtilities;
 import net.anwiba.commons.utilities.lang.ClassLoaderUtilities;
 
 public final class ImageExistsValidator implements IImageExistsValidator {

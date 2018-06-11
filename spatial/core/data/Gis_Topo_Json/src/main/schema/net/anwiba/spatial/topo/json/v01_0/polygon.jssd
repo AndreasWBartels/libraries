@@ -3,5 +3,5 @@
   @JssdImmutable
   @JssdNoProperty
   "type": <String> "Polygon",
-  "arcs": <double[][]> null
+  "arcs": <int[][]> null
 }

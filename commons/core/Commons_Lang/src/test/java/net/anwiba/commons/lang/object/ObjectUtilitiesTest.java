@@ -21,13 +21,10 @@
  */
 package net.anwiba.commons.lang.object;
 
-import net.anwiba.commons.lang.object.ObjectUtilities;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.*;
-
-import static org.junit.Assert.*;
 
 public class ObjectUtilitiesTest {
 
@@ -55,7 +52,6 @@ public class ObjectUtilitiesTest {
     assertFalse(ObjectUtilities.equals(values, compareValues));
   }
 
-  @SuppressWarnings("boxing")
   @Test
   public void testObjectArrayEquals() throws Exception {
     final Object[] values = { 12, 24, 98, 54 };
@@ -76,11 +72,10 @@ public class ObjectUtilitiesTest {
     }
   }
 
-  @SuppressWarnings("cast")
   @Test
   public void testToString() {
     assertThat(ObjectUtilities.toString(new TestClass("harrie", 10)), equalTo("[harrie, 10]")); //$NON-NLS-1$ //$NON-NLS-2$
-    assertThat(ObjectUtilities.toString((Object) new TestClass("harrie", 10)), equalTo("[harrie, 10]")); //$NON-NLS-1$ //$NON-NLS-2$
+    assertThat(ObjectUtilities.toString(new TestClass("harrie", 10)), equalTo("[harrie, 10]")); //$NON-NLS-1$ //$NON-NLS-2$
     final Object object = new Object();
     assertThat(ObjectUtilities.toString(object), equalTo(Integer.toHexString(object.hashCode())));
   }

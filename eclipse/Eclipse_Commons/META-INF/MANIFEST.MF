@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.0.126
+Bundle-Version: 1.0.140
 Bundle-Vendor: Andreas Bartels
 Bundle-Name: Commons
 Bundle-SymbolicName: net.anwiba.eclipse.commons;singleton:=true

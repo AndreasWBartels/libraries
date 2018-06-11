@@ -41,7 +41,7 @@ public class ObjectTableRowSorter<T> extends TableRowSorter<IObjectTableModel<T>
 
   private void checkColumn(final int column) {
     if (column < 0 || column >= getModelWrapper().getColumnCount()) {
-      throw new IndexOutOfBoundsException("column beyond range of TableModel");
+      throw new IndexOutOfBoundsException("Column out of range"); //$NON-NLS-1$
     }
   }
 

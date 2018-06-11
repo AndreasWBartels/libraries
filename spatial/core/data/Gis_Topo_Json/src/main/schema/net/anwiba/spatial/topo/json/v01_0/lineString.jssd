@@ -3,5 +3,5 @@
   @JssdImmutable
   @JssdNoProperty
   "type": <String> "LineString",
-  "arcs": <double[]> null
+  "arcs": <int[]> null
 }

@@ -47,6 +47,7 @@ import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.model.SelectionEvent;
 import net.anwiba.commons.swing.component.IInputListener;
+import net.anwiba.commons.swing.dialog.DialogMessages;
 import net.anwiba.commons.swing.dialog.IValueDialog;
 import net.anwiba.commons.swing.dialog.MessageDialog;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
@@ -152,7 +153,8 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
     if (!optionPanelConfigurations.isEmpty()) {
       selectionModel.setSelectedObject(optionPanelConfigurations.get(0));
       if (this.valueModel.get() != null) {
-        for (final IChooserPanelConfiguration<T> chooserPanelConfiguration : optionPanelConfigurations) {
+        for (@SuppressWarnings("hiding")
+        final IChooserPanelConfiguration<T> chooserPanelConfiguration : optionPanelConfigurations) {
           if (!chooserPanelConfiguration.getOptionPanelFactory().isApplicable(this.valueModel.get())) {
             continue;
           }
@@ -183,15 +185,16 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
     }
     final ITryTask tryTask = tryTaskFactory.create(this.valueModel.get());
     try {
-      ProgressDialog.show(this, "try", Message.create("try"), tryTask); //$NON-NLS-1$
+      ProgressDialog.show(this, "try", Message.create(DialogMessages.TRY), tryTask); //$NON-NLS-1$
       if (tryTask.isSuccessful()) {
         setMessage(Message.create(this.chooserPanel.getMessage().getText(), "successful")); //$NON-NLS-1$
         return true;
       }
-      setMessage(Message.create(
-          this.chooserPanel.getMessage().getText(),
-          "The connection attempt failed.", //$NON-NLS-1$
-          MessageType.ERROR));
+      setMessage(
+          Message.create(
+              this.chooserPanel.getMessage().getText(),
+              "The connection attempt failed.", //$NON-NLS-1$
+              MessageType.ERROR));
       setOkEnabled(false);
       return false;
     } catch (final InterruptedException exception) {

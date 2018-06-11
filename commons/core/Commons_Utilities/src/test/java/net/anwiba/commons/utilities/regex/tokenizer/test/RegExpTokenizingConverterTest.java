@@ -21,6 +21,13 @@
  */
 package net.anwiba.commons.utilities.regex.tokenizer.test;
 
+import static org.junit.Assert.*;
+
+import java.util.regex.Pattern;
+
+import org.junit.Test;
+
+import junit.framework.AssertionFailedError;
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.utilities.regex.DoNothingStringConverter;
@@ -28,39 +35,33 @@ import net.anwiba.commons.utilities.regex.tokenizer.IRegExpTokenConverter;
 import net.anwiba.commons.utilities.regex.tokenizer.RegExpTokenizingConverter;
 import net.anwiba.commons.utilities.string.StringAppender;
 
-import java.util.regex.Pattern;
-
-import junit.framework.AssertionFailedError;
-
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-@SuppressWarnings("synthetic-access")
 public class RegExpTokenizingConverterTest {
 
   @Test
   public void testConvertWithoutConverters() throws ConversionException {
-    final RegExpTokenizingConverter converter1 =
-        new RegExpTokenizingConverter(new DoNothingStringConverter(), new IRegExpTokenConverter[0]);
+    final RegExpTokenizingConverter converter1 = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        new IRegExpTokenConverter[0]);
     assertEquals("", converter1.convert("", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
     assertEquals("bla", converter1.convert("bla", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
 
-    final RegExpTokenizingConverter converter2 =
-        new RegExpTokenizingConverter(new DoNothingStringConverter(), new IRegExpTokenConverter[0]);
+    final RegExpTokenizingConverter converter2 = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        new IRegExpTokenConverter[0]);
     assertEquals("", converter2.convert("", new StringAppender("foo"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     assertEquals("bla", converter2.convert("bla", new StringAppender("foo"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
   }
 
   @Test
   public void testConvertWithoutConvertersUsesStringConverter() throws ConversionException {
-    final RegExpTokenizingConverter converter =
-        new RegExpTokenizingConverter(new IConverter<String, String, RuntimeException>() {
+    final RegExpTokenizingConverter converter = new RegExpTokenizingConverter(
+        new IConverter<String, String, RuntimeException>() {
           @Override
           public String convert(final String text) {
             return "a" + text + "b"; //$NON-NLS-1$//$NON-NLS-2$
           }
-        }, new IRegExpTokenConverter[0]);
+        },
+        new IRegExpTokenConverter[0]);
     assertEquals("", converter.convert("", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
     assertEquals("ablab", converter.convert("bla", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
   }
@@ -69,20 +70,19 @@ public class RegExpTokenizingConverterTest {
 
   @Test
   public void testConvertWithOneRegExpConverterNotMatching() throws ConversionException {
-    final RegExpTokenizingConverter converter =
-        new RegExpTokenizingConverter(
-            new DoNothingStringConverter(),
-            new IRegExpTokenConverter[] { new IRegExpTokenConverter() {
-              @Override
-              public Pattern getRegExpPattern() {
-                return VARIABLE_PATTERN;
-              }
+    final RegExpTokenizingConverter converter = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        new IRegExpTokenConverter[]{ new IRegExpTokenConverter() {
+          @Override
+          public Pattern getRegExpPattern() {
+            return VARIABLE_PATTERN;
+          }
 
-              @Override
-              public String convert(final String[] groups) {
-                throw new AssertionFailedError("Using converter, although not matching"); //$NON-NLS-1$
-              }
-            } });
+          @Override
+          public String convert(final String[] groups) {
+            throw new AssertionFailedError("Using converter, although not matching"); //$NON-NLS-1$
+          }
+        } });
     assertEquals("", converter.convert("", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
     assertEquals("ab", converter.convert("ab", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
     assertEquals("$$", converter.convert("$$", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
@@ -90,7 +90,7 @@ public class RegExpTokenizingConverterTest {
 
   @Test
   public void testConvertWithOneRegExpConverterMatching() throws ConversionException {
-    final IRegExpTokenConverter[] tokenConverters = new IRegExpTokenConverter[] { new IRegExpTokenConverter() {
+    final IRegExpTokenConverter[] tokenConverters = new IRegExpTokenConverter[]{ new IRegExpTokenConverter() {
       @Override
       public Pattern getRegExpPattern() {
         return VARIABLE_PATTERN;
@@ -102,28 +102,31 @@ public class RegExpTokenizingConverterTest {
       }
     } };
 
-    final RegExpTokenizingConverter converter1 =
-        new RegExpTokenizingConverter(new DoNothingStringConverter(), tokenConverters);
+    final RegExpTokenizingConverter converter1 = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        tokenConverters);
     assertEquals("match", converter1.convert("${variable}", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
     assertEquals("match", converter1.convert("${other_variable}", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
 
-    final RegExpTokenizingConverter converter2 =
-        new RegExpTokenizingConverter(new DoNothingStringConverter(), tokenConverters);
+    final RegExpTokenizingConverter converter2 = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        tokenConverters);
     assertEquals("match", converter2.convert("${variable}", new StringAppender("bla"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 
-    final RegExpTokenizingConverter converter3 =
-        new RegExpTokenizingConverter(new IConverter<String, String, RuntimeException>() {
+    final RegExpTokenizingConverter converter3 = new RegExpTokenizingConverter(
+        new IConverter<String, String, RuntimeException>() {
           @Override
           public String convert(final String text) {
             return "a" + text + "b"; //$NON-NLS-1$//$NON-NLS-2$
           }
-        }, tokenConverters);
+        },
+        tokenConverters);
     assertEquals("match", converter3.convert("${variable}", new StringAppender(""))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
   }
 
   @Test
   public void testConvertTokenizedWithOneRegExpConverterMatching() throws ConversionException {
-    final IRegExpTokenConverter[] tokenConverters = new IRegExpTokenConverter[] { new IRegExpTokenConverter() {
+    final IRegExpTokenConverter[] tokenConverters = new IRegExpTokenConverter[]{ new IRegExpTokenConverter() {
       @Override
       public Pattern getRegExpPattern() {
         return VARIABLE_PATTERN;
@@ -135,45 +138,47 @@ public class RegExpTokenizingConverterTest {
       }
     } };
 
-    final RegExpTokenizingConverter converter1 =
-        new RegExpTokenizingConverter(new DoNothingStringConverter(), tokenConverters);
+    final RegExpTokenizingConverter converter1 = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        tokenConverters);
     assertEquals("AmatchB", converter1.convert("A${variable}B", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
     assertEquals("match2", converter1.convert("${other_variable}2", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
 
-    final RegExpTokenizingConverter converter2 =
-        new RegExpTokenizingConverter(new DoNothingStringConverter(), tokenConverters);
+    final RegExpTokenizingConverter converter2 = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        tokenConverters);
     assertEquals("A<>match<>B", converter2.convert("A${variable}B", new StringAppender("<>"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     assertEquals("match<>2", converter2.convert("${other_variable}2", new StringAppender("<>"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     assertEquals("1<>match", converter2.convert("1${other_variable}", new StringAppender("<>"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 
-    final RegExpTokenizingConverter converter3 =
-        new RegExpTokenizingConverter(new IConverter<String, String, RuntimeException>() {
+    final RegExpTokenizingConverter converter3 = new RegExpTokenizingConverter(
+        new IConverter<String, String, RuntimeException>() {
           @Override
           public String convert(final String text) {
             return "(" + text + ")"; //$NON-NLS-1$ //$NON-NLS-2$
           }
-        }, tokenConverters);
+        },
+        tokenConverters);
     assertEquals("(A)+match+(B)", converter3.convert("A${variable}B", new StringAppender("+"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     assertEquals("match+(2)", converter3.convert("${other_variable}2", new StringAppender("+"))); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
   }
 
   @Test
   public void testConverterReceivesMatchedGroups() throws ConversionException {
-    final RegExpTokenizingConverter converter =
-        new RegExpTokenizingConverter(
-            new DoNothingStringConverter(),
-            new IRegExpTokenConverter[] { new IRegExpTokenConverter() {
-              @Override
-              public Pattern getRegExpPattern() {
-                return VARIABLE_PATTERN;
-              }
+    final RegExpTokenizingConverter converter = new RegExpTokenizingConverter(
+        new DoNothingStringConverter(),
+        new IRegExpTokenConverter[]{ new IRegExpTokenConverter() {
+          @Override
+          public Pattern getRegExpPattern() {
+            return VARIABLE_PATTERN;
+          }
 
-              @Override
-              public String convert(final String[] groups) {
-                org.junit.Assert.assertArrayEquals((new String[] { "${ab:cd}", "ab", "cd" }), groups); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-                return "matched"; //$NON-NLS-1$
-              }
-            } });
+          @Override
+          public String convert(final String[] groups) {
+            org.junit.Assert.assertArrayEquals((new String[]{ "${ab:cd}", "ab", "cd" }), groups); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+            return "matched"; //$NON-NLS-1$
+          }
+        } });
     assertEquals("matched", converter.convert("${ab:cd}", new StringAppender())); //$NON-NLS-1$//$NON-NLS-2$
   }
 
@@ -181,13 +186,14 @@ public class RegExpTokenizingConverterTest {
 
   @Test
   public void testConverterWithMultipleTokenConverters() throws Exception {
-    final RegExpTokenizingConverter converter =
-        new RegExpTokenizingConverter(new IConverter<String, String, RuntimeException>() {
+    final RegExpTokenizingConverter converter = new RegExpTokenizingConverter(
+        new IConverter<String, String, RuntimeException>() {
           @Override
           public String convert(final String text) {
             return '(' + text + ')';
           }
-        }, new IRegExpTokenConverter[] { new IRegExpTokenConverter() {
+        },
+        new IRegExpTokenConverter[]{ new IRegExpTokenConverter() {
           @Override
           public String convert(final String[] groups) {
             return "match1"; //$NON-NLS-1$

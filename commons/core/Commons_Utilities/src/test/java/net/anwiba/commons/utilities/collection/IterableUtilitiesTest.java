@@ -53,11 +53,11 @@ public class IterableUtilitiesTest {
         return value.length() == 4;
       }
     };
-    final List<String> values = new ArrayList<>();
-    assertFalse(IterableUtilities.containsAcceptedItems(values, validator));
-    values.addAll(Arrays.asList(new String[] { "123" })); //$NON-NLS-1$
-    assertFalse(IterableUtilities.containsAcceptedItems(values, validator));
-    values.addAll(Arrays.asList(new String[] { "1234" })); //$NON-NLS-1$
-    assertTrue(IterableUtilities.containsAcceptedItems(values, validator));
+    final List<String> strings = new ArrayList<>();
+    assertFalse(IterableUtilities.containsAcceptedItems(strings, validator));
+    strings.addAll(Arrays.asList(new String[] { "123" })); //$NON-NLS-1$
+    assertFalse(IterableUtilities.containsAcceptedItems(strings, validator));
+    strings.addAll(Arrays.asList(new String[] { "1234" })); //$NON-NLS-1$
+    assertTrue(IterableUtilities.containsAcceptedItems(strings, validator));
   }
 }

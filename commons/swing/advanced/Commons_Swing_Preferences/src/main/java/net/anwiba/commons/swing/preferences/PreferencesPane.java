@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -113,12 +113,15 @@ public class PreferencesPane implements IComponentProvider {
     preferenceEditorContainer.setPreferredSize(new Dimension(300, 200));
     final TreeModel treeModel = new TreeModel(new PreferenceNode(null, this.contentPreferences));
     final JTree tree = new JTree(treeModel);
+    @SuppressWarnings("hiding")
     final IPreferenceNodeEditorFactoryRegistry registry = this.registry;
     tree.setRootVisible(true);
     final TreeSelectionModel selectionModel = tree.getSelectionModel();
     selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     final IObjectContainer<IPreferenceNodeEditor> preferenceNodeEditorContainer = this.editorContainer;
+    @SuppressWarnings("hiding")
     final IFunction<IPreferenceNode, Boolean, RuntimeException> storeFunction = this.storeFunction;
+    @SuppressWarnings("hiding")
     final boolean isEditingEnabled = this.isEditingEnabled;
     final IBooleanModel isNodeDeleteEnabledModel = new BooleanModel(false);
 
@@ -131,6 +134,7 @@ public class PreferencesPane implements IComponentProvider {
         isNodeDeleteEnabledModel.set(isEditingEnabled && node != null && node.getParent() != null);
         final IPreferenceNodeEditorContext context = new PreferenceNodeEditorContext(isEditingEnabled, node);
         final IPreferenceNodeEditorFactory editorFactory = registry.get(context);
+        @SuppressWarnings("hiding")
         final IObjectContainer<IPreferenceNodeEditor> editorContainer = preferenceNodeEditorContainer;
         final IPreferenceNodeEditor editor = editorContainer.get();
         editorContainer.set(editorFactory.create(context));
@@ -164,10 +168,13 @@ public class PreferencesPane implements IComponentProvider {
     splitPane.setResizeWeight(1);
     SplitPanePreferenceUpdaterListener.connect(splitPane, this.panelPreferences);
 
+    @SuppressWarnings("hiding")
     final JPanel contentPane = new JPanel(new BorderLayout());
     final JToolBar toolbar = new JToolBar();
     toolbar.setFloatable(false);
-    final IObjectField<String> stringField = new StringFieldBuilder().addClearAction("clear filter").build();
+    final IObjectField<String> stringField = new StringFieldBuilder()
+        .addClearAction(PreferencesPaneMessages.PreferencesPaneClearFilter)
+        .build();
 
     stringField.getModel().addChangeListener(new IChangeableObjectListener() {
 
@@ -179,21 +186,22 @@ public class PreferencesPane implements IComponentProvider {
     });
     toolbar.add(stringField.getComponent());
     toolbar.addSeparator();
-    toolbar.add(new ConfigurableActionBuilder()//
-        .setIcon(ContrastHightIcons.EDIT_DELETE)
-        .setEnabledDistributor(isNodeDeleteEnabledModel)
-        .setTooltip("Remove selected preference")
-        .setTask(() -> {
-          final PreferenceNode preferenceNode = getPreferenceNode(selectionModel.getLeadSelectionPath());
-          Optional
-              .of(preferenceNode)
-              .convert(node -> node.getParent())
-              .accept(node -> node != treeModel.getRoot())
-              .consume(node -> selectionModel.setSelectionPath(getTreePath(treeModel.getRoot(), node)))
-              .or(() -> selectionModel.setSelectionPath(new TreePath(new PreferenceNode[]{ treeModel.getRoot() })));
-          treeModel.removeFromParent(preferenceNode);
-        })
-        .build());
+    toolbar.add(
+        new ConfigurableActionBuilder()//
+            .setIcon(ContrastHightIcons.EDIT_DELETE)
+            .setEnabledDistributor(isNodeDeleteEnabledModel)
+            .setTooltip(PreferencesPaneMessages.PreferencesPaneRemoveSelectedPreference)
+            .setTask(() -> {
+              final PreferenceNode preferenceNode = getPreferenceNode(selectionModel.getLeadSelectionPath());
+              Optional
+                  .of(preferenceNode)
+                  .convert(node -> node.getParent())
+                  .accept(node -> node != treeModel.getRoot())
+                  .consume(node -> selectionModel.setSelectionPath(getTreePath(treeModel.getRoot(), node)))
+                  .or(() -> selectionModel.setSelectionPath(new TreePath(new PreferenceNode[]{ treeModel.getRoot() })));
+              treeModel.removeFromParent(preferenceNode);
+            })
+            .build());
     contentPane.add(toolbar, BorderLayout.NORTH);
     contentPane.add(splitPane, BorderLayout.CENTER);
     return contentPane;

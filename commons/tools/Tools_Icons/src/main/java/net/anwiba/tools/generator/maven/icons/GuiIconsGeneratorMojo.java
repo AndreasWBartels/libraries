@@ -199,6 +199,7 @@ public class GuiIconsGeneratorMojo extends AbstractMojo {
     try {
       final String packageName = extractPackageName(iconClassName);
       final String className = extractClassName(iconClassName);
+      @SuppressWarnings("hiding")
       final Class iconClass = new Class();
       iconClass.setPackage(packageName);
       iconClass.setName(className);

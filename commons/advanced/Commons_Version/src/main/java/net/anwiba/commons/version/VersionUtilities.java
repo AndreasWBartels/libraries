@@ -116,7 +116,6 @@ public class VersionUtilities {
         return null;
       }
       boolean lastCharaterWasWhiteSpace = false;
-      ParseState lastState = ParseState.UNDEFIND;
       ParseState state = ParseState.UNDEFIND;
       StringBuilder builder = new StringBuilder();
       final VersionBuilder versionBuilder = new VersionBuilder();
@@ -146,7 +145,6 @@ public class VersionUtilities {
           lastCharaterWasWhiteSpace = false;
         }
         if (!state.equals(tmpState)) {
-          lastState = state;
           builder = new StringBuilder();
         }
         if (c == '.' || c == ':' || Character.isWhitespace(c)) {
@@ -158,7 +156,10 @@ public class VersionUtilities {
       return versionBuilder.build();
     }
 
-    private ParseState resolve(final ParseState state, final StringBuilder builder, final VersionBuilder versionBuilder) {
+    private ParseState resolve(
+        final ParseState state,
+        final StringBuilder builder,
+        final VersionBuilder versionBuilder) {
       switch (state) {
         case UNDEFIND: {
           return state;
@@ -364,7 +365,10 @@ public class VersionUtilities {
       throw new UnreachableCodeReachedException();
     }
 
-    private ParseState letter(final ParseState state, final StringBuilder builder, final VersionBuilder versionBuilder) {
+    private ParseState letter(
+        final ParseState state,
+        final StringBuilder builder,
+        final VersionBuilder versionBuilder) {
       switch (state) {
         case UNDEFIND: {
           return ParseState.RELEASESTATE;

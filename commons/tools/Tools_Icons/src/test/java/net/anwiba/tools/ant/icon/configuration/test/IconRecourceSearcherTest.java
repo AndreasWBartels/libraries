@@ -21,27 +21,26 @@
  */
 package net.anwiba.tools.ant.icon.configuration.test;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import net.anwiba.tools.icons.configuration.IconRecourceSearcher;
-
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
-import static org.junit.Assert.assertThat;
+import net.anwiba.tools.icons.configuration.IconRecourceSearcher;
 
 public class IconRecourceSearcherTest {
 
   @Test
-  @SuppressWarnings("boxing")
   public void search() throws IOException {
     final IconRecourceSearcher searcher = new IconRecourceSearcher(true);
     final List<File> list = searcher.search(new File("src/test/resources/ProjectA")); //$NON-NLS-1$
     assertThat(1, equalTo(list.size()));
     assertThat(
-        new File("src/test/resources/ProjectB/resources/icons/icons.xml").getCanonicalFile(), equalTo(list.get(0).getCanonicalFile())); //$NON-NLS-1$
+        new File("src/test/resources/ProjectB/resources/icons/icons.xml").getCanonicalFile(), //$NON-NLS-1$
+        equalTo(list.get(0).getCanonicalFile()));
   }
 }

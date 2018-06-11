@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Collections;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -44,7 +43,7 @@ import net.anwiba.commons.lang.functional.IApplicable;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.io.NoneClosingInputStream;
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.utilities.parameter.Parameters;
+import net.anwiba.commons.utilities.parameter.ParametersBuilder;
 import net.anwiba.commons.xml.jaxb.JaxbTransformer;
 
 public class RegistableConvertingXmlPersisterFactory {
@@ -73,7 +72,8 @@ public class RegistableConvertingXmlPersisterFactory {
       final URIResolver uriResolver,
       final String inputXsltScript,
       final String outputXsltScript,
-      final Class<?>... bindingClasses) throws CreationException {
+      final Class<?>... bindingClasses)
+      throws CreationException {
 
     try {
       final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
@@ -97,7 +97,7 @@ public class RegistableConvertingXmlPersisterFactory {
         @Override
         public T read(final InputStream inputStream) throws IOException {
           try {
-            return jaxbTransformer.unmarshall(inputStream, new Parameters(Collections.emptyList()));
+            return jaxbTransformer.unmarshall(inputStream, new ParametersBuilder().build());
           } catch (JAXBException | TransformerException exception) {
             throw new IOException(exception);
           }

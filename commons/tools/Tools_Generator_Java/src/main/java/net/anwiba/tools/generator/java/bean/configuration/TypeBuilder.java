@@ -34,7 +34,7 @@ public class TypeBuilder {
     this.name = name;
   }
 
-  public TypeBuilder dimension(final int dimension) {
+  public TypeBuilder dimension(@SuppressWarnings("hiding") final int dimension) {
     this.dimension = dimension;
     return this;
   }

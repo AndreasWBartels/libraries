@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,7 +26,6 @@ import java.awt.event.MouseListener;
 import javax.swing.DropMode;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import javax.swing.border.Border;
 
@@ -41,12 +40,6 @@ public class ObjectListConfigurationBuilder<T> {
   private int visibleRowCount = 8;
   private int selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION;
   private IObjectUi<T> objectUi = new ToStringUi<>();
-  private int iconTextGap = 2;
-  private int verticalAlignment = SwingConstants.CENTER;
-  private int verticalTextPosition = SwingConstants.CENTER;
-  private int horizontalTextPosition = SwingConstants.TRAILING;
-  private int horizontalAlignment = SwingConstants.LEADING;
-  private Border border = null;
   private int layoutOrientation = JList.VERTICAL;
   private MouseListener mouseListener;
   private ISelectionModel<T> selectionModel;
@@ -55,38 +48,7 @@ public class ObjectListConfigurationBuilder<T> {
   private DropMode dropMode = DropMode.USE_SELECTION;
   private T prototype = null;
 
-  IObjectUiCellRendererConfiguration objectUiCellRendererConfiguration = new IObjectUiCellRendererConfiguration() {
-
-    @Override
-    public int getVerticalAlignment() {
-      return ObjectListConfigurationBuilder.this.verticalAlignment;
-    }
-
-    @Override
-    public int getVerticalTextPosition() {
-      return ObjectListConfigurationBuilder.this.verticalTextPosition;
-    }
-
-    @Override
-    public int getIconTextGap() {
-      return ObjectListConfigurationBuilder.this.iconTextGap;
-    }
-
-    @Override
-    public int getHorizontalTextPosition() {
-      return ObjectListConfigurationBuilder.this.horizontalTextPosition;
-    }
-
-    @Override
-    public int getHorizontalAlignment() {
-      return ObjectListConfigurationBuilder.this.horizontalAlignment;
-    }
-
-    @Override
-    public Border getBorder() {
-      return ObjectListConfigurationBuilder.this.border;
-    }
-  };
+  private final ObjectUiCellRendererConfigurationBuilder objectUiCellRendererConfigurationBuilder = new ObjectUiCellRendererConfigurationBuilder();
 
   public ObjectListConfigurationBuilder<T> setObjectUi(final IObjectUi<T> objectUi) {
     this.objectUi = objectUi;
@@ -109,62 +71,62 @@ public class ObjectListConfigurationBuilder<T> {
   }
 
   public ObjectListConfigurationBuilder<T> setIconTextGap(final int iconTextGap) {
-    this.iconTextGap = iconTextGap;
+    this.objectUiCellRendererConfigurationBuilder.setIconTextGap(iconTextGap);
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setVerticalTextPosition(final int verticalTextPosition) {
-    this.verticalTextPosition = verticalTextPosition;
+    this.objectUiCellRendererConfigurationBuilder.setVerticalTextPosition(verticalTextPosition);
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setHorizontalTextPosition(final int horizontalTextPosition) {
-    this.horizontalTextPosition = horizontalTextPosition;
+    this.objectUiCellRendererConfigurationBuilder.setHorizontalTextPosition(horizontalTextPosition);
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setHorizontalAlignment(final int horizontalAlignment) {
-    this.horizontalAlignment = horizontalAlignment;
+    this.objectUiCellRendererConfigurationBuilder.setHorizontalAlignment(horizontalAlignment);
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setHorizontalAlignmentLeft() {
-    this.horizontalAlignment = SwingConstants.LEFT;
+    this.objectUiCellRendererConfigurationBuilder.setHorizontalAlignmentLeft();
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setHorizontalAlignmentRight() {
-    this.horizontalAlignment = SwingConstants.LEFT;
+    this.objectUiCellRendererConfigurationBuilder.setHorizontalAlignmentRight();
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setHorizontalAlignmentCenter() {
-    this.horizontalAlignment = SwingConstants.CENTER;
+    this.objectUiCellRendererConfigurationBuilder.setHorizontalAlignmentCenter();
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setHorizontalAlignmentLeading() {
-    this.horizontalAlignment = SwingConstants.LEADING;
+    this.objectUiCellRendererConfigurationBuilder.setHorizontalAlignmentLeading();
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setHorizontalAlignmentTrailing() {
-    this.horizontalAlignment = SwingConstants.TRAILING;
+    this.objectUiCellRendererConfigurationBuilder.setHorizontalAlignmentTrailing();
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setBorder(final Border border) {
-    this.border = border;
+    this.objectUiCellRendererConfigurationBuilder.setBorder(border);
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setVerticalAlignment(final int verticalAlignment) {
+    this.objectUiCellRendererConfigurationBuilder.setVerticalAlignment(verticalAlignment);
     return this;
   }
 
   public ObjectListConfigurationBuilder<T> setVisibleRowCount(final int visibleRowCount) {
     this.visibleRowCount = visibleRowCount;
-    return this;
-  }
-
-  public ObjectListConfigurationBuilder<T> setVerticalAlignment(final int verticalAlignment) {
-    this.verticalAlignment = verticalAlignment;
     return this;
   }
 
@@ -234,6 +196,8 @@ public class ObjectListConfigurationBuilder<T> {
   }
 
   public IObjectListConfiguration<T> build() {
+    final IObjectUiCellRendererConfiguration objectUiCellRendererConfiguration = this.objectUiCellRendererConfigurationBuilder
+        .build();
     return new IObjectListConfiguration<T>() {
 
       @Override
@@ -263,7 +227,7 @@ public class ObjectListConfigurationBuilder<T> {
 
       @Override
       public IObjectUiCellRendererConfiguration getObjectUiCellRendererConfiguration() {
-        return ObjectListConfigurationBuilder.this.objectUiCellRendererConfiguration;
+        return objectUiCellRendererConfiguration;
       }
 
       @Override

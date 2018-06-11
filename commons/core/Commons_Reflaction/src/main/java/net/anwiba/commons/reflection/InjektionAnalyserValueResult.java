@@ -13,15 +13,15 @@ package net.anwiba.commons.reflection;
 
 public final class InjektionAnalyserValueResult implements IInjektionAnalyserValueResult {
   @SuppressWarnings("rawtypes")
-  private final Class type;
+  private final IBinding binding;
   private final boolean isNullable;
   private final boolean isIterable;
 
   public InjektionAnalyserValueResult(
-      @SuppressWarnings("rawtypes") final Class type,
+      @SuppressWarnings("rawtypes") final IBinding type,
       final boolean isNullable,
       final boolean isIterable) {
-    this.type = type;
+    this.binding = type;
     this.isNullable = isNullable;
     this.isIterable = isIterable;
   }
@@ -38,7 +38,7 @@ public final class InjektionAnalyserValueResult implements IInjektionAnalyserVal
 
   @SuppressWarnings("rawtypes")
   @Override
-  public Class getType() {
-    return this.type;
+  public IBinding getBinding() {
+    return this.binding;
   }
 }

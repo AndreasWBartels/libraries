@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import net.anwiba.commons.json.JsonObjectUtilities;
 import net.anwiba.commons.lang.object.ObjectPair;
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.spatial.gps.gpsd.response.Device;
 import net.anwiba.spatial.gps.gpsd.response.Devices;
 import net.anwiba.spatial.gps.gpsd.response.Error;

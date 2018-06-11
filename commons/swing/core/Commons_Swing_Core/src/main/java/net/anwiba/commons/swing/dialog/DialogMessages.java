@@ -32,10 +32,13 @@ public class DialogMessages extends NLS {
   public static String CANCEL;
   public static String CLOSE;
   public static String CLOSE_DETAILS;
+  public static String Dialog;
+  public static String Empty;
   public static String ERROR;
   public static String FINISH;
   public static String FORMAT_DATE;
   public static String INFO;
+  public static String Initialize;
   public static String NAME;
   public static String NEXT;
   public static String NEW;
@@ -44,11 +47,13 @@ public class DialogMessages extends NLS {
   public static String OPEN;
   public static String OPEN_DETAILS;
   public static String OPEN_URL;
+  public static String OPEN_AND_CLOSE;
   public static String PROPERTIES;
   public static String REMOVE;
   public static String REMOVE_ALL;
   public static String QUERY;
   public static String SAVE;
+  public static String SAVE_AND_CLOSE;
   public static String TRY;
   public static String VALUE;
   public static String YES;

@@ -25,7 +25,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.anwiba.commons.resource.utilities.IoUtilities;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.xml.dom.DomConverterException;
 import net.anwiba.commons.xml.dom.IDomToObjectConverter;
 

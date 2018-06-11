@@ -22,14 +22,15 @@
 package net.anwiba.commons.swing.table.action;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 
 import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.action.ActionCustomization;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
+import net.anwiba.commons.swing.table.ObjectListTableMessages;
 
 public class EditTableActionFactory<T> extends AbstractTableActionFactory<T> {
   private final ITableActionClosure<T> closure;
@@ -41,22 +42,22 @@ public class EditTableActionFactory<T> extends AbstractTableActionFactory<T> {
   @Override
   protected final AbstractAction createAction(
       final IObjectTableModel<T> tableModel,
+      final ISelectionIndexModel<T> selectionIndexModel,
       final ISelectionModel<T> selectionModel,
-      final ISelectionIndexModel<T> selectionIndexModel) {
+      final IBooleanDistributor sortStateProvider) {
     return new TableActionClosureAction<>(
-        new ActionCustomization(null, GuiIcons.EDIT_ICON, "edit"),
+        new ActionCustomization(null, GuiIcons.EDIT_ICON, ObjectListTableMessages.edit),
         tableModel,
         selectionIndexModel,
         this.closure);
   }
 
   @Override
-  protected void checkEnabled(
-      final Action action,
+  protected boolean checkEnabled(
       final IObjectTableModel<T> tableModel,
       final ISelectionIndexModel<T> selectionIndexModel,
       final ISelectionModel<T> selectionModel,
       final IBooleanProvider sortStateProvider) {
-    action.setEnabled(!sortStateProvider.get() && selectionIndexModel.size() == 1);
+    return !sortStateProvider.get() && selectionIndexModel.size() == 1;
   }
 }

@@ -50,6 +50,7 @@ public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
     return unmarshal(new ByteArrayInputStream(body.getBytes(Charset.forName("UTF-8")))); //$NON-NLS-1$
   }
 
+  @SuppressWarnings("resource")
   public final O unmarshal(final InputStream inputStream) throws IOException, E {
     return _unmarshal(
         new NoneClosingInputStream(
@@ -105,9 +106,11 @@ public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
 
   protected IOException createIOException(final InputStream content, final Exception exception) {
     try {
-      return new IOException(MessageFormat.format(
-          "Error during mapping json resource, coudn''t map the content:\n {0}", //$NON-NLS-1$
-          toString(content, "UTF-8")), exception); //$NON-NLS-1$
+      return new IOException(
+          MessageFormat.format(
+              "Error during mapping json resource, coudn''t map the content:\n {0}", //$NON-NLS-1$
+              toString(content, "UTF-8")), //$NON-NLS-1$
+          exception);
     } catch (final IOException exception1) {
       return new IOException(
           "Error during mapping json resource, coudn''t map the content", //$NON-NLS-1$

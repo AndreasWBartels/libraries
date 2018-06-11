@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -47,6 +47,7 @@ final public class OptionalPrivilegedFieldSetterAction extends AbstractPrivilege
     final boolean accessible = field.isAccessible();
     try {
       field.setAccessible(true);
+      @SuppressWarnings("hiding")
       final Object value = convert(field, this.value);
       field.set(this.object, value);
       return null;
@@ -57,6 +58,7 @@ final public class OptionalPrivilegedFieldSetterAction extends AbstractPrivilege
     }
   }
 
+  @SuppressWarnings({ "hiding", "rawtypes", "unchecked" })
   private Object convert(final Field field, final Object value) {
     final Class declaringClass = field.getType();
     if (declaringClass.isArray()) {
@@ -82,7 +84,7 @@ final public class OptionalPrivilegedFieldSetterAction extends AbstractPrivilege
     return null;
   }
 
-  private double[] createDoubleArray(final Collection collection) {
+  private double[] createDoubleArray(@SuppressWarnings("rawtypes") final Collection collection) {
     final double[] array = new double[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -91,7 +93,7 @@ final public class OptionalPrivilegedFieldSetterAction extends AbstractPrivilege
     return array;
   }
 
-  private long[] createLongArray(final Collection collection) {
+  private long[] createLongArray(@SuppressWarnings("rawtypes") final Collection collection) {
     final long[] array = new long[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -100,7 +102,7 @@ final public class OptionalPrivilegedFieldSetterAction extends AbstractPrivilege
     return array;
   }
 
-  private int[] createIntegerArray(final Collection collection) {
+  private int[] createIntegerArray(@SuppressWarnings("rawtypes") final Collection collection) {
     final int[] array = new int[collection.size()];
     final Object[] objects = collection.toArray();
     for (int i = 0; i < array.length; i++) {
@@ -109,6 +111,7 @@ final public class OptionalPrivilegedFieldSetterAction extends AbstractPrivilege
     return array;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private <T> T[] create(final Class declaringClass, final Collection collection) {
     final T[] newInstance = (T[]) Array.newInstance(declaringClass, collection.size());
     return (T[]) collection.toArray(newInstance);

@@ -55,12 +55,12 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
 
   @Override
   public <O> IStream<O, E> convert(final IConverter<T, O, E> converter) {
-    return new SequencedStream<>(new ConvertingIterableIterable<>(this.iterable, i -> i != null, converter));
+    return new SequencedStream<>(new IterableConvertingIterable<>(this.iterable, i -> i != null, converter));
   }
 
   @Override
   public <O> IStream<O, E> convert(final IAggregator<Integer, T, O, E> aggegator) {
-    return new SequencedStream<>(new CountingIterableIterable<>(this.iterable, i -> i != null, aggegator));
+    return new SequencedStream<>(new IterableCountingIterable<>(this.iterable, i -> i != null, aggegator));
   }
 
   @Override
@@ -70,14 +70,8 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public IStream<T, E> call(final IConsumer<T, E> consumer) throws E {
-    this.foreach(consumer);
-    return this;
-  }
-
-  @Override
   public IStream<T, E> filter(final IAcceptor<T> acceptor) {
-    return new SequencedStream<>(new FilteringIterableIterable<>(this.iterable, acceptor));
+    return new SequencedStream<>(new IterableFilteringIterable<>(this.iterable, acceptor));
   }
 
   @Override
@@ -91,13 +85,15 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public void foreach(final IConsumer<T, E> consumer) throws E {
+  public IStream<T, E> foreach(final IConsumer<T, E> consumer) throws E {
     this.iterable.foreach(consumer);
+    return this;
   }
 
   @Override
-  public void foreach(final IAssimilator<Integer, T, E> assimilator) throws E {
+  public IStream<T, E> foreach(final IAssimilator<Integer, T, E> assimilator) throws E {
     this.iterable.foreach(assimilator);
+    return this;
   }
 
   @Override
@@ -160,6 +156,11 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
     final List<T> list = asList();
     Collections.reverse(list);
     return Streams.create(list);
+  }
+
+  @Override
+  public <O> IStream<O, E> flat(final IConverter<T, Iterable<O>, E> converter) {
+    return new SequencedStream<>(new IterableFlattingIterable<>(this.iterable, i -> i != null, converter));
   }
 
 }

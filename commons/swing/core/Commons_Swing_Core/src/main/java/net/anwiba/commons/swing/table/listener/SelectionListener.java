@@ -21,17 +21,17 @@
  */
 package net.anwiba.commons.swing.table.listener;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.ListSelectionModel;
+
 import net.anwiba.commons.model.ISelectionListener;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.SelectionEvent;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISortedRowMapper;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.ListSelectionModel;
 
 public final class SelectionListener<T> implements ISelectionListener<T> {
   private final IObjectTableModel<T> tableModel;
@@ -40,10 +40,10 @@ public final class SelectionListener<T> implements ISelectionListener<T> {
   private final ISortedRowMapper sortedRowMapper;
 
   public SelectionListener(
-    final IObjectTableModel<T> tableModel,
-    final ListSelectionModel tableSelectionModel,
-    final ISelectionModel<T> objectSelectionModel,
-    final ISortedRowMapper sortedRowMapper) {
+      final IObjectTableModel<T> tableModel,
+      final ListSelectionModel tableSelectionModel,
+      final ISelectionModel<T> objectSelectionModel,
+      final ISortedRowMapper sortedRowMapper) {
     this.tableModel = tableModel;
     this.tableSelectionModel = tableSelectionModel;
     this.objectSelectionModel = objectSelectionModel;
@@ -74,7 +74,9 @@ public final class SelectionListener<T> implements ISelectionListener<T> {
     this.tableSelectionModel.setValueIsAdjusting(false);
   }
 
-  private List<T> getObjects(final IObjectTableModel<T> tableModel, final ListSelectionModel tableSelectionModel) {
+  private List<T> getObjects(
+      @SuppressWarnings("hiding") final IObjectTableModel<T> tableModel,
+      @SuppressWarnings("hiding") final ListSelectionModel tableSelectionModel) {
     final List<T> objects = new ArrayList<>();
     if (tableSelectionModel.isSelectionEmpty()) {
       return objects;

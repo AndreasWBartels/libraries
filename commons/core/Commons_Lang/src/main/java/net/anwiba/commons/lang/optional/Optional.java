@@ -64,7 +64,7 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
   }
 
   @Override
-  public IOptional<T, E> accept(final IAcceptor<T> acceptor) throws E {
+  public IOptional<T, E> accept(@SuppressWarnings("hiding") final IAcceptor<T> acceptor) throws E {
     if (isAccepted()) {
       return new Optional<>(acceptor, this.value);
     }
@@ -84,8 +84,9 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
     return create(null);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public <O> IOptional<O, E> cast(final Class<O> clazz) {
+  public <O> IOptional<O, E> instanceOf(final Class<O> clazz) {
     if (isAccepted() && clazz.isInstance(this.value)) {
       return create((O) this.value);
     }
@@ -149,7 +150,7 @@ public class Optional<T, E extends Exception> implements IOptional<T, E> {
   }
 
   @Override
-  public IOptional<T, E> or(final T value) throws E {
+  public IOptional<T, E> or(@SuppressWarnings("hiding") final T value) throws E {
     if (isAccepted()) {
       return this;
     }

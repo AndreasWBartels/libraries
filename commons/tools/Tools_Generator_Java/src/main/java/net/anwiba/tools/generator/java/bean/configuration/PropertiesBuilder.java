@@ -64,6 +64,7 @@ public class PropertiesBuilder {
         this.setterAnnotations,
         new Argument(this.name, new ArrayList<Annotation>(), this.type),
         new HashMap<String, List<Annotation>>());
+    @SuppressWarnings("hiding")
     final String getterName = this.getterName == null
         ? MemberBuilder.createGetterName(this.type, this.name)
         : this.getterName;
@@ -91,12 +92,12 @@ public class PropertiesBuilder {
             this.valueGetterMethodName));
   }
 
-  public PropertiesBuilder isNullable(final boolean isNullable) {
+  public PropertiesBuilder isNullable(@SuppressWarnings("hiding") final boolean isNullable) {
     this.isNullable = isNullable;
     return this;
   }
 
-  public PropertiesBuilder isImutable(final boolean isImutable) {
+  public PropertiesBuilder isImutable(@SuppressWarnings("hiding") final boolean isImutable) {
     this.isImutable = isImutable;
     return this;
   }
@@ -148,7 +149,7 @@ public class PropertiesBuilder {
     return this;
   }
 
-  public PropertiesBuilder getterName(final String name) {
+  public PropertiesBuilder getterName(@SuppressWarnings("hiding") final String name) {
     this.getterName = name;
     return this;
   }

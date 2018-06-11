@@ -71,8 +71,8 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
         return false;
       }
 
-      private boolean contains(final String upperCase, final String value) {
-        return value == null ? false : upperCase.contains(value.toUpperCase());
+      private boolean contains(final String value, final String upperCase) {
+        return value == null ? false : value.toUpperCase().contains(upperCase);
       }
     };
   }

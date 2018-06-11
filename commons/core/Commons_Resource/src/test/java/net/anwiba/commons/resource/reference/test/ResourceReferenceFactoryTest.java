@@ -30,16 +30,17 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import net.anwiba.commons.resource.reference.FileResourceReference;
-import net.anwiba.commons.resource.reference.IResourceReference;
-import net.anwiba.commons.resource.reference.ResourceReferenceFactory;
-import net.anwiba.commons.resource.reference.ResourceReferenceUtilities;
-import net.anwiba.commons.resource.reference.UriResourceReference;
-import net.anwiba.commons.resource.reference.UrlResourceReference;
-import net.anwiba.commons.resource.utilities.IoUtilities;
-
 import org.junit.Ignore;
 import org.junit.Test;
+
+import net.anwiba.commons.reference.FileResourceReference;
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.MemoryResourceReference;
+import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.reference.ResourceReferenceUtilities;
+import net.anwiba.commons.reference.UriResourceReference;
+import net.anwiba.commons.reference.UrlResourceReference;
+import net.anwiba.commons.reference.utilities.IoUtilities;
 
 @SuppressWarnings("nls")
 public class ResourceReferenceFactoryTest {
@@ -49,6 +50,14 @@ public class ResourceReferenceFactoryTest {
   public void nullValueTest() throws Exception {
     this.factory.create((String) null);
     this.factory.create((File) null);
+  }
+
+  @Test
+  public void dataResource() throws Exception {
+    final IResourceReference resourceReference = this.factory.create(
+        "data:image/png;charset=UTF-8;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAK3RFWHRDcmVhdGlvbiBUaW1lAERpIDE5IFNlcCAyMDE3IDExOjU3OjM3ICswMTAwN18QagAAAAd0SU1FB+EJEw0cEdpvFnsAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAEZ0FNQQAAsY8L/GEFAAACEklEQVR42o2TPU/bUBSG74JYIhArMPAfkBhYmRAbiBV+ABNsfEggIWBDLEgIsSPCAiJBjR0bEzfGTojBNqhDC60aCqoqFKlqCyiQt+fcOFFM2qrDI/v6+rzv+bhXFAoVQaAK/pPa/xVRD3Zd4OKCKf8Tz4uKiFqwbZewtORgZibA7Kz/R6anPayvuzg7K9dFpMD5OXBwcAchTCJHnIbwez6y7u42YFn30jSSgeM8YmMjh8XFFPr7k4jF+P0NJiYUCnQwNhbH8rKO7e13YfArAc6Ce+A439HXp1NABkHwAtP8htZWE1NTx3Lf90ElNAhwcD7/E+l0EZr2BZubnHIW8/MKjo5ukEp9wPCwip4eE/v7l1DVG/p+S6ZlKSQM4zPGxy20tZ2gqytLbjYJuOjosNHZaVHNFtrbq32IxbLyW0uLJcvxvDKEolxhcFAPG2gRBeIkXDdyGjb0rWRuzqQMniC49kzmHsnkNdbWNNq0sbBg4PDwiiZTJZF4j5GRNDnr2Nkp0N5HKuFR9k42kWsJAmBlhR2OKeBaNovFGd7b2rKl8+7upVw3TcFxShgYSGBoKI1c7kd9zjUDTftEAjqlrpDoS/NB2tsrSvfVVUO6Nx5XFnPdXxgdNdDbq9DUStGDxA6q+hWTk6Z8VudcicAm8XiRjrRNGT5EBWouvv8cST0KaGws9Nx0mUTzVa78VeT1df4N8EUWrSNZCekAAAAASUVORK5CYII=");
+    assertThat(resourceReference, notNullValue());
+    assertThat(resourceReference, instanceOf(MemoryResourceReference.class));
   }
 
   @Test
@@ -68,14 +77,17 @@ public class ResourceReferenceFactoryTest {
   @Test
   public void relativeBackStepFileUrlResource() throws Exception {
     final String parent = new File(".").getAbsoluteFile().getParentFile().getName();
-    final IResourceReference resourceReference = this.factory.create("file:../"
-        + parent
-        + "/src/test/resources/net/anwiba/commons/resource/provider/test/text.txt");
+    final IResourceReference resourceReference = this.factory
+        .create("file:../" + parent + "/src/test/resources/net/anwiba/commons/resource/provider/test/text.txt");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UriResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new File("../"
-        + parent
-        + "/src/test/resources/net/anwiba/commons/resource/provider/test/text.txt").toURI().toURL().toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(
+            new File("../" + parent + "/src/test/resources/net/anwiba/commons/resource/provider/test/text.txt")
+                .toURI()
+                .toURL()
+                .toExternalForm()));
     assertConnection(resourceReference);
   }
 
@@ -87,11 +99,13 @@ public class ResourceReferenceFactoryTest {
         .create("file:./src/main/java/net/anwiba/commons/resource/reference/IResourceReference.java");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UriResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new File(
-        "./src/main/java/net/anwiba/commons/resource/reference/IResourceReference.java")
-        .toURI()
-        .toURL()
-        .toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(
+            new File("./src/main/java/net/anwiba/commons/resource/reference/IResourceReference.java")
+                .toURI()
+                .toURL()
+                .toExternalForm()));
     assertConnection(resourceReference);
   }
 
@@ -101,8 +115,9 @@ public class ResourceReferenceFactoryTest {
         .create("file:/g:/gisdata/projekte/Cadenza-Karte/CadenzaBundeslaender");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UrlResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new File(
-        "/g:/gisdata/projekte/Cadenza-Karte/CadenzaBundeslaender").toURI().toURL().toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(new File("/g:/gisdata/projekte/Cadenza-Karte/CadenzaBundeslaender").toURI().toURL().toExternalForm()));
   }
 
   // @Test
@@ -130,8 +145,9 @@ public class ResourceReferenceFactoryTest {
     final IResourceReference resourceReference = this.factory.create("http://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UrlResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new URL(
-        "http://temp/hallo.txt").toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(new URL("http://temp/hallo.txt").toExternalForm()));
   }
 
   @Test
@@ -139,8 +155,9 @@ public class ResourceReferenceFactoryTest {
     final IResourceReference resourceReference = this.factory.create("https://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UrlResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new URL(
-        "https://temp/hallo.txt").toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(new URL("https://temp/hallo.txt").toExternalForm()));
   }
 
   @Test
@@ -149,8 +166,11 @@ public class ResourceReferenceFactoryTest {
         .create("file:/C:/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UrlResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toString(), equalTo(new URL(
-        "file:/C:/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat").toString()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toString(),
+        equalTo(
+            new URL("file:/C:/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat")
+                .toString()));
     // assertConnection(resource);
   }
 
@@ -159,8 +179,9 @@ public class ResourceReferenceFactoryTest {
     final IResourceReference resourceReference = this.factory.create("file://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UrlResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new URL(
-        "file://temp/hallo.txt").toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(new URL("file://temp/hallo.txt").toExternalForm()));
   }
 
   @Test
@@ -168,8 +189,9 @@ public class ResourceReferenceFactoryTest {
     final IResourceReference resourceReference = this.factory.create("HTTP://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(UrlResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new URL(
-        "HTTP://temp/hallo.txt").toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(new URL("HTTP://temp/hallo.txt").toExternalForm()));
   }
 
   @Test
@@ -177,8 +199,9 @@ public class ResourceReferenceFactoryTest {
     final IResourceReference resourceReference = this.factory.create("//dumpsrv/export/Betroffeneflaeche.shp");
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(FileResourceReference.class));
-    assertThat(ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(), equalTo(new URL(
-        "file:/dumpsrv/export/Betroffeneflaeche.shp").toExternalForm()));
+    assertThat(
+        ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
+        equalTo(new URL("file:/dumpsrv/export/Betroffeneflaeche.shp").toExternalForm()));
     assertThat(resourceReference.toString(), equalTo("/dumpsrv/export/Betroffeneflaeche.shp"));
   }
 

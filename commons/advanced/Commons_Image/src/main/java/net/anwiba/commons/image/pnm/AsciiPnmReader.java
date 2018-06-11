@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.image.pnm;
 
-import net.anwiba.commons.resource.utilities.IoUtilities;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.StringTokenizer;
+
+import net.anwiba.commons.reference.utilities.IoUtilities;
 
 public class AsciiPnmReader {
 

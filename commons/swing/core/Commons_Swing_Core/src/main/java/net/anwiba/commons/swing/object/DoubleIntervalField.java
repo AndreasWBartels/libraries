@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
@@ -71,7 +72,7 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
         }
         return IValidationResult.inValid(
             MessageFormat
-                .format("Value is out of bounderies ({0}, {1})", toString(this.minimum), toString(this.maximum)));
+                .format(ObjectFieldMessages.ValueIsOutOfBounderies_0_1, toString(this.minimum), toString(this.maximum)));
       } catch (final NumberFormatException exception) {
         return IValidationResult.inValid(exception.getLocalizedMessage());
       }
@@ -79,7 +80,7 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
 
     private String toString(final double value) {
       if (Double.isNaN(value)) {
-        return "none";
+        return ObjectFieldMessages.none;
       }
       return String.valueOf(value);
     }
@@ -95,14 +96,17 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
   private JPanel component;
   private final double maximum;
   private final double minimum;
+  private final double stepSize;
   private final IConverter<Double, String, RuntimeException> toStringFormater;
 
   public DoubleIntervalField(
       final IConverter<Double, String, RuntimeException> toStringFormater,
       final double minimum,
       final double maximum,
+      final double stepSize,
       final IObjectModel<DoubleInterval> model,
       final IObjectModel<IValidationResult> validationModel) {
+    this.stepSize = stepSize;
     this.model = model;
     this.minimum = minimum;
     this.maximum = maximum;
@@ -134,13 +138,13 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
         if (!DoubleIntervalField.this.minimumValidationModel.get().isValid()) {
           validationModel.set(
               IValidationResult.inValid(
-                  "Illegal minimum value. " + DoubleIntervalField.this.minimumValidationModel.get().getMessage()));
+                  ObjectFieldMessages.IllegalMinimumValue + DoubleIntervalField.this.minimumValidationModel.get().getMessage()));
           return;
         }
         if (!DoubleIntervalField.this.maximumValidationModel.get().isValid()) {
           validationModel.set(
               IValidationResult.inValid(
-                  "Illegal maximum value. " + DoubleIntervalField.this.maximumValidationModel.get().getMessage()));
+                  ObjectFieldMessages.IllegalMaximumValue + DoubleIntervalField.this.maximumValidationModel.get().getMessage()));
           return;
         }
         final IValidationResult validationResult = checkValid();
@@ -218,15 +222,15 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
       return IValidationResult.valid();
     }
     if (this.minimumValueModel.get() == null) {
-      return IValidationResult.inValid("Missing minimum value.");
+      return IValidationResult.inValid(ObjectFieldMessages.MissingMinimumValue);
     }
     if (this.maximumValueModel.get() == null) {
-      return IValidationResult.inValid("Missing maximum value.");
+      return IValidationResult.inValid(ObjectFieldMessages.MissingMaximumValue);
     }
     if (this.maximumValueModel.get().doubleValue() == this.minimumValueModel.get().doubleValue()) {
-      return IValidationResult.inValid("Minimum value equals maximum value.");
+      return IValidationResult.inValid(ObjectFieldMessages.MinimumValueEqualsMaximumValue);
     }
-    return IValidationResult.inValid("Minimum value is larger than maximum value.");
+    return IValidationResult.inValid(ObjectFieldMessages.MinimumValueIsLargerThanMaximumValue);
   }
 
   @Override
@@ -239,8 +243,14 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
 
   private JPanel createComponent() {
     final ValueValidator validator = new ValueValidator(this.minimum, this.maximum);
-    final DoubleField minimumField = createDoubleField(this.minimumValueModel, this.minimumValidationModel, validator);
-    final DoubleField maximumField = createDoubleField(this.maximumValueModel, this.maximumValidationModel, validator);
+    final IObjectField<Double> minimumField = createDoubleField(
+        this.minimumValueModel,
+        this.minimumValidationModel,
+        validator);
+    final IObjectField<Double> maximumField = createDoubleField(
+        this.maximumValueModel,
+        this.maximumValidationModel,
+        validator);
     @SuppressWarnings("serial")
     final JPanel panel = new JPanel(new SpringLayout()) {
       @Override
@@ -254,16 +264,21 @@ public class DoubleIntervalField implements IObjectField<DoubleInterval> {
     return panel;
   }
 
-  private DoubleField createDoubleField(
+  private IObjectField<Double> createDoubleField(
       final IObjectModel<Double> valueModel,
       final IObjectModel<IValidationResult> validationModel,
       final ValueValidator validator) {
-    final DoubleObjectFieldConfigurationBuilder builder = new DoubleObjectFieldConfigurationBuilder();
-    builder.setModel(valueModel);
-    builder.setValidStateModel(validationModel);
-    builder.setValidator(validator);
-    builder.setToStringConverter(this.toStringFormater);
-    return new DoubleField(builder.build());
+    final DoubleFieldBuilder builder = new DoubleFieldBuilder()
+        .setModel(valueModel)
+        .setValidStateModel(validationModel)
+        .setValidator(validator)
+        .setToStringConverter(this.toStringFormater);
+    If.isTrue(Double.isFinite(this.stepSize)).excecute(
+        () -> builder.addSpinnerActions(
+            Double.isFinite(this.minimum) ? this.minimum : Double.NEGATIVE_INFINITY,
+            Double.isFinite(this.maximum) ? this.maximum : Double.POSITIVE_INFINITY,
+            this.stepSize));
+    return builder.build();
   }
 
   @Override

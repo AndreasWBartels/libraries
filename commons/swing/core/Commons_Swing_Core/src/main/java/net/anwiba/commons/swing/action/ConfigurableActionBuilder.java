@@ -27,6 +27,7 @@ import javax.swing.AbstractAction;
 
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.model.IBooleanDistributor;
+import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.utilities.factory.IFactory;
 
@@ -39,8 +40,13 @@ public class ConfigurableActionBuilder {
     return this;
   }
 
-  public ConfigurableActionBuilder setSelectedIcon(final IGuiIcon selectedIcon) {
-    this.configurationBuilder.setSelectedIcon(selectedIcon);
+  public ConfigurableActionBuilder setToolTipModel(final IObjectModel<String> toolTipModel) {
+    this.configurationBuilder.setToolTipModel(toolTipModel);
+    return this;
+  }
+
+  public ConfigurableActionBuilder setIconModel(final IObjectModel<IGuiIcon> iconModel) {
+    this.configurationBuilder.setIconModel(iconModel);
     return this;
   }
 

@@ -78,14 +78,14 @@ public final class Angle {
     return radian() * RHO_SEMI_CIRCLE;
   }
 
-  public Angle add(final Angle value) {
-    this.value += value.radian();
+  public Angle add(final Angle angle) {
+    this.value += angle.radian();
     this.value %= TWO_PI;
     return this;
   }
 
-  public Angle subtract(final Angle value) {
-    this.value -= value.radian();
+  public Angle subtract(final Angle angle) {
+    this.value -= angle.radian();
     this.value %= TWO_PI;
     return this;
   }

@@ -12,7 +12,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-default</artifactId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <scm>
@@ -26,6 +26,7 @@
     <module>Commons_Logging</module>
     <module>Commons_Lang</module>
     <module>Commons_Ensure</module>
+    <module>Commons_Reference</module>
     <module>Commons_Resource</module>
     <module>Commons_Utilities</module>
     <module>Commons_Message</module>

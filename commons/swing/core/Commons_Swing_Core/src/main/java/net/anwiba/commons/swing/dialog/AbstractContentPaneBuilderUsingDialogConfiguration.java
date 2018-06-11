@@ -69,12 +69,10 @@ public abstract class AbstractContentPaneBuilderUsingDialogConfiguration<T> exte
 
   @Override
   public IContentPaneBuilder getContentPaneBuilder() {
-    final IObjectModel<T> model = this.model;
-    final IPreferences preferences = this.preferences;
-    final DataState dataState = this.dataState;
-    return getContentPaneBuilder(preferences, dataState, model);
+    return getContentPaneBuilder(this.preferences, this.dataState, this.model);
   }
 
+  @SuppressWarnings("hiding")
   protected abstract IContentPaneBuilder getContentPaneBuilder(
       IPreferences preferences,
       DataState dataState,

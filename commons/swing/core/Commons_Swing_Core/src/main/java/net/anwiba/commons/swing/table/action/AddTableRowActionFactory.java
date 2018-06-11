@@ -30,13 +30,14 @@ import net.anwiba.commons.swing.action.IActionCustomization;
 import net.anwiba.commons.swing.icon.GuiIcons;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
+import net.anwiba.commons.swing.table.ObjectListTableMessages;
 
 public final class AddTableRowActionFactory<T> implements ITableActionFactory<T> {
   private final ITableActionClosure<T> closure;
   private IActionCustomization customization;
 
   public AddTableRowActionFactory(final ITableActionClosure<T> closure) {
-    this(new ActionCustomization(null, GuiIcons.LIST_ADD, "add"), closure); //$NON-NLS-1$
+    this(new ActionCustomization(null, GuiIcons.LIST_ADD, ObjectListTableMessages.add), closure);
   }
 
   public AddTableRowActionFactory(final IActionCustomization customization, final ITableActionClosure<T> closure) {

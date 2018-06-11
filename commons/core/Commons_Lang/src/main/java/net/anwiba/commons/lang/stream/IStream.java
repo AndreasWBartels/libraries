@@ -38,42 +38,42 @@ import net.anwiba.commons.lang.optional.IOptional;
 
 public interface IStream<T, E extends Exception> {
 
-  public IStream<T, E> distinct();
+  IStream<T, E> distinct();
 
-  public IStream<T, E> filter(IAcceptor<T> funtion);
+  IStream<T, E> filter(IAcceptor<T> funtion);
 
-  public <O> IStream<O, E> convert(IConverter<T, O, E> funtion);
+  <O> IStream<O, E> convert(IConverter<T, O, E> funtion);
 
-  public <O> IStream<O, E> convert(IAggregator<Integer, T, O, E> aggregator) throws E;
+  <O> IStream<O, E> flat(IConverter<T, Iterable<O>, E> funtion);
 
-  public IStream<T, E> call(IConsumer<T, E> consumer) throws E;
+  <O> IStream<O, E> convert(IAggregator<Integer, T, O, E> aggregator) throws E;
 
-  public Iterable<T> asIterable() throws E;
+  Iterable<T> asIterable() throws E;
 
-  public Collection<T> asCollection() throws E;
+  Collection<T> asCollection() throws E;
 
-  public <O> List<O> asList() throws E;
+  <O> List<O> asList() throws E;
 
-  public <K, V> Map<K, V> asMap(IFactory<T, K, E> keyFactrory, IFactory<T, V, E> valueFactrory) throws E;
+  <K, V> Map<K, V> asMap(IFactory<T, K, E> keyFactrory, IFactory<T, V, E> valueFactrory) throws E;
 
-  public IObjectList<T> asObjectList() throws E;
+  IObjectList<T> asObjectList() throws E;
 
-  public IOptional<T, E> first() throws E;
+  IOptional<T, E> first() throws E;
 
-  public IOptional<T, E> first(IAcceptor<T> acceptor) throws E;
+  IOptional<T, E> first(IAcceptor<T> acceptor) throws E;
 
-  public <O> IOptional<O, E> aggregate(O inital, IAggregator<O, T, O, E> aggregator) throws E;
+  <O> IOptional<O, E> aggregate(O inital, IAggregator<O, T, O, E> aggregator) throws E;
 
-  public void foreach(IConsumer<T, E> consumer) throws E;
+  IStream<T, E> foreach(IConsumer<T, E> consumer) throws E;
 
-  public void foreach(IAssimilator<Integer, T, E> assimilator) throws E;
+  IStream<T, E> foreach(IAssimilator<Integer, T, E> assimilator) throws E;
 
-  public <O> O[] asArray(IntFunction<O[]> function) throws E;
+  <O> O[] asArray(IntFunction<O[]> function) throws E;
 
-  public IStream<T, E> notNull();
+  IStream<T, E> notNull();
 
-  public IStream<T, E> revert() throws E;
+  IStream<T, E> revert() throws E;
 
-  public <O> IStream<O, E> instanceOf(Class<O> clazz);
+  <O> IStream<O, E> instanceOf(Class<O> clazz);
 
 }

@@ -42,6 +42,8 @@ public interface IImageContainer {
 
   IImageContainer scale(float factor);
 
+  IImageContainer invert();
+
   //  IImageContainer rotate(float factor);
   //
   //  IImageContainer rotate(float x, float y);
@@ -49,5 +51,13 @@ public interface IImageContainer {
   BufferedImage asBufferImage(int x, int y, int w, int h);
 
   BufferedImage asBufferImage(Rectangle rectangle);
+
+  int getNumberOfBands();
+
+  IImageContainer mapBands(int[] bandMapping);
+
+  IImageContainer toGrayScale();
+
+  int getColorSpaceType();
 
 }

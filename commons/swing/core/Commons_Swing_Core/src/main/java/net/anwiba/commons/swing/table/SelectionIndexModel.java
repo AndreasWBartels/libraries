@@ -21,7 +21,12 @@
  */
 package net.anwiba.commons.swing.table;
 
-import net.anwiba.commons.lang.functional.IAcceptor;
+import java.util.Iterator;
+
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.model.ISelectionListener;
 import net.anwiba.commons.model.ListenerList;
@@ -30,12 +35,6 @@ import net.anwiba.commons.model.SelectionModel;
 import net.anwiba.commons.utilities.interval.IntegerInterval;
 import net.anwiba.commons.utilities.interval.IntegerIterator;
 
-import java.util.Iterator;
-
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 public final class SelectionIndexModel<T> implements ISelectionIndexModel<T> {
   private final ListSelectionModel tableSelectionModel;
   private final ISortedRowMapper rowMapper;
@@ -43,9 +42,9 @@ public final class SelectionIndexModel<T> implements ISelectionIndexModel<T> {
   private final ListenerList<ISelectionListener<T>> listeners = new ListenerList<>();
 
   public SelectionIndexModel(
-    final ListSelectionModel tableSelectionModel,
-    final ISortedRowMapper rowMapper,
-    final SelectionModel<T> selectionModel) {
+      final ListSelectionModel tableSelectionModel,
+      final ISortedRowMapper rowMapper,
+      final SelectionModel<T> selectionModel) {
     this.tableSelectionModel = tableSelectionModel;
     this.rowMapper = rowMapper;
     this.selectionModel = selectionModel;
@@ -89,26 +88,18 @@ public final class SelectionIndexModel<T> implements ISelectionIndexModel<T> {
 
   @Override
   public void set(final int index) {
-    this.tableSelectionModel.setSelectionInterval(
-        this.rowMapper.getSortedRow(index),
-        this.rowMapper.getSortedRow(index));
+    this.tableSelectionModel
+        .setSelectionInterval(this.rowMapper.getSortedRow(index), this.rowMapper.getSortedRow(index));
   }
 
   @Override
   public Iterator<Integer> iterator() {
+    @SuppressWarnings("hiding")
     final ISortedRowMapper rowMapper = this.rowMapper;
-    final ListSelectionModel tableSelectionModel = this.tableSelectionModel;
-    final IntegerIterator integerIterator =
-        new IntegerIterator(
-            tableSelectionModel.getMinSelectionIndex(),
-            tableSelectionModel.getMaxSelectionIndex(),
-            new IAcceptor<Integer>() {
-
-              @Override
-              public boolean accept(final Integer value) {
-                return tableSelectionModel.isSelectedIndex(value.intValue());
-              }
-            });
+    final IntegerIterator integerIterator = new IntegerIterator(
+        this.tableSelectionModel.getMinSelectionIndex(),
+        this.tableSelectionModel.getMaxSelectionIndex(),
+        value -> this.tableSelectionModel.isSelectedIndex(value.intValue()));
     return new Iterator<Integer>() {
 
       private Integer value = null;

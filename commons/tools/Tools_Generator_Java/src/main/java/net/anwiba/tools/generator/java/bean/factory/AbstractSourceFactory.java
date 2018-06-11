@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -70,12 +70,11 @@ public class AbstractSourceFactory {
     }
   }
 
+  @SuppressWarnings("unchecked")
   Class<? extends java.lang.annotation.Annotation> getAnnotationClass(final String name) throws CreationException {
     try {
-      return (Class<? extends java.lang.annotation.Annotation>) this.codeModel
-          .getClass()
-          .getClassLoader()
-          .loadClass(name);
+      return (Class<? extends java.lang.annotation.Annotation>) this.codeModel.getClass().getClassLoader().loadClass(
+          name);
     } catch (final ClassNotFoundException exception) {
       throw new CreationException(exception.getMessage(), exception);
     }
@@ -96,6 +95,7 @@ public class AbstractSourceFactory {
 
           @Override
           public void annotations() throws CreationException {
+            @SuppressWarnings("unchecked")
             final List<Annotation> chAnnotations = (List<Annotation>) value;
             final JAnnotationArrayMember paramArray = annotate.paramArray(parameter.name());
             for (final Annotation parameter2 : chAnnotations) {
@@ -111,6 +111,7 @@ public class AbstractSourceFactory {
                 chAnnotation);
           }
 
+          @SuppressWarnings("rawtypes")
           @Override
           public void enumartation() {
             annotate.param(parameter.name(), (Enum) value);
@@ -172,7 +173,6 @@ public class AbstractSourceFactory {
     }
     final JClass[] classes = ArrayUtilities.convert(new IConverter<String, JClass, RuntimeException>() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public JClass convert(final String input) throws RuntimeException {
         return AbstractSourceFactory.this.codeModel.ref(input);
@@ -196,7 +196,6 @@ public class AbstractSourceFactory {
     }
     final JClass[] classes = ArrayUtilities.convert(new IConverter<String, JClass, RuntimeException>() {
 
-      @SuppressWarnings("synthetic-access")
       @Override
       public JClass convert(final String input) throws RuntimeException {
         return AbstractSourceFactory.this.codeModel.ref(input);

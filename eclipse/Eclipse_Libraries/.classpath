@@ -6,14 +6,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-ensure-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-lang-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-logging-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-message-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-model-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-thread-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-reflaction-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-resource-1.0.126.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/anwiba-commons-utilities-1.0.126.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

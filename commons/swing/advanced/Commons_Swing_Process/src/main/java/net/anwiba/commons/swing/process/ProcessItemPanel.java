@@ -21,12 +21,6 @@
  */
 package net.anwiba.commons.swing.process;
 
-import net.anwiba.commons.swing.icon.GuiIcons;
-import net.anwiba.commons.swing.utilities.GuiUtilities;
-import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
-import net.anwiba.commons.thread.cancel.CancelerProcess;
-import net.anwiba.commons.thread.process.IProcessManager;
-
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
@@ -38,6 +32,12 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SpringLayout;
 
+import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
+import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
+import net.anwiba.commons.thread.cancel.CancelerProcess;
+import net.anwiba.commons.thread.process.IProcessManager;
+
 public class ProcessItemPanel extends JPanel {
 
   public static final class CancelAction extends AbstractAction {
@@ -46,14 +46,15 @@ public class ProcessItemPanel extends JPanel {
     private final IProcessManager manager;
 
     public CancelAction(final IProcessManager manager, final ProcessContextModel model) {
-      super(null, model.isEnabled()
-          ? GuiIcons.CANCEL_ICON.getSmallIcon()
-          : GuiIcons.DISABLED_CANCEL_ICON.getSmallIcon());
+      super(
+          null,
+          model.isEnabled() ? GuiIcons.CANCEL_ICON.getSmallIcon() : GuiIcons.DISABLED_CANCEL_ICON.getSmallIcon());
       this.manager = manager;
       this.model = model;
       setEnabled(model.isEnabled());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void actionPerformed(final ActionEvent e) {
       if (!this.model.isEnabled()) {

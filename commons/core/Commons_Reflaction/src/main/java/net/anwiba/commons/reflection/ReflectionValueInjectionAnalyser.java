@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.reflection;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,11 +30,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.anwiba.commons.reflection.annotation.Injection;
+import net.anwiba.commons.reflection.annotation.Named;
 import net.anwiba.commons.reflection.annotation.Nullable;
+import net.anwiba.commons.reflection.binding.ClassBinding;
+import net.anwiba.commons.reflection.binding.NamedClassBinding;
 
 public class ReflectionValueInjectionAnalyser implements IReflectionValueInjectionAnalyser {
 
@@ -67,43 +72,71 @@ public class ReflectionValueInjectionAnalyser implements IReflectionValueInjecti
 
   @Override
   public <T> IInjektionAnalyserResult analyse(final Class<T> clazz) {
-    final Field[] fieldArray = clazz.getDeclaredFields();
-    final Constructor<T> constructor = this.injectableElementGetter.getConstructor(clazz);
-    final List<IInjektionAnalyserValueResult> results = new ArrayList<>();
-    for (final Parameter parameter : constructor.getParameters()) {
-      results.add(analyse(parameter));
-    }
-    for (final Field field : fieldArray) {
-      if (!this.injectableElementGetter.injectable(field)) {
-        continue;
+    try {
+      final Field[] fieldArray = clazz.getDeclaredFields();
+      final Constructor<T> constructor = this.injectableElementGetter.getConstructor(clazz);
+      final List<IInjektionAnalyserValueResult> results = new ArrayList<>();
+      for (final Parameter parameter : constructor.getParameters()) {
+        results.add(analyse(parameter));
       }
-      results.add(analyse(field));
+      for (final Field field : fieldArray) {
+        if (!this.injectableElementGetter.injectable(field)) {
+          continue;
+        }
+        results.add(analyse(field));
+      }
+      return InjektionAnalyserResult.create(clazz, results);
+    } catch (final IllegalStateException exception) {
+      throw new IllegalStateException(clazz.getName() + ", " + exception.getMessage(), exception); //$NON-NLS-1$
     }
-    return InjektionAnalyserResult.create(clazz, results);
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private IInjektionAnalyserValueResult analyse(final Parameter parameter) {
     final boolean isNullable = isNullable(parameter);
     final Class type = getType(parameter);
     final boolean isIterable = isIterable(type);
+    final String name = getName(null, parameter);
     if (isIterable) {
       final Class iterableType = getIterableType(parameter);
-      return new InjektionAnalyserValueResult(iterableType, isNullable, isIterable);
+      return new InjektionAnalyserValueResult(binding(iterableType, name), isNullable, isIterable);
     }
-    return new InjektionAnalyserValueResult(type, isNullable, isIterable);
+    return new InjektionAnalyserValueResult(binding(type, name), isNullable, isIterable);
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private IInjektionAnalyserValueResult analyse(final Field field) {
     final boolean isNullable = isNullable(field);
     final Class type = getType(field);
+    final String name = getName(field.getName(), field);
     final boolean isIterable = isIterable(type);
     if (isIterable) {
       final Class iterableType = getIterableType(field);
-      return new InjektionAnalyserValueResult(iterableType, isNullable, isIterable);
+      return new InjektionAnalyserValueResult(binding(iterableType, name), isNullable, isIterable);
     }
-    return new InjektionAnalyserValueResult(type, isNullable, isIterable);
+    return new InjektionAnalyserValueResult(binding(type, name), isNullable, isIterable);
+  }
+
+  private <T> IBinding<T> binding(final Class<T> clazz, final String name) {
+    return Optional.ofNullable(name).map(n -> (IBinding<T>) new NamedClassBinding<>(clazz, n)).orElseGet(
+        () -> new ClassBinding<>(clazz));
+  }
+
+  private String getName(final String name, final AnnotatedElement annotatedElement) {
+    return Optional
+        .ofNullable(annotatedElement.getAnnotation(Named.class))
+        .map(a -> a.value())
+        .map(s -> s.trim())
+        .map(n -> {
+          if (n.isEmpty()) {
+            if (name == null) {
+              throw new IllegalStateException("Missing annotation value"); //$NON-NLS-1$
+            }
+            return name;
+          }
+          return n;
+        })
+        .orElseGet(() -> null);
   }
 
   private boolean isNullable(final Parameter parameter) {

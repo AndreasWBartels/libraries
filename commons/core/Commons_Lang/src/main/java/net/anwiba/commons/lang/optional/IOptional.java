@@ -30,28 +30,28 @@ import net.anwiba.commons.lang.functional.ISupplier;
 
 public interface IOptional<T, E extends Exception> {
 
-  public IOptional<T, E> or(T value) throws E;
+  IOptional<T, E> or(T value) throws E;
 
-  public IOptional<T, E> or(IBlock<E> block) throws E;
+  IOptional<T, E> or(IBlock<E> block) throws E;
 
-  public IOptional<T, E> or(ISupplier<T, E> supplier) throws E;
+  IOptional<T, E> or(ISupplier<T, E> supplier) throws E;
 
-  public T get() throws E;
+  T get() throws E;
 
-  public IOptional<T, E> accept(IAcceptor<T> acceptor) throws E;
+  IOptional<T, E> accept(IAcceptor<T> acceptor) throws E;
 
-  public IOptional<T, E> consume(IConsumer<T, E> converter) throws E;
+  IOptional<T, E> consume(IConsumer<T, E> converter) throws E;
 
-  public <O> IOptional<O, E> convert(IConverter<T, O, E> converter) throws E;
+  <O> IOptional<O, E> convert(IConverter<T, O, E> converter) throws E;
 
-  public <O> IOptional<T, E> equals(IConverter<T, O, E> converter, O value) throws E;
+  <O> IOptional<T, E> equals(IConverter<T, O, E> converter, O value) throws E;
 
-  public <X extends Exception> T getOrThrow(ISupplier<X, E> supplier) throws X, E;
+  <X extends Exception> T getOrThrow(ISupplier<X, E> supplier) throws X, E;
 
   T getOr(ISupplier<T, E> supplier) throws E;
 
   boolean isAccepted();
 
-  public <O> IOptional<O, E> cast(Class<O> clazz);
+  <O> IOptional<O, E> instanceOf(Class<O> clazz);
 
 }

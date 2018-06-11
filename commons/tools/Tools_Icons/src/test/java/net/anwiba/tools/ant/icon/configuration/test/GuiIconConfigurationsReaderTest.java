@@ -17,17 +17,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.junit.Test;
+
 import net.anwiba.tools.icons.configuration.GuiIconConfigurationsReader;
 import net.anwiba.tools.icons.configuration.IImageExistsValidator;
 import net.anwiba.tools.icons.configuration.IOutput;
 import net.anwiba.tools.icons.configuration.IconResource;
 import net.anwiba.tools.icons.configuration.ImageExistsValidator;
 
-import org.junit.Test;
-
 public class GuiIconConfigurationsReaderTest {
 
-  @SuppressWarnings("boxing")
   @Test
   public void add() throws Exception {
     final IOutput output = new IOutput() {

@@ -10,7 +10,7 @@
   <parent>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
     <groupId>net.anwiba.spatial</groupId>
-    <version>1.0.126</version>
+    <version>1.0.140</version>
   </parent>
 
   <scm>
@@ -109,13 +109,27 @@
   <dependencies>
 
     <dependency>
+      <artifactId>jackson-annotations</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>anwiba-commons-logging</artifactId>
       <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-json</artifactId>
+    </dependency>
+    <dependency>
+      <artifactId>anwiba-commons-lang</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>anwiba-commons-reference</artifactId>
+      <groupId>net.anwiba.commons</groupId>
     </dependency>
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-utilities</artifactId>
+      <artifactId>anwiba-commons-json</artifactId>
     </dependency>
 
   </dependencies>

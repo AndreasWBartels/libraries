@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-// Copyright (c) 2010 by Andreas W. Bartels
+
 package net.anwiba.eclipse.icons.runner;
 
 import net.anwiba.commons.thread.cancel.ICanceler;

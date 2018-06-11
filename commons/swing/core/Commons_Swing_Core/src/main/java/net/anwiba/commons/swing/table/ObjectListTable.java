@@ -57,6 +57,7 @@ public class ObjectListTable<T> extends ObjectTable<T> {
                 configuration.getColumnClassProvider())));
     this.configuration = configuration;
     final FilterableObjectTableModel<T> tableModel = (FilterableObjectTableModel<T>) getTableModel();
+    @SuppressWarnings("hiding")
     final IObjectModel<IRowFilter> rowFilterModel = new ObjectModel<>();
     rowFilterModel.addChangeListener(new IChangeableObjectListener() {
 
@@ -83,7 +84,7 @@ public class ObjectListTable<T> extends ObjectTable<T> {
   @Override
   public JComponent getComponent() {
     if (this.configuration.isTextFieldEnable() || !this.configuration.getTextFieldActionConfiguration().isEmpty()) {
-      final StringFieldBuilder builder = new StringFieldBuilder().addClearAction("clear");
+      final StringFieldBuilder builder = new StringFieldBuilder().addClearAction(ObjectListTableMessages.clear);
 
       this.configuration.getTextFieldActionConfiguration().getFactories().forEach(
           f -> builder.addActionFactory(
@@ -111,6 +112,7 @@ public class ObjectListTable<T> extends ObjectTable<T> {
       final IObjectModel<String> model = stringField.getModel();
 
       if (this.configuration.isFilterable()) {
+        @SuppressWarnings("hiding")
         final IObjectModel<IRowFilter> rowFilterModel = getRowFilterModel();
         final IColumToStringConverter filterToStringConverter = this.configuration.getRowFilterToStringConverter();
         model.addChangeListener(() -> {
