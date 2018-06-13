@@ -5,14 +5,12 @@ This Repository contains libraries and tools developed for [JGISShell](https://g
 ## Author
 [Andreas W. Bartels](https://github.com/AndreasWBartels).
 
-## Tools
-
-### CKAN
+## CKAN
 * [Ckan JSON Beans](https://github.com/AndreasWBartels/libraries/wiki/Ckan)
 * [Ckan Query API](https://github.com/AndreasWBartels/libraries/wiki/Ckan)
 * [CKAN Search Dialog](https://github.com/AndreasWBartels/libraries/wiki/Swing-Ckan-Search-Dialog)
 
-### JSON
+## JSON
 * [JSSD](https://github.com/AndreasWBartels/libraries/wiki/JSSD)   
 Schemas and JSON serializer
   * [GeoJSON](https://github.com/AndreasWBartels/libraries/wiki/GeoJSON)
@@ -24,13 +22,13 @@ Schemas and JSON serializer
   * [TopoJson](https://github.com/AndreasWBartels/libraries/wiki/TopoJson)
   * [Ckan](https://github.com/AndreasWBartels/libraries/wiki/Ckan)
 
-### Swing
+## Swing
 * [Java preferences](https://github.com/AndreasWBartels/libraries/wiki/Swing-Java-Preferences)
 * [SQL Console](https://github.com/AndreasWBartels/libraries/wiki/Swing-SQL-Console)
 * [CKAN Search Dialog](https://github.com/AndreasWBartels/libraries/wiki/Swing-Ckan-Search-Dialog)
 * [Swing Icons](https://github.com/AndreasWBartels/libraries/wiki/Swing-Icons)
 
-### Eclipse
+## Eclipse
 * [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
   * [Eclipse Swing Icons Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Swing-Icons-Plugins)
   * [Eclipse Project Dependencies Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Project-Dependencies-Plugins)
