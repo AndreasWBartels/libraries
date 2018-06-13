@@ -2,9 +2,6 @@
 
 This Repository contains libraries and tools developed for [JGISShell](https://github.com/AndreasWBartels/JGISShell)
 
-## Author
-[Andreas W. Bartels](https://github.com/AndreasWBartels).
-
 ## CKAN
 * [Ckan JSON Beans](https://github.com/AndreasWBartels/libraries/wiki/Ckan)
 * [Ckan Query API](https://github.com/AndreasWBartels/libraries/wiki/Ckan)
@@ -32,6 +29,9 @@ Schemas and JSON serializer
 * [Eclipse Plugins](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Plugins)
   * [Eclipse Swing Icons Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Swing-Icons-Plugins)
   * [Eclipse Project Dependencies Plugin](https://github.com/AndreasWBartels/libraries/wiki/Eclipse-Project-Dependencies-Plugins)
+
+## Author
+[Andreas W. Bartels](https://github.com/AndreasWBartels).
 
 ## License
 
