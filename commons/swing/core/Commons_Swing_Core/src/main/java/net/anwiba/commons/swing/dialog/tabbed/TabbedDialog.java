@@ -45,7 +45,7 @@ import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.IAdditionalActionFactory;
 import net.anwiba.commons.swing.dialog.IDataStateListener;
 import net.anwiba.commons.swing.dialog.MessageDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.preference.IWindowPreferences;
 
 public class TabbedDialog extends MessageDialog {

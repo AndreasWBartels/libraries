@@ -72,9 +72,9 @@ public interface ICanceler extends Serializable {
 
   public void check() throws InterruptedException;
 
-  void addCancelerListener(ICancelerListener listner);
+  void addCancelerListener(ICancelerListener listener);
 
-  void removeCancelerListener(ICancelerListener listner);
+  void removeCancelerListener(ICancelerListener listener);
 
   default <T, E extends Exception> IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> watcherFactory() {
     return closure -> {

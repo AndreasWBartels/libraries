@@ -21,15 +21,41 @@
  */
 package net.anwiba.commons.logging;
 
-import java.util.logging.Level;
+import net.anwiba.commons.logging.java.LevelFactory;
 
+@SuppressWarnings("nls")
 public interface ILevel {
 
-  final static public Level ALL = Level.ALL;
-  final static public Level INFO = Level.INFO;
-  final static public Level WARNING = Level.WARNING;
-  final static public Level FATAL = Level.SEVERE;
-  final static public Level ERROR = LevelFactory.createLevel("ERROR", 1000); //$NON-NLS-1$
-  final static public Level DEBUG = LevelFactory.createLevel("DEBUG", 400); //$NON-NLS-1$
+  public static final class Level implements ILevel {
+
+    private final java.util.logging.Level level;
+
+    public Level(final java.util.logging.Level level) {
+      this.level = level;
+    }
+
+    @Override
+    public String getName() {
+      return level.getName();
+    }
+
+    @Override
+    public int intValue() {
+      return level.intValue();
+    }
+  }
+
+  final static public ILevel ALL = new Level(java.util.logging.Level.ALL);
+  final static public ILevel INFO = new Level(java.util.logging.Level.INFO);
+  final static public ILevel WARNING = new Level(java.util.logging.Level.WARNING);
+  final static public ILevel FATAL = new Level(java.util.logging.Level.SEVERE);
+  public static final ILevel SEVERE = new Level(java.util.logging.Level.SEVERE);
+  final static public ILevel ERROR = new Level(LevelFactory.createLevel("ERROR", 1000));
+  final static public ILevel DEBUG = new Level(LevelFactory.createLevel("DEBUG", 400));
+  public static final ILevel FINE = new Level(java.util.logging.Level.FINE);
+
+  public String getName();
+
+  public int intValue();
 
 }

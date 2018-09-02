@@ -26,6 +26,7 @@ import net.anwiba.spatial.coordinate.IEnvelope;
 import net.anwiba.spatial.coordinatereferencesystem.Authority;
 import net.anwiba.spatial.coordinatereferencesystem.ICoordinateReferenceSystem;
 import net.anwiba.spatial.coordinatereferencesystem.ICoordinateReferenceSystemConstants;
+import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.Accuracy;
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.Area;
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.Axis;
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.Datum;
@@ -91,19 +92,23 @@ public class CoordinateReferenceSystemUtilities {
     buffer.append(coordinateSystem.getName());
     buffer.append("\","); //$NON-NLS-1$
     buffer.append(createGeographicCoordinateSystemText(coordinateSystem.getGeographicCoordinateSystem(), isEnhanced));
-    buffer.append(","); //$NON-NLS-1$
     if (isEnhanced) {
-      buffer.append(createAreaText(coordinateSystem.getArea()));
+      final Area area = coordinateSystem.getArea();
+      if (area != null) {
+        buffer.append(", "); //$NON-NLS-1$
+        buffer.append(createAreaText(area));
+      }
     }
-    buffer.append(createProjectionText(coordinateSystem.getProjection()));
-    buffer.append(","); //$NON-NLS-1$
+    buffer.append(", "); //$NON-NLS-1$
+    buffer.append(createProjectionText(coordinateSystem.getProjection(), isEnhanced));
+    buffer.append(", "); //$NON-NLS-1$
     buffer.append(createParametersText(coordinateSystem.getParameters()));
     buffer.append(createUnitText(coordinateSystem.getUnit()));
     buffer.append(createExtensionsText(coordinateSystem.getExtensions()));
     buffer.append(createAxisesText(coordinateSystem.getAxises()));
     final Authority authority = coordinateSystem.getAuthority();
     if (authority != null) {
-      buffer.append(","); //$NON-NLS-1$
+      buffer.append(", "); //$NON-NLS-1$
       buffer.append(createAuthorityText(authority));
     }
     buffer.append("]"); //$NON-NLS-1$
@@ -127,7 +132,12 @@ public class CoordinateReferenceSystemUtilities {
     buffer.append(envelope.getMinimum().getYValue());
     buffer.append(", "); //$NON-NLS-1$
     buffer.append(envelope.getMaximum().getYValue());
-    buffer.append("],"); //$NON-NLS-1$
+    final Authority authority = area.getAuthority();
+    if (authority != null) {
+      buffer.append(", "); //$NON-NLS-1$
+      buffer.append(createAuthorityText(authority));
+    }
+    buffer.append("]"); //$NON-NLS-1$
     return buffer.toString();
   }
 
@@ -182,11 +192,24 @@ public class CoordinateReferenceSystemUtilities {
     return buffer.toString();
   }
 
-  private static String createProjectionText(final Projection projection) {
+  private static String createProjectionText(final Projection projection, final boolean isEnhanced) {
     final StringBuffer buffer = new StringBuffer();
     buffer.append("PROJECTION[\""); //$NON-NLS-1$
     buffer.append(projection.getPrintName());
-    buffer.append("\"]"); //$NON-NLS-1$
+    buffer.append("\""); //$NON-NLS-1$
+    if (isEnhanced) {
+      final Area area = projection.getArea();
+      if (area != null) {
+        buffer.append(", "); //$NON-NLS-1$
+        buffer.append(createAreaText(area));
+      }
+    }
+    final Authority authority = projection.getAuthority();
+    if (authority != null) {
+      buffer.append(", "); //$NON-NLS-1$
+      buffer.append(createAuthorityText(authority));
+    }
+    buffer.append("]"); //$NON-NLS-1$
     return buffer.toString();
   }
 
@@ -232,10 +255,14 @@ public class CoordinateReferenceSystemUtilities {
     buffer.append(coordinateSystem.getName());
     buffer.append("\", "); //$NON-NLS-1$
     buffer.append(createDatumText(coordinateSystem.getDatum(), isEnhanced));
-    buffer.append(", "); //$NON-NLS-1$
     if (isEnhanced) {
-      buffer.append(createAreaText(coordinateSystem.getArea()));
+      final Area area = coordinateSystem.getArea();
+      if (area != null) {
+        buffer.append(", "); //$NON-NLS-1$
+        buffer.append(createAreaText(area));
+      }
     }
+    buffer.append(", "); //$NON-NLS-1$
     buffer.append(createPrimeMeridanText(coordinateSystem.getPrimeMeridian()));
     buffer.append(", "); //$NON-NLS-1$
     buffer.append(createUnitText(coordinateSystem.getUnit()));
@@ -259,6 +286,13 @@ public class CoordinateReferenceSystemUtilities {
     if (datum.getToWgs84() != null) {
       buffer.append(", "); //$NON-NLS-1$
       buffer.append(createToWgs84Text(datum.getToWgs84(), isEnhanced));
+    }
+    if (isEnhanced) {
+      final Area area = datum.getArea();
+      if (area != null) {
+        buffer.append(", "); //$NON-NLS-1$
+        buffer.append(createAreaText(area));
+      }
     }
     final Authority authority = datum.getAuthority();
     if (authority != null) {
@@ -290,7 +324,12 @@ public class CoordinateReferenceSystemUtilities {
     final StringBuffer buffer = new StringBuffer();
     buffer.append("TOWGS84["); //$NON-NLS-1$
     if (isEnhanced) {
-      buffer.append(createAreaText(toWgs84.getArea()));
+      final String name = toWgs84.getName();
+      if (name != null) {
+        buffer.append("\""); //$NON-NLS-1$
+        buffer.append(name);
+        buffer.append("\", "); //$NON-NLS-1$
+      }
     }
     buffer.append(toWgs84.getDX());
     buffer.append(", "); //$NON-NLS-1$
@@ -305,6 +344,31 @@ public class CoordinateReferenceSystemUtilities {
     buffer.append(toWgs84.getRotZ());
     buffer.append(", "); //$NON-NLS-1$
     buffer.append(toWgs84.getSC());
+    if (isEnhanced) {
+      final Accuracy accuracy = toWgs84.getAccuracy();
+      if (accuracy != null) {
+        buffer.append(", "); //$NON-NLS-1$
+        buffer.append(createAccuracyText(accuracy));
+      }
+      final Area area = toWgs84.getArea();
+      if (area != null) {
+        buffer.append(", "); //$NON-NLS-1$
+        buffer.append(createAreaText(area));
+      }
+      final Authority authority = toWgs84.getAuthority();
+      if (authority != null) {
+        buffer.append(", "); //$NON-NLS-1$
+        buffer.append(createAuthorityText(authority));
+      }
+    }
+    buffer.append("]"); //$NON-NLS-1$
+    return buffer.toString();
+  }
+
+  private static Object createAccuracyText(final Accuracy accuracy) {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append("ACCURACY["); //$NON-NLS-1$
+    buffer.append(accuracy.getValue());
     buffer.append("]"); //$NON-NLS-1$
     return buffer.toString();
   }

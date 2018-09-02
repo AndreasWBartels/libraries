@@ -8,24 +8,24 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
- 
+
 package net.anwiba.spatial.geometry.internal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
+import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
 import net.anwiba.spatial.coordinate.Coordinate;
@@ -95,7 +95,7 @@ public class GeometryFactory implements IGeometryFactory {
   @Override
   public ILinearRing createLinearRing(final ICoordinateSequence sequence) {
     if (!sequence.isClosed() && sequence.getNumberOfCoordinates() > 2) {
-      logger.log(Level.WARNING, "Unclosed coordinate sequence for linear ring"); //$NON-NLS-1$
+      logger.log(ILevel.WARNING, "Unclosed coordinate sequence for linear ring"); //$NON-NLS-1$
       return new LinearRing(
           getCoordinateReferenceSystem(),
           CoordinateSequenceUtilities.concat(sequence, sequence.getCoordinateN(0)),

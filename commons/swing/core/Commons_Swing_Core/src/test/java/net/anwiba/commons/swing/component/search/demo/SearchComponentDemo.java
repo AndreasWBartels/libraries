@@ -48,7 +48,7 @@ import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.swing.component.search.ISearchEngine;
 import net.anwiba.commons.swing.component.search.SearchComponent;
 import net.anwiba.commons.swing.component.search.text.DocumentSearchEngine;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.string.IStringPart;
 import net.anwiba.commons.utilities.string.StringUtilities;

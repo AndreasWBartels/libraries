@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.dialog;
 
+import java.awt.Dialog;
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
@@ -61,7 +62,7 @@ public class DialogConfigurationBuilder {
   private String title = DialogMessages.Dialog;
   private IMessage message = null;
   private IGuiIcon icon = null;
-  private ModalityType modality = ModalityType.APPLICATION_MODAL;
+  private ModalityType modality = Dialog.DEFAULT_MODALITY_TYPE;
   private ModalExclusionType modalExclusionType;
   private boolean isMessagePanelEnabled = false;
   private boolean isResizeable = true;

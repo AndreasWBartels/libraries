@@ -22,7 +22,7 @@
 package net.anwiba.commons.swing.ui;
 
 import net.anwiba.commons.swing.dialog.DialogMessages;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

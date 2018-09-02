@@ -28,7 +28,7 @@ import javax.swing.Icon;
 import net.anwiba.commons.message.IMessageTypeVisitor;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.swing.icon.GuiIconSize;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 public class MessageTypeUI {
 

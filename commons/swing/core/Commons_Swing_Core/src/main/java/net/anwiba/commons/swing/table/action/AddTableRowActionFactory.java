@@ -27,7 +27,7 @@ import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.action.ActionCustomization;
 import net.anwiba.commons.swing.action.IActionCustomization;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
 import net.anwiba.commons.swing.table.ObjectListTableMessages;

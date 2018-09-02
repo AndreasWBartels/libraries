@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.table;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -93,6 +94,11 @@ public interface IObjectTableBuilder<T> {
       IFunction<T, LocalDateTime, RuntimeException> provider,
       int size);
 
+  IObjectTableBuilder<T> addSortableDurationColumn(
+      String string,
+      IFunction<T, Duration, RuntimeException> provider,
+      int size);
+
   IObjectTableBuilder<T> addSortableDoubleConfiguration(
       String title,
       IFunction<T, Double, RuntimeException> provider,
@@ -107,6 +113,8 @@ public interface IObjectTableBuilder<T> {
       String title,
       IFunction<T, Integer, RuntimeException> provider,
       int size);
+
+  IObjectTableBuilder<T> addSortableLongColumn(String title, IFunction<T, Long, RuntimeException> provider, int size);
 
   IObjectTableBuilder<T> addEditableStringColumn(
       String title,

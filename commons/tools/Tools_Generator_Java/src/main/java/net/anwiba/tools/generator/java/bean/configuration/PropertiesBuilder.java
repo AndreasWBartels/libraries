@@ -46,7 +46,6 @@ public class PropertiesBuilder {
   private final String namesGetterMethodName = GET_NAMES;
   private final String valueGetterMethodName = GET_VALUE;
   private boolean isImutable = false;
-  private String injectionAnnotationName = null;
 
   PropertiesBuilder(final Type type, final String name) {
     this.type = type;
@@ -59,8 +58,6 @@ public class PropertiesBuilder {
         this.isSetterEnabled,
         this.singleValueEnabled,
         true,
-        this.injectionAnnotationName != null,
-        this.injectionAnnotationName,
         this.setterAnnotations,
         new Argument(this.name, new ArrayList<Annotation>(), this.type),
         new HashMap<String, List<Annotation>>());
@@ -165,9 +162,5 @@ public class PropertiesBuilder {
 
   public void setNamedValueGetterEnabled(final boolean namedValueGetterEnabled) {
     this.namedValueGetterEnabled = namedValueGetterEnabled;
-  }
-
-  public void setInjectionAnnotationName(final String injectionAnnotationName) {
-    this.injectionAnnotationName = injectionAnnotationName;
   }
 }

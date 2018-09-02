@@ -27,7 +27,7 @@ import javax.swing.AbstractAction;
 
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.dialog.DialogMessages;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.process.IProcessMessageContext;
 import net.anwiba.commons.swing.process.ProcessMessageContextTableModel;
 import net.anwiba.commons.swing.utilities.GuiUtilities;

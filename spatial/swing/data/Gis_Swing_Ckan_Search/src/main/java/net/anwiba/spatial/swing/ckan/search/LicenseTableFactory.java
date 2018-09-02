@@ -27,6 +27,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
@@ -35,6 +36,8 @@ import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.IResultProducer;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.action.ActionProcedurBuilder;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
@@ -76,29 +79,38 @@ public final class LicenseTableFactory {
         .addSortableStringColumn(Messages.name, value -> CkanUtilities.toString(value), columnWitdh)
         .addActionFactory(
             (tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> new ConfigurableActionBuilder()
-                .setIcon(net.anwiba.commons.swing.icon.GuiIcons.EDIT_ICON)
+                .setIcon(net.anwiba.commons.swing.icons.GuiIcons.EDIT_ICON)
                 .setProcedure(createSelectTagActionProcedure(description, preferences, licenses, tableModel))
                 .build())
         .addRemoveObjectsAction()
+        .addActionFactory((tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> {
+          final IBooleanModel enabledModel = new BooleanModel(!tableModel.isEmpty());
+          tableModel.addTableModelListener(e -> enabledModel.set(!tableModel.isEmpty()));
+          return new ConfigurableActionBuilder()
+              .setIcon(net.anwiba.commons.swing.icons.GuiIcons.EDIT_CLEAR_LIST)
+              .setEnabledDistributor(enabledModel)
+              .setProcedure(component -> tableModel.removeAll())
+              .build();
+        })
         .build();
   }
 
   private IActionProcedure createSelectTagActionProcedure(
       final IHttpConnectionDescription description,
       final IPreferences preferences,
-      final List<License> tags,
+      final List<License> licenses,
       final IObjectTableModel<License> tableModel) {
     return new ActionProcedurBuilder<List<License>, List<License>>().setInitializer(parentComponent -> {
       try {
         return new ProgressDialogLauncher<>((progressMonitor, canceler) -> {
-          if (tags.isEmpty()) {
+          if (licenses.isEmpty()) {
             getValues(canceler, description)
                 .stream()
                 .filter(s1 -> s1 != null)
                 .sorted((o1, o2) -> CkanUtilities.toString(o1).compareTo(CkanUtilities.toString(o2)))
-                .forEachOrdered(s2 -> tags.add(s2));
+                .forEachOrdered(s2 -> licenses.add(s2));
           }
-          return tags;
+          return licenses;
         }).launch(parentComponent);
       } catch (final InterruptedException exception1) {
         return null;
@@ -153,6 +165,11 @@ public final class LicenseTableFactory {
     try (final IObjectRequestExecutor<LicenseListResultResponse> executor = this.requestExecutorBuilderFactory
         .<LicenseListResultResponse> create()
         .setResultProducer(responseProducer)
+        .addResultProducer(
+            (statusCode, contentType) -> new HashSet<>(Arrays.asList(409, 400, 500)).contains(statusCode)
+                && contentType != null
+                && contentType.startsWith("application/json"), //$NON-NLS-1$
+            responseProducer)
         .build()) {
       final LicenseListResultResponse response = executor.execute(canceler, request);
       return response.isSuccess() ? Arrays.asList(response.getResult()) : Collections.emptyList();

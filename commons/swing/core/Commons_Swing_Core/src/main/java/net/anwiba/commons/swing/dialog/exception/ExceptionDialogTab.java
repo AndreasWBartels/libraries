@@ -24,7 +24,7 @@ package net.anwiba.commons.swing.dialog.exception;
 import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.swing.dialog.DialogMessages;
 import net.anwiba.commons.swing.dialog.tabbed.AbstractDialogTab;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -34,17 +34,17 @@ public final class DemoWizardController extends AbstractWizardController {
         Arrays.asList(
             new DemoWizardPage(
                 "First", //$NON-NLS-1$
-                net.anwiba.commons.swing.icon.GuiIcons.DB_ICON.getMediumIcon(),
+                net.anwiba.commons.swing.icons.GuiIcons.DB_ICON.getMediumIcon(),
                 false,
                 DataState.UNKNOWN),
             new DemoWizardPage(
                 "Second", //$NON-NLS-1$
-                net.anwiba.commons.swing.icon.GuiIcons.TASKBAR_ICON.getMediumIcon(),
+                net.anwiba.commons.swing.icons.GuiIcons.TASKBAR_ICON.getMediumIcon(),
                 true,
                 DataState.UNKNOWN),
             new DemoWizardPage(
                 "Third", //$NON-NLS-1$
-                net.anwiba.commons.swing.icon.GuiIcons.SERVICE_ICON.getMediumIcon(),
+                net.anwiba.commons.swing.icons.GuiIcons.SERVICE_ICON.getMediumIcon(),
                 true,
                 DataState.VALIDE)),
         new ObjectModel<>());

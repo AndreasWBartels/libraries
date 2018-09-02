@@ -42,7 +42,8 @@ public final class IteratorFilteringIterator<T, E extends Exception> implements 
   public boolean hasNext() throws E {
     while (this.iterator.hasNext()) {
       final T i = this.iterator.next();
-      if (this.acceptor.accept(i) && (this.item = i) != null) {
+      if (this.acceptor.accept(i) && i != null) {
+        this.item = i;
         return true;
       }
     }

@@ -64,6 +64,7 @@ public class ObjectTableConfigurationBuilder<T> {
         -1,
         this.selectionMode,
         this.preferredVisibleRowCount,
+        null,
         this.columnConfigurations,
         this.mouseListenerFactory,
         this.keyListenerFactory,

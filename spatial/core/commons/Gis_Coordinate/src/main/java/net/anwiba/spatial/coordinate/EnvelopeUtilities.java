@@ -8,18 +8,17 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
- 
 package net.anwiba.spatial.coordinate;
 
 import java.util.Arrays;
@@ -113,17 +112,7 @@ public class EnvelopeUtilities {
   }
 
   public static IEnvelope moveCenterTo(final IEnvelope envelope, final ICoordinate coordinate) {
-    final double[] center = coordinate.getValues();
-    final double[] oldMin = envelope.getMinimum().getValues();
-    final double[] oldMax = envelope.getMaximum().getValues();
-    final double[] min = new double[oldMin.length];
-    final double[] max = new double[oldMax.length];
-    for (int i = 0; i < 2; i++) {
-      final double dist = (oldMax[i] - oldMin[i]) * 0.5;
-      min[i] = center[i] - dist;
-      max[i] = center[i] + dist;
-    }
-    return new Envelope(min, max, false);
+    return new TargetEnvelopeCalculator(3, 0.05).moveCenterTo(envelope, coordinate);
   }
 
   public static IEnvelope calculateTargetEnvelope(
@@ -131,24 +120,8 @@ public class EnvelopeUtilities {
       final IEnvelope maximalEnvelope,
       final IEnvelope objectEnvelope,
       final boolean isMoveEnabled) {
-    final IEnvelope targetEnvelope = scale(objectEnvelope, 3);
-    if (currentEnvelope.contains(objectEnvelope)) {
-      if (!isMoveEnabled
-          && currentEnvelope.getWidth() * 0.05 > objectEnvelope.getWidth()
-          && currentEnvelope.getHeight() * 0.05 > objectEnvelope.getHeight()) {
-        return targetEnvelope;
-      }
-      return currentEnvelope;
-    }
-    if (isMoveEnabled) {
-      return moveCenterTo(currentEnvelope, objectEnvelope.getCenterCoordinate());
-    }
-    if (!isNullEnvelope(maximalEnvelope)
-        && (targetEnvelope.getWidth() > maximalEnvelope.getWidth()
-            || (targetEnvelope.getHeight() > maximalEnvelope.getWidth()) && maximalEnvelope.contains(objectEnvelope))) {
-      return maximalEnvelope;
-    }
-    return targetEnvelope;
+    return new TargetEnvelopeCalculator(3, 0.05)
+        .calculate(currentEnvelope, maximalEnvelope, objectEnvelope, isMoveEnabled);
   }
 
   public static boolean isInfinity(final IEnvelope envelope) {

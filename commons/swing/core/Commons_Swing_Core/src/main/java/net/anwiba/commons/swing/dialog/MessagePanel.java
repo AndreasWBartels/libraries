@@ -32,7 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class MessagePanel extends JPanel {

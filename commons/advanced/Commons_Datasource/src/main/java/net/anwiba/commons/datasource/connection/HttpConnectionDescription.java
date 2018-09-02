@@ -47,4 +47,13 @@ public class HttpConnectionDescription extends AbstractHttpConnectionDescription
     return new ResourceReferenceFactory().create(getURI());
   }
 
+  @Override
+  public String toString() {
+    return toString(getFormat());
+  }
+
+  @Override
+  public String getFormat() {
+    return "Web"; //$NON-NLS-1$
+  }
 }

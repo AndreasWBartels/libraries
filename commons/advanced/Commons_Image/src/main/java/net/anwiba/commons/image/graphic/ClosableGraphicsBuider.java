@@ -37,8 +37,13 @@ public class ClosableGraphicsBuider {
   private final Object strokeControl;
   private final Object textAntialiasing;
   private final Object textLcdContrast;
+  private boolean dispose = true;
 
   public ClosableGraphicsBuider(final Graphics2D graphics) {
+    this(graphics, new RenderingHints(null));
+  }
+
+  public ClosableGraphicsBuider(final Graphics2D graphics, final RenderingHints hints) {
     this.graphics = graphics;
     this.antiAliasing = graphics.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
     this.alphaInterpolation = graphics.getRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION);
@@ -50,10 +55,12 @@ public class ClosableGraphicsBuider {
     this.strokeControl = graphics.getRenderingHint(RenderingHints.KEY_STROKE_CONTROL);
     this.textAntialiasing = graphics.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
     this.textLcdContrast = graphics.getRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST);
+    hints.forEach((k, v) -> graphics.setRenderingHint((RenderingHints.Key) k, v));
   }
 
   public IClosableGraphics build() {
     return new ClosableGraphics(
+        this.dispose,
         this.graphics,
         this.antiAliasing,
         this.alphaInterpolation,
@@ -65,6 +72,11 @@ public class ClosableGraphicsBuider {
         this.strokeControl,
         this.textAntialiasing,
         this.textLcdContrast);
+  }
+
+  public ClosableGraphicsBuider setDispose(final boolean dispose) {
+    this.dispose = dispose;
+    return this;
   }
 
   public ClosableGraphicsBuider setFractionalmetricsDefault() {

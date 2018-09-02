@@ -18,7 +18,7 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.140</version>
+    <version>1.0.154</version>
   </parent>
 
   <modules>
@@ -38,7 +38,7 @@
           <licenseName>lgpl_v2_1</licenseName>
           <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
           <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
-          <projectName>anwiba commons core</projectName>
+          <projectName>anwiba commons</projectName>
           <roots>
             <root>src/main/java</root>
             <root>src/test/java</root>

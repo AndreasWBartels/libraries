@@ -57,6 +57,7 @@ public class Messages extends NLS {
   public static String tag_query_faild;
   public static String tags;
   public static String title;
+  public static String publisher;
 
   static {
     NLS.initializeMessages(Messages.class);

@@ -25,6 +25,7 @@ package net.anwiba.spatial.coordinatereferencesystem.coordinatesystem;
 import java.io.Serializable;
 
 import net.anwiba.commons.lang.object.ObjectUtilities;
+import net.anwiba.spatial.coordinatereferencesystem.Authority;
 
 public class ToWgs84 implements Serializable {
 
@@ -54,6 +55,12 @@ public class ToWgs84 implements Serializable {
 
   private final Area area;
 
+  private final String name;
+
+  private final Authority authority;
+
+  private final Accuracy accuracy;
+
   public ToWgs84(
       final double dx,
       final double dy,
@@ -62,7 +69,7 @@ public class ToWgs84 implements Serializable {
       final double roty,
       final double rotz,
       final double sc) {
-    this(null, dx, dy, dz, rotx, roty, rotz, sc);
+    this(null, null, null, null, dx, dy, dz, rotx, roty, rotz, sc);
   }
 
   public ToWgs84(
@@ -74,6 +81,24 @@ public class ToWgs84 implements Serializable {
       final double roty,
       final double rotz,
       final double sc) {
+    this(null, null, null, area, dx, dy, dz, rotx, roty, rotz, sc);
+  }
+
+  public ToWgs84(
+      final Authority authority,
+      final String name,
+      final Accuracy accuracy,
+      final Area area,
+      final double dx,
+      final double dy,
+      final double dz,
+      final double rotx,
+      final double roty,
+      final double rotz,
+      final double sc) {
+    this.authority = authority;
+    this.name = name;
+    this.accuracy = accuracy;
     this.area = area;
     this.dx = dx;
     this.dy = dy;
@@ -82,6 +107,10 @@ public class ToWgs84 implements Serializable {
     this.roty = roty;
     this.rotz = rotz;
     this.sc = sc;
+  }
+
+  public String getName() {
+    return this.name;
   }
 
   public Area getArea() {
@@ -114,6 +143,14 @@ public class ToWgs84 implements Serializable {
 
   public double getSC() {
     return this.sc;
+  }
+
+  public Accuracy getAccuracy() {
+    return this.accuracy;
+  }
+
+  public Authority getAuthority() {
+    return this.authority;
   }
 
   @Override

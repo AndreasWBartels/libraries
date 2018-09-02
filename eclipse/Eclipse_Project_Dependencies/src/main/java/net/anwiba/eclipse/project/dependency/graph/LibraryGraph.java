@@ -34,11 +34,11 @@ import java.util.Set;
 
 public final class LibraryGraph {
 
-  Map<String, String> labelToId = new HashMap<>();
-  Map<String, String> idToLabel = new HashMap<>();
-  Map<String, LibraryType> idToType = new HashMap<>();
-  Map<String, List<String>> graph = new HashMap<>();
-  int counter = 0;
+  final private Map<String, String> labelToId = new HashMap<>();
+  final private Map<String, String> idToLabel = new HashMap<>();
+  final private Map<String, LibraryType> idToType = new HashMap<>();
+  final private Map<String, List<String>> graph = new HashMap<>();
+  private int counter = 0;
 
   public LibraryGraph addNode(final ILibrary item) {
     if (this.labelToId.containsKey(item.getName())) {

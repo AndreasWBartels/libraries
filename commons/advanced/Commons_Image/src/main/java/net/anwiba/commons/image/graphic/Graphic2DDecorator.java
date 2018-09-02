@@ -22,11 +22,17 @@
 package net.anwiba.commons.image.graphic;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 public class Graphic2DDecorator extends AbstractGraphics {
 
   public Graphic2DDecorator(final Graphics2D graphics) {
+    this(graphics, new RenderingHints(null));
+  }
+
+  public Graphic2DDecorator(final Graphics2D graphics, final RenderingHints hints) {
     super(graphics);
+    hints.forEach((k, v) -> graphics.setRenderingHint((RenderingHints.Key) k, v));
   }
 
 }

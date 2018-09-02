@@ -46,6 +46,8 @@ import net.anwiba.commons.swing.table.action.MoveTableRowDownActionFactory;
 import net.anwiba.commons.swing.table.action.MoveTableRowUpActionFactory;
 import net.anwiba.commons.swing.table.action.RemoveTableRowActionFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
+import net.anwiba.commons.utilities.string.IStringSubstituter;
+import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class ObjectListTableConfigurationBuilder<T> {
 
@@ -59,6 +61,7 @@ public class ObjectListTableConfigurationBuilder<T> {
   private IKeyListenerFactory<T> keyListenerFactory;
   private IColumToStringConverter columnToStringConverter;
   private int autoRizeMode = -1;
+  private IStringSubstituter toolTipSubstituter = s -> StringUtilities.substitute(s, 8, 120);
 
   public ObjectListTableConfigurationBuilder<T> setKeyListenerFactory(final IKeyListenerFactory<T> keyListenerFactory) {
     this.keyListenerFactory = keyListenerFactory;
@@ -123,6 +126,7 @@ public class ObjectListTableConfigurationBuilder<T> {
     final ITableTextFieldActionConfiguration<T> textFieldActionConfiguration = new TableTextFieldActionConfiguration<>(
         this.textFieldActionFactories);
     return new ObjectListTableConfiguration<>(
+        this.toolTipSubstituter,
         this.columnToStringConverter,
         this.autoRizeMode,
         this.selectionMode,
@@ -213,6 +217,11 @@ public class ObjectListTableConfigurationBuilder<T> {
 
   public ObjectListTableConfigurationBuilder<T> setAutoResizeModeOff() {
     this.autoRizeMode = JTable.AUTO_RESIZE_OFF;
+    return this;
+  }
+
+  final ObjectListTableConfigurationBuilder<T> setToolTipSubstituter(final IStringSubstituter stringSubstituter) {
+    this.toolTipSubstituter = stringSubstituter;
     return this;
   }
 

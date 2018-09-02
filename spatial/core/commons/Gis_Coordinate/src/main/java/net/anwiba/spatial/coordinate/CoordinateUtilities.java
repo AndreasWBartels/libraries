@@ -88,8 +88,7 @@ public class CoordinateUtilities {
       final ICoordinate c0,
       final ICoordinate c1,
       final double s,
-      final double r)
-      throws CoordinateCalculationException {
+      final double r) {
     return new SmallPointCalculator(c0, c1).calculate(s, r);
   }
 

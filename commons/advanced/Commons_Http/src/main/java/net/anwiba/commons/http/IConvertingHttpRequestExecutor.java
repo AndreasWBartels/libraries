@@ -22,6 +22,7 @@
 package net.anwiba.commons.http;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -30,7 +31,7 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
   <T> T execute(
       ICanceler cancelable,
       IRequest request,
-      IResultProducer<T> resultProducer,
+      IApplicableResultProducer<T> resultProducer,
       IApplicableHttpResponseExceptionFactory... exceptionFactories)
       throws InterruptedException,
       HttpServerException,
@@ -40,12 +41,43 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
   <T> T execute(
       ICanceler cancelable,
       IRequest request,
-      IResultProducer<T> resultProducer,
+      IApplicableResultProducer<T> resultProducer,
       IResultProducer<IOException> errorProducer)
       throws InterruptedException,
       HttpServerException,
       HttpRequestException,
       IOException;
+
+  default <T> T execute(
+      final ICanceler cancelable,
+      final IRequest request,
+      final IResultProducer<T> resultProducer,
+      final IResultProducer<IOException> errorProducer)
+      throws InterruptedException,
+      HttpServerException,
+      HttpRequestException,
+      IOException {
+    return execute(cancelable, request, new IApplicableResultProducer<T>() {
+
+      @Override
+      public T execute(
+          final ICanceler canceler,
+          final int statusCode,
+          final String statusMessage,
+          final String contentType,
+          final String contentEncoding,
+          final InputStream inputStream)
+          throws IOException,
+          InterruptedException {
+        return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
+      }
+
+      @Override
+      public boolean isApplicable(final int statusCode, final String contentType) {
+        return statusCode >= 200 && statusCode < 300;
+      }
+    }, errorProducer);
+  }
 
   @Override
   void close() throws IOException;

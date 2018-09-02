@@ -31,7 +31,7 @@ import javax.swing.Icon;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.swing.icon.GuiIconDecorator;
 import net.anwiba.commons.swing.icon.GuiIconSize;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.swing.process.IProcessMessageContext;
 import net.anwiba.commons.swing.process.IProcessMessageListener;

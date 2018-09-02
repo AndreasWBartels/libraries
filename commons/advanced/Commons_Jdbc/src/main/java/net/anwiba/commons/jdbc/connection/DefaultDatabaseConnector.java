@@ -25,8 +25,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import net.anwiba.commons.jdbc.DatabaseUtilities;
-
 public class DefaultDatabaseConnector implements IRegisterableDatabaseConnector {
 
   private static final int TIMEOUT = 10;
@@ -55,15 +53,26 @@ public class DefaultDatabaseConnector implements IRegisterableDatabaseConnector 
       final boolean isReadOnly)
       throws SQLException {
     if (timeout == -1) {
-      return DatabaseUtilities.createConnection(url, userName, password, isReadOnly);
+      return createConnection(url, userName, password, isReadOnly);
     }
     final int loginTimeout = DriverManager.getLoginTimeout();
     try {
       DriverManager.setLoginTimeout(timeout);
-      return DatabaseUtilities.createConnection(url, userName, password, isReadOnly);
+      return createConnection(url, userName, password, isReadOnly);
     } finally {
       DriverManager.setLoginTimeout(loginTimeout);
     }
+  }
+
+  private Connection createConnection(
+      final String url,
+      final String user,
+      final String password,
+      final boolean isReadOnly)
+      throws SQLException {
+    final Connection connection = DriverManager.getConnection(url, user, password);
+    connection.setReadOnly(isReadOnly);
+    return connection;
   }
 
   @Override

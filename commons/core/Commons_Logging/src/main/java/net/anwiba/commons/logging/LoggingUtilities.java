@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -44,6 +44,8 @@ import java.util.logging.SimpleFormatter;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
+
+import net.anwiba.commons.logging.java.JavaLogging;
 
 public class LoggingUtilities {
 
@@ -189,7 +191,7 @@ public class LoggingUtilities {
       final SimpleFormatter formatter = new SimpleFormatter();
       final Handler[] handlers = createHandler(properties, formatter);
       final String levelName = (String) properties.get(LEVEL);
-      initializeLogger(levelName == null ? ILevel.DEBUG : Level.parse(levelName), handlers);
+      initializeLogger(levelName == null ? JavaLogging.create(ILevel.DEBUG) : Level.parse(levelName), handlers);
       final ILogger logger = Logging.getLogger(LoggingUtilities.class.getName());
       logger.log(ILevel.DEBUG, "initialized logging by file " + propertiesFileName); //$NON-NLS-1$
       logger.log(ILevel.DEBUG, "for file " + properties.getProperty("log4j.appender.file.File", "none")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

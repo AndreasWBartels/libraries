@@ -45,22 +45,22 @@ public class Logging {
       return new ILogger() {
 
         @Override
-        public void log(final Level level, final String message, final Throwable throwable) {
+        public void log(final ILevel level, final String message, final Throwable throwable) {
           // nothing to do
         }
 
         @Override
-        public void log(final Level level, final String message) {
+        public void log(final ILevel level, final String message) {
           // nothing to do
         }
 
         @Override
-        public boolean isLoggable(final Level level) {
+        public boolean isLoggable(final ILevel level) {
           return false;
         }
 
         @Override
-        public void log(final Level level, final IMessageFactory messageFactory) {
+        public void log(final ILevel level, final IMessageFactory messageFactory) {
           // nothing to do
         }
       };

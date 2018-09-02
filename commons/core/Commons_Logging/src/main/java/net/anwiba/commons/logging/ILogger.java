@@ -21,16 +21,14 @@
  */
 package net.anwiba.commons.logging;
 
-import java.util.logging.Level;
-
 public interface ILogger {
 
-  void log(Level level, IMessageFactory messageFactory);
+  void log(ILevel level, IMessageFactory messageFactory);
 
-  void log(Level level, String message);
+  void log(ILevel level, String message);
 
-  void log(Level level, String message, Throwable throwable);
+  void log(ILevel level, String message, Throwable throwable);
 
-  boolean isLoggable(Level level);
+  boolean isLoggable(ILevel level);
 
 }

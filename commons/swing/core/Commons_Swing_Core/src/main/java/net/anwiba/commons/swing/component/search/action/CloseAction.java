@@ -22,7 +22,7 @@
 package net.anwiba.commons.swing.component.search.action;
 
 import net.anwiba.commons.lang.functional.IProcedure;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

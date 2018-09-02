@@ -22,6 +22,8 @@
 
 package net.anwiba.commons.lang.optional;
 
+import java.util.Optional;
+
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConsumer;
@@ -30,28 +32,44 @@ import net.anwiba.commons.lang.functional.ISupplier;
 
 public interface IOptional<T, E extends Exception> {
 
-  IOptional<T, E> or(T value) throws E;
+  IOptional<T, E> or(T value);
 
-  IOptional<T, E> or(IBlock<E> block) throws E;
+  IOptional<T, E> or(IBlock<E> block);
 
-  IOptional<T, E> or(ISupplier<T, E> supplier) throws E;
+  IOptional<T, E> or(ISupplier<T, E> supplier);
+
+  IOptional<T, E> failed(ISupplier<T, E> supplier);
+
+  IOptional<T, E> failed(IConverter<E, T, E> value);
+
+  IOptional<T, E> accept(IAcceptor<T> acceptor);
+
+  IOptional<T, E> consume(IConsumer<T, E> converter);
+
+  <O> IOptional<O, E> convert(IConverter<T, O, E> converter);
+
+  <O> IOptional<T, E> equals(IConverter<T, O, E> converter, O value);
+
+  <O> IOptional<O, E> instanceOf(Class<O> clazz);
 
   T get() throws E;
 
-  IOptional<T, E> accept(IAcceptor<T> acceptor) throws E;
+  T getObject() throws IllegalStateException;
 
-  IOptional<T, E> consume(IConsumer<T, E> converter) throws E;
+  E getCause() throws IllegalStateException;
 
-  <O> IOptional<O, E> convert(IConverter<T, O, E> converter) throws E;
-
-  <O> IOptional<T, E> equals(IConverter<T, O, E> converter, O value) throws E;
+  Optional<T> toOptional();
 
   <X extends Exception> T getOrThrow(ISupplier<X, E> supplier) throws X, E;
+
+  <X extends Exception> T getOrThrow(IConverter<E, X, X> supplier) throws X;
 
   T getOr(ISupplier<T, E> supplier) throws E;
 
   boolean isAccepted();
 
-  <O> IOptional<O, E> instanceOf(Class<O> clazz);
+  boolean isSuccessful();
+
+  boolean contains(T other);
 
 }

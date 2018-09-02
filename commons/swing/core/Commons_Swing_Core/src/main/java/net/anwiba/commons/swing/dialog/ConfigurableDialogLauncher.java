@@ -23,7 +23,6 @@
 package net.anwiba.commons.swing.dialog;
 
 import java.awt.Component;
-import java.awt.Dialog.ModalExclusionType;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Window;
@@ -187,13 +186,28 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
     return model.get();
   }
 
-  public ConfigurableDialogLauncher setApplicationModalExclusionType() {
-    this.dialogConfigurationBuilder.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+  //  public ConfigurableDialogLauncher setApplicationModalExclusionType() {
+  //    this.dialogConfigurationBuilder.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+  //    return this;
+  //  }
+  //
+  //  public ConfigurableDialogLauncher setNoModalExclusionType() {
+  //    this.dialogConfigurationBuilder.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+  //    return this;
+  //  }
+
+  public ConfigurableDialogLauncher setApplicationModality() {
+    this.dialogConfigurationBuilder.setModality(ModalityType.APPLICATION_MODAL);
     return this;
   }
 
-  public ConfigurableDialogLauncher setNoModalExclusionType() {
-    this.dialogConfigurationBuilder.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+  public ConfigurableDialogLauncher setDocumentModality() {
+    this.dialogConfigurationBuilder.setModality(ModalityType.DOCUMENT_MODAL);
+    return this;
+  }
+
+  public ConfigurableDialogLauncher setToolkitModality() {
+    this.dialogConfigurationBuilder.setModality(ModalityType.TOOLKIT_MODAL);
     return this;
   }
 

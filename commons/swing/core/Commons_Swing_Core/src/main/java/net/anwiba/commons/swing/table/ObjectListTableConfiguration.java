@@ -29,6 +29,7 @@ import net.anwiba.commons.swing.table.action.ITableTextFieldActionConfiguration;
 import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.utilities.collection.ListUtilities;
+import net.anwiba.commons.utilities.string.IStringSubstituter;
 
 public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
     implements
@@ -42,6 +43,7 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
   private ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory;
 
   public ObjectListTableConfiguration(
+      final IStringSubstituter toolTipSubstituter,
       final IColumToStringConverter columnToStringConverter,
       final int autoRizeMode,
       final int selectionMode,
@@ -56,6 +58,7 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
         autoRizeMode,
         selectionMode,
         preferredVisibleRowCount,
+        toolTipSubstituter,
         columnConfigurations,
         mouseListenerFactory,
         keyListenerFactory,

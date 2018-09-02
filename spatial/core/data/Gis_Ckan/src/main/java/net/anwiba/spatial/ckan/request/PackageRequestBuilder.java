@@ -22,6 +22,10 @@
 package net.anwiba.spatial.ckan.request;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,6 +43,7 @@ import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.utilities.parameter.IParameter;
 import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.spatial.ckan.values.Envelope;
 
 @SuppressWarnings("nls")
 public class PackageRequestBuilder {
@@ -58,11 +63,54 @@ public class PackageRequestBuilder {
     private IAuthentication authentication;
     private final List<IParameter> parameters = new ArrayList<>();
     private String query;
+    private Envelope envelope;
     private final List<String> fields = new LinkedList<>();
     private String identifier;
+    private boolean useDefaultSchema = false;
 
     public Builder(final String url) {
       this.url = url;
+    }
+
+    public void setCreated(final LocalDateTime from, final LocalDateTime to) {
+      final String value = convertToString(from, to);
+      if (value == null) {
+        return;
+      }
+      final SearchCondition searchCondition = new DateSearchCondition("metadata_created", new ArrayList<String>());
+      searchCondition.getValues().add(value);
+      addSearchCondition(searchCondition);
+    }
+
+    public void setModified(final LocalDateTime from, final LocalDateTime to) {
+      final String value = convertToString(from, to);
+      if (value == null) {
+        return;
+      }
+      final SearchCondition searchCondition = new DateSearchCondition("metadata_modified", new ArrayList<String>());
+      searchCondition.getValues().add(value);
+      addSearchCondition(searchCondition);
+    }
+
+    private String convertToString(final LocalDateTime from, final LocalDateTime to) {
+      if (from == null && to != null) {
+        return "[* TO " + toString(to) + "]";
+      }
+      if (from != null && to == null) {
+        return "[" + toString(from) + " TO NOW]";
+      }
+      if (from != null && to != null) {
+        return "[" + toString(from) + " TO " + toString(to) + "]";
+      }
+      return null;
+    }
+
+    private String toString(final LocalDateTime from) {
+      return ZonedDateTime.of(from, ZoneId.of("Z")).format(DateTimeFormatter.ISO_INSTANT);
+    }
+
+    public void setUseDefaultSchema(final boolean useDefaultSchema) {
+      this.useDefaultSchema = useDefaultSchema;
     }
 
     public void setType(final Type type) {
@@ -110,20 +158,45 @@ public class PackageRequestBuilder {
       this.query = query;
     }
 
+    public void setEnvelope(final Envelope envelope) {
+      this.envelope = envelope;
+    }
+
     public IRequest build() {
       switch (this.type) {
         case SEARCH: {
+
+          //sort (string) – sorting of the search results. Optional.
+          //Default: 'relevance asc, metadata_modified desc'.
+          //As per the solr documentation, this is a comma-separated string of
+          //field names and sort-orderings.
+
+          //Do not use the REST API, it's old and deprecated. Use the Action API.
+          //You can get the results you need using the package_search action, eg for datasets modified since 1st August 2026:
+          //http://demo.ckan.org/api/action/package_search?fq=metadata_modified:[2016-08-01T00:00:00.000Z TO NOW]
+          //For datasets created since then:
+          //http://demo.ckan.org/api/action/package_search?fq=metadata_created:[2016-08-01T00:00:00.000Z TO NOW]
+          //You can of course combine these with any other filters, pagination, sorting, etc. Check the docs to find more.
+          //
+          //Links:
+          //http://docs.ckan.org/en/latest/api/index.html
+          //http://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.get.package_search
+          //http://demo.ckan.org/api/action/package_search?fq=metadata_modified:[2016-08-01T00:00:00.000Z%20TO%20NOW]
+          //http://demo.ckan.org/api/action/package_search?fq=metadata_created:[2016-08-01T00:00:00.000Z%20TO%20NOW]
+
+          // https://www.europeandataportal.eu/data/en/api/3/action/package_search?start=0&rows=11&fq=(metadata_created:([2018-01-01T13:51:18.954Z+TO+NOW])+OR+metadata_modified:([2018-01-01T13:51:18.954Z+TO+NOW]))+AND+res_format:(WMS+OR+wms)&q=quellen
+
           final RequestBuilder builder = RequestBuilder
               .get(MessageFormat.format("{0}/3/action/package_search", this.url))
               .query("start", String.valueOf(this.start))
               .query("rows", String.valueOf(this.rows));
+          If.isTrue(this.useDefaultSchema).excecute(
+              () -> builder.query("use_default_schema", Boolean.valueOf(this.useDefaultSchema).toString()));
           If.isTrue(!this.searchConditions.isEmpty()).excecute(
               () -> builder.query("fq", toString(this.searchConditions.values())));
           Optional.of(this.query).convert(q -> builder.query("q", q));
-          if (this.fields.isEmpty()) {
-            return builder.build();
-          }
-          builder.query("fl", toString(this.fields));
+          Optional.of(this.envelope).consume(a -> builder.query("ext_bbox", toString(a)));
+          If.isTrue(!this.fields.isEmpty()).excecute(() -> builder.query("fl", toString(this.fields)));
           Optional.of(this.key).convert(k -> builder.header("X-CKAN-API-Key", k));
           Optional.of(this.authentication).consume(a -> builder.authentication(a.getUsername(), a.getPassword()));
           return builder.build();
@@ -132,6 +205,8 @@ public class PackageRequestBuilder {
           final RequestBuilder builder = RequestBuilder
               .get(MessageFormat.format("{0}/3/action/package_show", this.url))
               .query(this.parameters);
+          If.isTrue(this.useDefaultSchema).excecute(
+              () -> builder.query("use_default_schema", Boolean.valueOf(this.useDefaultSchema).toString()));
           Optional.of(this.key).convert(k -> builder.header("X-CKAN-API-Key", k));
           Optional.of(this.authentication).consume(a -> builder.authentication(a.getUsername(), a.getPassword()));
           Optional.of(this.identifier).consume(a -> builder.query("id", this.identifier));
@@ -139,6 +214,18 @@ public class PackageRequestBuilder {
         }
       }
       throw new IllegalStateException();
+    }
+
+    private String toString(final Envelope envelop) {
+      final StringBuilder builder = new StringBuilder();
+      builder.append(envelop.getMinX());
+      builder.append(",");
+      builder.append(envelop.getMinY());
+      builder.append(",");
+      builder.append(envelop.getMaxX());
+      builder.append(",");
+      builder.append(envelop.getMaxY());
+      return builder.toString();
     }
 
     private String toString(@SuppressWarnings("hiding") final List<String> fields) {
@@ -172,6 +259,9 @@ public class PackageRequestBuilder {
     }
 
     private String toString(final SearchCondition searchCondition) {
+      if (searchCondition instanceof DateSearchCondition) {
+        return toString((DateSearchCondition) searchCondition);
+      }
       final StringBuilder builder = new StringBuilder();
       boolean flag = false;
       builder.append(searchCondition.getField());
@@ -190,6 +280,25 @@ public class PackageRequestBuilder {
         } else {
           builder.append(value);
         }
+        flag = true;
+      }
+      builder.append(")");
+      return builder.toString();
+    }
+
+    private String toString(final DateSearchCondition searchCondition) {
+      final StringBuilder builder = new StringBuilder();
+      boolean flag = false;
+      builder.append(searchCondition.getField());
+      builder.append(":(");
+      final List<String> values = searchCondition.getValues();
+      for (final String value : values) {
+        if (flag) {
+          builder.append(" ");
+          builder.append(searchCondition.getOperator());
+          builder.append(" ");
+        }
+        builder.append(value);
         flag = true;
       }
       builder.append(")");
@@ -217,7 +326,7 @@ public class PackageRequestBuilder {
     return Operator.OR;
   }
 
-  private static final class SearchCondition {
+  private static class SearchCondition {
 
     private Operator operator = Operator.OR;
     final private String field;
@@ -244,6 +353,13 @@ public class PackageRequestBuilder {
       return this.field;
     }
 
+  }
+
+  private static class DateSearchCondition extends SearchCondition {
+
+    private DateSearchCondition(final String field, final List<String> values) {
+      super(field, values);
+    }
   }
 
   private static class PackageSearchConditionBuilder {
@@ -279,7 +395,6 @@ public class PackageRequestBuilder {
   public static class PackageSearchRequestBuilder {
 
     private final Builder builder;
-
     // https://offenedaten.de/api/3/action/package_search?fq=+(res_format:(GeoJSON%20OR%20SHP)%20AND%20tags:api)&rows=1000
 
     public PackageSearchRequestBuilder(final Builder builder) {
@@ -396,8 +511,27 @@ public class PackageRequestBuilder {
       return tags().operator(operator).build();
     }
 
+    public PackageSearchRequestBuilder setUseDefaultSchema(final boolean useDefaultSchema) {
+      this.builder.setUseDefaultSchema(useDefaultSchema);
+      return this;
+    }
+
+    public PackageSearchRequestBuilder created(final LocalDateTime from, final LocalDateTime to) {
+      this.builder.setCreated(from, to);
+      return this;
+    }
+
+    public PackageSearchRequestBuilder modified(final LocalDateTime from, final LocalDateTime to) {
+      this.builder.setCreated(from, to);
+      return this;
+    }
+
     public IRequest build() {
       return this.builder.build();
+    }
+
+    public void envelope(final Envelope envelope) {
+      this.builder.setEnvelope(envelope);
     }
 
   }
@@ -436,6 +570,11 @@ public class PackageRequestBuilder {
       parameters.forEach(p -> this.builder.addParameter(p));
       return this;
     }
+
+    public void setUseDefaultSchema(final boolean useDefaultSchema) {
+      this.builder.setUseDefaultSchema(useDefaultSchema);
+    }
+
   }
 
   public static PackageShowRequestBuilder show(final String url) {

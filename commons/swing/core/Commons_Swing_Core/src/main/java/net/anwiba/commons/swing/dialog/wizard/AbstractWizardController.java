@@ -39,7 +39,7 @@ import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.dialog.DataState;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 public abstract class AbstractWizardController implements IWizardController {
 

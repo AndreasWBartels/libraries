@@ -30,7 +30,7 @@ import net.anwiba.commons.message.Message;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.tabbed.TabbedDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.thread.process.IProcessManager;
 

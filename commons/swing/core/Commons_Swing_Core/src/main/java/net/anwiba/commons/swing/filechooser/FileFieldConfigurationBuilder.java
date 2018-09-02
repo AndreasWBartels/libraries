@@ -39,7 +39,7 @@ import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
 import net.anwiba.commons.swing.action.IActionProcedure;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.object.AbstractObjectFieldConfigurationBuilder;
 import net.anwiba.commons.swing.object.IActionFactory;
 import net.anwiba.commons.swing.object.IToolTipFactory;

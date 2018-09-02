@@ -40,7 +40,7 @@ import de.jdemo.annotation.Demo;
 import de.jdemo.extensions.SwingDemoCase;
 import de.jdemo.junit.DemoAsTestRunner;
 import net.anwiba.commons.swing.action.JComboBoxActionProvider;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.toolbar.ToolBarDescription;
 import net.anwiba.commons.swing.toolbar.ToolBarItemConfiguration;
 import net.anwiba.commons.swing.toolbar.ToolBarItemDescription;

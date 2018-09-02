@@ -26,7 +26,7 @@ import javax.swing.JPanel;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.swing.dialog.demo.DummyTabbedDialogTab;
 import net.anwiba.commons.swing.dialog.tabbed.TabbedDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 import org.junit.runner.RunWith;
 

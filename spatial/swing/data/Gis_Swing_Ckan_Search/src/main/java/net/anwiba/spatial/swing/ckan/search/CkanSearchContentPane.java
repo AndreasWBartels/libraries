@@ -22,66 +22,80 @@
 package net.anwiba.spatial.swing.ckan.search;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.html.HTMLDocument;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
+import net.anwiba.commons.http.HttpRequestException;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.lang.object.ObjectPair;
+import net.anwiba.commons.lang.optional.If;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IChangeableListListener;
+import net.anwiba.commons.model.IChangeableObjectListener;
+import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.IntegerModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
+import net.anwiba.commons.swing.dialog.ConfigurableDialogLauncher;
 import net.anwiba.commons.swing.dialog.MessageDialogLauncher;
 import net.anwiba.commons.swing.dialog.pane.AbstractContentPane;
+import net.anwiba.commons.swing.dialog.pane.LocalDateTimeContentPane;
+import net.anwiba.commons.swing.dialog.pane.TextContentPane;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialogLauncher;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icon.IGuiIcon;
+import net.anwiba.commons.swing.icons.GuiIcons;
+import net.anwiba.commons.swing.object.GenericObjectFieldBuilder;
 import net.anwiba.commons.swing.object.IObjectField;
 import net.anwiba.commons.swing.object.StringFieldBuilder;
 import net.anwiba.commons.swing.table.FilterableObjectTableModel;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ObjectListTable;
+import net.anwiba.commons.swing.table.ObjectListTableMessages;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.utilities.time.SystemDateTimeUtilities;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Dataset;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Group;
 import net.anwiba.spatial.ckan.json.schema.v1_0.License;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Organization;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Resource;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Tag;
+import net.anwiba.spatial.ckan.json.types.DateString;
+import net.anwiba.spatial.ckan.json.types.I18String;
+import net.anwiba.spatial.ckan.request.IPackageQueryCondition;
+import net.anwiba.spatial.ckan.request.IPackageQueryExecutor;
+import net.anwiba.spatial.ckan.request.PackageQueryConditionBuilder;
+import net.anwiba.spatial.ckan.utilities.CkanUtilities;
+import net.anwiba.spatial.ckan.values.Envelope;
 import net.anwiba.spatial.swing.ckan.search.message.Messages;
 
 public final class CkanSearchContentPane extends AbstractContentPane {
@@ -89,32 +103,65 @@ public final class CkanSearchContentPane extends AbstractContentPane {
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
       .getLogger(CkanSearchContentPane.class);
   private final IPreferences preferences;
-  private boolean isQueryEnabled = true;
+  private final IBooleanModel isQueryEnabledModel = new BooleanModel(true);
   private final IObjectRequestExecutorBuilderFactory requestExecutorBuilderFactory;
   private final IResourceOpenConsumer resourceOpenConsumer;
   private final IHttpConnectionDescription description;
-  private final DatasetQueryExecutor datasetQueryExecutor;
+  private final IPackageQueryExecutor packageQueryExecutor;
   private final List<Dataset> datasets;
   private final int results;
   private final int numberOfResultRows;
+  private final IObjectDistributor<Envelope> envelopeDistributor;
+  private final IZoomToConsumer zoomToConsumer;
+
+  final IObjectModel<Envelope> envelopeModel = new ObjectModel<>();
+  final IBooleanModel isEnvelopeLinkActiveModel = new BooleanModel(false);
+  final IBooleanModel isEnvelopeLinkEnabledModel;
+  private final IChangeableObjectListener envelopListener;
+  final IBooleanDistributor useEnvelopDistributor;
+  private final IDataSetResultsConsumer dataSetResultsConsumer;
+  private final IDataSetConsumer dataSetConsumer;
+  private final IObjectDistributor<String> datasetIdentifierDistributor;
+  private final IObjectModel<IPackageQueryCondition> packageQueryConditionModel;
 
   public CkanSearchContentPane(
       final IPreferences preferences,
       final IObjectRequestExecutorBuilderFactory requestExecutorBuilderFactory,
+      final IObjectModel<IPackageQueryCondition> packageQueryConditionModel,
+      final IDataSetResultsConsumer dataSetResultsConsumer,
+      final IDataSetConsumer dataSetConsumer,
       final IResourceOpenConsumer resourceOpenConsumer,
-      final DatasetQueryExecutor datasetQueryExecutor,
+      final IZoomToConsumer zoomToConsumer,
+      final IObjectDistributor<String> datasetIdentifierDistributor,
+      final IObjectDistributor<Envelope> envelopeDistributor,
+      final IPackageQueryExecutor packageQueryExecutor,
       final IHttpConnectionDescription description,
       final int numberOfResultRows,
       final List<Dataset> datasets,
       final int results) {
     this.preferences = preferences;
     this.requestExecutorBuilderFactory = requestExecutorBuilderFactory;
+    this.packageQueryConditionModel = packageQueryConditionModel;
+    this.dataSetResultsConsumer = dataSetResultsConsumer;
+    this.dataSetConsumer = dataSetConsumer;
     this.resourceOpenConsumer = resourceOpenConsumer;
-    this.datasetQueryExecutor = datasetQueryExecutor;
+    this.zoomToConsumer = zoomToConsumer;
+    this.datasetIdentifierDistributor = datasetIdentifierDistributor;
+    this.envelopeDistributor = envelopeDistributor;
+    this.packageQueryExecutor = packageQueryExecutor;
     this.datasets = datasets;
     this.numberOfResultRows = numberOfResultRows;
     this.results = results;
     this.description = description;
+    this.isEnvelopeLinkEnabledModel = new BooleanModel(this.envelopeDistributor.get() != null);
+    this.useEnvelopDistributor = this.isEnvelopeLinkActiveModel.and(this.isEnvelopeLinkEnabledModel);
+    this.envelopListener = () -> {
+      this.isEnvelopeLinkEnabledModel.set(this.envelopeDistributor.get() != null);
+      final boolean isUseEnvelope = this.useEnvelopDistributor.get();
+      if (isUseEnvelope) {
+        this.envelopeModel.set(this.envelopeDistributor.get());
+      }
+    };
   }
 
   @Override
@@ -124,16 +171,30 @@ public final class CkanSearchContentPane extends AbstractContentPane {
 
     final JPanel contentPanel = new JPanel();
 
+    final IPackageQueryCondition condition = new PackageQueryConditionBuilder(this.packageQueryConditionModel.get())
+        .build();
+
     final IObjectModel<Dataset> datasetModel = new ObjectModel<>();
+    final IntegerModel offsetModel = new IntegerModel(0);
+    final IObjectModel<DateString> datasetCreateDateModel = new ObjectModel<>();
+    final IObjectModel<DateString> resourceCreateDateModel = new ObjectModel<>();
+    final IObjectModel<License> datasetLicenceModel = new ObjectModel<>();
+    final IObjectModel<String> queryModel = new ObjectModel<>(condition.getQueryString());
+    final IObjectModel<LocalDateTime> fromDateModel = new ObjectModel<>(condition.getFromDate());
+    final IObjectModel<LocalDateTime> toDateModel = new ObjectModel<>(condition.getToDate());
+    final IntegerModel resultCountModel = new IntegerModel(this.results);
+    this.envelopeModel.set(condition.getEnvelope());
 
-    final IntegerModel offsetModel = new IntegerModel();
-    offsetModel.setValue(0);
-
-    final IntegerModel resultCountModel = new IntegerModel();
-    resultCountModel.setValue(this.results);
+    final IBooleanModel isTakeCurrentEnvelopeEnabledModel = new BooleanModel(true);
+    final IChangeableObjectListener isTakeCurrentEnabledModelController = () -> isTakeCurrentEnvelopeEnabledModel.set(
+        this.envelopeDistributor.get() != null
+            && !Objects.equals(this.envelopeDistributor.get(), this.envelopeModel.get()));
+    isTakeCurrentEnabledModelController.objectChanged();
+    this.envelopeModel.addChangeListener(isTakeCurrentEnabledModelController);
+    this.envelopeDistributor.addChangeListener(isTakeCurrentEnabledModelController);
 
     final ObjectListTable<String> formatsTable = new FormatTableFactory(this.requestExecutorBuilderFactory)
-        .create(this.preferences, this.description, new ArrayList<>());
+        .create(this.preferences, this.description, condition.getFormats());
 
     final JPanel formatsPanel = new JPanel();
     formatsPanel.setLayout(new BorderLayout());
@@ -142,7 +203,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     formatsPanel.add(formatsTable.getComponent(), BorderLayout.CENTER);
 
     final ObjectListTable<Group> groupsTable = new GroupTableFactory(this.requestExecutorBuilderFactory)
-        .create(this.preferences, this.description, new ArrayList<>(), columnWidth);
+        .create(this.preferences, this.description, condition.getGroups(), columnWidth);
 
     final JPanel groupsPanel = new JPanel();
     groupsPanel.setLayout(new BorderLayout());
@@ -151,7 +212,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     groupsPanel.add(groupsTable.getComponent(), BorderLayout.CENTER);
 
     final ObjectListTable<Tag> tagsTable = new TagTableFactory(this.requestExecutorBuilderFactory)
-        .create(this.preferences, this.description, new ArrayList<>(), columnWidth);
+        .create(this.preferences, this.description, condition.getTags(), columnWidth);
 
     final JPanel tagsPanel = new JPanel();
     tagsPanel.setLayout(new BorderLayout());
@@ -160,7 +221,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     tagsPanel.add(tagsTable.getComponent(), BorderLayout.CENTER);
 
     final ObjectListTable<Organization> organizationsTable = new OrganizationTableFactory(
-        this.requestExecutorBuilderFactory).create(this.preferences, this.description, new ArrayList<>());
+        this.requestExecutorBuilderFactory).create(this.preferences, this.description, condition.getOrganizations());
 
     final JPanel organizationsPanel = new JPanel();
     organizationsPanel.setLayout(new BorderLayout());
@@ -169,7 +230,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     organizationsPanel.add(organizationsTable.getComponent(), BorderLayout.CENTER);
 
     final ObjectListTable<License> licensesTable = new LicenseTableFactory(this.requestExecutorBuilderFactory)
-        .create(this.preferences, this.description, new ArrayList<>(), columnWidth);
+        .create(this.preferences, this.description, condition.getLicenses(), columnWidth);
 
     final JPanel licensesPanel = new JPanel();
     licensesPanel.setLayout(new BorderLayout());
@@ -215,18 +276,23 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     datasetsPanel.setPreferredSize(new Dimension(1000, 221));
     datasetsPanel.setMaximumSize(new Dimension(2000, 221));
 
-    final JEditorPane datasetDescriptionTextArea = createTextArea(contentPanel.getBackground());
-    final JPanel datasetDescriptionPanel = createDescriptionPanel(datasetDescriptionTextArea, 200);
+    final DescriptionPanelFactory descriptionPanelFactory = new DescriptionPanelFactory();
+    final JPanel datasetDescriptionPanel = descriptionPanelFactory.create(
+        datasetModel,
+        d -> "<font size=\"-1\">" //$NON-NLS-1$
+            + new DataSetDescriptionTextFactory().create(d)
+            + "</font></body></html>", //$NON-NLS-1$
+        contentPanel.getBackground(),
+        180,
+        datasetCreateDateModel,
+        datasetLicenceModel);
 
     if (!this.datasets.isEmpty()) {
       final Dataset dataset = this.datasets.get(0);
       dataSetSelectionModel.setSelectedObject(dataset);
       datasetModel.set(dataset);
-      datasetDescriptionTextArea.setText(
-          "<html><body><font size=\"-1\">" //$NON-NLS-1$
-              + new DataSetDescriptionTextFactory().create(dataset)
-              + "</font></body></html>"); //$NON-NLS-1$
-      datasetDescriptionTextArea.setCaretPosition(0);
+      datasetCreateDateModel.set(dataset.getMetadata_created());
+      datasetLicenceModel.set(createLicense(dataset));
     }
 
     datasetTable.getTableModel().addListModelListener(new IChangeableListListener<Dataset>() {
@@ -238,6 +304,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
 
       @Override
       public void objectsChanged(final Iterable<Dataset> oldObjects, final Iterable<Dataset> newObjects) {
+        CkanSearchContentPane.this.dataSetResultsConsumer.consume(newObjects);
         if (newObjects.iterator().hasNext()) {
           if (selectedIndexModel.getValue() != -1) {
             final List<Dataset> values = IterableUtilities.asList(newObjects);
@@ -261,8 +328,22 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       }
     });
 
-    final ObjectListTable<Resource> resourcesTable = new ResourceTableFactory(this.resourceOpenConsumer)
-        .create(this.description, datasetModel);
+    this.datasetIdentifierDistributor.addChangeListener(new IChangeableObjectListener() {
+
+      @Override
+      public void objectChanged() {
+        Optional
+            .of(CkanSearchContentPane.this.datasetIdentifierDistributor.get())
+            .convert(
+                i -> Streams.of(datasetTable.getTableModel().values()).first(d -> Objects.equals(i, d.getId())).get())
+            .consume(d -> datasetTable.getSelectionModel().setSelectedObject(d));
+      }
+    });
+
+    final ObjectListTable<Resource> resourcesTable = new ResourceTableFactory(
+        this.isQueryEnabledModel,
+        this.resourceOpenConsumer,
+        this.zoomToConsumer).create(this.description, datasetModel);
 
     final IObjectTableModel<Resource> resourceTableModel = resourcesTable.getTableModel();
     final ISelectionModel<Resource> resourceSelectionModel = resourcesTable.getSelectionModel();
@@ -272,9 +353,9 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     resourcesPanel.setLayout(new BorderLayout());
     resourcesPanel.add(createLabelPanel(Messages.resources), BorderLayout.NORTH);
     resourcesPanel.add(resourcesTable.getComponent(), BorderLayout.CENTER);
-    resourcesPanel.setMinimumSize(new Dimension(200, 124));
-    resourcesPanel.setPreferredSize(new Dimension(1000, 124));
-    resourcesPanel.setMaximumSize(new Dimension(2000, 124));
+    resourcesPanel.setMinimumSize(new Dimension(200, 158));
+    resourcesPanel.setPreferredSize(new Dimension(1000, 158));
+    resourcesPanel.setMaximumSize(new Dimension(2000, 158));
 
     resourcesTable.getTableModel().addListModelListener(new IChangeableListListener<Resource>() {
 
@@ -293,17 +374,23 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       }
     });
 
-    final JEditorPane resourceDescriptionTextArea = createTextArea(contentPanel.getBackground());
-    final JPanel resourceDescriptionPanel = createDescriptionPanel(resourceDescriptionTextArea, 100);
+    final IObjectModel<Resource> resourceModel = new ObjectModel<>();
+
+    final JPanel resourceDescriptionPanel = descriptionPanelFactory.create(
+        resourceModel,
+        r -> "<font size=\"-1\">" //$NON-NLS-1$
+            + new ResourceDescriptionTextFactory().create(r)
+            + "</font></body></html>", //$NON-NLS-1$
+        contentPanel.getBackground(),
+        100,
+        resourceCreateDateModel,
+        null);
 
     if (!resourcesTable.getTableModel().isEmpty()) {
       final Resource resource = resourcesTable.getTableModel().get(0);
       resourceSelectionModel.setSelectedObject(resource);
-      resourceDescriptionTextArea.setText(
-          "<html><body><font size=\"-1\">" //$NON-NLS-1$
-              + new ResourceDescriptionTextFactory().create(resource)
-              + "</font></body></html>"); //$NON-NLS-1$
-      resourceDescriptionTextArea.setCaretPosition(0);
+      resourceModel.set(resource);
+      resourceCreateDateModel.set(resource.getCreated());
     }
 
     final JPanel choosePane = new JPanel();
@@ -315,6 +402,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     choosePane.add(resourceDescriptionPanel);
 
     final IObjectField<String> queryField = new StringFieldBuilder()
+        .setModel(queryModel)
         .setColumns(40)
         .setToolTip(Messages.query_string)
         .setKeyListenerFactory((model, document, clearBlock) -> new KeyAdapter() {
@@ -328,18 +416,46 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                     offsetModel,
                     resultCountModel,
                     model,
+                    CkanSearchContentPane.this.envelopeModel,
                     formatsTable.getTableModel(),
                     groupsTable.getTableModel(),
                     tagsTable.getTableModel(),
                     organizationsTable.getTableModel(),
                     licensesTable.getTableModel(),
-                    datasetTable.getTableModel());
+                    datasetTable.getTableModel(),
+                    fromDateModel,
+                    toDateModel);
                 return;
               }
               offsetModel.setValue(0);
             }
           }
         })
+        .addActionFactory(
+            (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
+                .setIcon(net.anwiba.commons.swing.icons.GuiIcons.ADVANCED_SEARCH_ICON)
+                .setProcedure(component -> {
+                  if (offsetModel.getValue() == 0) {
+                    query(
+                        contentPanel,
+                        this.description,
+                        offsetModel,
+                        resultCountModel,
+                        model,
+                        this.envelopeModel,
+                        formatsTable.getTableModel(),
+                        groupsTable.getTableModel(),
+                        tagsTable.getTableModel(),
+                        organizationsTable.getTableModel(),
+                        licensesTable.getTableModel(),
+                        datasetTable.getTableModel(),
+                        fromDateModel,
+                        toDateModel);
+                    return;
+                  }
+                  offsetModel.setValue(0);
+                })
+                .build())
         .addActionFactory((model, document, enabledDistributor, clearBlock) -> {
           final IBooleanModel booleanModel = new BooleanModel(false);
           model.addChangeListener(() -> booleanModel.set(!StringUtilities.isNullOrTrimmedEmpty(model.get())));
@@ -356,57 +472,162 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                       offsetModel,
                       resultCountModel,
                       model,
+                      this.envelopeModel,
                       formatsTable.getTableModel(),
                       groupsTable.getTableModel(),
                       tagsTable.getTableModel(),
                       organizationsTable.getTableModel(),
                       licensesTable.getTableModel(),
-                      datasetTable.getTableModel());
+                      datasetTable.getTableModel(),
+                      fromDateModel,
+                      toDateModel);
                   return;
                 }
                 offsetModel.setValue(0);
               })
               .build();
         })
-        .addActionFactory(
-            (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
-                .setIcon(net.anwiba.commons.swing.icon.GuiIcons.ADVANCED_SEARCH_ICON)
-                .setProcedure(component -> {
-                  if (offsetModel.getValue() == 0) {
-                    query(
-                        contentPanel,
-                        this.description,
-                        offsetModel,
-                        resultCountModel,
-                        model,
-                        formatsTable.getTableModel(),
-                        groupsTable.getTableModel(),
-                        tagsTable.getTableModel(),
-                        organizationsTable.getTableModel(),
-                        licensesTable.getTableModel(),
-                        datasetTable.getTableModel());
-                    return;
-                  }
-                  offsetModel.setValue(0);
-                })
-                .build())
         .build();
 
+    this.envelopeDistributor.addChangeListener(this.envelopListener);
+
+    this.useEnvelopDistributor.addChangeListener(
+        () -> If.isTrue(this.useEnvelopDistributor.get()).excecute(
+            () -> this.envelopeModel.set(this.envelopeDistributor.get())));
+
+    final ObjectModel<IGuiIcon> envelopeLinkIconModel = new ObjectModel<>();
+
+    final IChangeableObjectListener envelopeLinkIconController = () -> {
+      if (this.isEnvelopeLinkEnabledModel.get()) {
+        if (this.isEnvelopeLinkActiveModel.get()) {
+          envelopeLinkIconModel
+              .set(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.NETWORK_TRANSMIT_RECEIVE);
+        } else {
+          envelopeLinkIconModel.set(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.NETWORK_IDLE);
+        }
+      } else {
+        envelopeLinkIconModel
+            .set(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.NETWORK_OFFLINE);
+      }
+    };
+    envelopeLinkIconController.objectChanged();
+    this.isEnvelopeLinkEnabledModel.addChangeListener(envelopeLinkIconController);
+    this.isEnvelopeLinkActiveModel.addChangeListener(envelopeLinkIconController);
+    final IBooleanModel isRemoveEnvelopeEnabledModel = new BooleanModel(this.envelopeModel.get() != null);
     final JPanel queryPanel = new JPanel();
     queryPanel.add(queryField.getComponent());
+    queryPanel.add(createGap());
+    queryPanel.add(
+        new GenericObjectFieldBuilder<Envelope>()
+            .setColumns(5)
+            .setToolTip("envelope")
+            .setModel(this.envelopeModel)
+            .setToStringConverter(c -> Optional.of(c).convert(v -> "# #").get())
+            .setToolTipFactory(
+                (validationResult, text) -> Optional
+                    .of(this.envelopeModel.get())
+                    .convert(e -> CkanUtilities.toString(e))
+                    .getOr(() -> "Envelope"))
+            .addActionFactory(
+                (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
+                    .setIcon(net.anwiba.commons.swing.icons.GuiIcons.UNDO_ZOOM_ICON)
+                    .setTooltip("Set current map envelope")
+                    .setEnabledDistributor(isTakeCurrentEnvelopeEnabledModel)
+                    .setProcedure(c -> {
+                      try {
+                        this.isQueryEnabledModel.set(false);
+                        this.isEnvelopeLinkActiveModel.set(false);
+                      } finally {
+                        this.isQueryEnabledModel.set(true);
+                      }
+                      this.envelopeModel.set(this.envelopeDistributor.get());
+                    })
+                    .build())
+            .addActionFactory((model, document, enabledDistributor, clearBlock) -> {
+              return new ConfigurableActionBuilder()
+                  .setIcon(envelopeLinkIconModel.get())
+                  .setIconModel(envelopeLinkIconModel)
+                  .setEnabledDistributor(this.isEnvelopeLinkEnabledModel)
+                  .setTooltip("Link with map")
+                  .setProcedure(c -> {
+                    this.isEnvelopeLinkActiveModel.set(!this.isEnvelopeLinkActiveModel.get());
+                  })
+                  .build();
+            })
+            .addClearAction(ObjectListTableMessages.clear)
+            .build()
+            .getComponent());
+    queryPanel.add(createGap());
+    queryPanel.add(
+        new GenericObjectFieldBuilder<LocalDateTime>()
+            .setColumns(12)
+            .setToolTip("form")
+            .setModel(fromDateModel)
+            .setToStringConverter(c -> Optional.of(c).convert(v -> SystemDateTimeUtilities.toStringAtUserTimeZone(v)).get())
+            .addActionFactory(
+                (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
+                    .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
+                    .setProcedure(
+                        component -> new ConfigurableDialogLauncher()
+                            .setDocumentModality()
+                            .setCancleOkButtonDialog()
+                            .enableCloseOnEscape()
+                            .setMessage(new MessageBuilder().setText("From").build())
+                            .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
+                            .setTitle("From")
+                            .setPreferences(this.preferences.node("date"))
+                            .setContentPaneFactory((o, p) -> new LocalDateTimeContentPane(model))
+                            .launch(component))
+                    .build())
+            .addClearAction(ObjectListTableMessages.clear)
+            .build()
+            .getComponent());
+    queryPanel.add(
+        new GenericObjectFieldBuilder<LocalDateTime>()
+            .setColumns(12)
+            .setToolTip("until")
+            .setModel(toDateModel)
+            .setToStringConverter(c -> Optional.of(c).convert(v -> SystemDateTimeUtilities.toStringAtUserTimeZone(v)).get())
+            .addActionFactory(
+                (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
+                    .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
+                    .setProcedure(
+                        component -> new ConfigurableDialogLauncher()
+                            .setDocumentModality()
+                            .setCancleOkButtonDialog()
+                            .enableCloseOnEscape()
+                            .setMessage(new MessageBuilder().setText("Until").build())
+                            .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
+                            .setTitle("Until")
+                            .setPreferences(this.preferences.node("date"))
+                            .setContentPaneFactory((o, p) -> new LocalDateTimeContentPane(model))
+                            .launch(component))
+                    .build())
+            .addClearAction(ObjectListTableMessages.clear)
+            .build()
+            .getComponent());
+    queryPanel.add(createGap());
     queryPanel.add(
         new JButton(
             new ConfigurableActionBuilder()
-                .setIcon(net.anwiba.commons.swing.icon.GuiIcons.EDIT_CLEAR_LIST)
+                .setIcon(net.anwiba.commons.swing.icons.GuiIcons.EDIT_CLEAR_LIST)
+                .setTooltip(Messages.reset)
                 .setProcedure(c -> {
-                  this.isQueryEnabled = false;
-                  queryField.getModel().set(null);
-                  formatsTable.getTableModel().removeAll();
-                  groupsTable.getTableModel().removeAll();
-                  tagsTable.getTableModel().removeAll();
-                  organizationsTable.getTableModel().removeAll();
-                  licensesTable.getTableModel().removeAll();
-                  this.isQueryEnabled = true;
+                  this.isQueryEnabledModel.set(false);
+                  try {
+                    queryField.getModel().set(null);
+                    fromDateModel.set(null);
+                    toDateModel.set(null);
+                    this.envelopeModel.set(null);
+                    formatsTable.getTableModel().removeAll();
+                    groupsTable.getTableModel().removeAll();
+                    tagsTable.getTableModel().removeAll();
+                    organizationsTable.getTableModel().removeAll();
+                    licensesTable.getTableModel().removeAll();
+                    this.isEnvelopeLinkActiveModel.set(false);
+                  } finally {
+                    this.isQueryEnabledModel.set(true);
+                  }
                   if (offsetModel.getValue() == 0) {
                     query(
                         contentPanel,
@@ -414,20 +635,20 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                         offsetModel,
                         resultCountModel,
                         queryField.getModel(),
+                        this.envelopeModel,
                         formatsTable.getTableModel(),
                         groupsTable.getTableModel(),
                         tagsTable.getTableModel(),
                         organizationsTable.getTableModel(),
                         licensesTable.getTableModel(),
-                        datasetTable.getTableModel());
+                        datasetTable.getTableModel(),
+                        fromDateModel,
+                        toDateModel);
                     return;
                   }
                   offsetModel.setValue(0);
                 })
-                .setTooltip(Messages.reset)
                 .build()));
-
-    final IObjectModel<String> queryModel = queryField.getModel();
 
     contentPanel.setLayout(new BorderLayout());
     contentPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -466,7 +687,10 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             licensesTable,
             datasetTable,
             contentPanel,
-            queryModel));
+            queryModel,
+            fromDateModel,
+            toDateModel,
+            this.envelopeModel));
 
     ((FilterableObjectTableModel<Group>) groupsTable.getTableModel()).getObjectTableModel().addListModelListener(
         createListListener(
@@ -480,7 +704,10 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             licensesTable,
             datasetTable,
             contentPanel,
-            queryModel));
+            queryModel,
+            fromDateModel,
+            toDateModel,
+            this.envelopeModel));
 
     ((FilterableObjectTableModel<Tag>) tagsTable.getTableModel()) //
         .getObjectTableModel()
@@ -496,7 +723,10 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                 licensesTable,
                 datasetTable,
                 contentPanel,
-                queryModel));
+                queryModel,
+                fromDateModel,
+                toDateModel,
+                this.envelopeModel));
 
     ((FilterableObjectTableModel<Organization>) organizationsTable.getTableModel())
         .getObjectTableModel()
@@ -512,7 +742,10 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                 licensesTable,
                 datasetTable,
                 contentPanel,
-                queryModel));
+                queryModel,
+                fromDateModel,
+                toDateModel,
+                this.envelopeModel));
 
     ((FilterableObjectTableModel<License>) licensesTable.getTableModel()).getObjectTableModel().addListModelListener(
         createListListener(
@@ -526,10 +759,13 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             licensesTable,
             datasetTable,
             contentPanel,
-            queryModel));
+            queryModel,
+            fromDateModel,
+            toDateModel,
+            this.envelopeModel));
 
     offsetModel.addChangeListener(() -> {
-      if (!this.isQueryEnabled) {
+      if (!this.isQueryEnabledModel.get()) {
         return;
       }
       query(
@@ -538,101 +774,128 @@ public final class CkanSearchContentPane extends AbstractContentPane {
           offsetModel,
           resultCountModel,
           queryModel,
+          this.envelopeModel,
           formatsTable.getTableModel(),
           groupsTable.getTableModel(),
           tagsTable.getTableModel(),
           organizationsTable.getTableModel(),
           licensesTable.getTableModel(),
-          datasetTable.getTableModel());
+          datasetTable.getTableModel(),
+          fromDateModel,
+          toDateModel);
+    });
+
+    final IChangeableObjectListener queryExecutingListener = () -> {
+      if (!this.isQueryEnabledModel.get()) {
+        return;
+      }
+      if (offsetModel.getValue() == 0) {
+        query(
+            contentPanel,
+            this.description,
+            offsetModel,
+            resultCountModel,
+            queryModel,
+            this.envelopeModel,
+            formatsTable.getTableModel(),
+            groupsTable.getTableModel(),
+            tagsTable.getTableModel(),
+            organizationsTable.getTableModel(),
+            licensesTable.getTableModel(),
+            datasetTable.getTableModel(),
+            fromDateModel,
+            toDateModel);
+        return;
+      }
+      offsetModel.setValue(0);
+    };
+    fromDateModel.addChangeListener(queryExecutingListener);
+    toDateModel.addChangeListener(queryExecutingListener);
+
+    this.envelopeModel.addChangeListener(() -> {
+      isRemoveEnvelopeEnabledModel.set(this.envelopeModel.get() != null);
+      if (!this.isQueryEnabledModel.get()) {
+        return;
+      }
+      if (offsetModel.getValue() == 0) {
+        query(
+            contentPanel,
+            this.description,
+            offsetModel,
+            resultCountModel,
+            queryModel,
+            this.envelopeModel,
+            formatsTable.getTableModel(),
+            groupsTable.getTableModel(),
+            tagsTable.getTableModel(),
+            organizationsTable.getTableModel(),
+            licensesTable.getTableModel(),
+            datasetTable.getTableModel(),
+            fromDateModel,
+            toDateModel);
+        return;
+      }
+      offsetModel.setValue(0);
     });
 
     dataSetSelectionModel.addSelectionListener(event -> {
       if (event.getSource().isEmpty()) {
         datasetModel.set(null);
         resourceTableModel.set(new ArrayList<>());
-        GuiUtilities.invokeLater(() -> {
-          datasetDescriptionTextArea.setText("<html><body><body></html>"); //$NON-NLS-1$
-          datasetDescriptionTextArea.setCaretPosition(0);
-        });
         return;
       }
       final Dataset dataset = event.getSource().getSelectedObjects().iterator().next();
-      GuiUtilities.invokeLater(() -> {
-        datasetDescriptionTextArea.setText(
-            "<html><body><font size=\"-1\">" //$NON-NLS-1$
-                + new DataSetDescriptionTextFactory().create(dataset)
-                + "</font></body></html>"); //$NON-NLS-1$
-        datasetDescriptionTextArea.setCaretPosition(0);
-      });
       datasetModel.set(dataset);
       resourceTableModel.set(new ArrayList<>(Arrays.asList(dataset.getResources())));
     });
 
+    datasetModel.addChangeListener(() -> {
+      this.dataSetConsumer.consume(datasetModel.get());
+      Optional
+          .of(datasetModel.get()) //
+          .consume(d -> {
+            datasetCreateDateModel.set(d.getMetadata_created());
+            datasetLicenceModel.set(createLicense(d));
+          })
+          .or(() -> {
+            datasetCreateDateModel.set(null);
+            datasetLicenceModel.set(null);
+          });
+    });
+
     resourceSelectionModel.addSelectionListener(event -> {
       if (event.getSource().isEmpty()) {
-        GuiUtilities.invokeLater(() -> {
-          resourceDescriptionTextArea.setText("<html><body><body></html>"); //$NON-NLS-1$
-          resourceDescriptionTextArea.setCaretPosition(0);
-        });
+        resourceModel.set(null);
         return;
       }
-      final Resource resource = event.getSource().getSelectedObjects().iterator().next();
-      GuiUtilities.invokeLater(() -> {
-        resourceDescriptionTextArea.setText(
-            "<html><body><font size=\"-1\">" //$NON-NLS-1$
-                + new ResourceDescriptionTextFactory().create(resource)
-                + "</font></body></html>"); //$NON-NLS-1$
-        resourceDescriptionTextArea.setCaretPosition(0);
-      });
+      resourceModel.set(event.getSource().getSelectedObjects().iterator().next());
+    });
+
+    resourceModel.addChangeListener(() -> {
+      final Resource resource = resourceModel.get();
+      Optional
+          .of(resource) //
+          .consume(r -> resourceCreateDateModel.set(r.getCreated()))
+          .or(() -> resourceCreateDateModel.set(null));
     });
 
     return contentPanel;
   }
 
-  private JPanel createDescriptionPanel(final JEditorPane textArea, final int height) {
-    final JPanel panel = new JPanel();
-    final JScrollPane scrollPanel = new JScrollPane(textArea);
-    scrollPanel.setBorder(BorderFactory.createEtchedBorder());
-    panel.setLayout(new BorderLayout());
-    panel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    panel.add(createLabelPanel(Messages.description), BorderLayout.NORTH);
-    panel.add(scrollPanel, BorderLayout.CENTER);
-    panel.setMinimumSize(new Dimension(200, height));
-    panel.setPreferredSize(new Dimension(1000, height));
-    panel.setMaximumSize(new Dimension(2000, 500));
-    return panel;
+  private License createLicense(final Dataset dataset) {
+    return Optional.of(dataset).convert(d -> {
+      final License license = new License();
+      license.setId(dataset.getLicense_id());
+      license.setTitle(new I18String(dataset.getLicense_title()));
+      license.setUrl(dataset.getLicense_url());
+      return license;
+    }).get();
   }
 
-  private JEditorPane createTextArea(final Color background) {
-    final JEditorPane textArea = new JEditorPane("text/html", "<html><body><body></html>"); //$NON-NLS-1$//$NON-NLS-2$
-    textArea.setEditable(false);
-    textArea.setBackground(background);
-    if (Desktop.isDesktopSupported() && textArea.getDocument() instanceof HTMLDocument) {
-      final Desktop desktop = Desktop.getDesktop();
-      if (desktop.isSupported(Desktop.Action.OPEN)) {
-        textArea.addHyperlinkListener(hyperlinkEvent -> {
-          if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            final String descriptionString = hyperlinkEvent.getDescription();
-            logger.log(ILevel.DEBUG, "href '" + descriptionString + "'"); //$NON-NLS-1$//$NON-NLS-2$
-            try {
-              final URL url = hyperlinkEvent.getURL();
-              if (url != null) {
-                logger.log(ILevel.DEBUG, "href '" + url + "'"); //$NON-NLS-1$//$NON-NLS-2$
-                desktop.browse(url.toURI());
-              } else if (descriptionString != null) {
-                final File file = new File(descriptionString);
-                final URI uri = file.getAbsoluteFile().toURI();
-                desktop.browse(uri);
-              }
-            } catch (final IOException | URISyntaxException exception) {
-              logger.log(ILevel.WARNING, "Couldn't browse '" + descriptionString + "'"); //$NON-NLS-1$//$NON-NLS-2$
-              logger.log(ILevel.WARNING, exception.getMessage(), exception);
-            }
-          }
-        });
-      }
-    }
-    return textArea;
+  private Component createGap() {
+    final JPanel gap = new JPanel();
+    gap.setSize(2, 1);
+    return gap;
   }
 
   private JPanel createLabelPanel(final String text) {
@@ -649,34 +912,48 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       final IntegerModel offsetModel,
       final IntegerModel resultCountModel,
       final IObjectModel<String> queryModel,
+      @SuppressWarnings("hiding") final IObjectModel<Envelope> envelopeModel,
       final IObjectTableModel<String> formatsTableModel,
       final IObjectTableModel<Group> groupTableModel,
       final IObjectTableModel<Tag> tagTableModel,
       final IObjectTableModel<Organization> organizationTableModel,
       final IObjectTableModel<License> licenseTableModel,
-      final IObjectTableModel<Dataset> datasetTableModel) {
-    final List<String> formats = IterableUtilities.asList(formatsTableModel.values());
-    final List<Group> groups = IterableUtilities.asList(groupTableModel.values());
-    final List<Tag> tags = IterableUtilities.asList(tagTableModel.values());
-    final List<Organization> organizations = IterableUtilities.asList(organizationTableModel.values());
-    final List<License> licenses = IterableUtilities.asList(licenseTableModel.values());
+      final IObjectTableModel<Dataset> datasetTableModel,
+      final IObjectModel<LocalDateTime> fromDateModel,
+      final IObjectModel<LocalDateTime> toDateModel) {
     final int offset = offsetModel.getValue();
-    final String string = queryModel.get();
     try {
+      final IPackageQueryCondition condition = new PackageQueryConditionBuilder()
+          .setQuery(queryModel.get())
+          .setFromDate(fromDateModel.get())
+          .setToDate(toDateModel.get())
+          .setEnvelope(envelopeModel.get())
+          .setOrganizations(IterableUtilities.asList(organizationTableModel.values()))
+          .setLicenses(IterableUtilities.asList(licenseTableModel.values()))
+          .setTags(IterableUtilities.asList(tagTableModel.values()))
+          .setGroups(IterableUtilities.asList(groupTableModel.values()))
+          .setFormats(IterableUtilities.asList(formatsTableModel.values()))
+          .build();
       final ObjectPair<List<Dataset>, Integer> result = new ProgressDialogLauncher<>(
-          (progressMonitor, canceler) -> this.datasetQueryExecutor.query(
-              canceler,
-              connectionDescription,
-              formats,
-              groups,
-              tags,
-              organizations,
-              licenses,
-              string,
-              offset,
-              this.numberOfResultRows)).launch(parentCompoment);
+          (progressMonitor, canceler) -> this.packageQueryExecutor
+              .query(canceler, connectionDescription, condition, offset, this.numberOfResultRows))
+                  .launch(parentCompoment);
+      this.packageQueryConditionModel.set(condition);
       resultCountModel.setValue(result.getSecondObject());
       datasetTableModel.set(result.getFirstObject());
+    } catch (final HttpRequestException exception) {
+      logger.log(ILevel.DEBUG, Messages.format_query_faild, exception);
+      new ConfigurableDialogLauncher() //
+          .setTitle(Messages.formats)
+          .setMessage(
+              new MessageBuilder()
+                  .setText(Messages.format_query_faild)
+                  .setDescription(exception.getStatusCode() + " " + exception.getStatusText()) //$NON-NLS-1$
+                  .setError()
+                  .build())
+          .setContentPaneFactory((o, p) -> new TextContentPane(exception.getContentAsString()))
+          .setCloseButtonDialog()
+          .launch(parentCompoment);
     } catch (final IOException exception) {
       logger.log(ILevel.DEBUG, Messages.format_query_faild, exception);
       new MessageDialogLauncher()
@@ -702,11 +979,14 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       final ObjectListTable<License> licensesTable,
       final ObjectListTable<Dataset> datasetsTable,
       final JPanel contentPanel,
-      final IObjectModel<String> queryModel) {
+      final IObjectModel<String> queryModel,
+      final IObjectModel<LocalDateTime> fromDateModel,
+      final IObjectModel<LocalDateTime> toDateModel,
+      @SuppressWarnings("hiding") final IObjectModel<Envelope> envelopeModel) {
     return new IChangeableListListener<T>() {
 
       private void execute() {
-        if (!CkanSearchContentPane.this.isQueryEnabled) {
+        if (!CkanSearchContentPane.this.isQueryEnabledModel.get()) {
           return;
         }
         if (offsetModel.getValue() == 0) {
@@ -716,12 +996,15 @@ public final class CkanSearchContentPane extends AbstractContentPane {
               offsetModel,
               resultCountModel,
               queryModel,
+              envelopeModel,
               formatsTable.getTableModel(),
               groupsTable.getTableModel(),
               tagsTable.getTableModel(),
               organizationsTable.getTableModel(),
               licensesTable.getTableModel(),
-              datasetsTable.getTableModel());
+              datasetsTable.getTableModel(),
+              fromDateModel,
+              toDateModel);
           return;
         }
         offsetModel.setValue(0);
@@ -750,5 +1033,10 @@ public final class CkanSearchContentPane extends AbstractContentPane {
         execute();
       }
     };
+  }
+
+  @Override
+  public void dispose() {
+    this.envelopeDistributor.removeChangeListener(this.envelopListener);
   }
 }

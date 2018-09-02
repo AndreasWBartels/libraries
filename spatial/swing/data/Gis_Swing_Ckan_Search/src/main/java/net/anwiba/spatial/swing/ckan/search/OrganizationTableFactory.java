@@ -27,6 +27,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
@@ -35,6 +36,8 @@ import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.IResultProducer;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.action.ActionProcedurBuilder;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
@@ -76,10 +79,19 @@ public class OrganizationTableFactory {
         .addSortableStringColumn(Messages.name, value -> CkanUtilities.toString(value), 10)
         .addActionFactory(
             (tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> new ConfigurableActionBuilder()
-                .setIcon(net.anwiba.commons.swing.icon.GuiIcons.EDIT_ICON)
+                .setIcon(net.anwiba.commons.swing.icons.GuiIcons.EDIT_ICON)
                 .setProcedure(createSelectActionProcedure(description, preferences, organizations, tableModel))
                 .build())
         .addRemoveObjectsAction()
+        .addActionFactory((tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> {
+          final IBooleanModel enabledModel = new BooleanModel(!tableModel.isEmpty());
+          tableModel.addTableModelListener(e -> enabledModel.set(!tableModel.isEmpty()));
+          return new ConfigurableActionBuilder()
+              .setIcon(net.anwiba.commons.swing.icons.GuiIcons.EDIT_CLEAR_LIST)
+              .setEnabledDistributor(enabledModel)
+              .setProcedure(component -> tableModel.removeAll())
+              .build();
+        })
         .build();
   }
 
@@ -155,6 +167,11 @@ public class OrganizationTableFactory {
     try (final IObjectRequestExecutor<OrganizationListResultResponse> executor = this.requestExecutorBuilderFactory
         .<OrganizationListResultResponse> create()
         .setResultProducer(responseProducer)
+        .addResultProducer(
+            (statusCode, contentType) -> new HashSet<>(Arrays.asList(409, 400, 500)).contains(statusCode)
+                && contentType != null
+                && contentType.startsWith("application/json"), //$NON-NLS-1$
+            responseProducer)
         .build()) {
       final OrganizationListResultResponse response = executor.execute(canceler, request);
       return response.isSuccess() ? Arrays.asList(response.getResult()) : Collections.emptyList();

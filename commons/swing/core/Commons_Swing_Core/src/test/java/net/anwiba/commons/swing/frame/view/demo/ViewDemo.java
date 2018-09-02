@@ -36,7 +36,7 @@ import net.anwiba.commons.swing.frame.IKeyActionConfiguration;
 import net.anwiba.commons.swing.frame.KeyActionManager;
 import net.anwiba.commons.swing.frame.view.ViewAdapter;
 import net.anwiba.commons.swing.frame.view.ViewManager;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.menu.AbstractMenuItemConfiguration;
 import net.anwiba.commons.swing.menu.AbstractMenuItemDescription;
 import net.anwiba.commons.swing.menu.MenuActionItemConfiguration;

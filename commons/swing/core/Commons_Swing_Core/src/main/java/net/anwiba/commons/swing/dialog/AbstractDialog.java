@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -567,31 +566,31 @@ public abstract class AbstractDialog extends JDialog {
     GuiUtilities.invokeLater(() -> this.messagePanel.setMessage(message));
   }
 
-  private Level getLevel(final MessageType messageType) {
-    final IMessageTypeVisitor<Level> visitor = new IMessageTypeVisitor<Level>() {
+  private ILevel getLevel(final MessageType messageType) {
+    final IMessageTypeVisitor<ILevel> visitor = new IMessageTypeVisitor<ILevel>() {
 
       @Override
-      public Level visitInfo() {
+      public ILevel visitInfo() {
         return ILevel.INFO;
       }
 
       @Override
-      public Level visitWarning() {
+      public ILevel visitWarning() {
         return ILevel.WARNING;
       }
 
       @Override
-      public Level visitError() {
+      public ILevel visitError() {
         return ILevel.ERROR;
       }
 
       @Override
-      public Level visitDefault() {
+      public ILevel visitDefault() {
         return ILevel.INFO;
       }
 
       @Override
-      public Level visitQuery() {
+      public ILevel visitQuery() {
         throw new IllegalStateException();
       }
 

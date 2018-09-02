@@ -15,7 +15,7 @@
  * GNU General Lesser Public License for more details.
  * 
  * You should have received a copy of the GNU General Lesser Public
- * License along with this program.  If not, see
+ * License along with this program.  If not, see//
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
@@ -29,36 +29,12 @@ import com.sun.media.jai.codec.ImageEncoder;
 
 public final class BmpEncoder extends AbstractEncoder {
 
+  public BmpEncoder() {
+    super("image/bmp"); //$NON-NLS-1$
+  }
+
   @Override
   protected ImageEncoder getEncoder(final RenderedImage image, final OutputStream out) {
-    //    return new ImageEncoder() {
-    //
-    //      private ImageEncodeParam param;
-    //
-    //      @Override
-    //      public void setParam(final ImageEncodeParam param) {
-    //        this.param = param;
-    //      }
-    //
-    //      @Override
-    //      public ImageEncodeParam getParam() {
-    //        return this.param;
-    //      }
-    //
-    //      @Override
-    //      public OutputStream getOutputStream() {
-    //        return out;
-    //      }
-    //
-    //      @Override
-    //      public void encode(final Raster arg0, final ColorModel arg1) throws IOException {
-    //      }
-    //
-    //      @Override
-    //      public void encode(final RenderedImage arg0) throws IOException {
-    //        ImageIO.write(image, "BMP", out);
-    //      }
-    //    };
     final BMPEncodeParam param = new BMPEncodeParam();
     return com.sun.media.jai.codec.ImageCodec.createImageEncoder("BMP", out, param); //$NON-NLS-1$
   }

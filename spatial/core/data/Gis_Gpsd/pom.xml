@@ -10,7 +10,7 @@
   <parent>
     <artifactId>anwiba-spatial-maven-core-data</artifactId>
     <groupId>net.anwiba.spatial</groupId>
-    <version>1.0.140</version>
+    <version>1.0.154</version>
   </parent>
 
   <scm>

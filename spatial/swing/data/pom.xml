@@ -7,7 +7,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-swing</artifactId>
-    <version>1.0.140</version>
+    <version>1.0.154</version>
   </parent>
 
   <dependencies>

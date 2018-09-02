@@ -72,6 +72,11 @@ public class FileSystemConnectionDescription extends AbstractConnectionDescripti
   }
 
   @Override
+  public String getFormat() {
+    return "Folder"; //$NON-NLS-1$
+  }
+
+  @Override
   public int hashCode() {
     return 31 * ((this.file == null) ? 0 : this.file.hashCode());
   }

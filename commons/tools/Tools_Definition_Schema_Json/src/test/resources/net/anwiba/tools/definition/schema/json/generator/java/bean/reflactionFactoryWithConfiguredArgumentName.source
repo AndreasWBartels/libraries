@@ -2,12 +2,14 @@
 
 package net.anwiba.generated.test.bean;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
 
 public class Factory {
 
@@ -42,13 +44,45 @@ public class Factory {
         return new Factory();
     }
 
-    private static Factory _createBean(Class<? extends Factory> clazz) {
-        try {
-            ReflectionConstructorInvoker<Factory> invoker = new ReflectionConstructorInvoker<Factory>(clazz);
-            return invoker.invoke();
-        } catch (InvocationTargetException exception) {
-            throw new RuntimeException(exception);
+    private static Factory _createBean(final Class<? extends Factory> clazz) {
+        if (System.getSecurityManager() == null) {
+            try {
+                Constructor<? extends Factory> constructor = clazz.getDeclaredConstructor(new Class[ 0 ] );
+                return constructor.newInstance();
+            } catch (InstantiationException exception) {
+                throw new RuntimeException(exception);
+            } catch (NoSuchMethodException exception) {
+                throw new RuntimeException(exception);
+            } catch (InvocationTargetException exception) {
+                throw new RuntimeException(exception);
+            } catch (IllegalAccessException exception) {
+                throw new RuntimeException(exception);
+            } catch (IllegalArgumentException exception) {
+                throw new RuntimeException(exception);
+            }
         }
+        return AccessController.doPrivileged(new PrivilegedAction<Factory>() {
+
+
+            public Factory run() {
+                try {
+                    Constructor<? extends Factory> constructor = clazz.getDeclaredConstructor(new Class[ 0 ] );
+                    return constructor.newInstance();
+                } catch (InstantiationException exception) {
+                    throw new RuntimeException(exception);
+                } catch (NoSuchMethodException exception) {
+                    throw new RuntimeException(exception);
+                } catch (InvocationTargetException exception) {
+                    throw new RuntimeException(exception);
+                } catch (IllegalAccessException exception) {
+                    throw new RuntimeException(exception);
+                } catch (IllegalArgumentException exception) {
+                    throw new RuntimeException(exception);
+                }
+            }
+
+        }
+        );
     }
 
     private static synchronized Class<? extends Factory> _createClass(java.lang.String type) {

@@ -29,6 +29,10 @@ import com.sun.media.jai.codec.PNGEncodeParam;
 
 public final class PngEncoder extends AbstractEncoder {
 
+  public PngEncoder() {
+    super("image/png"); //$NON-NLS-1$
+  }
+
   @Override
   protected ImageEncoder getEncoder(final RenderedImage image, final OutputStream out) {
     try {

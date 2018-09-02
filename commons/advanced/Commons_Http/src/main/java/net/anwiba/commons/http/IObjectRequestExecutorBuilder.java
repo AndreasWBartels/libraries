@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.http;
 
+import java.util.function.BiFunction;
+
 import net.anwiba.commons.lang.functional.IApplicable;
 
 public interface IObjectRequestExecutorBuilder<T> {
@@ -32,6 +34,12 @@ public interface IObjectRequestExecutorBuilder<T> {
   IObjectRequestExecutorBuilder<T> useAlwaysANewConnection();
 
   IObjectRequestExecutorBuilder<T> setResultProducer(IResultProducer<T> resultProducer);
+
+  IObjectRequestExecutorBuilder<T> addResultProducer(IApplicable<String> applicable, IResultProducer<T> resultProducer);
+
+  IObjectRequestExecutorBuilder<T> addResultProducer(
+      BiFunction<Integer, String, Boolean> applicable,
+      IResultProducer<T> resultProducer);
 
   IObjectRequestExecutorBuilder<T> addExceptionFactory(IApplicableHttpResponseExceptionFactory factory);
 

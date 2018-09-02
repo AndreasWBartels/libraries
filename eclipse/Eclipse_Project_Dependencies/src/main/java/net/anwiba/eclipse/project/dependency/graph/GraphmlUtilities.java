@@ -21,7 +21,7 @@
  */
 package net.anwiba.eclipse.project.dependency.graph;
 
-import net.anwiba.commons.utilities.program.ProgramLauncher;
+import net.anwiba.commons.thread.program.ProgramLauncher;
 import net.anwiba.eclipse.project.dependency.java.LibraryType;
 import net.anwiba.tools.graphml.io.GraphMarkupLanguageWriter;
 import net.anwiba.tools.graphml.utilities.GraphUtilities;
@@ -144,7 +144,7 @@ public class GraphmlUtilities {
     return graph;
   }
 
-  public static void saveAndLoad(final File file, final Graph graph) {
+  public static void saveAndLoad(final File file, final Graph graph) throws IOException {
     try (GraphMarkupLanguageWriter writer = new GraphMarkupLanguageWriter(new FileWriter(file))) {
       if (!file.exists()) {
         file.createNewFile();
@@ -174,8 +174,8 @@ public class GraphmlUtilities {
             .argument(file.getAbsolutePath())
             .launch();
       }
-    } catch (final IOException exception) {
-      exception.printStackTrace();
+    } catch (final InterruptedException exception) {
+      // nothing to do
     }
   }
 

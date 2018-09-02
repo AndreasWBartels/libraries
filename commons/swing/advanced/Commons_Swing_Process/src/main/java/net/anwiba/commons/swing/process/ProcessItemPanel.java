@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SpringLayout;
 
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
 import net.anwiba.commons.thread.cancel.CancelerProcess;

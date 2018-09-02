@@ -85,7 +85,7 @@ public final class Response implements IResponse {
     return new CancelableInputStream(
         this.cancelable,
         Optional
-            .<HttpResponse, IOException> create(this.response)
+            .of(IOException.class, this.response)
             .convert(r -> r.getEntity())
             .convert(e -> e.getContent())
             .getOrThrow(() -> new IOException()));

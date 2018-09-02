@@ -23,35 +23,16 @@ package net.anwiba.commons.lang.io;
 
 import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class MarkableInputStream extends FilterInputStream {
 
-  private final int available;
-
-  public MarkableInputStream(final InputStream in, final long contentLength) {
-    this(in, available(in, contentLength), in.markSupported());
+  public MarkableInputStream(final InputStream in) {
+    this(in, in.markSupported());
   }
 
-  private static int available(final InputStream in, final long contentLength) {
-    try {
-      final int available = in.available();
-      return available <= 1
-          ? contentLength < 0 || contentLength > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) contentLength
-          : available;
-    } catch (final IOException exception) {
-      return Integer.MAX_VALUE;
-    }
-  }
-
-  public MarkableInputStream(final InputStream in, final int available, final boolean markSupported) {
+  public MarkableInputStream(final InputStream in, final boolean markSupported) {
     super(markSupported ? in : new BufferedInputStream(in));
-    this.available = available;
   }
 
-  @Override
-  public int available() throws IOException {
-    return this.available;
-  }
 }

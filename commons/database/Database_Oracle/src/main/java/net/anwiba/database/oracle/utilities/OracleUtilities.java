@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,7 +26,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
 
 import net.anwiba.commons.jdbc.DatabaseUtilities;
 import net.anwiba.commons.jdbc.name.DatabaseNamesConverter;
@@ -62,9 +61,10 @@ public class OracleUtilities {
       final Connection connection,
       final String schemaName,
       final String tableName,
-      final String columnName) throws SQLException {
-    logger.log(Level.FINE, "Query: Schema " + schemaName + " table " + tableName + " column " + columnName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    logger.log(Level.FINE, "Query: " + OracleUtilitiesStatementString.IndexNameStatement); //$NON-NLS-1$
+      final String columnName)
+      throws SQLException {
+    logger.log(ILevel.FINE, "Query: Schema " + schemaName + " table " + tableName + " column " + columnName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    logger.log(ILevel.FINE, "Query: " + OracleUtilitiesStatementString.IndexNameStatement); //$NON-NLS-1$
     try (
         PreparedStatement statement = connection.prepareStatement(OracleUtilitiesStatementString.IndexNameStatement);) {
       statement.setString(1, schemaName);
@@ -75,7 +75,7 @@ public class OracleUtilities {
           return null;
         }
       } catch (final Exception exception) {
-        logger.log(Level.WARNING, "Query faild: " + OracleUtilitiesStatementString.IndexNameStatement, exception); //$NON-NLS-1$
+        logger.log(ILevel.WARNING, "Query faild: " + OracleUtilitiesStatementString.IndexNameStatement, exception); //$NON-NLS-1$
         return null;
       }
       try (ResultSet resultSet = statement.getResultSet();) {
@@ -95,9 +95,7 @@ public class OracleUtilities {
     logger.log(ILevel.DEBUG, "execute SQL OWNER: " + DatabaseUtilities.getSchemaName(connection, schemaName)); //$NON-NLS-1$
     logger.log(ILevel.DEBUG, "execute SQL TABLE_NAME: " + tableName); //$NON-NLS-1$
     final IProcedure<PreparedStatement, SQLException> preparedStatementClosure = DatabaseUtilities
-        .setterProcedur(
-            DatabaseUtilities.getSchemaName(connection, schemaName).toUpperCase(),
-            tableName);
+        .setterProcedur(DatabaseUtilities.getSchemaName(connection, schemaName).toUpperCase(), tableName);
     return DatabaseUtilities.execute(connection, statementString, preparedStatementClosure);
   }
 

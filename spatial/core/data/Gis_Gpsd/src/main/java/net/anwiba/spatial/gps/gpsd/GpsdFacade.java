@@ -52,12 +52,12 @@ public class GpsdFacade implements IGpsdFacade {
       final Iterable<IGpsDevice> gpsDevices = client.devices();
 
       final String deviceName = Streams
-          .create(gpsDevices)
+          .create(IOException.class, gpsDevices)
           .first(d -> "/dev/ttyUSB0".equals(d.getPath()))
           .convert(d -> d.getPath())
           .getOr(
               () -> Optional
-                  .create(gpsDevices.iterator())
+                  .of(IOException.class, gpsDevices.iterator())
                   .accept(i -> i.hasNext())
                   .convert(i -> i.next().getPath())
                   .getOrThrow(() -> new IOException("Couldn't find any device")));

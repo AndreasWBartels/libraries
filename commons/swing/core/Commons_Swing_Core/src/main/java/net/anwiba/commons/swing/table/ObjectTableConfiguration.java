@@ -28,6 +28,7 @@ import java.util.List;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
+import net.anwiba.commons.utilities.string.IStringSubstituter;
 
 public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T> {
 
@@ -38,11 +39,13 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
   private final IMouseListenerFactory<T> mouseListenerFactory;
   private final IKeyListenerFactory<T> keyListenerFactory;
   private final int autoResizeMode;
+  private final IStringSubstituter toolTipSubstituter;
 
   ObjectTableConfiguration(
       final int autoizeMode,
       final int selectionMode,
       final int preferredVisibleRowCount,
+      final IStringSubstituter toolTipSubstituter,
       final List<? extends IColumnConfiguration> columnConfigurations,
       final IMouseListenerFactory<T> mouseListenerFactory,
       final IKeyListenerFactory<T> keyListenerFactory,
@@ -50,6 +53,7 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
     this.autoResizeMode = autoizeMode;
     this.selectionMode = selectionMode;
     this.preferredVisibleRowCount = preferredVisibleRowCount;
+    this.toolTipSubstituter = toolTipSubstituter;
     this.columnConfigurations = columnConfigurations;
     this.keyListenerFactory = keyListenerFactory == null ? new IKeyListenerFactory<T>() {
 
@@ -108,6 +112,11 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
       flag |= isSortable;
     }
     return flag ? tableRowSorter : null;
+  }
+
+  @Override
+  public IStringSubstituter getToolTipSubstituter() {
+    return this.toolTipSubstituter;
   }
 
   @Override

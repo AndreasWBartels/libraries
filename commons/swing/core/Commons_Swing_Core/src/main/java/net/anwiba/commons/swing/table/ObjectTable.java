@@ -56,7 +56,7 @@ public class ObjectTable<T> implements IComponentProvider {
     this.tableModel = tableModel;
     final ObjectTableRowSorter<T> tableRowSorter = configuration.getRowSorter(tableModel);
     final ISortedRowMapper sortedRowMapper = new SortedRowMapper<>(tableRowSorter);
-    final Table table = new Table(tableModel);
+    final Table table = new Table(tableModel, configuration.getToolTipSubstituter());
     table.setRowSorter(tableRowSorter);
     table.setAutoResizeMode(configuration.getAutoResizeMode());
     table.setSelectionMode(configuration.getSelectionMode());

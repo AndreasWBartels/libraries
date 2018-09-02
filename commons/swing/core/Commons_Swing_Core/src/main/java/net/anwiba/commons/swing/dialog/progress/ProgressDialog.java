@@ -39,7 +39,7 @@ import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.swing.dialog.DialogResult;
 import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.MessageDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.thread.cancel.Canceler;
 import net.anwiba.commons.thread.cancel.ICanceler;

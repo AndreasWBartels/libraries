@@ -343,7 +343,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IConverter<IResult, T, SQLException> function)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription)) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
       return results(connection, statementString, function);
     }
   }
@@ -355,7 +355,7 @@ public class DatabaseUtilities {
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
       final IConverter<IResult, T, SQLException> function)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription)) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
       return results(connection, statementString, prepareProcedure, function);
     }
   }
@@ -474,7 +474,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription)) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
       return stringResult(connection, statementString, prepareProcedure);
     }
   }
@@ -517,7 +517,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription)) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
       return longResult(connection, statementString, prepareProcedure);
     }
   }
@@ -560,7 +560,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription)) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
       return booleanResult(connection, statementString, prepareProcedure);
     }
   }
@@ -595,7 +595,7 @@ public class DatabaseUtilities {
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
       final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription)) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
       return result(connection, statementString, prepareProcedure, resultFunction);
     }
   }
@@ -606,7 +606,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription);) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
       return result(connection, statementString, resultFunction);
     }
   }
@@ -634,7 +634,7 @@ public class DatabaseUtilities {
         try (final ResultSet resultSet = statement.getResultSet()) {
           final IResult result = new ResultSetToResultAdapter(resultSet);
           if (resultSet.next()) {
-            final T value = resultFunction.convert(Optional.<IResult, SQLException> create(result));
+            final T value = resultFunction.convert(Optional.of(SQLException.class, result));
             if (resultSet.next()) {
               throw new SQLException("Statement result isn't unique '" + statementString + "'"); //$NON-NLS-1$ //$NON-NLS-2$
             }
@@ -642,7 +642,7 @@ public class DatabaseUtilities {
           }
         }
       }
-      return resultFunction.convert(Optional.<IResult, SQLException> create(null));
+      return resultFunction.convert(Optional.<IResult, SQLException> empty(SQLException.class));
     } catch (final SQLException exception) {
       throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -666,7 +666,7 @@ public class DatabaseUtilities {
       final IInterruptableFunction<IResult, T, SQLException> resultFunction)
       throws SQLException,
       InterruptedException {
-    try (Connection connection = connector.connectWritable(connectionDescription);) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
       return results(b -> () -> {
       }, connection, statementString, s -> {
       }, resultFunction);
@@ -727,7 +727,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IConverter<Iterable<IResult>, T, SQLException> function)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription);) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
       return aggregate(connection, statementString, function);
     }
   }
@@ -891,7 +891,7 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription);) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
       return count(connection, statementString, values);
     }
   }

@@ -164,7 +164,6 @@ public class ObjectListComponent<T> implements IComponentProvider {
         .addListSelectionListener(new JListSelectionListener<>(listModel, tableSelectionModel, this.selectionModel));
     this.selectionModel
         .addSelectionListener(new SelectionListener<>(listModel, tableSelectionModel, this.selectionModel));
-
     this.list.setTransferHandler(configuration.getTransferHandler());
     this.list.setDropMode(configuration.getDropMode());
     this.list.setDragEnabled(configuration.isDragEnabled());

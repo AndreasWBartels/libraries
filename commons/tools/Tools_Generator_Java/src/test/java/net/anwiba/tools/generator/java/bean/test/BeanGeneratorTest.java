@@ -119,7 +119,7 @@ public class BeanGeneratorTest {
 
   @SuppressWarnings({ "nls" })
   @Test
-  public void creatornBuilder() throws CreationException, IOException {
+  public void creatorBuilder() throws CreationException, IOException {
     final BeanGenerator generator = new BeanGenerator();
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.comment(COPYRIGHT);

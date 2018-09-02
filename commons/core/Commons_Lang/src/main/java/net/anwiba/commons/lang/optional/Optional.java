@@ -22,139 +22,463 @@
 
 package net.anwiba.commons.lang.optional;
 
+import java.util.Objects;
+
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.functional.ISupplier;
-import net.anwiba.commons.lang.object.ObjectUtilities;
 
-public class Optional<T, E extends Exception> implements IOptional<T, E> {
+public class Optional<T, E extends Exception> {
 
-  private final T value;
-  private final IAcceptor<T> acceptor;
+  static class Filled<T, E extends Exception> implements IOptional<T, E> {
 
-  private Optional(final IAcceptor<T> acceptor, final T value) {
-    this.acceptor = acceptor;
-    this.value = value;
+    private final Class<E> exceptionClass;
+    private final T value;
+
+    public Filled(final Class<E> exceptionClass, final T value) {
+      this.exceptionClass = Objects.requireNonNull(exceptionClass);
+      this.value = Objects.requireNonNull(value);
+    }
+
+    @Override
+    public int hashCode() {
+      return this.value.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+      if (object == this) {
+        return true;
+      }
+      if (object instanceof Filled) {
+        @SuppressWarnings("rawtypes")
+        final Filled other = (Filled) object;
+        return Objects.equals(this.value, other.value);
+      }
+      return false;
+    }
+
+    @Override
+    public IOptional<T, E> or(final T other) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> or(final IBlock<E> block) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> or(final ISupplier<T, E> supplier) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> failed(final ISupplier<T, E> supplier) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> failed(final IConverter<E, T, E> converter) {
+      return this;
+    }
+
+    @Override
+    public T get() throws E {
+      return this.value;
+    }
+
+    @Override
+    public T getObject() {
+      return this.value;
+    }
+
+    @Override
+    public E getCause() {
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public IOptional<T, E> accept(final IAcceptor<T> acceptor) {
+      return acceptor.accept(this.value) ? this : empty(this.exceptionClass);
+    }
+
+    @Override
+    public IOptional<T, E> consume(final IConsumer<T, E> consumer) {
+      try {
+        consumer.consume(this.value);
+        return this;
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, getCause());
+      }
+    }
+
+    @Override
+    public <O> IOptional<O, E> convert(final IConverter<T, O, E> converter) {
+      try {
+        return of(this.exceptionClass, converter.convert(this.value));
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, getCause());
+      }
+    }
+
+    @Override
+    public <O> IOptional<T, E> equals(final IConverter<T, O, E> converter, final O other) {
+      try {
+        if (Objects.equals(converter.convert(this.value), other)) {
+          return this;
+        }
+        return empty(this.exceptionClass);
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, getCause());
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <O> IOptional<O, E> instanceOf(final Class<O> clazz) {
+      if (clazz.isInstance(this.value)) {
+        return of(this.exceptionClass, (O) this.value);
+      }
+      return empty(this.exceptionClass);
+    }
+
+    @Override
+    public <X extends Exception> T getOrThrow(final ISupplier<X, E> supplier) throws X, E {
+      return this.value;
+    }
+
+    @Override
+    public <X extends Exception> T getOrThrow(final IConverter<E, X, X> supplier) throws X {
+      return this.value;
+    }
+
+    @Override
+    public T getOr(final ISupplier<T, E> supplier) throws E {
+      return this.value;
+    }
+
+    @Override
+    public boolean isAccepted() {
+      return true;
+    }
+
+    @Override
+    public boolean isSuccessful() {
+      return true;
+    }
+
+    @Override
+    public boolean contains(final T other) {
+      return Objects.equals(this.value, other);
+    }
+
+    @Override
+    public java.util.Optional<T> toOptional() {
+      return java.util.Optional.of(this.value);
+    }
+
+  }
+
+  static class Failed<T, E extends Exception> implements IOptional<T, E> {
+
+    private final Class<E> exceptionClass;
+    private final E cause;
+
+    public Failed(final Class<E> exceptionClass, final E cause) {
+      this.exceptionClass = Objects.requireNonNull(exceptionClass);
+      this.cause = Objects.requireNonNull(cause);
+    }
+
+    @Override
+    public IOptional<T, E> or(final T value) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> or(final IBlock<E> block) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> or(final ISupplier<T, E> supplier) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> failed(final ISupplier<T, E> supplier) {
+      try {
+        return of(this.exceptionClass, supplier.supply());
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, getCause());
+      }
+    }
+
+    @Override
+    public IOptional<T, E> failed(final IConverter<E, T, E> converter) {
+      try {
+        return of(this.exceptionClass, converter.convert(this.cause));
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, getCause());
+      }
+    }
+
+    @Override
+    public T get() throws E {
+      throw this.cause;
+    }
+
+    @Override
+    public T getObject() {
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public E getCause() {
+      return this.cause;
+    }
+
+    @Override
+    public IOptional<T, E> accept(final IAcceptor<T> acceptor) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> consume(final IConsumer<T, E> converter) {
+      return this;
+    }
+
+    @Override
+    public <O> IOptional<O, E> convert(final IConverter<T, O, E> converter) {
+      return Optional.failed(this.exceptionClass, this.cause);
+    }
+
+    @Override
+    public <O> IOptional<T, E> equals(final IConverter<T, O, E> converter, final O value) {
+      return Optional.failed(this.exceptionClass, this.cause);
+    }
+
+    @Override
+    public <X extends Exception> T getOrThrow(final ISupplier<X, E> supplier) throws X, E {
+      throw this.cause;
+    }
+
+    @Override
+    public <X extends Exception> T getOrThrow(final IConverter<E, X, X> converter) throws X {
+      throw converter.convert(this.cause);
+    }
+
+    @Override
+    public T getOr(final ISupplier<T, E> supplier) throws E {
+      throw this.cause;
+    }
+
+    @Override
+    public boolean isAccepted() {
+      return false;
+    }
+
+    @Override
+    public boolean isSuccessful() {
+      return false;
+    }
+
+    @Override
+    public <O> IOptional<O, E> instanceOf(final Class<O> clazz) {
+      return Optional.failed(this.exceptionClass, this.cause);
+    }
+
+    @Override
+    public boolean contains(final T other) {
+      return false;
+    }
+
+    @Override
+    public java.util.Optional<T> toOptional() {
+      throw new RuntimeException(this.cause.getMessage(), this.cause);
+    }
+  }
+
+  static class Empty<T, E extends Exception> implements IOptional<T, E> {
+
+    private final Class<E> exceptionClass;
+
+    public Empty(final Class<E> exceptionClass) {
+      this.exceptionClass = Objects.requireNonNull(exceptionClass);
+    }
+
+    @Override
+    public IOptional<T, E> or(final T value) {
+      return of(this.exceptionClass, value);
+    }
+
+    @Override
+    public IOptional<T, E> or(final IBlock<E> block) {
+      try {
+        block.execute();
+        return this;
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, getCause());
+      }
+    }
+
+    @Override
+    public int hashCode() {
+      return Empty.class.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+      if (object == this) {
+        return true;
+      }
+      return object instanceof Empty;
+    }
+
+    @Override
+    public IOptional<T, E> or(final ISupplier<T, E> supplier) {
+      try {
+        return of(this.exceptionClass, supplier.supply());
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, getCause());
+      }
+    }
+
+    @Override
+    public IOptional<T, E> failed(final ISupplier<T, E> supplier) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> failed(final IConverter<E, T, E> value) {
+      return this;
+    }
+
+    @Override
+    public T get() throws E {
+      return null;
+    }
+
+    @Override
+    public T getObject() {
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public E getCause() {
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public IOptional<T, E> accept(final IAcceptor<T> acceptor) {
+      return this;
+    }
+
+    @Override
+    public IOptional<T, E> consume(final IConsumer<T, E> converter) {
+      return this;
+    }
+
+    @Override
+    public <O> IOptional<O, E> convert(final IConverter<T, O, E> converter) {
+      return new Empty<>(this.exceptionClass);
+    }
+
+    @Override
+    public <O> IOptional<T, E> equals(final IConverter<T, O, E> converter, final O value) {
+      return this;
+    }
+
+    @Override
+    public <X extends Exception> T getOrThrow(final ISupplier<X, E> supplier) throws X, E {
+      throw supplier.supply();
+    }
+
+    @Override
+    public <X extends Exception> T getOrThrow(final IConverter<E, X, X> converter) throws X {
+      throw converter.convert(null);
+    }
+
+    @Override
+    public T getOr(final ISupplier<T, E> supplier) throws E {
+      return supplier.supply();
+    }
+
+    @Override
+    public boolean isAccepted() {
+      return false;
+    }
+
+    @Override
+    public boolean isSuccessful() {
+      return true;
+    }
+
+    @Override
+    public <O> IOptional<O, E> instanceOf(final Class<O> clazz) {
+      return empty(this.exceptionClass);
+    }
+
+    @Override
+    public boolean contains(final T other) {
+      return false;
+    }
+
+    @Override
+    public java.util.Optional<T> toOptional() {
+      return java.util.Optional.empty();
+    }
+  }
+
+  public static <T> IOptional<T, RuntimeException> empty() {
+    return of(RuntimeException.class, null);
+  }
+
+  public static <T, E extends Exception> IOptional<T, E> empty(final Class<E> exceptionClass) {
+    return new Empty<>(exceptionClass);
   }
 
   public static <T> IOptional<T, RuntimeException> of(final T value) {
-    return create(i -> i != null, value);
+    return of(RuntimeException.class, value);
   }
 
-  public static <T> IOptional<T, RuntimeException> of(final IAcceptor<T> acceptor, final T value) {
-    return create(acceptor, value);
+  public static <T> IOptional<T, RuntimeException> of(final java.util.Optional<T> optional) {
+    return optional.isPresent() ? of(optional.get()) : empty();
   }
 
-  public static <T, E extends Exception> IOptional<T, E> create(final T value) {
-    return create(i -> i != null, value);
-  }
-
-  public static <T, E extends Exception> IOptional<T, E> create(final IAcceptor<T> acceptor, final T value) {
-    return new Optional<>(acceptor, value);
-  }
-
-  @Override
-  public T get() throws E {
-    if (isAccepted()) {
-      return this.value;
+  public static <T, E extends Exception> IOptional<T, E> of(final Class<E> exceptionClass, final T value) {
+    if (value == null) {
+      return empty(exceptionClass);
     }
-    return null;
+    return new Filled<>(exceptionClass, value);
   }
 
-  @Override
-  public IOptional<T, E> accept(@SuppressWarnings("hiding") final IAcceptor<T> acceptor) throws E {
-    if (isAccepted()) {
-      return new Optional<>(acceptor, this.value);
-    }
-    return create(null);
+  public static <I, O, E extends Exception> IOptional<O, E> bind(
+      final IOptional<I, E> optional,
+      final IFunction<I, O, E> function) {
+    return optional.convert(i -> function.execute(i));
   }
 
-  @Override
-  public boolean isAccepted() {
-    return this.acceptor.accept(this.value);
-  }
-
-  @Override
-  public <O> IOptional<O, E> convert(final IConverter<T, O, E> converter) throws E {
-    if (isAccepted()) {
-      return create(converter.convert(this.value));
-    }
-    return create(null);
+  public static <T, E extends Exception> IOptional<T, E> failed(final Class<E> exceptionClass, final E cause) {
+    return new Failed<>(exceptionClass, cause);
   }
 
   @SuppressWarnings("unchecked")
-  @Override
-  public <O> IOptional<O, E> instanceOf(final Class<O> clazz) {
-    if (isAccepted() && clazz.isInstance(this.value)) {
-      return create((O) this.value);
+  private static <T, E extends Exception> IOptional<T, E> failed(
+      final Class<E> exceptionClass,
+      final Exception exception,
+      final E cause) {
+    exception.addSuppressed(cause);
+    if (exceptionClass.isInstance(exception)) {
+      return new Failed<>(exceptionClass, (E) exception);
     }
-    return create(null);
-  }
-
-  @Override
-  public IOptional<T, E> consume(final IConsumer<T, E> consumer) throws E {
-    if (isAccepted()) {
-      consumer.consume(this.value);
+    if (exception instanceof RuntimeException) {
+      throw (RuntimeException) exception;
     }
-    return this;
-  }
-
-  //  @Override
-  //  public IOptional<T, E> or(final IConsumer<T, E> consumer) throws E {
-  //    if (!isAccepted()) {
-  //      consumer.consume(this.value);
-  //    }
-  //    return this;
-  //  }
-
-  @Override
-  public IOptional<T, E> or(final IBlock<E> block) throws E {
-    if (!isAccepted()) {
-      block.execute();
-    }
-    return this;
-  }
-
-  @Override
-  public IOptional<T, E> or(final ISupplier<T, E> supplier) throws E {
-    if (!isAccepted()) {
-      return create(supplier.supply());
-    }
-    return this;
-  }
-
-  @Override
-  public <O> IOptional<T, E> equals(final IConverter<T, O, E> converter, final O other) throws E {
-    if (isAccepted() && ObjectUtilities.equals(converter.convert(this.value), other)) {
-      return this;
-    }
-    return create(null);
-  }
-
-  @Override
-  public <X extends Exception> T getOrThrow(final ISupplier<X, E> supplier) throws E, X {
-    if (isAccepted()) {
-      return this.value;
-    }
-    throw supplier.supply();
-  }
-
-  @Override
-  public T getOr(final ISupplier<T, E> supplier) throws E {
-    if (isAccepted()) {
-      return this.value;
-    }
-    return supplier.supply();
-  }
-
-  @Override
-  public IOptional<T, E> or(@SuppressWarnings("hiding") final T value) throws E {
-    if (isAccepted()) {
-      return this;
-    }
-    return new Optional<>(this.acceptor, value);
+    throw new RuntimeException(exception.getMessage(), exception);
   }
 
 }

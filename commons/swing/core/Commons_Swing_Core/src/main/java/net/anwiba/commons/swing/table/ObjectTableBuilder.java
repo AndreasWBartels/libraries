@@ -22,6 +22,7 @@
 
 package net.anwiba.commons.swing.table;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableCellEditor;
 
+import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.comparable.ComparableComparator;
 import net.anwiba.commons.lang.comparable.NumberComparator;
 import net.anwiba.commons.lang.functional.IAggregator;
@@ -45,6 +47,7 @@ import net.anwiba.commons.swing.table.action.ITableTextFieldActionFactory;
 import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.swing.table.renderer.BooleanRenderer;
+import net.anwiba.commons.swing.table.renderer.DurationTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.LocalDateTimeTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.ObjectTableCellRenderer;
@@ -233,6 +236,24 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   }
 
   @Override
+  public IObjectTableBuilder<T> addSortableLongColumn(
+      final String title,
+      final IFunction<T, Long, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new NumberTableCellRenderer("0"), size, Long.class, true, new NumberComparator())); //$NON-NLS-1$
+    return this;
+  }
+
+  @Override
   public IObjectTableBuilder<T> addSortableLocalTimeDateColumn(
       final String title,
       final IFunction<T, LocalDateTime, RuntimeException> provider,
@@ -246,7 +267,25 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
         }
         return provider.execute(object);
       }
-    }, new LocalDateTimeTableCellRenderer(), size, Double.class, true, new ComparableComparator<>()));
+    }, new LocalDateTimeTableCellRenderer(), size, LocalDateTime.class, true, new ComparableComparator<>()));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addSortableDurationColumn(
+      final String title,
+      final IFunction<T, Duration, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
+
+      @Override
+      public Object getValue(final T object) {
+        if (object == null) {
+          return null;
+        }
+        return provider.execute(object);
+      }
+    }, new DurationTableCellRenderer(), size, Duration.class, true, new ComparableComparator<>()));
     return this;
   }
 
@@ -374,4 +413,8 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
     return this;
   }
 
+  public IObjectTableBuilder<T> setValues(final IObjectList<T> values) {
+    setValues(values.stream().asList());
+    return this;
+  }
 }

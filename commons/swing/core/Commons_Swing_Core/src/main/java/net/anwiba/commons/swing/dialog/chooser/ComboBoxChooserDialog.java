@@ -51,7 +51,7 @@ import net.anwiba.commons.swing.dialog.IValueDialog;
 import net.anwiba.commons.swing.dialog.MessageDialog;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
 import net.anwiba.commons.swing.icon.GuiIconSize;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.list.ObjectListConfigurationBuilder;
 import net.anwiba.commons.swing.preference.WindowPreferences;
 import net.anwiba.commons.swing.utilities.GuiUtilities;

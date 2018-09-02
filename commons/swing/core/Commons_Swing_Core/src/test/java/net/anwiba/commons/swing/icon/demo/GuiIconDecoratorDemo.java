@@ -24,7 +24,7 @@ package net.anwiba.commons.swing.icon.demo;
 import net.anwiba.commons.swing.icon.DecorationPosition;
 import net.anwiba.commons.swing.icon.GuiIconDecorator;
 import net.anwiba.commons.swing.icon.GuiIconSize;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.ui.GuiIconDecoration;
 
 import org.junit.runner.RunWith;

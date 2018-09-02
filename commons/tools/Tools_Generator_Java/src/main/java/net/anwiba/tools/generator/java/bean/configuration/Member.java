@@ -24,9 +24,6 @@ package net.anwiba.tools.generator.java.bean.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anwiba.tools.generator.java.bean.factory.IAsObjectMethodFactory;
-import net.anwiba.tools.generator.java.bean.factory.IValueOfMethodFactory;
-
 public class Member {
 
   private final Type type;

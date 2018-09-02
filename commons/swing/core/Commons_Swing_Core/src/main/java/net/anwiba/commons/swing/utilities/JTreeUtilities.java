@@ -30,55 +30,41 @@ import javax.swing.tree.TreePath;
 public class JTreeUtilities {
 
   public static void expandAll(final JTree tree, final DefaultMutableTreeNode node) {
-    GuiUtilities.invokeLater(new Runnable() {
-
-      @Override
-      public void run() {
-        internalExpandAll(tree, node);
-      }
-    });
+    GuiUtilities.invokeLater(() -> internalExpandAll(tree, node));
   }
 
   static void internalExpandAll(final JTree tree, final DefaultMutableTreeNode node) {
     tree.expandPath(new TreePath(node.getPath()));
     for (int i = 0; i < node.getChildCount(); ++i) {
-      expandAll(tree, (DefaultMutableTreeNode) node.getChildAt(i));
+      internalExpandAll(tree, (DefaultMutableTreeNode) node.getChildAt(i));
     }
   }
 
   public static void expandAll(final JTree tree) {
-    GuiUtilities.invokeLater(new Runnable() {
-
-      @Override
-      public void run() {
-        internalExpandAll(tree);
-      }
-    });
+    GuiUtilities.invokeLater(() -> internalExpandAll(tree));
   }
 
   static void internalExpandAll(final JTree tree) {
-    int row = 0;
-    while (row < tree.getRowCount()) {
-      tree.expandRow(row);
-      row++;
+    synchronized (tree) {
+      int row = 0;
+      while (row < tree.getRowCount()) {
+        tree.expandRow(row);
+        row++;
+      }
     }
   }
 
   public static void collapseAll(final JTree tree) {
-    GuiUtilities.invokeLater(new Runnable() {
-
-      @Override
-      public void run() {
-        internalCollapseAll(tree);
-      }
-    });
+    GuiUtilities.invokeLater(() -> internalCollapseAll(tree));
   }
 
   static void internalCollapseAll(final JTree tree) {
-    int row = tree.getRowCount() - 1;
-    while (row >= 0) {
-      tree.collapseRow(row);
-      row--;
+    synchronized (tree) {
+      int row = tree.getRowCount() - 1;
+      while (row >= 0) {
+        tree.collapseRow(row);
+        row--;
+      }
     }
   }
 
@@ -91,8 +77,10 @@ public class JTreeUtilities {
   }
 
   private static void selectPath(final JTree tree, final TreePath treePath) {
-    tree.getSelectionModel().setSelectionPath(treePath);
-    tree.scrollPathToVisible(treePath);
+    GuiUtilities.invokeLater(() -> {
+      tree.getSelectionModel().setSelectionPath(treePath);
+      tree.scrollPathToVisible(treePath);
+    });
   }
 
   public static void selectFirstNode(final JTree tree, final DefaultMutableTreeNode node) {
@@ -112,13 +100,7 @@ public class JTreeUtilities {
       final DefaultMutableTreeNode root,
       final DefaultMutableTreeNode node,
       final int index) {
-    final Runnable runnable = new Runnable() {
-      @Override
-      public void run() {
-        internalInsertNode(model, tree, root, node, index);
-      }
-    };
-    GuiUtilities.invokeLater(runnable);
+    GuiUtilities.invokeLater(() -> internalInsertNode(model, tree, root, node, index));
   }
 
   static void internalInsertNode(
@@ -129,9 +111,7 @@ public class JTreeUtilities {
       final int index) {
     synchronized (tree) {
       model.insertNodeInto(node, root, index);
-      final TreePath treePath = new TreePath(node.getPath());
-      tree.getSelectionModel().setSelectionPath(treePath);
-      tree.scrollPathToVisible(treePath);
+      selectPath(tree, new TreePath(node.getPath()));
     }
   }
 }

@@ -25,6 +25,7 @@ import java.nio.file.Path;
 
 public class PathResourceReference implements IResourceReference {
 
+  private static final long serialVersionUID = 1L;
   private final Path path;
 
   public PathResourceReference(final Path path) {

@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.lang.object.ObjectUtilities;
+import net.anwiba.spatial.coordinatereferencesystem.Authority;
 
 public class Projection implements Serializable {
 
@@ -37,10 +38,18 @@ public class Projection implements Serializable {
   public static final Projection MERCATOR_1SP = new Projection(ProjectionType.MERCATOR_1SP);
 
   private final IProjectionType type;
+  private final Area area;
+  private final Authority authority;
 
   public Projection(final IProjectionType type) {
+    this(type, null, null);
+  }
+
+  public Projection(final IProjectionType type, final Area area, final Authority authority) {
     Ensure.ensureArgumentNotNull(type);
     this.type = type;
+    this.area = area;
+    this.authority = authority;
   }
 
   @Override
@@ -67,5 +76,13 @@ public class Projection implements Serializable {
 
   public IProjectionType getProjectionType() {
     return this.type;
+  }
+
+  public Area getArea() {
+    return this.area;
+  }
+
+  public Authority getAuthority() {
+    return this.authority;
   }
 }

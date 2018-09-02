@@ -29,8 +29,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import net.anwiba.commons.lang.stream.IStream;
+import net.anwiba.commons.lang.stream.Streams;
 
 public abstract class AbstractObjectCollection<T> implements IMutableObjectCollection<T> {
 
@@ -171,7 +173,7 @@ public abstract class AbstractObjectCollection<T> implements IMutableObjectColle
   }
 
   @Override
-  public Stream<T> stream() {
-    return this.objects.stream();
+  public IStream<T, RuntimeException> stream() {
+    return Streams.of(this.objects);
   }
 }

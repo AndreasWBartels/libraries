@@ -36,7 +36,7 @@ import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
 import net.anwiba.commons.swing.icon.GuiIcon;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class MessageDialogLauncher {

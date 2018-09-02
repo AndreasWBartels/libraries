@@ -21,8 +21,6 @@
  */
 package net.anwiba.spatial.swing.ckan.search;
 
-import java.time.LocalDateTime;
-
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Resource;
 import net.anwiba.spatial.ckan.json.types.DateString;
@@ -33,6 +31,10 @@ import net.anwiba.spatial.swing.ckan.search.message.Messages;
 public class ResourceDescriptionTextFactory {
 
   public String create(final Resource resource) {
+    if (resource == null) {
+      return ""; //$NON-NLS-1$
+    }
+
     final StringBuilder text = new StringBuilder();
 
     final I18String description = resource.getDescription();
@@ -61,32 +63,28 @@ public class ResourceDescriptionTextFactory {
     if (modified != null || created != null) {
       if (text.length() == 0) {
         if (created != null) {
-          final LocalDateTime localTime = created.getLocalDateTime();
           text.append("<b>" + Messages.created + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-          text.append(localTime.toString());
+          text.append(CkanUtilities.toUserTimeString(created));
         }
         if (modified != null) {
           if (created != null) {
             text.append("<br>"); //$NON-NLS-1$
           }
-          final LocalDateTime localTime = modified.getLocalDateTime();
           text.append("<b>" + Messages.modified + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-          text.append(localTime.toString());
+          text.append(CkanUtilities.toUserTimeString(modified));
         }
       } else {
         text.append("<p>"); //$NON-NLS-1$
         if (created != null) {
-          final LocalDateTime localTime = created.getLocalDateTime();
           text.append("<b>" + Messages.created + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-          text.append(localTime.toString());
+          text.append(CkanUtilities.toUserTimeString(created));
         }
         if (modified != null) {
           if (created != null) {
             text.append("<br>"); //$NON-NLS-1$
           }
-          final LocalDateTime localTime = modified.getLocalDateTime();
           text.append("<b>" + Messages.modified + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-          text.append(localTime.toString());
+          text.append(CkanUtilities.toUserTimeString(modified));
         }
         text.append("</p>"); //$NON-NLS-1$
       }

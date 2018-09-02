@@ -44,7 +44,7 @@ import net.anwiba.commons.swing.dialog.IAdditionalActionFactory;
 import net.anwiba.commons.swing.dialog.IDataStateVisitor;
 import net.anwiba.commons.swing.dialog.IDialogResult;
 import net.anwiba.commons.swing.dialog.MessageDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.preference.IWindowPreferences;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 

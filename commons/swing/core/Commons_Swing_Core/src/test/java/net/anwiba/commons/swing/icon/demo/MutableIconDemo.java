@@ -33,7 +33,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.anwiba.commons.model.IChangeableObjectListener;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.icon.MutableImageIcon;
 
 import org.junit.runner.RunWith;

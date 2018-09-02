@@ -446,9 +446,9 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     return true;
   }
 
-  protected IOptional<File, IOException> ifFile(final IResourceReference resourceReference) throws IOException {
+  protected IOptional<File, IOException> ifFile(final IResourceReference resourceReference) {
     return Optional
-        .<IResourceReference, IOException> create(resourceReference)
+        .of(IOException.class, resourceReference)
         .accept(r -> isFileSystemResource(resourceReference))
         .convert(r -> {
           try {

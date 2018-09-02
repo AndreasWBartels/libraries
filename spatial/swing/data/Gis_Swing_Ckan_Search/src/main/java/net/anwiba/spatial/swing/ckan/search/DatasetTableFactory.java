@@ -21,7 +21,6 @@
  */
 package net.anwiba.spatial.swing.ckan.search;
 
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -32,14 +31,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
-import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.IntegerModel;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
-import net.anwiba.commons.swing.action.IActionProcedure;
 import net.anwiba.commons.swing.table.IKeyListenerFactory;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
@@ -69,12 +66,7 @@ public class DatasetTableFactory {
     return new ObjectTableBuilder<Dataset>()
         .setSingleSelectionMode()
         .setValues(datasets)
-        .addSortableStringColumn(Messages.title, new IFunction<Dataset, String, RuntimeException>() {
-          @Override
-          public String execute(final Dataset value) throws RuntimeException {
-            return value == null ? null : CkanUtilities.toString(value);
-          }
-        }, 40)
+        .addStringColumn(Messages.title, value -> value == null ? null : CkanUtilities.toString(value), 40)
         .addActionFactory((tableModel, selectionIndexModel, selectionModel, sortStateModel) -> {
           final BooleanModel enabledModel = new BooleanModel(false);
           tableModel.addTableModelListener(e -> enabledModel.set(offsetModel.getValue() > 0));
@@ -157,19 +149,15 @@ public class DatasetTableFactory {
               .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.NETWORK_TRANSMIT)
               .setTooltip(Messages.ckan_json_respone)
               .setEnabledDistributor(enabledModel)
-              .setProcedure(new IActionProcedure() {
-
-                @Override
-                public void execute(final Component component) throws RuntimeException {
-                  final Desktop desktop = Desktop.getDesktop();
-                  final Dataset dataset = selectionModel.getSelectedObjects().iterator().next();
-                  final String urlString = description.getUrl() + "/3/action/package_show?id=" + dataset.getId(); //$NON-NLS-1$
-                  try {
-                    final URI uri = new URI(urlString);
-                    desktop.browse(uri);
-                  } catch (URISyntaxException | IOException exception) {
-                    logger.log(ILevel.ERROR, exception.getMessage(), exception);
-                  }
+              .setProcedure(component -> {
+                final Desktop desktop = Desktop.getDesktop();
+                final Dataset dataset = selectionModel.getSelectedObjects().iterator().next();
+                final String urlString = description.getUrl() + "/3/action/package_show?id=" + dataset.getId(); //$NON-NLS-1$
+                try {
+                  final URI uri = new URI(urlString);
+                  desktop.browse(uri);
+                } catch (URISyntaxException | IOException exception) {
+                  logger.log(ILevel.ERROR, exception.getMessage(), exception);
                 }
               })
               .build();
@@ -186,18 +174,15 @@ public class DatasetTableFactory {
               .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.WEB_BROWSER)
               .setTooltip(Messages.browse_dataset)
               .setEnabledDistributor(enabledModel)
-              .setProcedure(new IActionProcedure() {
-
-                @Override
-                public void execute(final Component component) throws RuntimeException {
-                  final Desktop desktop = Desktop.getDesktop();
-                  final Dataset dataset = selectionModel.getSelectedObjects().iterator().next();
-                  try {
-                    final URI uri = new URI(dataset.getUrl());
-                    desktop.browse(uri);
-                  } catch (URISyntaxException | IOException exception) {
-                    logger.log(ILevel.ERROR, exception.getMessage(), exception);
-                  }
+              .setProcedure(component -> {
+                final Desktop desktop = Desktop.getDesktop();
+                final Dataset dataset = selectionModel.getSelectedObjects().iterator().next();
+                try {
+                  final String url = dataset.getUrl().trim();
+                  final URI uri = new URI(url);
+                  desktop.browse(uri);
+                } catch (URISyntaxException | IOException exception) {
+                  logger.log(ILevel.ERROR, exception.getMessage(), exception);
                 }
               })
               .build();

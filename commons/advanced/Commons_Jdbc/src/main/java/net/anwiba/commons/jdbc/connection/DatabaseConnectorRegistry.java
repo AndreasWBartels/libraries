@@ -92,9 +92,10 @@ public class DatabaseConnectorRegistry implements IDatabaseConnectorRegistry {
     return connection;
   }
 
+  @SuppressWarnings("unused")
   private void setUp(final Connection connection) throws SQLException {
     Streams
-        .<IPostConnectionProcedure, SQLException> create(this.procedures)
+        .<IPostConnectionProcedure, SQLException> create(SQLException.class, this.procedures)
         .filter(p -> p.isApplicable(connection))
         .foreach(p -> p.execute(connection));
   }

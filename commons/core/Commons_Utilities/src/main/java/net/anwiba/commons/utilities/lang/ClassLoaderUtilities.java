@@ -44,7 +44,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
 
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.logging.ILevel;
@@ -316,7 +315,7 @@ public class ClassLoaderUtilities {
             logger.log(ILevel.DEBUG, "add file: " + string); //$NON-NLS-1$
             uris.add(new File(uri).getCanonicalFile().toURI());
           } catch (final IOException exception) {
-            logger.log(Level.ALL, exception.getMessage(), exception);
+            logger.log(ILevel.ALL, exception.getMessage(), exception);
             uris.add(new URI(string));
           }
           continue;
@@ -324,7 +323,7 @@ public class ClassLoaderUtilities {
         logger.log(ILevel.DEBUG, "add: " + string); //$NON-NLS-1$
         uris.add(uri);
       } catch (final URISyntaxException e) {
-        logger.log(Level.ALL, e.getMessage(), e);
+        logger.log(ILevel.ALL, e.getMessage(), e);
       }
     }
     return uris.toArray(new URI[uris.size()]);

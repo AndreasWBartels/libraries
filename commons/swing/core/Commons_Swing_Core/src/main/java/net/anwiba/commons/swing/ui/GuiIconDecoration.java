@@ -23,7 +23,7 @@ package net.anwiba.commons.swing.ui;
 
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.message.MessageType;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.swing.icon.IGuiIconDecoration;
 

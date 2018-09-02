@@ -42,7 +42,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
   public <T> T execute(
       final ICanceler cancelable,
       final IRequest request,
-      final IResultProducer<T> resultProducer,
+      final IApplicableResultProducer<T> resultProducer,
       final IApplicableHttpResponseExceptionFactory... exceptionFactories)
       throws InterruptedException,
       HttpServerException,
@@ -55,7 +55,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
   public <T> T execute(
       final ICanceler cancelable,
       final IRequest request,
-      final IResultProducer<T> resultProducer,
+      final IApplicableResultProducer<T> resultProducer,
       final IResultProducer<IOException> errorProducer)
       throws InterruptedException,
       HttpServerException,
@@ -71,7 +71,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
           throw new HttpServerException("Http request faild, empty response", statusCode, statusText); //$NON-NLS-1$
         }
         final String contentType = response.getContentType();
-        if (statusCode >= 200 && statusCode < 300) {
+        if (resultProducer.isApplicable(statusCode, contentType)) {
           try (InputStream stream = response.getInputStream()) {
             try (InputStream inputStream = new BufferedInputStream(new NoneClosingInputStream(stream))) {
               try {

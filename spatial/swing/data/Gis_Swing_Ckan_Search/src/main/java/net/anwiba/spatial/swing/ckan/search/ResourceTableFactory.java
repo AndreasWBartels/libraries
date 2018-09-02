@@ -29,15 +29,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
-import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
+import net.anwiba.commons.swing.icon.DecoratedGuiIcon;
 import net.anwiba.commons.swing.table.ObjectListTable;
 import net.anwiba.commons.swing.table.ObjectTableBuilder;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Dataset;
+import net.anwiba.spatial.ckan.json.schema.v1_0.ExtraGeometry;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Resource;
 import net.anwiba.spatial.ckan.utilities.CkanUtilities;
 import net.anwiba.spatial.swing.ckan.search.message.Messages;
@@ -47,9 +50,16 @@ public class ResourceTableFactory {
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
       .getLogger(ResourceTableFactory.class);
   private final IResourceOpenConsumer resourceOpenconsumer;
+  private final IZoomToConsumer zoomToConsumer;
+  private final IBooleanModel isQueryEnabledModel;
 
-  public ResourceTableFactory(final IResourceOpenConsumer resourceOpenconsumer) {
+  public ResourceTableFactory(
+      final IBooleanModel isQueryEnabledModel,
+      final IResourceOpenConsumer resourceOpenconsumer,
+      final IZoomToConsumer zoomToConsumer) {
+    this.isQueryEnabledModel = isQueryEnabledModel;
     this.resourceOpenconsumer = resourceOpenconsumer;
+    this.zoomToConsumer = zoomToConsumer;
   }
 
   public ObjectListTable<Resource> create(
@@ -60,18 +70,8 @@ public class ResourceTableFactory {
         .setValues(
             Optional.of(datasetModel.get()).convert(d -> d.getResources()).convert(a -> Arrays.asList(a)).getOr(
                 () -> new ArrayList<>()))
-        .addSortableStringColumn(Messages.title, new IFunction<Resource, String, RuntimeException>() {
-          @Override
-          public String execute(final Resource value) throws RuntimeException {
-            return value == null ? null : CkanUtilities.toString(value);
-          }
-        }, 350)
-        .addSortableStringColumn(Messages.format, new IFunction<Resource, String, RuntimeException>() {
-          @Override
-          public String execute(final Resource value) throws RuntimeException {
-            return value == null ? null : value.getFormat();
-          }
-        }, 50)
+        .addSortableStringColumn(Messages.title, value -> value == null ? null : CkanUtilities.toString(value), 350)
+        .addSortableStringColumn(Messages.format, value -> value == null ? null : value.getFormat(), 50)
         .addActionFactory((tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> {
           final BooleanModel enabledModel = new BooleanModel(false);
           selectionModel
@@ -97,26 +97,12 @@ public class ResourceTableFactory {
           final BooleanModel enabledModel = new BooleanModel(false);
           selectionModel.addSelectionListener(
               e -> enabledModel.set(
-                  !e.getSource().isEmpty()
-                      && this.resourceOpenconsumer
-                          .isApplicable(selectionModel.getSelectedObjects().iterator().next())));
-          return new ConfigurableActionBuilder()
-              .setIcon(net.anwiba.commons.swing.icon.GuiIcons.OPEN_ICON)
-              .setEnabledDistributor(enabledModel)
-              .setProcedure(
-                  c -> this.resourceOpenconsumer
-                      .open(description, datasetModel.get(), selectionModel.getSelectedObjects().iterator().next()))
-              .build();
-        })
-        .addActionFactory((tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> {
-          final BooleanModel enabledModel = new BooleanModel(false);
-          selectionModel.addSelectionListener(
-              e -> enabledModel.set(
                   Desktop.isDesktopSupported()
                       && !e.getSource().isEmpty()
                       && isHttpResource(selectionModel.getSelectedObjects().iterator().next())));
           return new ConfigurableActionBuilder()
               .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.WEB_BROWSER)
+              .setTooltip("Browse resource")
               .setEnabledDistributor(enabledModel)
               .setProcedure(component -> {
                 final Desktop desktop = Desktop.getDesktop();
@@ -130,7 +116,74 @@ public class ResourceTableFactory {
               })
               .build();
         })
+        .addActionFactory((tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> {
+          final BooleanModel enabledModel = new BooleanModel(false);
+          selectionModel.addSelectionListener(
+              e -> enabledModel.set(
+                  !e.getSource().isEmpty()
+                      && this.resourceOpenconsumer
+                          .isApplicable(selectionModel.getSelectedObjects().iterator().next())));
+          return new ConfigurableActionBuilder()
+              .setIcon(net.anwiba.commons.swing.icons.GuiIcons.OPEN_ICON)
+              .setTooltip("Open resource")
+              .setEnabledDistributor(enabledModel)
+              .setProcedure(
+                  c -> this.resourceOpenconsumer
+                      .open(description, datasetModel.get(), selectionModel.getSelectedObjects().iterator().next()))
+              .build();
+        })
+        .addActionFactory((tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> {
+          final BooleanModel enabledModel = new BooleanModel(false);
+          datasetModel.addChangeListener(() -> enabledModel.set(hasSpatialLocation(datasetModel.get())));
+          return new ConfigurableActionBuilder()
+              .setIcon(
+                  new DecoratedGuiIcon(
+                      net.anwiba.commons.swing.icons.GuiIcons.MAPS_ICON,
+                      net.anwiba.commons.swing.icons.GuiIcons.ZOOM_ICON))
+              .setTooltip("Zoom to")
+              .setEnabledDistributor(enabledModel)
+              .setProcedure(c -> {
+                final boolean isQueryEnabled = this.isQueryEnabledModel.get();
+                try {
+                  this.isQueryEnabledModel.set(false);
+                  this.zoomToConsumer.consume(
+                      Optional
+                          .of(datasetModel.get()) //
+                          .convert(d -> d.getExtras())
+                          .convert(e -> Streams.of(e).instanceOf(ExtraGeometry.class).first().get())
+                          .convert(s -> s.getValue())
+                          .convert(s -> {
+                            try {
+                              return s.asGeometry();
+                            } catch (final Exception exception) {
+                              return null;
+                            }
+                          })
+                          .get());
+
+                } finally {
+                  this.isQueryEnabledModel.set(isQueryEnabled);
+                }
+              })
+              .build();
+        })
         .build();
+  }
+
+  private boolean hasSpatialLocation(final Dataset dataset) {
+    return Optional
+        .of(dataset) //
+        .convert(d -> d.getExtras())
+        .convert(e -> Streams.of(e).instanceOf(ExtraGeometry.class).first().get())
+        .convert(s -> s.getValue())
+        .convert(s -> {
+          try {
+            return s.asGeometry();
+          } catch (final Exception exception) {
+            return null;
+          }
+        })
+        .isAccepted();
   }
 
   private boolean isHttpResource(final Resource resource) {

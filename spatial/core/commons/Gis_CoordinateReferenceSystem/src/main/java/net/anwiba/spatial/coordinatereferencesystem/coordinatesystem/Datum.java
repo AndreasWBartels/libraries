@@ -38,21 +38,37 @@ public class Datum implements Serializable {
 
   private final Authority authority;
 
+  private final Area area;
+
   public Datum(final String name, final Spheroid spheroid, final ToWgs84 toWgs84) {
     this(name, spheroid, toWgs84, null);
   }
 
   public Datum(final String name, final Spheroid spheroid, final ToWgs84 toWgs84, final Authority authority) {
-    this.authority = authority;
+    this(name, spheroid, toWgs84, null, authority);
+  }
+
+  public Datum(
+      final String name,
+      final Spheroid spheroid,
+      final ToWgs84 toWgs84,
+      final Area area,
+      final Authority authority) {
     Ensure.ensureArgumentNotNull(name);
     Ensure.ensureArgumentNotNull(spheroid);
     this.name = name;
     this.spheroid = spheroid;
     this.toWgs84 = toWgs84;
+    this.area = area;
+    this.authority = authority;
   }
 
   public String getName() {
     return this.name;
+  }
+
+  public Area getArea() {
+    return this.area;
   }
 
   public Spheroid getSpheroid() {

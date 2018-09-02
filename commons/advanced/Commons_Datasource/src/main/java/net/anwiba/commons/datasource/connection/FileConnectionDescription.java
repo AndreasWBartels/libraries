@@ -72,4 +72,9 @@ public class FileConnectionDescription extends AbstractConnectionDescription imp
   public DataSourceType getDataSourceType() {
     return DataSourceType.FILE;
   }
+
+  @Override
+  public String getFormat() {
+    return "File"; //$NON-NLS-1$
+  }
 }

@@ -44,7 +44,7 @@ public final class ContentPaneBuilderUsingDialogConfiguration
         preferences,
         true,
         message,
-        net.anwiba.commons.swing.icon.GuiIcons.EMPTY_ICON,
+        net.anwiba.commons.swing.icons.GuiIcons.EMPTY_ICON,
         DataState.UNKNOWN,
         ModalityType.APPLICATION_MODAL,
         dialogType,

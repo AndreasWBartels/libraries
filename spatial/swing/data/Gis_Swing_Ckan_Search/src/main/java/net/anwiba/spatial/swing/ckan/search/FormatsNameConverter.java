@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.anwiba.commons.lang.optional.If;
+import net.anwiba.spatial.ckan.request.IFormatsNameConverter;
 
 public class FormatsNameConverter implements IFormatsNameConverter {
 

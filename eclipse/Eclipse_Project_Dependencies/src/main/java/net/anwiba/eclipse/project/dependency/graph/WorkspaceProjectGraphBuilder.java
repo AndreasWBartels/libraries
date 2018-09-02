@@ -27,7 +27,7 @@ import net.anwiba.tools.simple.graphml.generated.Graph;
 
 public class WorkspaceProjectGraphBuilder {
 
-  LibraryGraph libraryGraph = new LibraryGraph();
+  final private LibraryGraph libraryGraph = new LibraryGraph();
   private boolean isNormalizeEnabled = false;
 
   public WorkspaceProjectGraphBuilder set(final IWorkspace workspace) {

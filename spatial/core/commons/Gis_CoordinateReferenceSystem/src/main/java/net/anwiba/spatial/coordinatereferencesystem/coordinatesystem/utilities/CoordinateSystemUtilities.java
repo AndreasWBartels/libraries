@@ -268,7 +268,7 @@ public class CoordinateSystemUtilities {
       case TIME:
       case SCALE:
       case UNKNOWN: {
-        throw new UnsupportedOperationException();
+        return 1;
       }
     }
     throw new UnreachableCodeReachedException();

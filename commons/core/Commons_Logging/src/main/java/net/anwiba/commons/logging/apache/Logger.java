@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,13 +21,11 @@
  */
 package net.anwiba.commons.logging.apache;
 
+import org.apache.commons.logging.Log;
+
+import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.IMessageFactory;
-import net.anwiba.commons.logging.LogLevel;
-
-import java.util.logging.Level;
-
-import org.apache.commons.logging.Log;
 
 public final class Logger implements ILogger {
 
@@ -38,8 +36,8 @@ public final class Logger implements ILogger {
   }
 
   @Override
-  public void log(final Level level, final String message, final Throwable throwable) {
-    switch (LogLevel.byLevel(level)) {
+  public void log(final ILevel level, final String message, final Throwable throwable) {
+    switch (ApacheLogging.create(level)) {
       case ALL: {
         this.log.trace(message, throwable);
         return;
@@ -76,13 +74,13 @@ public final class Logger implements ILogger {
   }
 
   @Override
-  public void log(final Level level, final String message) {
+  public void log(final ILevel level, final String message) {
     log(level, message, null);
   }
 
   @Override
-  public boolean isLoggable(final Level level) {
-    switch (LogLevel.byLevel(level)) {
+  public boolean isLoggable(final ILevel level) {
+    switch (ApacheLogging.create(level)) {
       case ALL: {
         return this.log.isTraceEnabled();
       }
@@ -113,7 +111,7 @@ public final class Logger implements ILogger {
   }
 
   @Override
-  public void log(final Level level, final IMessageFactory factory) {
+  public void log(final ILevel level, final IMessageFactory factory) {
     if (!isLoggable(level)) {
       return;
     }

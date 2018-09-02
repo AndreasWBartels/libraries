@@ -9,7 +9,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-swing-data</artifactId>
-    <version>1.0.140</version>
+    <version>1.0.154</version>
   </parent>
 
   <scm>
@@ -18,8 +18,8 @@
     <url>${scm.url.net.anwiba.master}/spatial/swing/data/Gis_Swing_Ckan_Search</url>
   </scm>
 
-
   <dependencies>
+
     <dependency>
       <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-logging</artifactId>
@@ -56,6 +56,14 @@
       <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-http</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-message</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-message</artifactId>
+    </dependency>
 
 
     <dependency>
@@ -63,17 +71,26 @@
       <artifactId>anwiba-commons-swing-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-icon</artifactId>
+    </dependency>
+    <dependency>
       <groupId>net.anwiba.commons.swing.icons</groupId>
       <artifactId>org.gnome.gtk-contrast-high-icons</artifactId>
       <version>3.22.1-${net.anwiba.commons.version}</version>
     </dependency>
 
+
+    <dependency>
+      <artifactId>anwiba-spatial-data-geo-json</artifactId>
+      <groupId>net.anwiba.spatial</groupId>
+      <version>${net.anwiba.spatial.version}</version>
+    </dependency>
     <dependency>
       <artifactId>anwiba-spatial-data-ckan</artifactId>
       <groupId>net.anwiba.spatial</groupId>
       <version>${net.anwiba.spatial.version}</version>
     </dependency>
-
 
   </dependencies>
 

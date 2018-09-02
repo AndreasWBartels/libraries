@@ -29,28 +29,18 @@ public class Setter extends AbstractBeanMethod {
 
   private final boolean isMultiValue;
   private final boolean isSingleValue;
-  private final boolean isInjection;
-  private final String injectionAnnotationName;
 
   public Setter(
       final String name,
       final boolean isEnabled,
       final boolean isSingleValue,
       final boolean isMultiValue,
-      final boolean isInjection,
-      final String injectionAnnotationName,
       final List<Annotation> annotations,
       final Argument argument,
       final Map<String, List<Annotation>> map) {
     super(name, isEnabled, annotations, Arrays.asList(argument), map);
     this.isSingleValue = isSingleValue;
     this.isMultiValue = isMultiValue;
-    this.isInjection = isInjection;
-    this.injectionAnnotationName = injectionAnnotationName;
-  }
-
-  public boolean isInjection() {
-    return this.isInjection;
   }
 
   public boolean isMultiValue() {
@@ -59,9 +49,5 @@ public class Setter extends AbstractBeanMethod {
 
   public boolean isSingleValue() {
     return this.isSingleValue;
-  }
-
-  public String getInjectionAnnotationName() {
-    return this.injectionAnnotationName;
   }
 }

@@ -25,7 +25,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
+
+import net.anwiba.commons.logging.ILevel;
 
 public class SqliteUtilities {
 
@@ -34,8 +35,8 @@ public class SqliteUtilities {
 
   public static boolean exists(final Connection connection, final String tableName) throws SQLException {
     final String selectStatement = "pragma table_info('" + tableName + "');"; //$NON-NLS-1$ //$NON-NLS-2$
-    logger.log(Level.FINE, "Query: Table " + tableName); //$NON-NLS-1$
-    logger.log(Level.FINE, "Query: " + selectStatement); //$NON-NLS-1$
+    logger.log(ILevel.FINE, "Query: Table " + tableName); //$NON-NLS-1$
+    logger.log(ILevel.FINE, "Query: " + selectStatement); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(selectStatement)) {
       if (statement.execute()) {
         try (ResultSet resultSet = statement.getResultSet()) {

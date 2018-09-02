@@ -27,9 +27,9 @@ import java.lang.reflect.InvocationTargetException;
 
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.swing.dialog.MessageDialogUtilities;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialogUtilities;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
-import net.anwiba.commons.swing.utilities.MessageDialogUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O> {
@@ -62,7 +62,7 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
       final Window owner = GuiUtilities.getParentWindow(component);
       try {
         final I value = Optional
-            .<IActionInitializer<I>, InvocationTargetException> create(this.initializer)
+            .of(InvocationTargetException.class, this.initializer)
             .convert(i -> i.initialize(component))
             .get();
         @SuppressWarnings("unchecked")
@@ -73,8 +73,7 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
                 .setTitle(this.title)
                 .setDescription(this.description)
                 .launch(owner);
-        Optional.<IActionConsumer<O>, InvocationTargetException> create(this.consumer).consume(
-            c -> c.consume(component, result));
+        Optional.of(InvocationTargetException.class, this.consumer).consume(c -> c.consume(component, result));
       } catch (final InvocationTargetException exception) {
         final Throwable throwable = exception.getCause();
         logger.log(ILevel.DEBUG, throwable.getMessage(), throwable);

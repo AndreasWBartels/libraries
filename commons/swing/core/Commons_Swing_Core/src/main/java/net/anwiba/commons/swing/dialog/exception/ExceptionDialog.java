@@ -33,7 +33,7 @@ import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.swing.dialog.DialogMessages;
 import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.MessageDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 public class ExceptionDialog extends MessageDialog {
 

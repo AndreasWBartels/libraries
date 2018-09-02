@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.swing.menu.demo;
 
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.menu.JRadioButtonMenuItemProvider;
 import net.anwiba.commons.swing.menu.MenuActionItemConfiguration;
 import net.anwiba.commons.swing.menu.MenuActionItemDescription;

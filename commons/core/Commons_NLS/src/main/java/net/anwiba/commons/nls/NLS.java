@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.logging.Level;
 
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
@@ -155,7 +154,7 @@ public abstract class NLS {
         final MessagesProperties properties = new MessagesProperties(fields, bundleName, isAccessible, ASSIGNED);
         properties.load(input);
       } catch (final IOException e) {
-        logger.log(Level.SEVERE, "Error loading " + element, e); //$NON-NLS-1$
+        logger.log(ILevel.SEVERE, "Error loading " + element, e); //$NON-NLS-1$
       } finally {
         try {
           input.close();

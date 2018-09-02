@@ -30,6 +30,7 @@ import net.anwiba.eclipse.project.dependency.java.IWorkspace;
 import net.anwiba.eclipse.project.dependency.model.IDependenciesModel;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -85,10 +86,14 @@ public class SaveGraphmlAction extends Action {
 
         @Override
         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-          final WorkspaceProjectGraphBuilder builder = new WorkspaceProjectGraphBuilder();
-          builder.setNormalize(SaveGraphmlAction.this.enableNormalizeGraphModel.get());
-          builder.set(workspace);
-          GraphmlUtilities.saveAndLoad(file, builder.build());
+          try {
+            final WorkspaceProjectGraphBuilder builder = new WorkspaceProjectGraphBuilder();
+            builder.setNormalize(SaveGraphmlAction.this.enableNormalizeGraphModel.get());
+            builder.set(workspace);
+            GraphmlUtilities.saveAndLoad(file, builder.build());
+          } catch (final IOException e) {
+            throw new InvocationTargetException(e);
+          }
         }
       });
     } catch (final InvocationTargetException e) {

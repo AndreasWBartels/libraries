@@ -44,7 +44,7 @@ import net.anwiba.commons.swing.dialog.chooser.IChooserPanel;
 import net.anwiba.commons.swing.dialog.chooser.IChooserPanelConfiguration;
 import net.anwiba.commons.swing.dialog.chooser.IChooserPanelFactory;
 import net.anwiba.commons.swing.dialog.chooser.ListChooserDialog;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 
 import org.junit.runner.RunWith;

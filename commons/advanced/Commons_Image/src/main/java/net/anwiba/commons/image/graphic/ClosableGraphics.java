@@ -24,6 +24,7 @@ package net.anwiba.commons.image.graphic;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
+import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.optional.Optional;
 
 class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
@@ -39,8 +40,10 @@ class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
   private final Object textAntialiasing;
   private final Object textLcdContrast;
   private final Graphics2D graphics;
+  private final boolean dispose;
 
   ClosableGraphics(
+      final boolean dispose,
       final Graphics2D graphics,
       final Object antiAliasing,
       final Object alphaInterpolation,
@@ -53,6 +56,7 @@ class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
       final Object textAntialiasing,
       final Object textLcdContrast) {
     super(graphics);
+    this.dispose = dispose;
     this.graphics = graphics;
     this.antiAliasing = antiAliasing;
     this.alphaInterpolation = alphaInterpolation;
@@ -68,9 +72,8 @@ class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
 
   @Override
   public void close() throws RuntimeException {
-    Optional
-        .of(this.antiAliasing)
-        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, value));
+    Optional.of(this.antiAliasing).consume(
+        value -> this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, value));
     Optional.of(this.textAntialiasing).consume(
         value -> this.graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, value));
     Optional
@@ -112,8 +115,10 @@ class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
         .or(
             () -> this.graphics
                 .setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT));
-    Optional.of(this.rendering).consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, value)).or(
-        () -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT));
-    this.graphics.dispose();
+    Optional
+        .of(this.rendering)
+        .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, value))
+        .or(() -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT));
+    If.isTrue(this.dispose).excecute(() -> this.graphics.dispose());
   }
 }

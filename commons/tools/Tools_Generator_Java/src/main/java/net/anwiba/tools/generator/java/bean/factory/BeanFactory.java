@@ -115,7 +115,8 @@ public class BeanFactory extends AbstractSourceFactory {
   private void memberMethods(
       final JDefinedClass instance,
       final Map<Member, JFieldVar> fieldsByMember,
-      final Bean configuration) throws CreationException {
+      final Bean configuration)
+      throws CreationException {
     final Set<Entry<Member, JFieldVar>> entrySet = fieldsByMember.entrySet();
     for (final Entry<Member, JFieldVar> entry : entrySet) {
       final Member member = entry.getKey();
@@ -132,7 +133,8 @@ public class BeanFactory extends AbstractSourceFactory {
       final JDefinedClass instance,
       final Bean configuration,
       final Member member,
-      final JFieldVar field) throws CreationException {
+      final JFieldVar field)
+      throws CreationException {
     final NamedValueProvider namedValueProvider = configuration.namedValueProvider(member.name());
     if (namedValueProvider != null) {
       this.namedValueProviderFactory.create(instance, namedValueProvider, field);
@@ -143,7 +145,8 @@ public class BeanFactory extends AbstractSourceFactory {
       final JDefinedClass instance,
       final Bean configuration,
       final Member member,
-      final JFieldVar field) throws CreationException {
+      final JFieldVar field)
+      throws CreationException {
     final Getter getter = member.getter();
     if (getter.isEnabled()) {
       if (getter.isNamedValueGetterEnabled()) {
@@ -171,7 +174,8 @@ public class BeanFactory extends AbstractSourceFactory {
       final JDefinedClass instance,
       final Bean configuration,
       final Member member,
-      final JFieldVar field) throws CreationException {
+      final JFieldVar field)
+      throws CreationException {
     final Setter setter = member.setter();
     final Argument argument = setter.arguments().iterator().next();
     if (configuration.isMutable() && setter.isEnabled()) {
@@ -184,8 +188,6 @@ public class BeanFactory extends AbstractSourceFactory {
               setter.name(), //
               member.isImutable(), //
               member.isNullable(), //
-              setter.isInjection(),
-              setter.getInjectionAnnotationName(),
               annotations, //
               _type(member.type().generics()[0]), //
               "name", //$NON-NLS-1$

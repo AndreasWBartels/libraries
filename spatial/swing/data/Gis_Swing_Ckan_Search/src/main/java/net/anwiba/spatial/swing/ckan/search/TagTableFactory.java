@@ -30,6 +30,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -89,10 +90,36 @@ public final class TagTableFactory {
         .addSortableStringColumn(Messages.name, value -> CkanUtilities.toString(value), columnWitdh)
         .addActionFactory(
             (tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> new ConfigurableActionBuilder()
-                .setIcon(net.anwiba.commons.swing.icon.GuiIcons.EDIT_ICON)
+                .setIcon(net.anwiba.commons.swing.icons.GuiIcons.EDIT_ICON)
                 .setProcedure(createSelectTagActionProcedure(description, preferences, tags, tableModel))
                 .build())
         .addRemoveObjectsAction()
+        .addActionFactory((tableModel, selectionIndicesProvider, selectionModel, sortStateModel) -> {
+          final IBooleanModel enabledModel = new BooleanModel(!tableModel.isEmpty());
+          tableModel.addTableModelListener(e -> enabledModel.set(!tableModel.isEmpty()));
+          return new ConfigurableActionBuilder()
+              .setIcon(net.anwiba.commons.swing.icons.GuiIcons.EDIT_CLEAR_LIST)
+              .setEnabledDistributor(enabledModel)
+              .setProcedure(component -> tableModel.removeAll())
+              .build();
+        })
+        .addTextFieldActionFactory(
+            (tableModel, selectionIndicesProvider, selectionModel, sortStateModel, model, clearblock) -> {
+              final IBooleanModel enabledModel = new BooleanModel(false);
+              model.addChangeListener(() -> enabledModel.set(!StringUtilities.isNullOrTrimmedEmpty(model.get())));
+              return new ConfigurableActionBuilder()
+                  .setIcon(net.anwiba.commons.swing.icons.GuiIcons.ADVANCED_SEARCH_ICON)
+                  .setEnabledDistributor(enabledModel)
+                  .setProcedure(
+                      createSearchTagActionProcedure(
+                          description,
+                          preferences,
+                          new ArrayList<>(),
+                          tableModel,
+                          clearblock,
+                          model))
+                  .build();
+            })
         .addTextFieldActionFactory(
             (tableModel, selectionIndicesProvider, selectionModel, sortStateModel, model, clearblock) -> {
               final IBooleanModel enabledModel = new BooleanModel(false);
@@ -103,22 +130,15 @@ public final class TagTableFactory {
                   .setProcedure(component -> {
                     final String value = model.get();
                     clearblock.execute();
-                    Streams.of(tableModel.values()).first(v -> value.equalsIgnoreCase(CkanUtilities.toString(v))).or(
-                        () -> {
-                          tableModel.add(createTag(value));
-                        });
+                    final List<Tag> results = new ArrayList<>();
+                    for (final String token : StringUtilities.trimedTokens(value, ',')) {
+                      Streams
+                          .of(tableModel.values())//
+                          .first(v -> token.equalsIgnoreCase(CkanUtilities.toString(v)))
+                          .or(() -> results.add(createTag(token)));
+                    }
+                    tableModel.add(results);
                   })
-                  .build();
-            })
-        .addTextFieldActionFactory(
-            (tableModel, selectionIndicesProvider, selectionModel, sortStateModel, model, clearblock) -> {
-              final IBooleanModel enabledModel = new BooleanModel(false);
-              model.addChangeListener(() -> enabledModel.set(!StringUtilities.isNullOrTrimmedEmpty(model.get())));
-              return new ConfigurableActionBuilder()
-                  .setIcon(net.anwiba.commons.swing.icon.GuiIcons.ADVANCED_SEARCH_ICON)
-                  .setEnabledDistributor(enabledModel)
-                  .setProcedure(
-                      createSearchTagActionProcedure(description, preferences, tags, tableModel, clearblock, model))
                   .build();
             })
         .setTextFieldKeyListenerFactory(
@@ -132,10 +152,14 @@ public final class TagTableFactory {
                     return;
                   }
                   clearBlock.execute();
-                  Streams.of(tableModel.values()).first(v -> value.equalsIgnoreCase(CkanUtilities.toString(v))).or(
-                      () -> {
-                        tableModel.add(createTag(value));
-                      });
+                  final List<Tag> results = new ArrayList<>();
+                  for (final String token : StringUtilities.trimedTokens(value, ',')) {
+                    Streams
+                        .of(tableModel.values())//
+                        .first(v -> token.equalsIgnoreCase(CkanUtilities.toString(v)))
+                        .or(() -> results.add(createTag(token)));
+                  }
+                  tableModel.add(results);
                 }
               }
 
@@ -319,6 +343,11 @@ public final class TagTableFactory {
     try (final IObjectRequestExecutor<TagSearchResultResponse> executor = this.requestExecutorBuilderFactory
         .<TagSearchResultResponse> create()
         .setResultProducer(responseProducer)
+        .addResultProducer(
+            (statusCode, contentType) -> new HashSet<>(Arrays.asList(409, 400, 500)).contains(statusCode)
+                && contentType != null
+                && contentType.startsWith("application/json"), //$NON-NLS-1$
+            responseProducer)
         .build()) {
       final TagSearchResultResponse response = executor.execute(canceler, request);
       return response.isSuccess() ? Arrays.asList(response.getResult().getResults()) : Collections.emptyList();

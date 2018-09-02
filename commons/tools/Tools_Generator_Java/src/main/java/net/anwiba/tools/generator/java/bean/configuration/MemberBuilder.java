@@ -28,8 +28,6 @@ import java.util.List;
 import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.utilities.ArrayUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
-import net.anwiba.tools.generator.java.bean.factory.IAsObjectMethodFactory;
-import net.anwiba.tools.generator.java.bean.factory.IValueOfMethodFactory;
 
 @SuppressWarnings("nls")
 public class MemberBuilder {
@@ -63,8 +61,6 @@ public class MemberBuilder {
         this.isSetterEnabled,
         this.isSingleValue,
         this.isMultiValue,
-        false,
-        null,
         this.setterAnnotations,
         new Argument(this.name, this.setterArgumentAnnotations, this.type),
         map);

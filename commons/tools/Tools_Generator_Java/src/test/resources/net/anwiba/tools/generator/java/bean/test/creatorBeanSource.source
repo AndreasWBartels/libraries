@@ -2,10 +2,12 @@
 
 package net.anwiba.test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
 
 public class Bean {
 
@@ -37,13 +39,45 @@ public class Bean {
         return new Bean();
     }
 
-    private static Bean _createBean(Class<? extends Bean> clazz) {
-        try {
-            ReflectionConstructorInvoker<Bean> invoker = new ReflectionConstructorInvoker<Bean>(clazz);
-            return invoker.invoke();
-        } catch (InvocationTargetException exception) {
-            throw new RuntimeException(exception);
+    private static Bean _createBean(final Class<? extends Bean> clazz) {
+        if (System.getSecurityManager() == null) {
+            try {
+                Constructor<? extends Bean> constructor = clazz.getDeclaredConstructor(new Class[ 0 ] );
+                return constructor.newInstance();
+            } catch (InstantiationException exception) {
+                throw new RuntimeException(exception);
+            } catch (NoSuchMethodException exception) {
+                throw new RuntimeException(exception);
+            } catch (InvocationTargetException exception) {
+                throw new RuntimeException(exception);
+            } catch (IllegalAccessException exception) {
+                throw new RuntimeException(exception);
+            } catch (IllegalArgumentException exception) {
+                throw new RuntimeException(exception);
+            }
         }
+        return AccessController.doPrivileged(new PrivilegedAction<Bean>() {
+
+
+            public Bean run() {
+                try {
+                    Constructor<? extends Bean> constructor = clazz.getDeclaredConstructor(new Class[ 0 ] );
+                    return constructor.newInstance();
+                } catch (InstantiationException exception) {
+                    throw new RuntimeException(exception);
+                } catch (NoSuchMethodException exception) {
+                    throw new RuntimeException(exception);
+                } catch (InvocationTargetException exception) {
+                    throw new RuntimeException(exception);
+                } catch (IllegalAccessException exception) {
+                    throw new RuntimeException(exception);
+                } catch (IllegalArgumentException exception) {
+                    throw new RuntimeException(exception);
+                }
+            }
+
+        }
+        );
     }
 
     private static synchronized Class<? extends Bean> _createClass(String type) {

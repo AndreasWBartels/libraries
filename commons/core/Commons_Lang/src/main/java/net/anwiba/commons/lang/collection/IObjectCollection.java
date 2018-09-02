@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.lang.collection;
 
-import java.util.stream.Stream;
+import net.anwiba.commons.lang.stream.IStream;
 
 public interface IObjectCollection<T> extends IObjectIterable<T> {
 
   public int size();
 
-  public Stream<T> stream();
+  public IStream<T, RuntimeException> stream();
 
   IObjectIterable<T> values();
 

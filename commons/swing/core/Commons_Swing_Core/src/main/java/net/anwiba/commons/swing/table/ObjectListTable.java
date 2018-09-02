@@ -84,7 +84,7 @@ public class ObjectListTable<T> extends ObjectTable<T> {
   @Override
   public JComponent getComponent() {
     if (this.configuration.isTextFieldEnable() || !this.configuration.getTextFieldActionConfiguration().isEmpty()) {
-      final StringFieldBuilder builder = new StringFieldBuilder().addClearAction(ObjectListTableMessages.clear);
+      final StringFieldBuilder builder = new StringFieldBuilder();
 
       this.configuration.getTextFieldActionConfiguration().getFactories().forEach(
           f -> builder.addActionFactory(
@@ -95,6 +95,8 @@ public class ObjectListTable<T> extends ObjectTable<T> {
                   enabledDistributor,
                   model,
                   clearBlock)));
+
+      builder.addClearAction(ObjectListTableMessages.clear);
 
       Optional.of(this.configuration.getTextFieldKeyListenerFactory()).consume(
           f -> builder.setKeyListenerFactory(new IKeyListenerFactory<String>() {

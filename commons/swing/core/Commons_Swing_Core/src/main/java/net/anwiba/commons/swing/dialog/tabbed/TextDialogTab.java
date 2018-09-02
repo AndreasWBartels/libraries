@@ -39,7 +39,7 @@ import javax.swing.text.html.HTMLDocument;
 
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 public class TextDialogTab extends AbstractNoneEditTabbedDialogTab {
 

@@ -44,7 +44,6 @@ import net.anwiba.commons.lang.io.NoneClosingInputStream;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.xml.jaxb.IJaxbContext;
-import net.anwiba.commons.xml.jaxb.JaxbContextBuilder;
 import net.anwiba.commons.xml.jaxb.JaxbTransformer;
 
 public class RegistableConvertingXmlReaderFactory {
@@ -80,9 +79,6 @@ public class RegistableConvertingXmlReaderFactory {
       transformerFactory.setURIResolver(uriResolver);
       //      transformerFactory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
       final Templates inputTransformerTemplate = create(inputXsltScript, transformerFactory);
-
-      new JaxbContextBuilder();
-
       final JaxbTransformer<T> jaxbTransformer = new JaxbTransformer<>(
           transformerFactory,
           inputTransformerTemplate,

@@ -45,11 +45,19 @@ public class If implements IIf {
   }
 
   @Override
-  public <O, E extends Exception> IOptional<O, E> excecute(final ISupplier<O, E> supplier) throws E {
+  public <O> IOptional<O, RuntimeException> excecute(final ISupplier<O, RuntimeException> supplier) {
+    return excecute(RuntimeException.class, supplier);
+  }
+
+  @Override
+  public <O, E extends Exception> IOptional<O, E> excecute(
+      final Class<E> exceptionClass,
+      final ISupplier<O, E> supplier)
+      throws E {
     if (this.value) {
-      return Optional.<O, E> create(supplier.supply());
+      return Optional.of(exceptionClass, supplier.supply());
     }
-    return Optional.<O, E> create(null);
+    return Optional.empty(exceptionClass);
   }
 
   @Override
@@ -61,11 +69,17 @@ public class If implements IIf {
   }
 
   @Override
-  public <O, E extends Exception> IOptional<O, E> or(final ISupplier<O, E> supplier) throws E {
+  public <O> IOptional<O, RuntimeException> or(final ISupplier<O, RuntimeException> supplier) {
+    return or(RuntimeException.class, supplier);
+  }
+
+  @Override
+  public <O, E extends Exception> IOptional<O, E> or(final Class<E> exceptionClass, final ISupplier<O, E> supplier)
+      throws E {
     if (!this.value) {
-      return Optional.<O, E> create(supplier.supply());
+      return Optional.of(exceptionClass, supplier.supply());
     }
-    return Optional.<O, E> create(null);
+    return Optional.empty(exceptionClass);
   }
 
   @Override

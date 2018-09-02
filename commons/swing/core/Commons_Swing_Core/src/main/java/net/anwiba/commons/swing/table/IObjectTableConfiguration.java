@@ -22,6 +22,7 @@
 package net.anwiba.commons.swing.table;
 
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
+import net.anwiba.commons.utilities.string.IStringSubstituter;
 
 public interface IObjectTableConfiguration<T> {
 
@@ -40,5 +41,7 @@ public interface IObjectTableConfiguration<T> {
   IKeyListenerFactory<T> getKeyListenerFactory();
 
   int getAutoResizeMode();
+
+  IStringSubstituter getToolTipSubstituter();
 
 }

@@ -26,12 +26,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
+import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.object.ObjectPair;
+import net.anwiba.commons.model.IObjectDistributor;
+import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.dialog.ConfigurableDialogLauncher;
 import net.anwiba.commons.swing.dialog.IDialogLauncher;
@@ -39,6 +41,12 @@ import net.anwiba.commons.swing.dialog.IDialogsContainer;
 import net.anwiba.commons.swing.dialog.MessageDialogLauncher;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialogLauncher;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Dataset;
+import net.anwiba.spatial.ckan.request.IFormatsNameConverter;
+import net.anwiba.spatial.ckan.request.IPackageQueryCondition;
+import net.anwiba.spatial.ckan.request.IPackageQueryExecutor;
+import net.anwiba.spatial.ckan.request.PackageQueryConditionBuilder;
+import net.anwiba.spatial.ckan.request.PackageQueryExecutor;
+import net.anwiba.spatial.ckan.values.Envelope;
 import net.anwiba.spatial.swing.ckan.search.message.Messages;
 
 public class CkanSearchDialogLauncherFactory {
@@ -47,17 +55,38 @@ public class CkanSearchDialogLauncherFactory {
   private final IObjectRequestExecutorBuilderFactory requestExecutorBuilderFactory;
   private final IResourceOpenConsumer resourceOpenConsumer;
   private final IDialogsContainer dialogsContainer;
-  private final DatasetQueryExecutor datasetQueryExecutor;
+  private final IPackageQueryExecutor datasetQueryExecutor;
+  private final IObjectDistributor<Envelope> envelopeDistributor;
+  private final IZoomToConsumer zoomToConsumer;
+  private final IDataSetResultsConsumer dataSetResultsConsumer;
+  private final IBlock<RuntimeException> disposeBlock;
+  private final IDataSetConsumer dataSetConsumer;
+  private final IObjectDistributor<String> datasetIdentifierDistributor;
+  private final IObjectModel<IPackageQueryCondition> packageQueryConditionModel;
 
   public CkanSearchDialogLauncherFactory(
       final IDialogsContainer dialogsContainer,
       final IObjectRequestExecutorBuilderFactory requestExecutorBuilderFactory,
-      final IResourceOpenConsumer resourceOpenconsumer,
+      final IDataSetResultsConsumer dataSetResultsConsumer,
+      final IDataSetConsumer dataSetConsumer,
+      final IResourceOpenConsumer resourceOpenConsumer,
+      final IBlock<RuntimeException> disposeBlock,
+      final IZoomToConsumer zoomToConsumer,
+      final IObjectDistributor<String> datasetIdentifierDistributor,
+      final IObjectModel<IPackageQueryCondition> packageQueryConditionModel,
+      final IObjectDistributor<Envelope> envelopeDistributor,
       final IFormatsNameConverter formatsNameConverter) {
     this.dialogsContainer = dialogsContainer;
     this.requestExecutorBuilderFactory = requestExecutorBuilderFactory;
-    this.resourceOpenConsumer = resourceOpenconsumer;
-    this.datasetQueryExecutor = new DatasetQueryExecutor(requestExecutorBuilderFactory, formatsNameConverter);
+    this.dataSetConsumer = dataSetConsumer;
+    this.resourceOpenConsumer = resourceOpenConsumer;
+    this.dataSetResultsConsumer = dataSetResultsConsumer;
+    this.disposeBlock = disposeBlock;
+    this.zoomToConsumer = zoomToConsumer;
+    this.datasetIdentifierDistributor = datasetIdentifierDistributor;
+    this.packageQueryConditionModel = packageQueryConditionModel;
+    this.envelopeDistributor = envelopeDistributor;
+    this.datasetQueryExecutor = new PackageQueryExecutor(requestExecutorBuilderFactory, formatsNameConverter);
   }
 
   public IDialogLauncher create(
@@ -69,20 +98,13 @@ public class CkanSearchDialogLauncherFactory {
     try {
       return new ProgressDialogLauncher<IDialogLauncher, IOException>((progressMonitor, canceler) -> {
 
-        final ObjectPair<List<Dataset>, Integer> datasetsResponse = this.datasetQueryExecutor.query(
-            canceler,
-            description,
-            new ArrayList<>(),
-            new ArrayList<>(),
-            new ArrayList<>(),
-            new ArrayList<>(),
-            new ArrayList<>(),
-            null,
-            0,
-            RESTULT_ROWS);
+        final IPackageQueryCondition condition = new PackageQueryConditionBuilder(this.packageQueryConditionModel.get())
+            .build();
+        final ObjectPair<List<Dataset>, Integer> datasetsResponse = this.datasetQueryExecutor
+            .query(canceler, description, condition, 0, RESTULT_ROWS);
         final int results = datasetsResponse.getSecondObject();
         final List<Dataset> datasets = datasetsResponse.getFirstObject();
-
+        this.dataSetResultsConsumer.consume(datasets);
         return new ConfigurableDialogLauncher() //
             .addBeforeShowExecutable(value -> {
               CkanSearchDialogLauncherFactory.this.dialogsContainer.add(description, value);
@@ -96,7 +118,6 @@ public class CkanSearchDialogLauncherFactory {
 
               });
             })
-            .setApplicationModalExclusionType()
             .setModelessModality()
             .setTitle(MessageFormat.format(Messages.ckan_search_t0, description.toString()))
             .setProgressDialogDisabled()
@@ -104,10 +125,17 @@ public class CkanSearchDialogLauncherFactory {
             .enableCloseOnEscape()
             //            .setCloseButtonDialog()
             .setPreferences(preferences.node("ckan", "search")) //$NON-NLS-1$ //$NON-NLS-2$
+            .addOnCloseExecutable(this.disposeBlock)
             .setContentPaneFactory(
                 new CkanSearchContentPaneFactory(
                     this.requestExecutorBuilderFactory,
+                    this.packageQueryConditionModel,
+                    this.dataSetResultsConsumer,
+                    this.dataSetConsumer,
                     this.resourceOpenConsumer,
+                    this.zoomToConsumer,
+                    this.datasetIdentifierDistributor,
+                    this.envelopeDistributor,
                     this.datasetQueryExecutor,
                     description,
                     RESTULT_ROWS,

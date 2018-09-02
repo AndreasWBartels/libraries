@@ -21,13 +21,14 @@
  */
 package net.anwiba.spatial.swing.ckan.search;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Dataset;
+import net.anwiba.spatial.ckan.json.schema.v1_0.Organization;
+import net.anwiba.spatial.ckan.json.schema.v1_0.Publisher;
 import net.anwiba.spatial.ckan.json.types.DateString;
 import net.anwiba.spatial.ckan.utilities.CkanUtilities;
 import net.anwiba.spatial.swing.ckan.search.message.Messages;
@@ -35,6 +36,9 @@ import net.anwiba.spatial.swing.ckan.search.message.Messages;
 public final class DataSetDescriptionTextFactory {
 
   public String create(final Dataset dataset) {
+    if (dataset == null) {
+      return ""; //$NON-NLS-1$
+    }
     final StringBuilder text = new StringBuilder();
     Streams.of(dataset.getExtras()).first(e -> Objects.equals(e.getKey(), "spatial_text")).consume(e -> { //$NON-NLS-1$
       text.append("<b>" + Messages.location + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -55,39 +59,6 @@ public final class DataSetDescriptionTextFactory {
       }
     });
 
-    if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getMaintainer())) {
-      text.append("<p>"); //$NON-NLS-1$
-      text.append("<b>" + Messages.maintainer + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-      if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getMaintainer_email())) {
-        text.append(
-            "<a href=\"" + converToUrl(dataset.getMaintainer_email()) + "\">" + dataset.getMaintainer() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      } else {
-        text.append(dataset.getMaintainer());
-      }
-      text.append("</p>"); //$NON-NLS-1$
-    } else {
-      if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getAuthor())) {
-        text.append("<p>"); //$NON-NLS-1$
-        text.append("<b>" + Messages.author + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-        if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getAuthor_email())) {
-          text.append("<a href=\"" + converToUrl(dataset.getAuthor_email()) + "\">" + dataset.getAuthor() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        } else {
-          text.append(dataset.getAuthor());
-        }
-        text.append("</p>"); //$NON-NLS-1$
-      }
-    }
-
-    if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getLicense_title())) {
-      text.append("<p>"); //$NON-NLS-1$
-      text.append("<b>" + Messages.license + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-      if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getLicense_url())) {
-        text.append("<a href=\"" + dataset.getLicense_url() + "\">" + dataset.getLicense_title() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      } else {
-        text.append(dataset.getLicense_title());
-      }
-      text.append("</p>"); //$NON-NLS-1$
-    }
     if (dataset.getGroups() != null && dataset.getGroups().length > 0) {
       text.append("<p>"); //$NON-NLS-1$
       text.append("<b>" + Messages.categories + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -105,26 +76,67 @@ public final class DataSetDescriptionTextFactory {
       text.append("</p>"); //$NON-NLS-1$
     }
 
+    final Organization organization = dataset.getOrganization();
+    if (organization != null) {
+      text.append("<p>"); //$NON-NLS-1$
+      text.append("<b>" + "Organization" + ": </b>"); //$NON-NLS-1$ //$NON-NLS-3$
+      text.append(CkanUtilities.toString(organization));
+      text.append("</p>"); //$NON-NLS-1$
+    }
+
+    if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getMaintainer())) {
+      text.append("<p>"); //$NON-NLS-1$
+      text.append("<b>" + Messages.maintainer + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
+      if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getMaintainer_email())) {
+        text.append(
+            "<a href=\"" + converToUrl(dataset.getMaintainer_email()) + "\">" + dataset.getMaintainer() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      } else {
+        text.append(dataset.getMaintainer());
+      }
+      text.append("</p>"); //$NON-NLS-1$
+    }
+    if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getAuthor())) {
+      text.append("<p>"); //$NON-NLS-1$
+      text.append("<b>" + Messages.author + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
+      if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getAuthor_email())) {
+        text.append("<a href=\"" + converToUrl(dataset.getAuthor_email()) + "\">" + dataset.getAuthor() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      } else {
+        text.append(dataset.getAuthor());
+      }
+      text.append("</p>"); //$NON-NLS-1$
+    }
+    if (dataset.getPublisher() != null) {
+      final Publisher publisher = dataset.getPublisher();
+      final String string = CkanUtilities.toString(publisher);
+      if (string != null) {
+        text.append("<p>"); //$NON-NLS-1$
+        text.append("<b>" + Messages.publisher + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (!StringUtilities.isNullOrTrimmedEmpty(publisher.getResource())) {
+          text.append("<a href=\"" + publisher.getResource().trim() + "\">" + string.trim() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        } else {
+          text.append(string.trim());
+        }
+        text.append("</p>"); //$NON-NLS-1$
+      }
+    }
+
     final DateString modified = dataset.getMetadata_modified();
     final DateString created = dataset.getMetadata_created();
     if (modified != null || created != null) {
       text.append("<p>"); //$NON-NLS-1$
       if (created != null) {
-        final LocalDateTime localTime = created.getLocalDateTime();
         text.append("<b>" + Messages.created + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-        text.append(localTime.toString());
+        text.append(CkanUtilities.toUserTimeString(created));
       }
       if (modified != null) {
         if (created != null) {
           text.append("<br>"); //$NON-NLS-1$
         }
-        final LocalDateTime localTime = modified.getLocalDateTime();
         text.append("<b>" + Messages.modified + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
-        text.append(localTime.toString());
+        text.append(CkanUtilities.toUserTimeString(modified));
       }
       text.append("</p>"); //$NON-NLS-1$
     }
-
     return text.toString();
   }
 

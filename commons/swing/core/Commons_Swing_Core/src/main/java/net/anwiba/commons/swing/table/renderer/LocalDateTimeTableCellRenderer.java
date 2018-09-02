@@ -29,6 +29,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import net.anwiba.commons.lang.object.ObjectUtilities;
+import net.anwiba.commons.utilities.time.LocalDateTimeUtilities;
 
 @SuppressWarnings("serial")
 public class LocalDateTimeTableCellRenderer extends DefaultTableCellRenderer {
@@ -48,7 +49,7 @@ public class LocalDateTimeTableCellRenderer extends DefaultTableCellRenderer {
     setHorizontalAlignment(SwingConstants.RIGHT);
     if (value instanceof LocalDateTime) {
       final LocalDateTime time = (LocalDateTime) value;
-      setText(time.toString());
+      setText(LocalDateTimeUtilities.toString(time));
       return this;
     }
     setText(ObjectUtilities.toString(value));

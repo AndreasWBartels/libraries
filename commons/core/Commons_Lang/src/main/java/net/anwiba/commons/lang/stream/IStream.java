@@ -34,6 +34,7 @@ import net.anwiba.commons.lang.functional.IAssimilator;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.lang.functional.ISupplier;
 import net.anwiba.commons.lang.optional.IOptional;
 
 public interface IStream<T, E extends Exception> {
@@ -46,7 +47,19 @@ public interface IStream<T, E extends Exception> {
 
   <O> IStream<O, E> flat(IConverter<T, Iterable<O>, E> funtion);
 
-  <O> IStream<O, E> convert(IAggregator<Integer, T, O, E> aggregator) throws E;
+  <O> IStream<O, E> convert(IAggregator<Integer, T, O, E> aggregator);
+
+  <O> IStream<O, E> instanceOf(Class<O> clazz);
+
+  IStream<T, E> foreach(IConsumer<T, E> consumer);
+
+  IStream<T, E> foreach(IAssimilator<Integer, T, E> assimilator);
+
+  IStream<T, E> notNull();
+
+  IStream<T, E> revert();
+
+  IStream<T, E> failed(ISupplier<Iterable<T>, E> supplier);
 
   Iterable<T> asIterable() throws E;
 
@@ -56,24 +69,14 @@ public interface IStream<T, E extends Exception> {
 
   <K, V> Map<K, V> asMap(IFactory<T, K, E> keyFactrory, IFactory<T, V, E> valueFactrory) throws E;
 
-  IObjectList<T> asObjectList() throws E;
-
-  IOptional<T, E> first() throws E;
-
-  IOptional<T, E> first(IAcceptor<T> acceptor) throws E;
-
-  <O> IOptional<O, E> aggregate(O inital, IAggregator<O, T, O, E> aggregator) throws E;
-
-  IStream<T, E> foreach(IConsumer<T, E> consumer) throws E;
-
-  IStream<T, E> foreach(IAssimilator<Integer, T, E> assimilator) throws E;
-
   <O> O[] asArray(IntFunction<O[]> function) throws E;
 
-  IStream<T, E> notNull();
+  IObjectList<T> asObjectList() throws E;
 
-  IStream<T, E> revert() throws E;
+  IOptional<T, E> first();
 
-  <O> IStream<O, E> instanceOf(Class<O> clazz);
+  IOptional<T, E> first(IAcceptor<T> acceptor);
+
+  <O> IOptional<O, E> aggregate(O inital, IAggregator<O, T, O, E> aggregator);
 
 }

@@ -62,7 +62,7 @@ public class XmlStreamStartElementNameAndVersionExtractor {
       throws E,
       IOException {
     try {
-      inputStream.mark(inputStream.available());
+      inputStream.mark(Integer.MAX_VALUE);
       final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
       inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
       final XMLEventReader eventReader = inputFactory.createXMLEventReader(inputStream);

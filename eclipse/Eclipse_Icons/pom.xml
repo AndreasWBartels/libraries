@@ -12,7 +12,7 @@
   <parent>
     <groupId>net.anwiba.eclipse</groupId>
     <artifactId>anwiba-eclipse-maven-default</artifactId>
-    <version>1.0.140</version>
+    <version>1.0.154</version>
   </parent>
 
   <scm>

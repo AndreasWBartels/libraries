@@ -10,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-core</artifactId>
-    <version>1.0.140</version>
+    <version>1.0.154</version>
   </parent>
 
   <scm>
@@ -18,41 +18,5 @@
     <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
     <url>${scm.url.net.anwiba.master}/commons/core/Commons_Ensure</url>
    </scm>
-
-  <dependencies>
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-lang</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <licenseName>lgpl_v2_1</licenseName>
-          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
-          <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
-          <projectName>anwiba commons core</projectName>
-          <roots>
-            <root>src/main/java</root>
-            <root>src/test/java</root>
-          </roots>
-        </configuration>
-        <executions>
-          <execution>
-            <id>first</id>
-            <goals>
-              <goal>update-file-header</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
 
 </project>

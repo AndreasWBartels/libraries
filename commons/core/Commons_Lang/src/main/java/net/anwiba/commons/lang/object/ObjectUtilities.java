@@ -23,6 +23,8 @@ package net.anwiba.commons.lang.object;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 
 public class ObjectUtilities {
@@ -189,8 +191,14 @@ public class ObjectUtilities {
     if (ObjectUtilities.isToStringImplemented(object.getClass())) {
       return object.toString();
     }
-    final Field[] fields = object.getClass().getDeclaredFields();
-    return toString(object, fields, nullValue);
+    if (System.getSecurityManager() == null) {
+      final Field[] fields = object.getClass().getDeclaredFields();
+      return toString(object, fields, nullValue);
+    }
+    return AccessController.doPrivileged((PrivilegedAction<String>) () -> {
+      final Field[] fields = object.getClass().getDeclaredFields();
+      return ObjectUtilities.toString(object, fields, nullValue);
+    });
   }
 
   private static String toString(final Object object, final Field[] fields, final String nullValue) {

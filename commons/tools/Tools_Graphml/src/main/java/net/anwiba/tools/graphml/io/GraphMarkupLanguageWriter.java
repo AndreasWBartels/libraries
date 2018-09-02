@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -68,20 +68,10 @@ public class GraphMarkupLanguageWriter implements Closeable {
   @Override
   public void close() throws IOException {
     try {
-
-      final JAXBContext jaxbContext =
-          JAXBContext.newInstance(
-              net.anwiba.tools.simple.graphml.generated.GraphMl.class,
-              net.anwiba.tools.simple.graphml.generated.Graph.class,
-              net.anwiba.tools.simple.graphml.generated.Key.class,
-              net.anwiba.tools.simple.graphml.generated.Node.class,
-              net.anwiba.tools.simple.graphml.generated.Data.class,
-              net.anwiba.tools.simple.graphml.generated.Edge.class,
-              net.anwiba.tools.yworks.shapenode.generated.ShapeNode.class,
-              net.anwiba.tools.yworks.shapenode.generated.NodeLabel.class,
-              net.anwiba.tools.yworks.labels.generated.Labels.class,
-              net.anwiba.tools.yworks.labels.generated.Label.class,
-              net.anwiba.tools.yworks.labels.generated.Text.class);
+      final JAXBContext jaxbContext = JAXBContext.newInstance(
+          net.anwiba.tools.simple.graphml.generated.ObjectFactory.class,
+          net.anwiba.tools.yworks.shapenode.generated.ObjectFactory.class,
+          net.anwiba.tools.yworks.labels.generated.ObjectFactory.class);
       final Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
       marshaller.marshal(this.root, this.writer);

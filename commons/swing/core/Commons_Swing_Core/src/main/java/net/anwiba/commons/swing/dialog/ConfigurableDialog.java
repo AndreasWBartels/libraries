@@ -126,4 +126,10 @@ public class ConfigurableDialog extends AbstractDialog {
     this.contentPane.close();
     super.close();
   }
+
+  @Override
+  public void dispose() {
+    this.contentPane.dispose();
+    super.dispose();
+  }
 }

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -33,10 +33,20 @@ public class JaxbContextBuilder {
   public static final class JaxbContext implements IJaxbContext {
     private final List<Class<?>> objectFactories;
     private final List<Source> schemaSources;
+    private final ClassLoader classLoader;
 
-    public JaxbContext(final List<Class<?>> objectFactories, final List<Source> schemaSources) {
+    public JaxbContext(
+        final List<Class<?>> objectFactories,
+        final List<Source> schemaSources,
+        final ClassLoader classLoader) {
       this.objectFactories = objectFactories;
       this.schemaSources = schemaSources;
+      this.classLoader = classLoader;
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+      return this.classLoader;
     }
 
     @Override
@@ -50,6 +60,7 @@ public class JaxbContextBuilder {
     }
   }
 
+  ClassLoader classLoader = getClass().getClassLoader();
   List<Class<?>> objectFactories = new ArrayList<>();
   List<Source> schemaSources = new ArrayList<>();
 
@@ -64,6 +75,10 @@ public class JaxbContextBuilder {
     return this;
   }
 
+  public void setClassLoader(final ClassLoader classLoader) {
+    this.classLoader = classLoader;
+  }
+
   private Source getSourceSchema(final String filename) {
     if (filename == null) {
       throw new IllegalArgumentException();
@@ -73,6 +88,6 @@ public class JaxbContextBuilder {
   }
 
   public IJaxbContext build() {
-    return new JaxbContext(this.objectFactories, this.schemaSources);
+    return new JaxbContext(this.objectFactories, this.schemaSources, this.classLoader);
   }
 }

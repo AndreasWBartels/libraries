@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <icons>
-  <class name="GuiIcons" package="net.anwiba.commons.swing.icon"/>
+  <class name="GuiIcons" package="net.anwiba.commons.swing.icons"/>
 
   <icon name="ADVANCED_SEARCH_ICON" ref="SYSTEM_SEARCH">
     <class name="ContrastHightIcons" package="net.anwiba.commons.swing.icons.gnome.contrast.high"/>

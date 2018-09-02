@@ -28,7 +28,7 @@ import javax.swing.Action;
 
 import net.anwiba.commons.swing.component.search.ISearchEngine;
 import net.anwiba.commons.swing.component.search.SearchComponentMessages;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 public final class PreviousAction<C, R> extends AbstractAction {
   private final ISearchEngine<C, R> engine;

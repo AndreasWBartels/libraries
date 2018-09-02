@@ -129,7 +129,7 @@ public class ImagePanel extends JComponent implements Scrollable {
           }
         } catch (final IOException e) {
           logger.log(ILevel.DEBUG, e.getMessage(), e);
-          final Image image = net.anwiba.commons.swing.icon.GuiIcons.ERROR_ICON.getLargeIcon().getImage();
+          final Image image = net.anwiba.commons.swing.icons.GuiIcons.ERROR_ICON.getLargeIcon().getImage();
           final BufferedImage bufferedImage = image instanceof BufferedImage
               ? (BufferedImage) image
               : new IConverter<Image, BufferedImage, RuntimeException>() {

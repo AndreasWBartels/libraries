@@ -67,7 +67,7 @@ public enum ProjectionType implements IProjectionType {
 
     @Override
     protected boolean accept(final String name) {
-      return name.indexOf(name()) != -1;
+      return name.replace("Ü", "U").indexOf(name()) != -1; //$NON-NLS-1$//$NON-NLS-2$
     }
   },
   LAMBERT_CONFORMAL_CONIC(CoordinateSystemMessages.LAMBERT_CONFORMAL_CONIC) {

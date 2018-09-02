@@ -26,11 +26,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
 
 import net.anwiba.commons.jdbc.DatabaseUtilities;
 import net.anwiba.commons.jdbc.name.DatabaseIndexName;
 import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
+import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
 
@@ -42,12 +42,13 @@ public class PostgresqlUtilities {
       final Connection connection,
       final String schemaName,
       final String tableName,
-      final String columnName) throws SQLException {
+      final String columnName)
+      throws SQLException {
     Statement statement = null;
     try {
       statement = connection.createStatement();
       final String activateVacumAnalyze = "VACUUM ANALYZE " + schemaName + "." + tableName + " ( " + columnName + " )"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-      logger.log(Level.FINE, "Statement: " + activateVacumAnalyze); //$NON-NLS-1$
+      logger.log(ILevel.FINE, "Statement: " + activateVacumAnalyze); //$NON-NLS-1$
       statement.execute(activateVacumAnalyze);
     } finally {
       DatabaseUtilities.close(statement);
@@ -58,9 +59,10 @@ public class PostgresqlUtilities {
       final Connection connection,
       final String schemaName,
       final String tableName,
-      final String columnName) throws SQLException {
-    logger.log(Level.FINE, "Query: Schema " + schemaName + " table " + tableName + " column " + columnName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    logger.log(Level.FINE, "Query: " + PostgresqlUtilitiesStatementStrings.IndexNameStatement); //$NON-NLS-1$
+      final String columnName)
+      throws SQLException {
+    logger.log(ILevel.FINE, "Query: Schema " + schemaName + " table " + tableName + " column " + columnName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    logger.log(ILevel.FINE, "Query: " + PostgresqlUtilitiesStatementStrings.IndexNameStatement); //$NON-NLS-1$
     try (PreparedStatement statement = connection
         .prepareStatement(PostgresqlUtilitiesStatementStrings.IndexNameStatement);) {
       statement.setString(1, schemaName);
@@ -71,7 +73,7 @@ public class PostgresqlUtilities {
           return null;
         }
       } catch (final Exception exception) {
-        logger.log(Level.WARNING, "Query faild: " + PostgresqlUtilitiesStatementStrings.IndexNameStatement, exception); //$NON-NLS-1$
+        logger.log(ILevel.WARNING, "Query faild: " + PostgresqlUtilitiesStatementStrings.IndexNameStatement, exception); //$NON-NLS-1$
         return null;
       }
       try (ResultSet resultSet = statement.getResultSet();) {
@@ -89,9 +91,10 @@ public class PostgresqlUtilities {
       final Connection connection,
       final String schemaName,
       final String tableName,
-      final String columnName) throws SQLException {
-    logger.log(Level.FINE, "Query: Schema " + schemaName + " table " + tableName + " column " + columnName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    logger.log(Level.FINE, "Query: " + PostgresqlUtilitiesStatementStrings.IsIndexedStatement); //$NON-NLS-1$
+      final String columnName)
+      throws SQLException {
+    logger.log(ILevel.FINE, "Query: Schema " + schemaName + " table " + tableName + " column " + columnName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    logger.log(ILevel.FINE, "Query: " + PostgresqlUtilitiesStatementStrings.IsIndexedStatement); //$NON-NLS-1$
     try (PreparedStatement statement = connection
         .prepareStatement(PostgresqlUtilitiesStatementStrings.IsIndexedStatement)) {
       statement.setString(1, schemaName);
@@ -102,7 +105,7 @@ public class PostgresqlUtilities {
           return false;
         }
       } catch (final Exception exception) {
-        logger.log(Level.WARNING, "Query faild: " + PostgresqlUtilitiesStatementStrings.IsIndexedStatement, exception); //$NON-NLS-1$
+        logger.log(ILevel.WARNING, "Query faild: " + PostgresqlUtilitiesStatementStrings.IsIndexedStatement, exception); //$NON-NLS-1$
         return false;
       }
       try (ResultSet resultSet = statement.getResultSet()) {

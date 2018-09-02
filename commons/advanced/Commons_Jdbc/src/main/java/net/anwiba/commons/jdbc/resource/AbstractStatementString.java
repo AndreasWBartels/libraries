@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
@@ -143,17 +142,18 @@ public abstract class AbstractStatementString {
     for (final Field field : fieldArray) {
       final String element = resources.get(field.getName());
       @SuppressWarnings("resource")
-      final InputStream input = loader == null ? ClassLoader.getSystemResourceAsStream(element) : loader
-          .getResourceAsStream(element);
+      final InputStream input = loader == null
+          ? ClassLoader.getSystemResourceAsStream(element)
+          : loader.getResourceAsStream(element);
       if (input == null) {
-        logger.log(Level.SEVERE, "Error loading " + element); //$NON-NLS-1$
+        logger.log(ILevel.SEVERE, "Error loading " + element); //$NON-NLS-1$
         continue;
       }
       try {
         final String value = readInputStream(input);
         setValue(fields, field, value, isAccessible);
       } catch (final IOException e) {
-        logger.log(Level.SEVERE, "Error loading " + element, e); //$NON-NLS-1$
+        logger.log(ILevel.SEVERE, "Error loading " + element, e); //$NON-NLS-1$
       } finally {
         try {
           input.close();
@@ -194,7 +194,7 @@ public abstract class AbstractStatementString {
       }
       field.set(null, fieldValue);
     } catch (final Exception e) {
-      logger.log(Level.SEVERE, "Exception setting field value.", e); //$NON-NLS-1$
+      logger.log(ILevel.SEVERE, "Exception setting field value.", e); //$NON-NLS-1$
     }
     return;
   }

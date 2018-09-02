@@ -22,7 +22,7 @@
 package net.anwiba.commons.swing.process;
 
 import net.anwiba.commons.swing.dialog.tabbed.AbstractDialogTab;
-import net.anwiba.commons.swing.icon.GuiIcons;
+import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.thread.process.IProcessManager;
 
 import java.awt.Dimension;

@@ -23,6 +23,10 @@ package net.anwiba.tools.generator.java.bean.factory;
 
 import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +35,7 @@ import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
@@ -159,19 +164,48 @@ public class CreatorFactory extends AbstractSourceFactory {
   public JMethod createCreateBeanMethod(final JDefinedClass bean) {
 
     final JMethod method = bean.method(JMod.PRIVATE | JMod.STATIC, bean, "_createBean");
-    final JVar param = method.param(
+    final JVar classParameter = method.param(
+        JMod.FINAL,
         _classByNames(java.lang.Class.class.getName(), MessageFormat.format("? extends {0}", bean.name())),
         "clazz");
-    final JClass invokerClass = _classByNames(
-        "net.anwiba.commons.reflection.ReflectionConstructorInvoker",
-        bean.name());
-    final JTryBlock _try = method.body()._try();
-    final JVar invoker = _try.body().decl(invokerClass, "invoker", JExpr._new(invokerClass).arg(param)); //$NON-NLS-1$
-    _try.body()._return(invoker.invoke("invoke"));
-    final JCatchBlock _catch = _try._catch(_classByNames(java.lang.reflect.InvocationTargetException.class.getName()));
-    final JVar exception = _catch.param("exception"); //$NON-NLS-1$
-    _catch.body()._throw(JExpr._new(_classByNames(java.lang.RuntimeException.class.getName())).arg(exception));
+
+    final JBlock methodBody = method.body();
+    final JConditional ifBlock = methodBody
+        ._if(_classByNames(System.class.getName()).staticInvoke("getSecurityManager").eq(JExpr._null()));
+    add(bean, classParameter, ifBlock._then()._try());
+
+    final JDefinedClass anonymousClass = getCodeModel()
+        .anonymousClass(_classByNames(PrivilegedAction.class.getName(), bean.name()));
+
+    final JMethod anonymousClassMethod = anonymousClass.method(JMod.PUBLIC, bean, "run");
+    add(bean, classParameter, anonymousClassMethod.body()._try());
+    methodBody._return(
+        _classByNames(AccessController.class.getName()).staticInvoke("doPrivileged").arg(JExpr._new(anonymousClass)));
     return method;
+  }
+
+  private void add(final JDefinedClass bean, final JVar classParameter, final JTryBlock tryBlock) {
+    final JBlock tryBody = tryBlock.body();
+    final JClass invokerClass = _classByNames(
+        Constructor.class.getName(),
+        MessageFormat.format("? extends {0}", bean.name()));
+    final JVar invoker = tryBody.decl(
+        invokerClass,
+        "constructor", //$NON-NLS-1$
+        classParameter.invoke("getDeclaredConstructor").arg(JExpr.newArray(_classByNames(Class.class.getName()), 0)));
+    tryBody._return(invoker.invoke("newInstance"));
+    addRuntimeExceptionThrowingCatchTo(tryBlock, _classByNames(InstantiationException.class.getName()));
+    addRuntimeExceptionThrowingCatchTo(tryBlock, _classByNames(NoSuchMethodException.class.getName()));
+    addRuntimeExceptionThrowingCatchTo(tryBlock, _classByNames(InvocationTargetException.class.getName()));
+    addRuntimeExceptionThrowingCatchTo(tryBlock, _classByNames(IllegalAccessException.class.getName()));
+    addRuntimeExceptionThrowingCatchTo(tryBlock, _classByNames(IllegalArgumentException.class.getName()));
+  }
+
+  private void addRuntimeExceptionThrowingCatchTo(final JTryBlock block, final JClass exceptionClass) {
+    final JCatchBlock catchBlock = block._catch(exceptionClass);
+    final JVar catchedException = catchBlock.param("exception");
+    final JBlock catchBody = catchBlock.body();
+    catchBody._throw(JExpr._new(_classByNames(RuntimeException.class.getName())).arg(catchedException));
   }
 
   public JMethod createCreateClassMethod(final JDefinedClass bean, final JFieldVar classes) {

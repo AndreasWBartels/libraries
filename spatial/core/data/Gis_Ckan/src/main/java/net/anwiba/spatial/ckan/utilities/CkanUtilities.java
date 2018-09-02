@@ -21,12 +21,34 @@
  */
 package net.anwiba.spatial.ckan.utilities;
 
+import java.time.LocalDateTime;
+
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.utilities.time.SystemDateTimeUtilities;
+import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
+import net.anwiba.commons.utilities.time.ZonedDateTimeUtilities;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Named;
+import net.anwiba.spatial.ckan.json.types.DateString;
 import net.anwiba.spatial.ckan.json.types.I18String;
+import net.anwiba.spatial.ckan.values.Envelope;
 
 public class CkanUtilities {
+
+  @SuppressWarnings("nls")
+  public static String toString(final Envelope envelope) {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("<html><body><p>");
+    builder.append(envelope.getMinX());
+    builder.append(" ");
+    builder.append(envelope.getMinY());
+    builder.append("</p><p>");
+    builder.append(envelope.getMaxX());
+    builder.append(" ");
+    builder.append(envelope.getMaxY());
+    builder.append("</p></body></html>");
+    return builder.toString();
+  }
 
   public static String toString(final Named named) {
     return Optional
@@ -41,4 +63,21 @@ public class CkanUtilities {
     return Optional.of(string).convert(v -> v.toString()).accept(n -> !StringUtilities.isNullOrEmpty(n)).get();
   }
 
+  public static String toString(final DateString dateString) {
+    return Optional.of(dateString).convert(v -> v.getLocalDateTime()).convert(d -> toString(d)).getOr(() -> ""); //$NON-NLS-1$
+  }
+
+  public static String toUserTimeString(final DateString dateString) {
+    return Optional
+        .of(dateString)
+        .convert(v -> v.getLocalDateTime())
+        .convert(
+            d -> toString(
+                UserDateTimeUtilities.atUserZone(d, ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone())))
+        .getOr(() -> ""); //$NON-NLS-1$
+  }
+
+  public static String toString(final LocalDateTime d) {
+    return SystemDateTimeUtilities.toStringAtUserTimeZone(d);
+  }
 }

@@ -34,6 +34,7 @@ import net.anwiba.eclipse.project.dependency.model.IDependenciesModel;
 import net.anwiba.tools.simple.graphml.generated.Graph;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -92,23 +93,28 @@ public class SaveIntersectionGraphmlAction extends Action {
 
         @Override
         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-          final ProjectGraphBuilder builder = new ProjectGraphBuilder(workspace);
-          boolean flag = false;
-          for (final IItem item : SaveIntersectionGraphmlAction.this.selectedItems.values()) {
-            if (!(item instanceof IProject)) {
-              continue;
+          try {
+            final ProjectGraphBuilder builder = new ProjectGraphBuilder(workspace);
+            boolean flag = false;
+            for (final IItem item : SaveIntersectionGraphmlAction.this.selectedItems.values()) {
+
+              if (!(item instanceof IProject)) {
+                continue;
+              }
+              final IProject project = (IProject) item;
+              if (flag) {
+                builder.intersect(project);
+                continue;
+              }
+              builder.add(project);
+              flag = true;
             }
-            final IProject project = (IProject) item;
-            if (flag) {
-              builder.intersect(project);
-              continue;
-            }
-            builder.add(project);
-            flag = true;
+            builder.setNormalize(SaveIntersectionGraphmlAction.this.enableNormalizeGraphModel.get());
+            final Graph graph = builder.build();
+            GraphmlUtilities.saveAndLoad(file, graph);
+          } catch (final IOException e) {
+            throw new InvocationTargetException(e);
           }
-          builder.setNormalize(SaveIntersectionGraphmlAction.this.enableNormalizeGraphModel.get());
-          final Graph graph = builder.build();
-          GraphmlUtilities.saveAndLoad(file, graph);
         }
       });
     } catch (final InvocationTargetException e) {

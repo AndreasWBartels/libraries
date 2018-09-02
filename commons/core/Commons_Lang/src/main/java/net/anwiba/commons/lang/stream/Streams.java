@@ -24,6 +24,7 @@ package net.anwiba.commons.lang.stream;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -34,27 +35,33 @@ public class Streams {
 
   public static final class Builder<E extends Exception> extends From<E> {
 
-    public Builder() {
-      super(0);
+    public Builder(final Class<E> exceptionClass) {
+      super(exceptionClass, 0);
     }
 
     public From<E> from(final int value) {
-      return new From<>(value);
+      return new From<>(getExceptionClass(), value);
     }
   }
 
   public static class From<E extends Exception> {
 
     private final int value;
+    private final Class<E> exceptionClass;
 
-    public From(final int value) {
+    public From(final Class<E> exceptionClass, final int value) {
+      this.exceptionClass = exceptionClass;
       this.value = value;
+    }
+
+    Class<E> getExceptionClass() {
+      return this.exceptionClass;
     }
 
     public IStream<Integer, E> until(@SuppressWarnings("hiding") final int value) {
       final int from = this.value - 1;
       final int until = value;
-      return create(new IIterable<Integer, E>() {
+      return create(this.exceptionClass, new IIterable<Integer, E>() {
 
         @Override
         public IIterator<Integer, E> iterator() {
@@ -93,67 +100,94 @@ public class Streams {
   }
 
   public static Builder<RuntimeException> of() {
-    return new Builder<>();
+    return new Builder<>(RuntimeException.class);
   }
 
-  public static <E extends Exception> Builder<E> create() {
-    return new Builder<>();
+  public static <E extends Exception> Builder<E> create(final Class<E> exceptionClass) {
+    return new Builder<>(exceptionClass);
   }
 
   public static <T> IStream<T, RuntimeException> of(final IIterable<T, RuntimeException> input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(RuntimeException.class, Collections.emptyList());
     }
-    return new SequencedStream<>(new IterableFilteringIterable<>(input, i -> i != null));
+    return new SequencedStream<>(RuntimeException.class, new IterableFilteringIterable<>(input, i -> i != null));
   }
 
   public static <T> IStream<T, RuntimeException> of(final Iterable<T> input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(RuntimeException.class, Collections.emptyList());
     }
-    return new SequencedStream<>(new JavaUtilIterableFilteringIterable<>(input, i -> i != null));
+    return new SequencedStream<>(
+        RuntimeException.class,
+        new JavaUtilIterableFilteringIterable<>(input, i -> i != null));
   }
 
   public static <T> IStream<T, RuntimeException> of(final T[] input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(RuntimeException.class, Collections.emptyList());
     }
-    return create(Arrays.asList(input));
+    return create(RuntimeException.class, Arrays.asList(input));
   }
 
   public static IStream<Integer, RuntimeException> of(final int[] input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(RuntimeException.class, Collections.emptyList());
     }
-    return create(Arrays.stream(input).boxed().collect(Collectors.toList()));
+    return create(RuntimeException.class, Arrays.stream(input).boxed().collect(Collectors.toList()));
   }
 
   public static IStream<Double, RuntimeException> of(final double[] input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(RuntimeException.class, Collections.emptyList());
     }
-    return create(Arrays.stream(input).boxed().collect(Collectors.toList()));
+    return create(RuntimeException.class, Arrays.stream(input).boxed().collect(Collectors.toList()));
   }
 
-  public static <T, E extends Exception> IStream<T, E> create(final IIterable<T, E> input) {
+  public static <T, E extends Exception> IStream<T, E> create(
+      final Class<E> exceptionClass,
+      final IIterable<T, E> input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(exceptionClass, Collections.emptyList());
     }
-    return new SequencedStream<>(new IterableFilteringIterable<>(input, i -> i != null));
+    return new SequencedStream<>(exceptionClass, new IterableFilteringIterable<>(input, i -> i != null));
   }
 
-  public static <T, E extends Exception> IStream<T, E> create(final Iterable<T> input) {
+  public static <T, E extends Exception> IStream<T, E> create(final Class<E> exceptionClass, final Iterable<T> input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(exceptionClass, Collections.emptyList());
     }
-    return new SequencedStream<>(new JavaUtilIterableFilteringIterable<>(input, i -> i != null));
+    return new SequencedStream<>(exceptionClass, new JavaUtilIterableFilteringIterable<>(input, i -> i != null));
   }
 
-  public static <T, E extends Exception> IStream<T, E> create(final T[] input) {
+  public static <T, E extends Exception> IStream<T, E> create(final Class<E> exceptionClass, final T[] input) {
     if (input == null) {
-      return create(Collections.emptyList());
+      return create(exceptionClass, Collections.emptyList());
     }
-    return create(Arrays.asList(input));
+    return create(exceptionClass, Arrays.asList(input));
+  }
+
+  public static <T, E extends Exception> IStream<T, E> create(
+      final Class<E> exceptionClass,
+      final Iterator<T> iterator) {
+    return create(exceptionClass, new IIterable<T, E>() {
+
+      @Override
+      public IIterator<T, E> iterator() {
+        return new IIterator<T, E>() {
+
+          @Override
+          public boolean hasNext() throws E {
+            return iterator.hasNext();
+          }
+
+          @Override
+          public T next() throws E {
+            return iterator.next();
+          }
+        };
+      }
+    });
   }
 
 }

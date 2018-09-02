@@ -26,6 +26,7 @@ import java.util.List;
 
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.utilities.parameter.IParameter;
+import net.anwiba.commons.utilities.parameter.Parameter;
 
 public class UrlBuilder {
 
@@ -62,6 +63,11 @@ public class UrlBuilder {
     return new Url(this.scheme, authority, this.path, this.parameters, this.fragment);
   }
 
+  public UrlBuilder addQueryParameter(final IParameter parameter) {
+    this.parameters.add(parameter);
+    return this;
+  }
+
   public UrlBuilder setUsername(final String username) {
     this.username = username;
     return this;
@@ -79,6 +85,11 @@ public class UrlBuilder {
 
   public UrlBuilder setPort(final Integer port) {
     this.port = port;
+    return this;
+  }
+
+  public UrlBuilder addQueryParameter(final String name, final String value) {
+    addQueryParameter(new Parameter(name, value));
     return this;
   }
 

@@ -9,7 +9,7 @@
   <parent>
     <groupId>net.anwiba.database</groupId>
     <artifactId>anwiba-database-maven</artifactId>
-    <version>1.0.140</version>
+    <version>1.0.154</version>
   </parent>
 
   <scm>
