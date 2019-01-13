@@ -184,7 +184,7 @@ public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
       logger.log(ILevel.DEBUG, "no spatialite"); //$NON-NLS-1$
       return;
     }
-    if (DatabaseUtilities.containts(
+    if (DatabaseUtilities.contains(
         connection,
         "PRAGMA table_info('geometry_columns')", //$NON-NLS-1$
         "name", //$NON-NLS-1$

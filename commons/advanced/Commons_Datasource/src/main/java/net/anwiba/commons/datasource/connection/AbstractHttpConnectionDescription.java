@@ -28,6 +28,8 @@ import java.util.Objects;
 
 import net.anwiba.commons.datasource.DataSourceType;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.utilities.io.url.Authentication;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 import net.anwiba.commons.utilities.parameter.IParameter;
 import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.string.StringUtilities;
@@ -167,6 +169,11 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
     result = prime * result + (this.sslEnabled ? 1231 : 1237);
     result = prime * result + ((this.userName == null) ? 0 : this.userName.toUpperCase().hashCode());
     return result;
+  }
+
+  @Override
+  public IAuthentication getAuthentication() {
+    return new Authentication(this.userName, this.password);
   }
 
   @Override

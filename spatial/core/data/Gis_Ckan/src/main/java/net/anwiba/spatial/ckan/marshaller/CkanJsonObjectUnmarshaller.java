@@ -22,20 +22,49 @@
 
 package net.anwiba.spatial.ckan.marshaller;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.deser.ValueInstantiator;
+
 import net.anwiba.commons.json.AbstractJsonObjectUnmarshaller;
 import net.anwiba.commons.lang.map.HasMapBuilder;
+import net.anwiba.commons.logging.ILevel;
 import net.anwiba.spatial.ckan.json.factory.ExtraValueFactory;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Response;
+import net.anwiba.spatial.ckan.json.schema.v1_0.Result;
 
 public class CkanJsonObjectUnmarshaller<T>
     extends
     AbstractJsonObjectUnmarshaller<T, Response, CkanJsonMapperException> {
+
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(CkanJsonObjectUnmarshaller.class);
 
   public CkanJsonObjectUnmarshaller(final Class<T> clazz) {
     super(
         clazz,
         Response.class,
         new HasMapBuilder<String, Object>().put("extravaluefactory", new ExtraValueFactory()).build(), //$NON-NLS-1$
+        Arrays.asList(new DeserializationProblemHandler() {
+          @Override
+          public Object handleMissingInstantiator(
+              final DeserializationContext ctxt,
+              final Class<?> instClass,
+              final ValueInstantiator valueInsta,
+              final JsonParser p,
+              final String msg)
+              throws IOException {
+            if (Response.class.isAssignableFrom(instClass) || Result.class.isAssignableFrom(instClass)) {
+              return super.handleMissingInstantiator(ctxt, instClass, valueInsta, p, msg);
+            }
+            logger.log(ILevel.WARNING, "Cannot construct instance of '" + instClass.getName() + "', " + msg);
+            return null;
+          }
+        }),
         new CkanJsonMapperExceptionFactory());
   }
 

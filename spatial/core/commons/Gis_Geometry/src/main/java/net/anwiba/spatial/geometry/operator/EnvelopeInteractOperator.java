@@ -85,6 +85,10 @@ public class EnvelopeInteractOperator {
     if (geometry == null) {
       return false;
     }
+    final IEnvelope geometryEnvelop = geometry.getEnvelope();
+    if (!geometryEnvelop.interact(this.envelope)) {
+      return false;
+    }
     final IGeometryTypeVisitor<Boolean, RuntimeException> visitor = new IGeometryTypeVisitor<Boolean, RuntimeException>() {
 
       @Override
@@ -95,7 +99,7 @@ public class EnvelopeInteractOperator {
       @Override
       public Boolean visitPolygon() throws RuntimeException {
         final IPolygon polygon = (IPolygon) geometry;
-        return interact(polygon) ? Boolean.TRUE : Boolean.FALSE;
+        return interact(polygon, geometryEnvelop) ? Boolean.TRUE : Boolean.FALSE;
       }
 
       @Override
@@ -107,37 +111,37 @@ public class EnvelopeInteractOperator {
       @Override
       public Boolean visitMultiPolygon() throws RuntimeException {
         final IMultiPolygon multiPolygon = (IMultiPolygon) geometry;
-        return interact(multiPolygon) ? Boolean.TRUE : Boolean.FALSE;
+        return interact(multiPolygon, geometryEnvelop) ? Boolean.TRUE : Boolean.FALSE;
       }
 
       @Override
       public Boolean visitMultiPoint() throws RuntimeException {
         final IMultiPoint multiPoint = (IMultiPoint) geometry;
-        return interact(multiPoint) ? Boolean.TRUE : Boolean.FALSE;
+        return interact(multiPoint, geometryEnvelop) ? Boolean.TRUE : Boolean.FALSE;
       }
 
       @Override
       public Boolean visitMultiLineString() throws RuntimeException {
         final IMultiLineString multiLineString = (IMultiLineString) geometry;
-        return interact(multiLineString) ? Boolean.TRUE : Boolean.FALSE;
+        return interact(multiLineString, geometryEnvelop) ? Boolean.TRUE : Boolean.FALSE;
       }
 
       @Override
       public Boolean visitLinearRing() throws RuntimeException {
         final ILinearRing linearRing = (ILinearRing) geometry;
-        return interact(linearRing) ? Boolean.TRUE : Boolean.FALSE;
+        return interact(linearRing, geometryEnvelop) ? Boolean.TRUE : Boolean.FALSE;
       }
 
       @Override
       public Boolean visitLineString() throws RuntimeException {
         final ILineString lineString = (ILineString) geometry;
-        return interact(lineString) ? Boolean.TRUE : Boolean.FALSE;
+        return interact(lineString, geometryEnvelop) ? Boolean.TRUE : Boolean.FALSE;
       }
 
       @Override
       public Boolean visitCollection() throws RuntimeException {
         final IGeometryCollection collection = (IGeometryCollection) geometry;
-        return interact(collection) ? Boolean.TRUE : Boolean.FALSE;
+        return interact(collection, geometryEnvelop) ? Boolean.TRUE : Boolean.FALSE;
       }
     };
     return geometry.getGeometryType().accept(visitor).booleanValue();
@@ -147,11 +151,7 @@ public class EnvelopeInteractOperator {
     return this.envelope.interact(point.getCoordinateN(0));
   }
 
-  private boolean interact(final IMultiPoint multiPoint) {
-    final IEnvelope geometryEnvelop = multiPoint.getEnvelope();
-    if (!geometryEnvelop.interact(this.envelope)) {
-      return false;
-    }
+  private boolean interact(final IMultiPoint multiPoint, final IEnvelope geometryEnvelop) {
     if (this.envelope.contains(geometryEnvelop)) {
       return true;
     }
@@ -163,22 +163,14 @@ public class EnvelopeInteractOperator {
     return false;
   }
 
-  private boolean interact(final ILineString lineString) {
-    final IEnvelope geometryEnvelop = lineString.getEnvelope();
-    if (!this.envelope.interact(geometryEnvelop)) {
-      return false;
-    }
+  private boolean interact(final ILineString lineString, final IEnvelope geometryEnvelop) {
     if (this.envelope.contains(geometryEnvelop)) {
       return true;
     }
     return isCrossing(lineString.getCoordinateSequence().getCoordinates());
   }
 
-  private boolean interact(final IGeometryCollection collection) {
-    final IEnvelope geometryEnvelop = collection.getEnvelope();
-    if (!this.envelope.interact(geometryEnvelop)) {
-      return false;
-    }
+  private boolean interact(final IGeometryCollection collection, final IEnvelope geometryEnvelop) {
     if (this.envelope.contains(geometryEnvelop)) {
       return true;
     }
@@ -190,11 +182,7 @@ public class EnvelopeInteractOperator {
     return false;
   }
 
-  private boolean interact(final IMultiLineString multiLineString) {
-    final IEnvelope geometryEnvelop = multiLineString.getEnvelope();
-    if (!this.envelope.interact(geometryEnvelop)) {
-      return false;
-    }
+  private boolean interact(final IMultiLineString multiLineString, final IEnvelope geometryEnvelop) {
     if (this.envelope.contains(geometryEnvelop)) {
       return true;
     }
@@ -206,28 +194,20 @@ public class EnvelopeInteractOperator {
     return false;
   }
 
-  private boolean interact(final IPolygon polygon) {
-    final IEnvelope geometryEnvelop = polygon.getEnvelope();
-    if (!this.envelope.interact(geometryEnvelop)) {
-      return false;
-    }
+  private boolean interact(final IPolygon polygon, final IEnvelope geometryEnvelop) {
     if (this.envelope.contains(geometryEnvelop)) {
       return true;
     }
     final ICoordinateSequence coordinateSequence = this.envelope.getCoordinateSequence();
-    for (int i = 0; i < 4; i++) {
-      if (new PointInteractOperator(coordinateSequence.getCoordinateN(i)).interact(polygon, 0.)) {
+    for (final ICoordinate coordinate : coordinateSequence.getCoordinates()) {
+      if (new PointInteractOperator(coordinate).interact(polygon, 0.)) {
         return true;
       }
     }
     return isCrossing(polygon.getOuterRing().getCoordinateSequence().getCoordinates());
   }
 
-  private boolean interact(final IMultiPolygon multiPolygon) {
-    final IEnvelope geometryEnvelop = multiPolygon.getEnvelope();
-    if (!this.envelope.interact(geometryEnvelop)) {
-      return false;
-    }
+  private boolean interact(final IMultiPolygon multiPolygon, final IEnvelope geometryEnvelop) {
     if (this.envelope.contains(geometryEnvelop)) {
       return true;
     }

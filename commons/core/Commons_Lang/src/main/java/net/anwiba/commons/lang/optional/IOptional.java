@@ -72,4 +72,6 @@ public interface IOptional<T, E extends Exception> {
 
   boolean contains(T other);
 
+  boolean isEmpty();
+
 }

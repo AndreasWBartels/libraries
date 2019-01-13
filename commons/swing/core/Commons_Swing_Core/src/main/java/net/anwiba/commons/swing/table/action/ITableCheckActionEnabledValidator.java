@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.swing.table.action;
 
-import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.lang.primitive.IBooleanProvider;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;

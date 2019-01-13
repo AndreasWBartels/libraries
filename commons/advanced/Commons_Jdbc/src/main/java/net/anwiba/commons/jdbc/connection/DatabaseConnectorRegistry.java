@@ -95,7 +95,7 @@ public class DatabaseConnectorRegistry implements IDatabaseConnectorRegistry {
   @SuppressWarnings("unused")
   private void setUp(final Connection connection) throws SQLException {
     Streams
-        .<IPostConnectionProcedure, SQLException> create(SQLException.class, this.procedures)
+        .<IPostConnectionProcedure, SQLException> of(SQLException.class, this.procedures)
         .filter(p -> p.isApplicable(connection))
         .foreach(p -> p.execute(connection));
   }

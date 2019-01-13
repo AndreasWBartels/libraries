@@ -60,7 +60,7 @@ public class DateTimeInterval {
     return this.resolution;
   }
 
-  public boolean containts(final ZonedDateTime value) {
+  public boolean contains(final ZonedDateTime value) {
     return (!this.from.isAfter(value)) && (!this.until.isBefore(value));
   }
 

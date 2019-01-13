@@ -53,6 +53,7 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
   private final Dimension preferdSize;
   private final IGuiIcon image;
   private final ModalExclusionType modalExclusionType;
+  private final DataState dataState;
 
   public AbstractDialogConfiguration(
       final IPreferences preferences,
@@ -68,13 +69,15 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
       final IFunction<String, String, RuntimeException> actionButtonTextFactory,
       final boolean isResizeable,
       final int dialogCloseKeyEvent,
-      final List<IAdditionalActionFactory> additionalActionFactories) {
+      final List<IAdditionalActionFactory> additionalActionFactories,
+      final DataState dataState) {
     this.preferdSize = preferdSize;
     this.title = title;
     this.image = image;
     this.modalExclusionType = modalExclusionType;
     this.actionButtonTextFactory = actionButtonTextFactory;
     this.dialogCloseKeyEvent = dialogCloseKeyEvent;
+    this.dataState = dataState;
     this.additionalActionFactories.addAll(additionalActionFactories);
     this.windowPreferences = new WindowPreferences(preferences.node(PREFERENCE_NODE_NAME));
     this.message = message;
@@ -156,5 +159,10 @@ public abstract class AbstractDialogConfiguration implements IDialogConfiguratio
   @Override
   public Image getImage() {
     return this.image == null ? null : this.image.getSmallIcon().getImage();
+  }
+
+  @Override
+  public DataState getDataState() {
+    return this.dataState;
   }
 }

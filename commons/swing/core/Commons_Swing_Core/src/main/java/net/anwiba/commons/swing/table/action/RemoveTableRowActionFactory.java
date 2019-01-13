@@ -23,7 +23,7 @@ package net.anwiba.commons.swing.table.action;
 
 import javax.swing.AbstractAction;
 
-import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.lang.primitive.IBooleanProvider;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.icons.GuiIcons;
@@ -32,6 +32,7 @@ import net.anwiba.commons.swing.table.ISelectionIndexModel;
 import net.anwiba.commons.swing.table.ObjectListTableMessages;
 
 public class RemoveTableRowActionFactory<T> extends AbstractTableActionFactory<T> {
+
   @Override
   public AbstractAction createAction(
       final IObjectTableModel<T> tableModel,

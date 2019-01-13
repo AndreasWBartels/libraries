@@ -104,7 +104,7 @@ public class ProjectGraphBuilder {
   }
 
   private void addTo(final Graph<String> graph, final ILibrary library) {
-    if (graph.containts(library.getIdentifier())) {
+    if (graph.contains(library.getIdentifier())) {
       return;
     }
     graph.add(new Node<>(library.getIdentifier()));

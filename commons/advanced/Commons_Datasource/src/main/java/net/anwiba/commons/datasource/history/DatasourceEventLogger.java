@@ -24,15 +24,36 @@ package net.anwiba.commons.datasource.history;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import net.anwiba.commons.datasource.constaint.IResourceConstraintProvider;
+import net.anwiba.commons.datasource.constaint.IResourceConstraintStorage;
+import net.anwiba.commons.datasource.constaint.ResourceConstraint;
 import net.anwiba.commons.datasource.resource.IResourceDescription;
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.message.IMessageCollector;
+import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.commons.thread.process.AbstractProcess;
+import net.anwiba.commons.thread.process.IProcessIdentfier;
+import net.anwiba.commons.thread.process.IProcessManager;
+import net.anwiba.commons.thread.queue.IQueueNameConstans;
 import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
 
 public class DatasourceEventLogger implements IDatasourceEventLogger {
 
-  private final IDatasourceEventStorage storage;
+  private final IDatasourceEventStorage eventStorage;
+  private final IResourceConstraintStorage constraintStorage;
+  private final IResourceConstraintProvider constraintProvider;
+  private final IProcessManager processManager;
 
-  public DatasourceEventLogger(final IDatasourceEventStorage storage) {
-    this.storage = storage;
+  public DatasourceEventLogger(
+      final IProcessManager processManager,
+      final IDatasourceEventStorage eventStorage,
+      final IResourceConstraintProvider constraintProvider,
+      final IResourceConstraintStorage constraintStorage) {
+    this.processManager = processManager;
+    this.eventStorage = eventStorage;
+    this.constraintProvider = constraintProvider;
+    this.constraintStorage = constraintStorage;
   }
 
   @Override
@@ -44,18 +65,32 @@ public class DatasourceEventLogger implements IDatasourceEventLogger {
       final String condition,
       final Long numberOfRows,
       final Duration duration) {
-
     final LocalDateTime date = UserDateTimeUtilities.now();
-    this.storage.save(
-        new DatasourceEvent(
-            kind,
-            targetResourceDescription,
-            sourceResourceDescription,
-            date,
-            duration,
-            join,
-            condition,
-            numberOfRows));
-  }
+    this.processManager.execute(new AbstractProcess(IQueueNameConstans.AUDIT_LOGGING_QUEUE, "Audit logging", false) {
 
+      @Override
+      public void execute(
+          final IMessageCollector processMonitor,
+          final ICanceler canceler,
+          final IProcessIdentfier processIdentfier)
+          throws CanceledException {
+        DatasourceEventLogger.this.eventStorage.save(
+            new DatasourceEvent(
+                kind,
+                targetResourceDescription,
+                sourceResourceDescription,
+                date,
+                duration,
+                join,
+                condition,
+                numberOfRows));
+        Optional.of(sourceResourceDescription).consume(
+            d -> DatasourceEventLogger.this.constraintProvider
+                .getConstaints(d)
+                .stream()
+                .convert(c -> ResourceConstraint.of(targetResourceDescription, c.getLicense(), c.getMaintainer()))
+                .foreach(c -> DatasourceEventLogger.this.constraintStorage.save(c)));
+      }
+    });
+  }
 }

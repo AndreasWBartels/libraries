@@ -24,6 +24,7 @@ package net.anwiba.commons.thread.program;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -43,8 +44,8 @@ public interface IProgramLauncher {
 
   IProgramLauncher inputStreamConsumer(IConsumer<InputStream, IOException> inputStreamConsumer);
 
-  Process launch() throws IOException, InterruptedException;
+  Process launch() throws IOException, CanceledException;
 
-  Process launch(ICanceler canceler) throws IOException, InterruptedException;
+  Process launch(ICanceler canceler) throws IOException, CanceledException;
 
 }

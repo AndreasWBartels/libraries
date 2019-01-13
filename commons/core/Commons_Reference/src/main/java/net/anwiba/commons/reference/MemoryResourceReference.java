@@ -73,7 +73,7 @@ public class MemoryResourceReference implements IResourceReference {
     return this.buffer;
   }
 
-  public String getMimeType() {
+  public String getContentType() {
     return this.mimeType;
   }
 

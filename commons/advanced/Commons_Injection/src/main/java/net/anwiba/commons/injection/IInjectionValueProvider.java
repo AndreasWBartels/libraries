@@ -32,10 +32,4 @@ public interface IInjectionValueProvider {
 
   <T> Collection<T> getAll(IBinding<T> binding);
 
-  boolean contains(Class<?> clazz);
-
-  <T> T get(Class<T> clazz);
-
-  <T> Collection<T> getAll(Class<T> componentType);
-
 }

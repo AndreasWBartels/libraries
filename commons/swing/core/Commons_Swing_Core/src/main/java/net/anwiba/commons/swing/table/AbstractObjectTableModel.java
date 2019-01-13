@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import java.util.Set;
 import javax.swing.table.AbstractTableModel;
 
 import net.anwiba.commons.lang.collection.IObjectIterable;
+import net.anwiba.commons.lang.collection.IObjectIterator;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.utilities.ArrayUtilities;
@@ -261,6 +263,37 @@ public abstract class AbstractObjectTableModel<T> extends AbstractTableModel imp
       this.objects.forEach(o -> result.add(o));
       return result;
     }
+  }
+
+  @Override
+  public Collection<T> toCollection() {
+    synchronized (this) {
+      return Collections.unmodifiableCollection(new ArrayList<>(this.objects));
+    }
+  }
+
+  @Override
+  public List<T> toList() {
+    synchronized (this) {
+      return Collections.unmodifiableList(new ArrayList<>(this.objects));
+    }
+  }
+
+  @Override
+  public IObjectIterator<T> iterator() {
+    final Iterator<T> iterator = values().iterator();
+    return new IObjectIterator<T>() {
+
+      @Override
+      public boolean hasNext() {
+        return iterator.hasNext();
+      }
+
+      @Override
+      public T next() {
+        return iterator.next();
+      }
+    };
   }
 
   private final List<IChangeableListListener<T>> listModelListeners = new ArrayList<>();

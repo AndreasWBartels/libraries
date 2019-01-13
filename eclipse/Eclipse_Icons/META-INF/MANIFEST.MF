@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.0.154
+Bundle-Version: 1.0.180
 Bundle-Vendor: Andreas W. Bartels
 Bundle-Name: GuiIcons
 Bundle-SymbolicName: net.anwiba.eclipse.icons;singleton:=true
@@ -11,17 +11,14 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.ui,
  org.eclipse.jface.text,
  org.eclipse.jdt.core,
- net.anwiba.eclipse.commons
+ net.anwiba.eclipse.commons,
+ net.anwiba.eclipse.libraries
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.core.databinding.observable.list,
  org.eclipse.jface.databinding.viewers,
  org.eclipse.ui.texteditor,
  net.anwiba.commons.eclipse.utilities,
- net.anwiba.commons.eclipse.logging,
- net.anwiba.commons.lang.object,
- net.anwiba.commons.model,
- net.anwiba.commons.thread.cancel,
- net.anwiba.commons.utilities.string
+ net.anwiba.commons.eclipse.logging
 Bundle-ClassPath: .,
- lib/anwiba-tools-icons-1.0.154.jar
+ lib/anwiba-tools-icons-1.0.180.jar

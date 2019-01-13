@@ -87,7 +87,7 @@ public final class Parameters implements IParameters {
   }
 
   @Override
-  public boolean containts(final String name) {
+  public boolean contains(final String name) {
     return this.map.containsKey(name);
   }
 

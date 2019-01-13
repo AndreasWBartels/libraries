@@ -29,5 +29,6 @@ public interface IQueueNameConstans {
   public static final String SCRIPTING_QUEUE = "SCRIPTING_QUEUE"; //$NON-NLS-1$
   public static final String CANCEL_QUEUE = "CANCEL_QUEUE"; //$NON-NLS-1$
   public static final String IMAGE_CACHE_WRITER_QUEUE = "CACHE_WRITER_QUEUE"; //$NON-NLS-1$
+  public static final String AUDIT_LOGGING_QUEUE = "AUDIT_LOGGING_QUEUE"; //$NON-NLS-1$
 
 }

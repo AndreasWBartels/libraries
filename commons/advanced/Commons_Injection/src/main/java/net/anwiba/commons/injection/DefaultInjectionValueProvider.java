@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import net.anwiba.commons.injection.binding.ClassBinding;
-
 @SuppressWarnings("rawtypes")
 public final class DefaultInjectionValueProvider implements IInjectionValueProvider {
 
@@ -54,6 +52,9 @@ public final class DefaultInjectionValueProvider implements IInjectionValueProvi
   @Override
   public <T> T get(final IBinding<T> binding) {
     final List<Object> list = this.values.get(binding);
+    if (list == null) {
+      return null;
+    }
     if (list.size() != 1) {
       throw new IllegalStateException();
     }
@@ -67,25 +68,5 @@ public final class DefaultInjectionValueProvider implements IInjectionValueProvi
         .ofNullable(this.values.get(binding))
         .map(l -> l.stream().map(o -> (T) o).collect(Collectors.toList()))
         .orElseGet(() -> new ArrayList<>());
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public boolean contains(final Class clazz) {
-    return contains(binding(clazz));
-  }
-
-  @Override
-  public <T> T get(final Class<T> clazz) {
-    return get(binding(clazz));
-  }
-
-  @Override
-  public <T> Collection<T> getAll(final Class<T> clazz) {
-    return getAll(binding(clazz));
-  }
-
-  private <T> IBinding<T> binding(final Class<T> clazz) {
-    return new ClassBinding<>(clazz);
   }
 }

@@ -22,6 +22,7 @@
 package net.anwiba.commons.swing.table.renderer;
 
 import java.awt.Component;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.swing.JTable;
@@ -31,6 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import net.anwiba.commons.swing.ui.DateUi;
 import net.anwiba.commons.utilities.math.Angle;
 import net.anwiba.commons.utilities.math.AngleFormat;
+import net.anwiba.commons.utilities.time.LocalDateTimeUtilities;
 
 public class ObjectTableCellRenderer extends DefaultTableCellRenderer {
   private static final long serialVersionUID = 1L;
@@ -46,6 +48,12 @@ public class ObjectTableCellRenderer extends DefaultTableCellRenderer {
       final int row,
       final int column) {
     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    if (value instanceof LocalDateTime) {
+      final LocalDateTime time = (LocalDateTime) value;
+      setText(LocalDateTimeUtilities.toString(time));
+      setHorizontalAlignment(SwingConstants.RIGHT);
+      return this;
+    }
     if (value instanceof Date) {
       setText(this.dateUi.getText((Date) value));
       setHorizontalAlignment(SwingConstants.RIGHT);

@@ -24,6 +24,7 @@ package net.anwiba.commons.thread.cancel;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILevel;
 
 public class Canceler implements ICanceler {
@@ -67,9 +68,9 @@ public class Canceler implements ICanceler {
   }
 
   @Override
-  public void check() throws InterruptedException {
+  public void check() throws CanceledException {
     if (isCanceled()) {
-      throw new InterruptedException();
+      throw new CanceledException();
     }
   }
 
@@ -101,6 +102,13 @@ public class Canceler implements ICanceler {
         logger.log(ILevel.DEBUG, exception.getMessage());
         logger.log(ILevel.ALL, exception.getMessage(), exception);
       }
+    }
+  }
+
+  @Override
+  public void removeAllCancelerListener() {
+    synchronized (this.listeners) {
+      this.listeners.clear();
     }
   }
 

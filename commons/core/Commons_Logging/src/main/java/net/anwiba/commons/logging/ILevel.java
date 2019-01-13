@@ -45,14 +45,14 @@ public interface ILevel {
     }
   }
 
-  final static public ILevel ALL = new Level(java.util.logging.Level.ALL);
-  final static public ILevel INFO = new Level(java.util.logging.Level.INFO);
-  final static public ILevel WARNING = new Level(java.util.logging.Level.WARNING);
-  final static public ILevel FATAL = new Level(java.util.logging.Level.SEVERE);
-  public static final ILevel SEVERE = new Level(java.util.logging.Level.SEVERE);
+  final static public ILevel ALL = new Level(LevelFactory.add(java.util.logging.Level.ALL));
+  final static public ILevel INFO = new Level(LevelFactory.add(java.util.logging.Level.INFO));
+  final static public ILevel WARNING = new Level(LevelFactory.add(java.util.logging.Level.WARNING));
+  final static public ILevel FATAL = new Level(LevelFactory.add(java.util.logging.Level.SEVERE));
+  public static final ILevel SEVERE = new Level(LevelFactory.add(java.util.logging.Level.SEVERE));
   final static public ILevel ERROR = new Level(LevelFactory.createLevel("ERROR", 1000));
   final static public ILevel DEBUG = new Level(LevelFactory.createLevel("DEBUG", 400));
-  public static final ILevel FINE = new Level(java.util.logging.Level.FINE);
+  public static final ILevel FINE = new Level(LevelFactory.add(java.util.logging.Level.FINE));
 
   public String getName();
 

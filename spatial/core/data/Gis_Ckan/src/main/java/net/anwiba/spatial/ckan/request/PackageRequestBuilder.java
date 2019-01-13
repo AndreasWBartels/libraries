@@ -40,9 +40,14 @@ import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.RequestBuilder;
 import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.utilities.parameter.IParameter;
 import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.spatial.ckan.request.sort.ISortOrder;
+import net.anwiba.spatial.ckan.request.sort.ISortOrderTerm;
+import net.anwiba.spatial.ckan.request.sort.ISortOrderVisitor;
+import net.anwiba.spatial.ckan.request.time.Event;
 import net.anwiba.spatial.ckan.values.Envelope;
 
 @SuppressWarnings("nls")
@@ -53,6 +58,8 @@ public class PackageRequestBuilder {
   }
 
   static final class Builder {
+
+    Envelope maximumEnvelope = new Envelope(-180, -90, 180, 90);
 
     private Type type = null;
     private String key = null;
@@ -67,9 +74,33 @@ public class PackageRequestBuilder {
     private final List<String> fields = new LinkedList<>();
     private String identifier;
     private boolean useDefaultSchema = false;
+    //    sort (string) – sorting of the search results. Optional. Default: 'relevance asc, metadata_modified desc'.
+    //    As per the solr documentation, this is a comma-separated string of field names and sort-orderings.
+    private ISortOrder sortOrder = null;
 
     public Builder(final String url) {
       this.url = url;
+    }
+
+    public void setSortOrder(final ISortOrder sortOrder) {
+      this.sortOrder = sortOrder;
+    }
+
+    public void setEvent(final Event event, final LocalDateTime from, final LocalDateTime to) {
+      if (event == null) {
+        setModified(from, to);
+        return;
+      }
+      switch (event) {
+        case CREATED: {
+          setCreated(from, to);
+          return;
+        }
+        case MODIFIED: {
+          setModified(from, to);
+          return;
+        }
+      }
     }
 
     public void setCreated(final LocalDateTime from, final LocalDateTime to) {
@@ -159,7 +190,21 @@ public class PackageRequestBuilder {
     }
 
     public void setEnvelope(final Envelope envelope) {
-      this.envelope = envelope;
+      if (envelope == null) {
+        this.envelope = envelope;
+        return;
+      }
+      if (!this.maximumEnvelope.intersects(envelope)) {
+        this.envelope = null;
+        return;
+      }
+      this.envelope = new Envelope(
+          envelope.getMinX() < -180 ? -180 : envelope.getMinX(),
+          envelope.getMinY() < -90 ? -90 : envelope.getMinY(),
+          envelope.getMaxX() > 180 ? 180 : envelope.getMaxX(),
+          envelope.getMaxY() > 90 ? 90 : envelope.getMaxY())
+
+      ;
     }
 
     public IRequest build() {
@@ -186,6 +231,8 @@ public class PackageRequestBuilder {
 
           // https://www.europeandataportal.eu/data/en/api/3/action/package_search?start=0&rows=11&fq=(metadata_created:([2018-01-01T13:51:18.954Z+TO+NOW])+OR+metadata_modified:([2018-01-01T13:51:18.954Z+TO+NOW]))+AND+res_format:(WMS+OR+wms)&q=quellen
 
+          // +spatial_geom:"Intersects(ENVELOPE(-180.0, -197.067608389, 46.937575538, 27.0033887294))"
+
           final RequestBuilder builder = RequestBuilder
               .get(MessageFormat.format("{0}/3/action/package_search", this.url))
               .query("start", String.valueOf(this.start))
@@ -197,6 +244,7 @@ public class PackageRequestBuilder {
           Optional.of(this.query).convert(q -> builder.query("q", q));
           Optional.of(this.envelope).consume(a -> builder.query("ext_bbox", toString(a)));
           If.isTrue(!this.fields.isEmpty()).excecute(() -> builder.query("fl", toString(this.fields)));
+          Optional.of(this.sortOrder).consume(o -> builder.query("sort", toString(o)));
           Optional.of(this.key).convert(k -> builder.header("X-CKAN-API-Key", k));
           Optional.of(this.authentication).consume(a -> builder.authentication(a.getUsername(), a.getPassword()));
           return builder.build();
@@ -214,6 +262,26 @@ public class PackageRequestBuilder {
         }
       }
       throw new IllegalStateException();
+    }
+
+    @SuppressWarnings("hiding")
+    private String toString(final ISortOrder sortOrder) {
+      final ISortOrderVisitor<String, RuntimeException> visitor = new ISortOrderVisitor<String, RuntimeException>() {
+
+        @Override
+        public String visitTerm(final ISortOrderTerm term) {
+          return term.getAspect() + " " + term.getOrder().name();
+        }
+
+        @Override
+        public String visitList(final Iterable<ISortOrderTerm> terms) {
+          return Streams
+              .of(terms)
+              .aggregate((String) null, (i, t) -> i == null ? visitTerm(t) : i + ", " + visitTerm(t))
+              .getOr(() -> "relevance asc, metadata_modified desc");
+        }
+      };
+      return sortOrder.accept(visitor);
     }
 
     private String toString(final Envelope envelop) {
@@ -406,6 +474,11 @@ public class PackageRequestBuilder {
       return this;
     }
 
+    public PackageSearchRequestBuilder sortOrder(final ISortOrder sortOrder) {
+      this.builder.setSortOrder(sortOrder);
+      return this;
+    }
+
     public PackageSearchRequestBuilder authentication(final String userName, final String password) {
       if (StringUtilities.isNullOrTrimmedEmpty(userName) || StringUtilities.isNullOrTrimmedEmpty(password)) {
         return this;
@@ -522,7 +595,12 @@ public class PackageRequestBuilder {
     }
 
     public PackageSearchRequestBuilder modified(final LocalDateTime from, final LocalDateTime to) {
-      this.builder.setCreated(from, to);
+      this.builder.setModified(from, to);
+      return this;
+    }
+
+    public PackageSearchRequestBuilder event(final Event event, final LocalDateTime from, final LocalDateTime to) {
+      this.builder.setEvent(event, from, to);
       return this;
     }
 

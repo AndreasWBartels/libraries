@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.injection;
 
-import net.anwiba.commons.injection.annotation.Injection;
+import net.anwiba.commons.annotation.Injection;
 
 public class TestObjectConstructor {
 

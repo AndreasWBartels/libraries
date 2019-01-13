@@ -22,13 +22,9 @@
 
 package net.anwiba.commons.injection;
 
-import net.anwiba.commons.reflection.CreationException;
+import net.anwiba.commons.injection.impl.IInjectingObjectFactory;
 
-public interface IValueInjector {
-
-  public abstract <T> T create(IInjectingFactory<T> factory) throws CreationException;
-
-  public abstract <T> T create(Class<T> clazz) throws CreationException;
+public interface IValueInjector extends IInjectingObjectFactory {
 
   public abstract <T> void inject(final T object) throws InjectionException;
 

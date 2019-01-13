@@ -24,15 +24,14 @@ package net.anwiba.commons.image;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public interface IImageReader {
 
-  IImageContainer read(ICanceler canceler, IResourceReference resourceReference)
-      throws InterruptedException,
-      IOException;
+  IImageContainer read(ICanceler canceler, IResourceReference resourceReference) throws CanceledException, IOException;
 
-  IImageContainer read(ICanceler canceler, InputStream inputStream) throws InterruptedException, IOException;
+  IImageContainer read(ICanceler canceler, InputStream inputStream) throws CanceledException, IOException;
 
 }

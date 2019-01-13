@@ -36,7 +36,7 @@ public interface IParameters extends INamedValueProvider<String, RuntimeExceptio
 
   IParameters adapt(int rowIndex, IParameter parameter);
 
-  boolean containts(String name);
+  boolean contains(String name);
 
   void forEach(Consumer<IParameter> consumer);
 

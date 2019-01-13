@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.swing.dialog.MessageDialogUtilities;
@@ -93,7 +94,7 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
             .throwable(exception)
             .error()
             .launch(owner);
-      } catch (final InterruptedException exception) {
+      } catch (final CanceledException exception) {
         // nothing to do
       }
     }

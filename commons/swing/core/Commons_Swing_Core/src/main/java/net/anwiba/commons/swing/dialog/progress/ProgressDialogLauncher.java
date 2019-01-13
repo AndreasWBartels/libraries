@@ -26,6 +26,7 @@ import java.awt.Window;
 
 import javax.swing.SwingUtilities;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.thread.progress.IProgressTask;
@@ -55,12 +56,12 @@ public class ProgressDialogLauncher<O, E extends Exception> {
     return this;
   }
 
-  public O launch(final Window owner) throws E, InterruptedException {
+  public O launch(final Window owner) throws E, CanceledException {
     final IMessage message = this.builder.build();
     return ProgressDialog.show(owner, this.titel == null ? message.getText() : this.titel, message, this.task);
   }
 
-  public O launch(final Component component) throws E, InterruptedException {
+  public O launch(final Component component) throws E, CanceledException {
     return launch(component == null ? (Window) null : SwingUtilities.windowForComponent(component));
   }
 }

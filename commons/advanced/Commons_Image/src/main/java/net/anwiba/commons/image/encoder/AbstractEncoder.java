@@ -58,7 +58,7 @@ public abstract class AbstractEncoder implements IEncoder {
 
   private ImageWriter getWriter(final OutputStream out) throws IOException {
     return Streams
-        .create(IOException.class, ImageIO.getImageWritersByMIMEType(this.mimetype))
+        .of(IOException.class, ImageIO.getImageWritersByMIMEType(this.mimetype))
         .first()
         .consume(w -> w.setOutput(ImageIO.createImageOutputStream(out)))
         .get();

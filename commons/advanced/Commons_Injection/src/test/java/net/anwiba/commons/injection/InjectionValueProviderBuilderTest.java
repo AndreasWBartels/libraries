@@ -30,9 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-import net.anwiba.commons.injection.annotation.Injection;
-import net.anwiba.commons.injection.annotation.Named;
+import net.anwiba.commons.annotation.Imitable;
+import net.anwiba.commons.annotation.Injection;
+import net.anwiba.commons.annotation.Named;
 import net.anwiba.commons.injection.binding.NamedClassBinding;
+import net.anwiba.commons.injection.impl.BindingFactory;
 import net.anwiba.commons.reflection.CreationException;
 
 @SuppressWarnings("nls")
@@ -69,10 +71,9 @@ public class InjectionValueProviderBuilderTest {
 
     private final Iterable<IFoo> foos;
 
-    public Woww(final IBar bar, final Iterable<IFoo> foos) {
+    public Woww(final IBar bar, final Collection<IFoo> foos) {
       this.bar = bar;
       this.foos = foos;
-
     }
 
     @Override
@@ -156,7 +157,48 @@ public class InjectionValueProviderBuilderTest {
 
   };
 
+  public static class Meu {
+
+    private final Peu peu;
+
+    public Meu(final Peu peu) {
+      this.peu = peu;
+    }
+
+    public Peu getPeu() {
+      return this.peu;
+    }
+
+  };
+
+  public static class Peu {
+  };
+
   public static interface IFoo {
+  };
+
+  public static interface IImitable {
+
+    void any();
+
+    default boolean that() {
+      return true;
+    };
+
+  };
+
+  public static class ImitableUser {
+
+    private final IImitable imitable;
+
+    @Injection
+    public ImitableUser(@Imitable final IImitable imitable) {
+      this.imitable = imitable;
+    }
+
+    public IImitable getImitable() {
+      return this.imitable;
+    }
   };
 
   public static interface IFoos extends IFoo {
@@ -171,107 +213,131 @@ public class InjectionValueProviderBuilderTest {
   public static class FooC implements IFoos {
   };
 
-  @Test
-  public void setFoo() throws CreationException {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
-    builder.set(IFoo.class, new Foo());
-    assertThat(builder.get(IFoo.class), instanceOf(IFoo.class));
-    builder.link(IFoo.class, Foo.class);
-    final IInjectionValueProvider provider = builder.build();
-    assertThat(provider.get(IFoo.class), instanceOf(Foo.class));
-    assertThat(provider.get(Foo.class), instanceOf(Foo.class));
+  IScope scope = new IScope() {
+  };
+
+  private final IBindingFactory bindingFactory = new BindingFactory();
+
+  private <T> IBinding<T> binding(final Class<T> clazz) {
+    return this.bindingFactory.create(clazz, null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void setInjectFooThrowIllegalArgumentException() {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
-    builder.set(IFoo.class, Foo.class);
-    builder.get(IFoo.class);
+  @Test
+  public void createImitable() throws CreationException {
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
+    builder.set(ImitableUser.class);
+    final IInjectionValueProvider provider = builder.build();
+    final ImitableUser actual = provider.get(binding(ImitableUser.class));
+    final IImitable imitable = actual.getImitable();
+    assertThat(imitable, notNullValue());
+    assertThat(imitable.that(), equalTo(true));
+    imitable.any();
+    assertThat(provider.get(binding(IImitable.class)), nullValue());
+  }
+
+  @Test
+  public void createMeu() throws CreationException {
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
+    builder.set(Meu.class);
+    final IInjectionValueProvider provider = builder.build();
+    assertThat(provider.get(binding(Meu.class)), instanceOf(Meu.class));
+    assertThat(provider.get(binding(Meu.class)).getPeu(), notNullValue());
+    assertThat(provider.get(binding(Peu.class)), nullValue());
+  }
+
+  @Test
+  public void setFoo() throws CreationException {
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
+    builder.set(Foo.class, new Foo());
+    builder.link(Foo.class, IFoo.class);
+    final IInjectionValueProvider provider = builder.build();
+    assertThat(provider.get(binding(IFoo.class)), instanceOf(Foo.class));
+    assertThat(provider.get(binding(Foo.class)), instanceOf(Foo.class));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void setAddInjectFooThrowIllegalArgumentException() {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.set(IFoo.class, FooA.class);
     builder.add(IFoo.class, FooB.class);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void addSetInjectFooThrowIllegalArgumentException() {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.add(IFoo.class, FooB.class);
     builder.set(IFoo.class, FooA.class);
   }
 
   @Test(expected = IllegalStateException.class)
   public void addGetInjectFooThrowIllegalStateException() throws CreationException {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.add(IFoo.class, FooB.class);
-    builder.build().get(IFoo.class);
+    builder.build().get(binding(IFoo.class));
   }
 
   @Test
   public void setGetAllInjectFoo() throws CreationException {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.set(IFoo.class, FooB.class);
-    final Collection<IFoo> foos = builder.build().getAll(IFoo.class);
+    final Collection<IFoo> foos = builder.build().getAll(binding(IFoo.class));
     assertThat(foos.size(), equalTo(1));
   }
 
   @Test
   public void injectMau() throws CreationException {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.set(new NamedClassBinding<>(String.class, "name"), "Text");
     builder.set(new NamedClassBinding<>(Integer.class, "value"), Integer.valueOf(20));
     builder.set(IMau.class, Mau.class);
     final IInjectionValueProvider provider = builder.build();
-    final IMau mau = provider.get(IMau.class);
+    final IMau mau = provider.get(binding(IMau.class));
     assertThat(mau.getName(), equalTo("Text"));
     assertThat(mau.getValue(), equalTo(Integer.valueOf(20)));
   }
 
   @Test
   public void injectPau() throws CreationException {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.set(new NamedClassBinding<>(String.class, "name"), "Text");
     builder.set(new NamedClassBinding<>(Integer.class, "value"), Integer.valueOf(20));
     builder.set(IMau.class, Pau.class);
     final IInjectionValueProvider provider = builder.build();
-    final IMau mau = provider.get(IMau.class);
+    final IMau mau = provider.get(binding(IMau.class));
     assertThat(mau.getName(), equalTo("Text"));
     assertThat(mau.getValue(), equalTo(Integer.valueOf(20)));
   }
 
   @Test(expected = CreationException.class)
   public void injectPauThrowException() throws CreationException {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.set(IMau.class, Pau.class);
     builder.build();
   }
 
   @Test
   public void injectBarAndFooAndWow() throws CreationException {
-    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder();
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
     builder.set(IWow.class, Wow.class);
     builder.set(IBar.class, Bar.class);
-    builder.add(IFoo.class, FooA.class);
-    builder.add(IFoo.class, FooB.class);
-    builder.add(IFoo.class, FooC.class);
-    builder.link(IFoo.class, IFoos.class);
-    builder.set(Woww.class, Woww.class);
+    builder.add(IFoos.class, FooA.class);
+    builder.add(IFoos.class, FooB.class);
+    builder.add(IFoos.class, FooC.class);
+    builder.link(IFoos.class, IFoo.class);
+    builder.set(Woww.class);
     final IInjectionValueProvider provider = builder.build();
-    final Collection<IFoo> foos = provider.getAll(IFoo.class);
+    final Collection<IFoo> foos = provider.getAll(binding(IFoo.class));
     assertThat(foos.size(), equalTo(3));
 
-    final Collection<IFoos> fooss = provider.getAll(IFoos.class);
+    final Collection<IFoos> fooss = provider.getAll(binding(IFoos.class));
     assertThat(fooss.size(), equalTo(3));
 
-    final IBar bar = provider.get(IBar.class);
+    final IBar bar = provider.get(binding(IBar.class));
     final AtomicInteger barFooCounter = new AtomicInteger();
     bar.getFoos().forEach(f -> barFooCounter.incrementAndGet());
     assertThat(barFooCounter.get(), equalTo(3));
 
-    final IWow wow = provider.get(IWow.class);
+    final IWow wow = provider.get(binding(IWow.class));
     assertThat(wow, notNullValue());
     assertThat(wow.getBar(), notNullValue());
     assertThat(wow.getBar(), sameInstance(bar));
@@ -279,7 +345,7 @@ public class InjectionValueProviderBuilderTest {
     wow.getFoos().forEach(f -> wowFooCounter.incrementAndGet());
     assertThat(wowFooCounter.get(), equalTo(3));
 
-    final IWow woww = provider.get(Woww.class);
+    final IWow woww = provider.get(binding(Woww.class));
     assertThat(woww, notNullValue());
     assertThat(woww.getBar(), notNullValue());
     assertThat(woww.getBar(), sameInstance(bar));

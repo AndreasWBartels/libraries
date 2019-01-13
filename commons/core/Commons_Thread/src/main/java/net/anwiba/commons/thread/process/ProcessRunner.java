@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
@@ -81,15 +82,28 @@ public final class ProcessRunner implements IRunnable {
       logger.log(ILevel.DEBUG, MessageFormat.format("process {0} started", this.processIdentfier)); //$NON-NLS-1$
       this.process.execute(this.monitor, this.canceler, this.processIdentfier);
       logger.log(ILevel.DEBUG, MessageFormat.format("process {0} finished", this.processIdentfier)); //$NON-NLS-1$
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       logger.log(ILevel.DEBUG, MessageFormat.format("process {0} interrupted", this.processIdentfier)); //$NON-NLS-1$
+      this.processes.cancel(this.processIdentfier);
     } catch (final RuntimeException throwable) {
       this.monitor.addMessage(
           new Message(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
       logger.log(ILevel.ERROR, "", throwable); //$NON-NLS-1$
+      this.processes.cancel(this.processIdentfier);
+    } catch (final Exception throwable) {
+      this.monitor.addMessage(
+          new Message(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
+      logger.log(ILevel.ERROR, "", throwable); //$NON-NLS-1$
+      this.processes.cancel(this.processIdentfier);
+    } catch (final Throwable throwable) {
+      this.monitor.addMessage(
+          new Message(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
+      logger.log(ILevel.ERROR, "", throwable); //$NON-NLS-1$
+      this.processes.cancel(this.processIdentfier);
+      throw throwable;
     } finally {
       synchronized (this.listeners) {
-        this.listeners.forEach(l -> this.canceler.removeCancelerListener(l));
+        this.canceler.removeAllCancelerListener();
         this.canceler = null;
       }
       synchronized (this.processes) {

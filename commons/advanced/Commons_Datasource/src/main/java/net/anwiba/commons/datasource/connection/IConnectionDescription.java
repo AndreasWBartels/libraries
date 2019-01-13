@@ -26,8 +26,13 @@ import java.net.URI;
 
 import net.anwiba.commons.datasource.DataSourceType;
 import net.anwiba.commons.datasource.DataSourceVersion;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 
 public interface IConnectionDescription extends Serializable {
+
+  IConnectionDescription adapt(IAuthentication authentication);
+
+  IAuthentication getAuthentication();
 
   String getUrl();
 

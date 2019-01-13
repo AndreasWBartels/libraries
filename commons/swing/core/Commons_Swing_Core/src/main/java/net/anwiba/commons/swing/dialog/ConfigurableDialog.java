@@ -25,11 +25,13 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Objects;
 
 import javax.swing.JComponent;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectModel;
@@ -67,6 +69,8 @@ public class ConfigurableDialog extends AbstractDialog {
     this.contentPane = contentPane;
     setContentPane(this.contentPane.getComponent());
     this.dataStateModel = this.contentPane.getDataStateModel();
+    Optional.of(configuration.getDataState()).accept(d -> !Objects.equals(d, DataState.UNKNOWN)).consume(
+        d -> this.dataStateModel.set(d));
     this.dataStateModel.addChangeListener(new IChangeableObjectListener() {
 
       @Override

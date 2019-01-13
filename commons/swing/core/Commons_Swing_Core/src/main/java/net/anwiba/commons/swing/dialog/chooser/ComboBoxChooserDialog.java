@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.message.Message;
@@ -208,7 +209,7 @@ public class ComboBoxChooserDialog<T> extends MessageDialog implements IValueDia
               MessageType.ERROR));
       setOkEnabled(false);
       return false;
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       return false;
     } catch (final InvocationTargetException exception) {
       setOkEnabled(false);

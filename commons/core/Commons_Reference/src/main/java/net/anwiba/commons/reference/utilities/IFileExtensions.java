@@ -65,6 +65,7 @@ public interface IFileExtensions {
   public static final String FLML = "flml"; //$NON-NLS-1$
   public static final String SQLITE = "sqlite"; //$NON-NLS-1$
   public static final String GPKG = "gpkg"; //$NON-NLS-1$
+  public static final String GRIDTILES = "gridtiles"; //$NON-NLS-1$
   public static final String TOPOJSON = "topojson"; //$NON-NLS-1$
   public static final String GEOJSON = "geojson"; //$NON-NLS-1$
   public static final String ESRIGEOJSON = "esrijson"; //$NON-NLS-1$
@@ -74,5 +75,6 @@ public interface IFileExtensions {
 
   public static final String SLD = "sld"; //$NON-NLS-1$
   public static final String SE = "se"; //$NON-NLS-1$
+  public static final String GROOVY = "groovy"; //$NON-NLS-1$
 
 }

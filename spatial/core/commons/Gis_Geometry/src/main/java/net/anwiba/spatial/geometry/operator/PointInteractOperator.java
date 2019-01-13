@@ -55,6 +55,10 @@ public class PointInteractOperator {
     if (geometry == null) {
       return false;
     }
+    final IEnvelope envelope = EnvelopeUtilities.createEnvelope(geometry.getEnvelope(), tolerance);
+    if (!envelope.interact(this.coordinate)) {
+      return false;
+    }
     final IGeometryTypeVisitor<Boolean, RuntimeException> visitor = new IGeometryTypeVisitor<Boolean, RuntimeException>() {
 
       @Override
@@ -128,10 +132,6 @@ public class PointInteractOperator {
   }
 
   public boolean interact(final IMultiPoint multiPoint, final double tolerance) {
-    final IEnvelope envelope = EnvelopeUtilities.createEnvelope(multiPoint.getEnvelope(), tolerance);
-    if (!envelope.interact(this.coordinate)) {
-      return false;
-    }
     for (int i = 0; i < multiPoint.getNumberOfGeometries(); i++) {
       if (interact(multiPoint.getGeometryN(i), tolerance)) {
         return true;
@@ -141,10 +141,6 @@ public class PointInteractOperator {
   }
 
   public boolean interact(final ILineString line, final double tolerance) {
-    final IEnvelope envelope = EnvelopeUtilities.createEnvelope(line.getEnvelope(), tolerance);
-    if (!envelope.interact(this.coordinate)) {
-      return false;
-    }
     final ICoordinateSequence coordinateSequence = line.getCoordinateSequence();
     ICoordinate previous = null;
     for (final ICoordinate next : coordinateSequence.getCoordinates()) {
@@ -164,10 +160,6 @@ public class PointInteractOperator {
   }
 
   public boolean interact(final IMultiLineString multiLineString, final double tolerance) {
-    final IEnvelope envelope = EnvelopeUtilities.createEnvelope(multiLineString.getEnvelope(), tolerance);
-    if (!envelope.interact(this.coordinate)) {
-      return false;
-    }
     for (int i = 0; i < multiLineString.getNumberOfGeometries(); i++) {
       if (interact(multiLineString.getGeometryN(i), tolerance)) {
         return true;
@@ -177,10 +169,6 @@ public class PointInteractOperator {
   }
 
   public boolean interact(final IPolygon polygon, final double tolerance) {
-    final IEnvelope envelope = EnvelopeUtilities.createEnvelope(polygon.getEnvelope(), tolerance);
-    if (!envelope.interact(this.coordinate)) {
-      return false;
-    }
     if (CoordinateUtilities.isPointInRing(this.coordinate, polygon.getOuterRing().getCoordinateSequence())) {
       for (int i = 0; i < polygon.getNumberOfInnerRings(); i++) {
         final IGeometry innerRing = polygon.getInnerRingN(i);
@@ -200,12 +188,13 @@ public class PointInteractOperator {
   }
 
   public boolean interact(final IMultiPolygon polygon, final double tolerance) {
-    final IEnvelope envelope = EnvelopeUtilities.createEnvelope(polygon.getEnvelope(), tolerance);
-    if (!envelope.interact(this.coordinate)) {
-      return false;
-    }
     for (int i = 0; i < polygon.getNumberOfGeometries(); i++) {
-      if (interact(polygon.getGeometryN(i), tolerance)) {
+      final IPolygon geometryN = polygon.getGeometryN(i);
+      final IEnvelope envelope = EnvelopeUtilities.createEnvelope(geometryN.getEnvelope(), tolerance);
+      if (!envelope.interact(this.coordinate)) {
+        continue;
+      }
+      if (interact(geometryN, tolerance)) {
         return true;
       }
     }

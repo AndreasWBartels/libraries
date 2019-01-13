@@ -48,9 +48,7 @@ public class CoordinateSequenceOrientationCalculator {
   }
 
   public static Orientation getOrientation(final ICoordinateSequence coordinateSequence) {
-    return isOrientationPositive(coordinateSequence)
-        ? Orientation.POSITIVE
-        : Orientation.NEGATIVE;
+    return isOrientationPositive(coordinateSequence) ? Orientation.POSITIVE : Orientation.NEGATIVE;
   }
 
   public static boolean isOrientationPositive(final ICoordinateSequence coordinateSequence) {
@@ -67,19 +65,17 @@ public class CoordinateSequenceOrientationCalculator {
     if (predecessor.getXValue() == upperLeftCoordinate.getXValue()) {
       return true;
     }
-    final double a =
-        nullSaveDividing(successor.getYValue() - upperLeftCoordinate.getYValue(), successor.getXValue()
-            - upperLeftCoordinate.getXValue());
-    final double b =
-        nullSaveDividing(upperLeftCoordinate.getYValue() - predecessor.getYValue(), upperLeftCoordinate.getXValue()
-            - predecessor.getXValue());
+    final double a = nullSaveDividing(
+        successor.getYValue() - upperLeftCoordinate.getYValue(),
+        successor.getXValue() - upperLeftCoordinate.getXValue());
+    final double b = nullSaveDividing(
+        upperLeftCoordinate.getYValue() - predecessor.getYValue(),
+        upperLeftCoordinate.getXValue() - predecessor.getXValue());
     return (a <= b);
   }
 
   private static double nullSaveDividing(final double dividend, final double divisor) {
-    return divisor == 0
-        ? Double.POSITIVE_INFINITY
-        : dividend / divisor;
+    return divisor == 0 ? Double.POSITIVE_INFINITY : dividend / divisor;
   }
 
   private static ICoordinate getPredecessor(
@@ -87,14 +83,13 @@ public class CoordinateSequenceOrientationCalculator {
       final int upperLeftCoordinateIndex,
       final ICoordinate upperLeftCoordinate) {
     final int numberOfCoordinates = coordinateSequence.getNumberOfCoordinates();
-    int predecessorIndex = upperLeftCoordinateIndex == 0
-        ? numberOfCoordinates - 1
-        : upperLeftCoordinateIndex - 1;
+    int predecessorIndex = upperLeftCoordinateIndex == 0 ? numberOfCoordinates - 1 : upperLeftCoordinateIndex - 1;
     while (coordinateSequence.getXValue(predecessorIndex) == upperLeftCoordinate.getXValue()
         && coordinateSequence.getYValue(predecessorIndex) == upperLeftCoordinate.getYValue()) {
       predecessorIndex--;
       if (predecessorIndex == upperLeftCoordinateIndex) {
-        throw new IllegalArgumentException("All sequence coordinates are equals"); //$NON-NLS-1$
+        //        throw new IllegalArgumentException("All sequence coordinates are equals"); //$NON-NLS-1$
+        return coordinateSequence.getCoordinateN(predecessorIndex);
       }
       if (predecessorIndex < 0) {
         predecessorIndex = numberOfCoordinates - 1;
@@ -113,7 +108,8 @@ public class CoordinateSequenceOrientationCalculator {
         && upperLeftCoordinate.getYValue() == coordinateSequence.getYValue(successorIndex)) {
       successorIndex = ++successorIndex % numberOfCoordinates;
       if (successorIndex == upperLeftCoordinateIndex) {
-        throw new IllegalArgumentException("All sequence coordinates are equals"); //$NON-NLS-1$
+        //        throw new IllegalArgumentException("All sequence coordinates are equals"); //$NON-NLS-1$
+        return coordinateSequence.getCoordinateN(successorIndex);
       }
     }
     return coordinateSequence.getCoordinateN(successorIndex);

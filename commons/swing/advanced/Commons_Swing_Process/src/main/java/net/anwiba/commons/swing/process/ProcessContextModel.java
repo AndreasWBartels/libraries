@@ -90,7 +90,7 @@ public class ProcessContextModel {
   }
 
   public boolean isEnabled() {
-    return this.context.getCanceler().isEnabled();
+    return this.context.getCanceler().isEnabled() && !this.context.getCanceler().isCanceled();
   }
 
   public ICanceler getCanceler() {

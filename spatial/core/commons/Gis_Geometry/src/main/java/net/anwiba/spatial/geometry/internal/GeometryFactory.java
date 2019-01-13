@@ -149,28 +149,6 @@ public class GeometryFactory implements IGeometryFactory {
     return new Polygon(getCoordinateReferenceSystem(), outerRing, innerRings);
   }
 
-  // private ILinearRing[] checkInnerRings(final ILinearRing[] innerRings) {
-  // final List<ILinearRing> list = new ArrayList<ILinearRing>();
-  // for (final ILinearRing linearRing : innerRings) {
-  // list.add(checkInnerRing(linearRing));
-  // }
-  // return list.toArray(new ILinearRing[list.size()]);
-  // }
-
-  // private ILinearRing checkInnerRing(final ILinearRing innerRing) {
-  // if (CoordinateSequenceOrientationCalculator.isOrientationPositive(innerRing.getCoordinateSequence())) {
-  // return innerRing;
-  // }
-  // return createLinearRing(CoordinateSequenceUtilities.reverse(innerRing.getCoordinateSequence()));
-  // }
-  //
-  // private ILinearRing checkOuterRing(final ILinearRing outerRing) {
-  // if (!CoordinateSequenceOrientationCalculator.isOrientationPositive(outerRing.getCoordinateSequence())) {
-  // return outerRing;
-  // }
-  // return createLinearRing(CoordinateSequenceUtilities.reverse(outerRing.getCoordinateSequence()));
-  // }
-
   @Override
   public IMultiPoint createMultiPoint(final double[] xs, final double[] ys) {
     return createMultiPoint(this.coordinateSequenceFactory.create(xs, ys));

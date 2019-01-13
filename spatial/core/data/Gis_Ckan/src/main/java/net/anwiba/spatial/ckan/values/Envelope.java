@@ -51,4 +51,8 @@ public class Envelope {
     return this.maxY;
   }
 
+  public boolean intersects(final Envelope other) {
+    return !(other.minX > this.maxX || other.maxX < this.minX || other.minY > this.maxY || other.maxY < this.minY);
+  }
+
 }

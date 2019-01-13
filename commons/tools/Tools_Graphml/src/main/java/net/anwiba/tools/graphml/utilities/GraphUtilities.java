@@ -75,7 +75,7 @@ public class GraphUtilities {
     final Set<Node<String>> nodes = new HashSet<>();
     final Graph<String> result = new Graph<>();
     for (final Node<String> node : graph.nodes()) {
-      if (!other.containts(node)) {
+      if (!other.contains(node)) {
         continue;
       }
       nodes.add(node);

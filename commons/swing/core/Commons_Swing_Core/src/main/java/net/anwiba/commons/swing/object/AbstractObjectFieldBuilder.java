@@ -80,10 +80,10 @@ public abstract class AbstractObjectFieldBuilder<O, C extends AbstractObjectFiel
     return field;
   }
 
-  public B setRegularExpressionValidator(final String patternString, final String message) {
+  public B addRegularExpressionValidator(final String patternString, final String message) {
     final Pattern pattern = Pattern.compile(patternString);
 
-    this.builder.setValidator(value -> {
+    this.builder.addValidator(value -> {
       if (StringUtilities.isNullOrTrimmedEmpty(value)) {
         return IValidationResult.inValid(message);
       }

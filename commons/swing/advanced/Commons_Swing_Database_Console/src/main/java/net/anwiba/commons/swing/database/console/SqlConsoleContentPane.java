@@ -94,6 +94,7 @@ import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
 import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
 import net.anwiba.commons.jdbc.name.IDatabaseTableName;
 import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IApplicable;
 import net.anwiba.commons.lang.functional.IBlock;
@@ -977,7 +978,7 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
         block.execute();
         return null;
       }).setTitle(title).setText(text).setDescription("").launch(component); //$NON-NLS-1$
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       // // nothing to do
     }
   }

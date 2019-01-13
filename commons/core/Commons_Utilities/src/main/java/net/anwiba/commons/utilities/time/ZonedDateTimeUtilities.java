@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.utilities.time;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -34,7 +35,8 @@ public class ZonedDateTimeUtilities {
   }
 
   public static ZonedDateTime atTimeZone(final Date date, final ZoneId zone) {
-    return ZonedDateTime.ofInstant(date.toInstant(), zone);
+    final Instant instant = date.toInstant();
+    return instant.atZone(zone);
   }
 
   public static ZonedDateTime atCoordinatedUniversalTimeZone(final Date value) {
@@ -49,6 +51,14 @@ public class ZonedDateTimeUtilities {
     return zonedDateTime.toInstant().atZone(getCoordinatedUniversalTimeZone());
   }
 
+  public static ZonedDateTime atSystemTimeZone(final ZonedDateTime zonedDateTime) {
+    return zonedDateTime.toInstant().atZone(getSystemZone());
+  }
+
+  public static ZonedDateTime atUserTimeZone(final ZonedDateTime zonedDateTime) {
+    return zonedDateTime.toInstant().atZone(getUserZone());
+  }
+
   public static ZoneId getUserZone() {
     return TimeZoneUtilities.getUserTimeZone().toZoneId();
   }
@@ -61,8 +71,16 @@ public class ZonedDateTimeUtilities {
     return ZoneId.of("UTC"); //$NON-NLS-1$
   }
 
+  public static Date toDate(final ZonedDateTime dateTime) {
+    return Date.from(dateTime.toInstant());
+  }
+
   public static String toString(final ZonedDateTime dateTime) {
     return dateTime.format(DateTimeFormatter.ISO_INSTANT);
+  }
+
+  public static ZonedDateTime valueOf(final String date) {
+    return ZonedDateTime.parse(date);
   }
 
 }

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 
 import net.anwiba.commons.lang.io.NoneClosingInputStream;
 
@@ -39,11 +41,13 @@ public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
   public AbstractJsonUnmarshaller(
       final Class<T> clazz,
       final Class<R> errorResponseClass,
-      final Map<String, Object> injectionValues) {
+      final Map<String, Object> injectionValues,
+      final Collection<DeserializationProblemHandler> problemHandlers) {
     this.clazz = clazz;
     this.errorResponseClass = errorResponseClass;
     this.injectionValues.putAll(injectionValues);
     this.mapper.getFactory().configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
+    problemHandlers.forEach(h -> this.mapper.addHandler(h));
   }
 
   public final O unmarshal(final String body) throws IOException, E {

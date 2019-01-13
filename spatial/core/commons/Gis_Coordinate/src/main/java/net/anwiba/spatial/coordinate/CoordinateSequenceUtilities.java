@@ -354,4 +354,76 @@ public class CoordinateSequenceUtilities {
     }
     return coordinates;
   }
+
+  public static boolean isRectangle(final ICoordinateSequence coordinateSequence) {
+    final ICoordinateSequence sequence = removePointsOnStaightLineAndDupplicates(coordinateSequence, 5);
+    if (sequence.getNumberOfCoordinates() != 5) {
+      return false;
+    }
+    if (sequence.getXValue(0) == sequence.getXValue(1)) {
+      if (sequence.getYValue(1) != sequence.getYValue(2)) {
+        return false;
+      }
+      if (sequence.getXValue(2) != sequence.getXValue(3)) {
+        return false;
+      }
+      if (sequence.getYValue(3) != sequence.getYValue(4)) {
+        return false;
+      }
+      return true;
+    } else if (sequence.getYValue(0) == sequence.getYValue(1)) {
+      if (sequence.getXValue(1) != sequence.getXValue(2)) {
+        return false;
+      }
+      if (sequence.getYValue(2) != sequence.getYValue(3)) {
+        return false;
+      }
+      if (sequence.getXValue(3) != sequence.getXValue(4)) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  private static ICoordinateSequence removePointsOnStaightLineAndDupplicates(
+      final ICoordinateSequence coordinateSequence,
+      final int breakSize) {
+    final List<ICoordinate> coordinates = new ArrayList<>();
+    ICoordinate previous = null;
+    ICoordinate next = null;
+    double gradient = Double.NaN;
+    for (final ICoordinate coordinate : coordinateSequence.getCoordinates()) {
+      if (previous == null) {
+        previous = coordinate;
+        coordinates.add(coordinate);
+        continue;
+      }
+      if (next == null) {
+        gradient = calculateGradient(previous, coordinate);
+        next = coordinate;
+        continue;
+      }
+      final double currentGradient = calculateGradient(previous, coordinate);
+      if (currentGradient == gradient) {
+        next = coordinate;
+        continue;
+      }
+      coordinates.add(next);
+      if (coordinates.size() > breakSize) {
+        return coordinateSequence;
+      }
+      gradient = currentGradient;
+      previous = next;
+      next = coordinate;
+    }
+    if (next != null) {
+      coordinates.add(next);
+    }
+    return new CoordinateSequenceFactory().create(coordinates);
+  }
+
+  private static double calculateGradient(final ICoordinate previous, final ICoordinate next) {
+    return (next.getXValue() - previous.getXValue()) / (next.getYValue() - previous.getYValue());
+  }
 }

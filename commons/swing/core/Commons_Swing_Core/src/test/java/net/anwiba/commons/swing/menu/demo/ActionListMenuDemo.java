@@ -8,22 +8,18 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
 package net.anwiba.commons.swing.menu.demo;
-
-import de.jdemo.annotation.Demo;
-import de.jdemo.extensions.SwingDemoCase;
-import de.jdemo.junit.DemoAsTestRunner;
 
 import java.awt.event.ActionEvent;
 
@@ -34,11 +30,15 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
+import org.junit.runner.RunWith;
+
+import de.jdemo.annotation.Demo;
+import de.jdemo.extensions.SwingDemoCase;
+import de.jdemo.junit.DemoAsTestRunner;
+import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
 import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.menu.ActionListMenu;
 import net.anwiba.commons.swing.menu.ActionListModel;
-
-import org.junit.runner.RunWith;
 
 @RunWith(DemoAsTestRunner.class)
 public class ActionListMenuDemo extends SwingDemoCase {
@@ -63,25 +63,29 @@ public class ActionListMenuDemo extends SwingDemoCase {
     final JFrame frame = createJFrame();
     final JMenuBar menubar = new JMenuBar();
     final ActionListModel actionListModel = new ActionListModel();
-    final JMenu listMenu = new ActionListMenu("title", actionListModel); //$NON-NLS-1$
+    final JMenu listMenu = new ActionListMenu(
+        "title", //$NON-NLS-1$
+        actionListModel,
+        10,
+        new ConfigurableActionBuilder().setName("...").build()); //$NON-NLS-1$
     listMenu.add(new AbstractAction("ADD", GuiIcons.ADD_ICON.getSmallIcon()) { //$NON-NLS-1$
 
-          private static final long serialVersionUID = 1L;
+      private static final long serialVersionUID = 1L;
 
-          @Override
-          public void actionPerformed(final ActionEvent e) {
-            actionListModel.add(action);
-          }
-        });
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        actionListModel.add(action);
+      }
+    });
     listMenu.add(new AbstractAction("REMOVE", GuiIcons.MINUS_ICON.getSmallIcon()) { //$NON-NLS-1$
 
-          private static final long serialVersionUID = 1L;
+      private static final long serialVersionUID = 1L;
 
-          @Override
-          public void actionPerformed(final ActionEvent e) {
-            actionListModel.remove(action);
-          }
-        });
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        actionListModel.remove(action);
+      }
+    });
     menubar.add(listMenu);
     frame.setJMenuBar(menubar);
     show(frame);

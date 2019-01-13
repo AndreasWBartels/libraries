@@ -25,12 +25,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.Properties;
 
-import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.utilities.time.ZonedDateTimeUtilities;
 
 public class VersionUtilities {
 
@@ -49,7 +51,7 @@ public class VersionUtilities {
       final ReleaseState releaseState = getReleaseState(properties);
       final ProductState productState = getProductState(properties);
       final int buildCount = getIntProperty(properties, "build.count"); //$NON-NLS-1$
-      final Date date = getDate(properties);
+      final ZonedDateTime date = getDate(properties);
       return new Version(major, minor, releaseState, step, productState, date, buildCount);
     } catch (final IOException exception) {
       // nothing to do
@@ -57,14 +59,16 @@ public class VersionUtilities {
     return Version.DUMMY;
   }
 
-  private static Date getDate(final Properties properties) {
+  private static ZonedDateTime getDate(final Properties properties) {
     final String property = properties.getProperty("build.date"); //$NON-NLS-1$
     if (property == null) {
       return Version.defaultDate;
     }
     try {
-      return new SimpleDateFormat("yyyy.MM.dd HH:mm").parse(property); //$NON-NLS-1$
-    } catch (final ParseException exception) {
+      return ZonedDateTimeUtilities.atCoordinatedUniversalTimeZone(
+          LocalDateTime.parse(property, DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm", Locale.getDefault())), //$NON-NLS-1$
+          ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone());
+    } catch (final DateTimeParseException exception) {
       return Version.defaultDate;
     }
   }
@@ -101,364 +105,21 @@ public class VersionUtilities {
     return Integer.parseInt(property);
   }
 
-  public enum ParseState {
-    UNDEFIND, MAJOR, MINOR, RELEASESTATE, STEP, PRODUCTSTATE, YEAR, MONTH, DAY, HOUR, MIN, COUNT;
-  }
-
   public static IVersion valueOf(final String string) {
     return new VersionParser().parse(string);
   }
 
-  public static class VersionParser {
-
-    public IVersion parse(final String string) {
-      if (string == null) {
-        return null;
-      }
-      boolean lastCharaterWasWhiteSpace = false;
-      ParseState state = ParseState.UNDEFIND;
-      StringBuilder builder = new StringBuilder();
-      final VersionBuilder versionBuilder = new VersionBuilder();
-      for (final char c : string.toCharArray()) {
-        final ParseState tmpState = state;
-        if (c == '.') {
-          state = point(state, builder, versionBuilder);
-          lastCharaterWasWhiteSpace = false;
-        }
-        if (c == ':') {
-          state = colon(state, builder, versionBuilder);
-          lastCharaterWasWhiteSpace = false;
-        }
-        if (Character.isWhitespace(c) || c == '-') {
-          if (lastCharaterWasWhiteSpace) {
-            continue;
-          }
-          state = checkWhitespace(state, builder, versionBuilder);
-          lastCharaterWasWhiteSpace = true;
-        }
-        if (Character.isDigit(c)) {
-          state = digit(state, builder, versionBuilder);
-          lastCharaterWasWhiteSpace = false;
-        }
-        if (Character.isLetter(c)) {
-          state = letter(state, builder, versionBuilder);
-          lastCharaterWasWhiteSpace = false;
-        }
-        if (!state.equals(tmpState)) {
-          builder = new StringBuilder();
-        }
-        if (c == '.' || c == ':' || Character.isWhitespace(c)) {
-          continue;
-        }
-        builder.append(c);
-      }
-      state = resolve(state, builder, versionBuilder);
-      return versionBuilder.build();
+  public static String getText(final IVersion version) {
+    String string = internal(version);
+    final ProductState productState = version.getProductState();
+    if (productState != ProductState.STABLE) {
+      string += " "; //$NON-NLS-1$
+      string += String.valueOf(productState.getAcronym());
     }
-
-    private ParseState resolve(
-        final ParseState state,
-        final StringBuilder builder,
-        final VersionBuilder versionBuilder) {
-      switch (state) {
-        case UNDEFIND: {
-          return state;
-        }
-        case MAJOR: {
-          versionBuilder.setMajor(builder.toString());
-          return state;
-        }
-        case MINOR: {
-          versionBuilder.setMinor(builder.toString());
-          return state;
-        }
-        case RELEASESTATE: {
-          versionBuilder.setReleaseState(builder.toString());
-          return state;
-        }
-        case STEP: {
-          versionBuilder.setStep(builder.toString());
-          return state;
-        }
-        case PRODUCTSTATE: {
-          versionBuilder.setProductState(builder.toString());
-          return state;
-        }
-        case YEAR: {
-          versionBuilder.setYear(builder.toString());
-          return state;
-        }
-        case MONTH: {
-          versionBuilder.setMonth(builder.toString());
-          return state;
-        }
-        case DAY: {
-          versionBuilder.setDay(builder.toString());
-          return state;
-        }
-        case HOUR: {
-          versionBuilder.setHour(builder.toString());
-          return state;
-        }
-        case MIN: {
-          versionBuilder.setMinute(builder.toString());
-          return state;
-        }
-        case COUNT: {
-          versionBuilder.setCount(builder.toString());
-          return state;
-        }
-      }
-      throw new UnreachableCodeReachedException();
-    }
-
-    private ParseState checkWhitespace(
-        final ParseState state,
-        final StringBuilder builder,
-        final VersionBuilder versionBuilder) {
-      switch (state) {
-        case UNDEFIND: {
-          return state;
-        }
-        case MAJOR: {
-          versionBuilder.setMajor(builder.toString());
-          return ParseState.RELEASESTATE;
-        }
-        case MINOR: {
-          versionBuilder.setMinor(builder.toString());
-          return ParseState.RELEASESTATE;
-        }
-        case RELEASESTATE: {
-          versionBuilder.setReleaseState(builder.toString());
-          return ParseState.STEP;
-        }
-        case STEP: {
-          versionBuilder.setStep(builder.toString());
-          return ParseState.PRODUCTSTATE;
-        }
-        case PRODUCTSTATE: {
-          versionBuilder.setProductState(builder.toString());
-          return ParseState.YEAR;
-        }
-        case YEAR: {
-          versionBuilder.setYear(builder.toString());
-          return ParseState.HOUR;
-        }
-        case MONTH: {
-          versionBuilder.setMonth(builder.toString());
-          return ParseState.HOUR;
-        }
-        case DAY: {
-          versionBuilder.setDay(builder.toString());
-          return ParseState.HOUR;
-        }
-        case HOUR: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.COUNT;
-        }
-        case MIN: {
-          versionBuilder.setMinute(builder.toString());
-          return ParseState.COUNT;
-        }
-        case COUNT: {
-          throw new IllegalArgumentException();
-        }
-      }
-      throw new UnreachableCodeReachedException();
-    }
-
-    private ParseState colon(final ParseState state, final StringBuilder builder, final VersionBuilder versionBuilder) {
-      switch (state) {
-        case UNDEFIND: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case MAJOR: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case MINOR: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case RELEASESTATE: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case STEP: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case PRODUCTSTATE: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case YEAR: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case MONTH: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case DAY: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case HOUR: {
-          versionBuilder.setHour(builder.toString());
-          return ParseState.MIN;
-        }
-        case MIN: {
-          versionBuilder.setMinute(builder.toString());
-          return ParseState.MIN;
-        }
-        case COUNT: {
-          throw new IllegalArgumentException();
-        }
-      }
-      throw new UnreachableCodeReachedException();
-    }
-
-    private ParseState point(final ParseState state, final StringBuilder builder, final VersionBuilder versionBuilder) {
-      switch (state) {
-        case UNDEFIND: {
-          versionBuilder.setMajor(builder.toString());
-          return ParseState.MINOR;
-        }
-        case MAJOR: {
-          versionBuilder.setMajor(builder.toString());
-          return ParseState.MINOR;
-        }
-        case MINOR: {
-          versionBuilder.setMinor(builder.toString());
-          return ParseState.STEP;
-        }
-        case RELEASESTATE: {
-          throw new IllegalArgumentException();
-        }
-        case STEP: {
-          throw new IllegalArgumentException();
-        }
-        case PRODUCTSTATE: {
-          throw new IllegalArgumentException();
-        }
-        case YEAR: {
-          throw new IllegalArgumentException();
-        }
-        case MONTH: {
-          throw new IllegalArgumentException();
-        }
-        case DAY: {
-          throw new IllegalArgumentException();
-        }
-        case HOUR: {
-          throw new IllegalArgumentException();
-        }
-        case MIN: {
-          throw new IllegalArgumentException();
-        }
-        case COUNT: {
-          throw new IllegalArgumentException();
-        }
-      }
-      throw new UnreachableCodeReachedException();
-    }
-
-    private ParseState letter(
-        final ParseState state,
-        final StringBuilder builder,
-        final VersionBuilder versionBuilder) {
-      switch (state) {
-        case UNDEFIND: {
-          return ParseState.RELEASESTATE;
-        }
-        case MAJOR: {
-          versionBuilder.setMajor(builder.toString());
-          return ParseState.RELEASESTATE;
-        }
-        case MINOR: {
-          versionBuilder.setMinor(builder.toString());
-          return ParseState.RELEASESTATE;
-        }
-        case RELEASESTATE: {
-          return state;
-        }
-        case STEP: {
-          versionBuilder.setStep(builder.toString());
-          return ParseState.PRODUCTSTATE;
-        }
-        case PRODUCTSTATE: {
-          return state;
-        }
-        case YEAR: {
-          throw new IllegalArgumentException();
-        }
-        case MONTH: {
-          throw new IllegalArgumentException();
-        }
-        case DAY: {
-          throw new IllegalArgumentException();
-        }
-        case HOUR: {
-          throw new IllegalArgumentException();
-        }
-        case MIN: {
-          throw new IllegalArgumentException();
-        }
-        case COUNT: {
-          throw new IllegalArgumentException();
-        }
-      }
-      throw new UnreachableCodeReachedException();
-    }
-
-    private ParseState digit(final ParseState state, final StringBuilder builder, final VersionBuilder versionBuilder) {
-      switch (state) {
-        case UNDEFIND: {
-          return ParseState.MAJOR;
-        }
-        case MAJOR: {
-          return state;
-        }
-        case MINOR: {
-          return state;
-        }
-        case RELEASESTATE: {
-          versionBuilder.setReleaseState(builder.toString());
-          return ParseState.STEP;
-        }
-        case STEP: {
-          return state;
-        }
-        case PRODUCTSTATE: {
-          versionBuilder.setProductState(builder.toString());
-          return ParseState.YEAR;
-        }
-        case YEAR: {
-          return state;
-        }
-        case MONTH: {
-          return state;
-        }
-        case DAY: {
-          return state;
-        }
-        case HOUR: {
-          return state;
-        }
-        case MIN: {
-          return state;
-        }
-        case COUNT: {
-          return state;
-        }
-      }
-      throw new IllegalArgumentException();
-    }
+    return string;
   }
 
-  public static String getText(final IVersion version) {
+  private static String internal(final IVersion version) {
     String string = String.valueOf(version.getMajor());
     string += "."; //$NON-NLS-1$
     string += String.valueOf(version.getMinor());
@@ -469,20 +130,18 @@ public class VersionUtilities {
       string += "."; //$NON-NLS-1$
     }
     string += String.valueOf(version.getStep());
-    final ProductState productState = version.getProductState();
-    if (productState != ProductState.STABLE) {
-      string += " "; //$NON-NLS-1$
-      string += String.valueOf(productState.getAcronym());
-    }
     return string;
   }
 
   public static String getTextLong(final IVersion version) {
-    String string = getText(version);
+    String string = internal(version);
+    final ProductState productState = version.getProductState();
+    string += " "; //$NON-NLS-1$
+    string += String.valueOf(productState.getAcronym());
     string += " "; //$NON-NLS-1$
     string += version.getBuildCount();
     string += " "; //$NON-NLS-1$
-    string += new SimpleDateFormat("dd.MM.yyyy HH:mm").format(version.getDate()); //$NON-NLS-1$
+    string += version.getDate().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm", Locale.getDefault())); //$NON-NLS-1$
     return string;
   }
 }

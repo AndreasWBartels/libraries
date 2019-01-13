@@ -36,12 +36,14 @@ public interface IObjectTableConfiguration<T> {
 
   int getPreferredVisibleRowCount();
 
-  IMouseListenerFactory<T> getMouseListenerFactory();
+  IMouseListenerFactory<T> getTableMouseListenerFactory();
 
   IKeyListenerFactory<T> getKeyListenerFactory();
 
   int getAutoResizeMode();
 
   IStringSubstituter getToolTipSubstituter();
+
+  IMouseListenerFactory<T> getHeaderMouseListenerFactory();
 
 }

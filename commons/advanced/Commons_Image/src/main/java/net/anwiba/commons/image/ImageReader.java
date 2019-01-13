@@ -25,16 +25,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-
 import net.anwiba.commons.http.IHttpRequestExecutor;
 import net.anwiba.commons.http.IHttpRequestExecutorFactory;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.IResponse;
 import net.anwiba.commons.http.RequestBuilder;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.reference.IResourceReference;
@@ -53,18 +49,21 @@ public final class ImageReader implements IImageReader {
       .getLogger(ImageReader.class);
   private final IResourceReferenceHandler handler;
   private final IHttpRequestExecutorFactory httpRequestExcecutorFactory;
+  private final IImageContainerFactory imageContainerFactory;
 
   public ImageReader(
+      final IImageContainerFactory imageContainerFactory,
       final IResourceReferenceHandler handler,
       final IHttpRequestExecutorFactory httpRequestExcecutorFactory) {
     super();
+    this.imageContainerFactory = imageContainerFactory;
     this.handler = handler;
     this.httpRequestExcecutorFactory = httpRequestExcecutorFactory;
   }
 
   @Override
   public IImageContainer read(final ICanceler canceler, final IResourceReference resourceReference)
-      throws InterruptedException,
+      throws CanceledException,
       IOException {
     canceler.check();
 
@@ -72,7 +71,7 @@ public final class ImageReader implements IImageReader {
       return read(canceler, this.handler.openInputStream(resourceReference));
     }
 
-    if (!this.handler.hasLocation(resourceReference)) {
+    if (this.handler.isMemoryResource(resourceReference)) {
       return read(canceler, this.handler.openInputStream(resourceReference));
     }
 
@@ -137,15 +136,9 @@ public final class ImageReader implements IImageReader {
 
   @Override
   public IImageContainer read(final ICanceler canceler, final InputStream inputStream)
-      throws InterruptedException,
+      throws CanceledException,
       IOException {
     canceler.check();
-    return new PlanarImageContainer(createRenderOp(inputStream));
-  }
-
-  @SuppressWarnings("resource")
-  private RenderedOp createRenderOp(final InputStream inputStream) {
-    final MemoryCacheSeekableStream memoryCacheSeekableStream = new MemoryCacheSeekableStream(inputStream);
-    return JAI.create("Stream", memoryCacheSeekableStream);
+    return this.imageContainerFactory.create(inputStream);
   }
 }

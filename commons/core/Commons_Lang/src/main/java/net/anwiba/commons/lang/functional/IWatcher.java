@@ -21,10 +21,12 @@
  */
 package net.anwiba.commons.lang.functional;
 
+import net.anwiba.commons.lang.exception.CanceledException;
+
 public interface IWatcher extends ICloseable<RuntimeException> {
 
   @SuppressWarnings("unused")
-  default void check() throws InterruptedException {
+  default void check() throws CanceledException {
     // nothing to do
   }
 }

@@ -24,6 +24,7 @@ package net.anwiba.commons.swing.action;
 import java.awt.Component;
 import java.lang.reflect.InvocationTargetException;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.model.BooleanModel;
@@ -131,7 +132,7 @@ public class ActionConfigurationBuilder {
         @Override
         public Void excecute(final IMessageCollector monitor, final ICanceler canceler, final Void value)
             throws InvocationTargetException,
-            InterruptedException {
+            CanceledException {
           ActionConfigurationBuilder.this.task.execute();
           return null;
         }

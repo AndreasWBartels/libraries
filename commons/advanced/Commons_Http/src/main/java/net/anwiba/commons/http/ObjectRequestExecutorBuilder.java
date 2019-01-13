@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IApplicable;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -67,7 +68,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           final String contentEncoding,
           final InputStream inputStream)
           throws IOException,
-          InterruptedException {
+          CanceledException {
         return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 
@@ -118,7 +119,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
     return new IObjectRequestExecutor<T>() {
 
       @Override
-      public T execute(final ICanceler cancelable, final IRequest request) throws InterruptedException, IOException {
+      public T execute(final ICanceler cancelable, final IRequest request) throws CanceledException, IOException {
         return convertingExecutor.execute(cancelable, request, new IApplicableResultProducer<T>() {
 
           @Override
@@ -130,7 +131,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
               final String contentEncoding,
               final InputStream inputStream)
               throws IOException,
-              InterruptedException {
+              CanceledException {
             for (final IApplicableResultProducer<T> producer : ObjectRequestExecutorBuilder.this.applicableResultProducers) {
               if (!producer.isApplicable(statusCode, contentType)) {
                 continue;
@@ -175,7 +176,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           final String contentEncoding,
           final InputStream inputStream)
           throws IOException,
-          InterruptedException {
+          CanceledException {
         return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 
@@ -202,7 +203,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           final String contentEncoding,
           final InputStream inputStream)
           throws IOException,
-          InterruptedException {
+          CanceledException {
         return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 

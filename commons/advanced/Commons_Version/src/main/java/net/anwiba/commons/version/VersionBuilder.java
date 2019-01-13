@@ -21,9 +21,12 @@
  */
 package net.anwiba.commons.version;
 
-import java.util.GregorianCalendar;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.utilities.time.ZonedDateTimeUtilities;
 
 public class VersionBuilder {
 
@@ -32,12 +35,13 @@ public class VersionBuilder {
   private ReleaseState releaseState = ReleaseState.RELEASE;
   private int step = 0;
   private ProductState productState = ProductState.STABLE;
-  private int year = Integer.MIN_VALUE;
-  private int month = 0;
-  private int day = 0;
+  private int year = 0;
+  private int month = 1;
+  private int day = 1;
   private int hour = 0;
   private int minute = 0;
   private int count = 0;
+  private final ZoneId timeZone = ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone();
 
   public VersionBuilder setMajor(final int value) {
     if (value == Integer.MIN_VALUE) {
@@ -128,7 +132,8 @@ public class VersionBuilder {
         this.releaseState,
         this.step,
         this.productState,
-        new GregorianCalendar(this.year, this.month - 1, this.day, this.hour, this.minute).getTime(),
+        ZonedDateTime.of(this.year, this.month, this.day, this.hour, this.minute, 0, 0, this.timeZone),
+        //        new GregorianCalendar(this.year, this.month - 1, this.day, this.hour, this.minute, 0).getTime(),
         this.count);
   }
 
@@ -148,27 +153,27 @@ public class VersionBuilder {
   }
 
   public VersionBuilder setYear(final String value) {
-    setStep(convertToInt(value));
+    setYear(convertToInt(value));
     return this;
   }
 
   public VersionBuilder setMonth(final String value) {
-    setStep(convertToInt(value));
+    setMonth(convertToInt(value));
     return this;
   }
 
   public VersionBuilder setDay(final String value) {
-    setStep(convertToInt(value));
+    setDay(convertToInt(value));
     return this;
   }
 
   public VersionBuilder setHour(final String value) {
-    setStep(convertToInt(value));
+    setHour(convertToInt(value));
     return this;
   }
 
   public VersionBuilder setMinute(final String value) {
-    setStep(convertToInt(value));
+    setMinute(convertToInt(value));
     return this;
   }
 
@@ -185,13 +190,35 @@ public class VersionBuilder {
   }
 
   public VersionBuilder setProductState(final String string) {
-    this.productState = ProductState.valueOf(string);
+    if (StringUtilities.isNullOrTrimmedEmpty(string)) {
+      this.productState = ProductState.STABLE;
+      return this;
+    }
+    final String upperCase = string.toUpperCase();
+    for (final ProductState state : ProductState.values()) {
+      if (Objects.equals(upperCase, state.getAcronym()) || Objects.equals(upperCase, state.name())) {
+        this.productState = state;
+        return this;
+      }
+    }
+    this.productState = ProductState.STABLE;
     return this;
 
   }
 
   public VersionBuilder setReleaseState(final String string) {
-    this.releaseState = ReleaseState.valueOf(string);
+    if (StringUtilities.isNullOrTrimmedEmpty(string)) {
+      this.releaseState = ReleaseState.RELEASE;
+      return this;
+    }
+    final String upperCase = string.toUpperCase();
+    for (final ReleaseState state : ReleaseState.values()) {
+      if (Objects.equals(upperCase, state.getAcronym()) || Objects.equals(upperCase, state.name())) {
+        this.releaseState = state;
+        return this;
+      }
+    }
+    this.releaseState = ReleaseState.RELEASE;
     return this;
   }
 }

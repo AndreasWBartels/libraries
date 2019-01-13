@@ -28,12 +28,12 @@ public class ValueInjectorBuilder implements IValueInjectorBuilder {
 
   private final IInjectionValueProviderBuilder builder;
 
-  public ValueInjectorBuilder() {
-    this.builder = new InjectionValueProviderBuilder();
+  public ValueInjectorBuilder(final IScope scope) {
+    this.builder = new InjectionValueProviderBuilder(scope);
   }
 
-  public ValueInjectorBuilder(final IInjectionValueProvider provider) {
-    this.builder = new InjectionValueProviderBuilder(provider);
+  public ValueInjectorBuilder(final IScope scope, final IInjectionValueProvider provider) {
+    this.builder = new InjectionValueProviderBuilder(scope, provider);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class ValueInjectorBuilder implements IValueInjectorBuilder {
   }
 
   @Override
-  public <T> IValueInjectorBuilder link(final Class<T> clazz, final Class<? extends T> link) {
+  public <T> IValueInjectorBuilder link(final Class<? extends T> clazz, final Class<T> link) {
     this.builder.link(clazz, link);
     return this;
   }

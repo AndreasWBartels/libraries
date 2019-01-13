@@ -21,27 +21,23 @@
  */
 package net.anwiba.commons.injection;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.anwiba.commons.injection.annotation.Emptiable;
-import net.anwiba.commons.injection.annotation.Injection;
-import net.anwiba.commons.injection.annotation.Named;
-import net.anwiba.commons.injection.annotation.Nullable;
-import net.anwiba.commons.injection.binding.ClassBinding;
-import net.anwiba.commons.injection.binding.NamedClassBinding;
+import net.anwiba.commons.annotation.Injection;
+import net.anwiba.commons.injection.impl.BindingFactory;
+import net.anwiba.commons.injection.impl.FieldValueProvider;
+import net.anwiba.commons.injection.impl.IValueInjectionAnalyser;
+import net.anwiba.commons.injection.impl.ImitateObjectProxyFactory;
+import net.anwiba.commons.injection.impl.InjectableConstructorsGetter;
+import net.anwiba.commons.injection.impl.NameProvider;
+import net.anwiba.commons.injection.impl.ParameterValuesProvider;
+import net.anwiba.commons.injection.impl.ValueInjectionAnalyser;
 import net.anwiba.commons.reflection.CreationException;
 import net.anwiba.commons.reflection.ReflectionConstructorInvoker;
 import net.anwiba.commons.reflection.ReflectionMethodInvoker;
@@ -50,12 +46,30 @@ import net.anwiba.commons.reflection.privileged.PrivilegedFieldSetterAction;
 
 public class ValueInjector implements IValueInjector {
 
-  final private InjectableElementGetter injectableElementGetter = new InjectableElementGetter();
+  final private InjectableConstructorsGetter injectableElementGetter = new InjectableConstructorsGetter();
   private final PrivilegedActionInvoker<Void> invoker = new PrivilegedActionInvoker<>(System.getSecurityManager());
-  private final IInjectionValueProvider values;
+  private final ImitateObjectProxyFactory imitateFactory = new ImitateObjectProxyFactory();
+  private final ParameterValuesProvider parameterValuesProvider;
+  private final FieldValueProvider fieldValueProvider;
+  private final IValueInjectionAnalyser analyser = new ValueInjectionAnalyser();
 
-  public ValueInjector(final IInjectionValueProvider values) {
-    this.values = values;
+  public ValueInjector(final IInjectionValueProvider valuesProvider) {
+    final BindingFactory bindingFactory = new BindingFactory();
+    final NameProvider nameProvider = new NameProvider();
+    this.parameterValuesProvider = new ParameterValuesProvider(
+        this.analyser,
+        this,
+        valuesProvider,
+        bindingFactory,
+        nameProvider,
+        this.imitateFactory);
+    this.fieldValueProvider = new FieldValueProvider(
+        this.analyser,
+        this,
+        valuesProvider,
+        bindingFactory,
+        nameProvider,
+        this.imitateFactory);
   }
 
   @Override
@@ -83,7 +97,7 @@ public class ValueInjector implements IValueInjector {
           factoryClass,
           "create",
           parameterTypes);
-      final Object[] methodValues = getValues(method.getParameters());
+      final Object[] methodValues = this.parameterValuesProvider.getValues(method.getParameters());
       return methodInvoker.invoke(factory, methodValues);
     } catch (final IllegalStateException exception) {
       throw new CreationException(
@@ -107,7 +121,7 @@ public class ValueInjector implements IValueInjector {
       final ReflectionConstructorInvoker<T> constructorInvoker = new ReflectionConstructorInvoker<>(
           clazz,
           constructor.getParameterTypes());
-      final Object[] constructorValues = getValues(constructor.getParameters());
+      final Object[] constructorValues = this.parameterValuesProvider.getValues(constructor.getParameters());
       final T object = constructorInvoker.invoke(constructorValues);
       inject(object);
       return object;
@@ -121,17 +135,10 @@ public class ValueInjector implements IValueInjector {
       throw new CreationException(
           "Couldn't create instance for class '" //$NON-NLS-1$
               + clazz.getName()
-              + "'", //$NON-NLS-1$
+              + "', " //$NON-NLS-1$
+              + exception.getMessage(),
           exception);
     }
-  }
-
-  private Object[] getValues(final Parameter[] parameters) {
-    final List<Object> result = new ArrayList<>();
-    for (final Parameter parameter : parameters) {
-      result.add(getValue(parameter));
-    }
-    return result.toArray(new Object[result.size()]);
   }
 
   @Override
@@ -140,142 +147,37 @@ public class ValueInjector implements IValueInjector {
     final Class<T> clazz = (Class<T>) object.getClass();
     final Field[] fieldArray = clazz.getDeclaredFields();
     for (final Field field : fieldArray) {
-      try {
-        setValue(field, object);
-      } catch (final InvocationTargetException exception) {
-        throw new InjectionException(
-            "Couldn't inject value to field '" //$NON-NLS-1$
-                + field.getName()
-                + "' of class '" //$NON-NLS-1$
-                + object.getClass().getName()
-                + "'", //$NON-NLS-1$
-            exception.getCause());
-      } catch (final IllegalStateException exception) {
-        throw new InjectionException(
-            "Couldn't inject value to field '" //$NON-NLS-1$
-                + field.getName()
-                + "' of class '" //$NON-NLS-1$
-                + object.getClass().getName()
-                + "'", //$NON-NLS-1$
-            exception);
-      }
+      inject(object, field);
+    }
+  }
+
+  private <T> void inject(final T object, final Field field) throws InjectionException {
+    try {
+      setValue(field, object);
+    } catch (final InvocationTargetException exception) {
+      throw new InjectionException(
+          "Couldn't inject value to field '" //$NON-NLS-1$
+              + field.getName()
+              + "' of class '" //$NON-NLS-1$
+              + object.getClass().getName()
+              + "'", //$NON-NLS-1$
+          exception.getCause());
+    } catch (final IllegalStateException exception) {
+      throw new InjectionException(
+          "Couldn't inject value to field '" //$NON-NLS-1$
+              + field.getName()
+              + "' of class '" //$NON-NLS-1$
+              + object.getClass().getName()
+              + "'", //$NON-NLS-1$
+          exception);
     }
   }
 
   private <T> void setValue(final Field field, final T object) throws InvocationTargetException {
-    if (!this.injectableElementGetter.injectable(field)) {
+    if (!this.analyser.isInjectable(field)) {
       return;
     }
-    final Object value = getValue(field);
+    final Object value = this.fieldValueProvider.getValue(field);
     this.invoker.invoke(new PrivilegedFieldSetterAction(object, field.getName(), value));
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Object getValue(final Field field) {
-    final IBinding binding = createBinding(field);
-    if (!this.values.contains(binding)) {
-      final Nullable nullable = field.getAnnotation(Nullable.class);
-      if (nullable != null && nullable.value()) {
-        return null;
-      }
-    }
-    final Class<?> clazz = field.getType();
-    if (clazz.isAssignableFrom(Iterable.class)) {
-      final Collection<?> value = this.values.getAll(binding);
-      if (value != null) {
-        return value;
-      }
-      final Emptiable emptiable = field.getAnnotation(Emptiable.class);
-      if (emptiable != null && emptiable.value()) {
-        return new ArrayList<>();
-      }
-      throw new IllegalStateException("missing injektion value for field '" + field.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-    if (this.values.contains(binding)) {
-      return this.values.get(binding);
-    }
-    throw new IllegalStateException("missing injektion value for field '" + field.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  @SuppressWarnings("rawtypes")
-  private IBinding createBinding(final Field field) {
-    final Class<?> clazz = field.getType();
-    final String name = getName(field.getName(), field);
-    if (clazz.isAssignableFrom(Iterable.class)) {
-      final Class<?> genericType = getIterableType(field);
-      return binding(genericType, name);
-    }
-    return binding(clazz, name);
-  }
-
-  private <T> IBinding<T> binding(final Class<T> clazz, final String name) {
-    return Optional.ofNullable(name).map(n -> (IBinding<T>) new NamedClassBinding<>(clazz, n)).orElseGet(
-        () -> new ClassBinding<>(clazz));
-  }
-
-  private String getName(final String name, final AnnotatedElement annotatedElement) {
-    return Optional
-        .ofNullable(annotatedElement.getAnnotation(Named.class))
-        .map(a -> a.value())
-        .map(s -> s.trim().isEmpty() ? name : s)
-        .orElseGet(() -> null);
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Object getValue(final Parameter parameter) {
-    final Class<?> clazz = parameter.getType();
-    if (clazz.isAssignableFrom(IValueInjector.class)) {
-      return this;
-    }
-    final IBinding binding = createBinding(parameter);
-    if (!this.values.contains(binding)) {
-      final Nullable nullable = parameter.getAnnotation(Nullable.class);
-      if (nullable != null && nullable.value()) {
-        return null;
-      }
-    }
-    if (clazz.isAssignableFrom(Iterable.class)) {
-      final Collection<?> value = this.values.getAll(binding);
-      if (value != null) {
-        return value;
-      }
-      final Emptiable emptiable = parameter.getAnnotation(Emptiable.class);
-      if (emptiable != null && emptiable.value()) {
-        return new ArrayList<>();
-      }
-      throw new IllegalStateException("missing injektion value for field '" + parameter.getType().getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-    if (this.values.contains(binding)) {
-      return this.values.get(binding);
-    }
-    throw new IllegalStateException("missing injektion value for field '" + parameter.getType().getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  @SuppressWarnings("rawtypes")
-  private IBinding createBinding(final Parameter parameter) {
-    final Class<?> clazz = parameter.getType();
-    final String name = getName(parameter.getName(), parameter);
-    if (clazz.isAssignableFrom(Iterable.class)) {
-      final Class<?> genericType = getIterableType(parameter);
-      return binding(genericType, name);
-    }
-    return binding(clazz, name);
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Class<? extends Type> getIterableType(final Field field) {
-    if (ParameterizedType.class.isAssignableFrom(field.getGenericType().getClass())) {
-      final ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-      final Type[] actualTypeArguments = genericType.getActualTypeArguments();
-      return (Class) actualTypeArguments[0];
-    }
-    return field.getGenericType().getClass();
-  }
-
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  private Class<? extends Type> getIterableType(final Parameter parameter) {
-    final ParameterizedType parameterizedType = (ParameterizedType) parameter.getParameterizedType();
-    final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-    return (Class) actualTypeArguments[0];
   }
 }

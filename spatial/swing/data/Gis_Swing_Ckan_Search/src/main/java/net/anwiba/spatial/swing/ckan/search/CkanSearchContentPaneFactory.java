@@ -26,14 +26,15 @@ import java.util.List;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
+import net.anwiba.commons.lang.object.IObjectReceiver;
 import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.swing.dialog.IContentPaneFactory;
 import net.anwiba.commons.swing.dialog.pane.IContentPanel;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Dataset;
-import net.anwiba.spatial.ckan.request.IPackageQueryCondition;
-import net.anwiba.spatial.ckan.request.IPackageQueryExecutor;
+import net.anwiba.spatial.ckan.query.IPackageQueryExecutor;
+import net.anwiba.spatial.ckan.query.IPackageSearchCondition;
 import net.anwiba.spatial.ckan.values.Envelope;
 
 public final class CkanSearchContentPaneFactory implements IContentPaneFactory {
@@ -49,17 +50,21 @@ public final class CkanSearchContentPaneFactory implements IContentPaneFactory {
   private final IDataSetResultsConsumer dataSetResultsConsumer;
   private final IDataSetConsumer dataSetConsumer;
   private final IObjectDistributor<String> datasetIdentifierDistributor;
-  private final IObjectModel<IPackageQueryCondition> packageQueryConditionModel;
+  private final IObjectModel<IPackageSearchCondition> packageQueryConditionModel;
+  private final IObjectReceiver<Envelope> envelopeReceiver;
+  private final IObjectDistributor<Envelope> envelopeSetter;
 
   public CkanSearchContentPaneFactory(
       final IObjectRequestExecutorBuilderFactory requestExecutorBuilderFactory,
-      final IObjectModel<IPackageQueryCondition> packageQueryConditionModel,
+      final IObjectModel<IPackageSearchCondition> packageQueryConditionModel,
       final IDataSetResultsConsumer dataSetResultsConsumer,
       final IDataSetConsumer dataSetConsumer,
       final IResourceOpenConsumer resourceOpenConsumer,
       final IZoomToConsumer zoomToConsumer,
       final IObjectDistributor<String> datasetIdentifierDistributor,
       final IObjectDistributor<Envelope> envelopeDistributor,
+      final IObjectReceiver<Envelope> envelopeReceiver,
+      final IObjectDistributor<Envelope> envelopeSetter,
       final IPackageQueryExecutor datasetQueryExecutor,
       final IHttpConnectionDescription description,
       final int numberOfResultRows,
@@ -73,6 +78,8 @@ public final class CkanSearchContentPaneFactory implements IContentPaneFactory {
     this.zoomToConsumer = zoomToConsumer;
     this.datasetIdentifierDistributor = datasetIdentifierDistributor;
     this.envelopeDistributor = envelopeDistributor;
+    this.envelopeReceiver = envelopeReceiver;
+    this.envelopeSetter = envelopeSetter;
     this.datasetQueryExecutor = datasetQueryExecutor;
     this.numberOfResultRows = numberOfResultRows;
     this.datasets = datasets;
@@ -92,6 +99,8 @@ public final class CkanSearchContentPaneFactory implements IContentPaneFactory {
         this.zoomToConsumer,
         this.datasetIdentifierDistributor,
         this.envelopeDistributor,
+        this.envelopeReceiver,
+        this.envelopeSetter,
         this.datasetQueryExecutor,
         this.description,
         this.numberOfResultRows,

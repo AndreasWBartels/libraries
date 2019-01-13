@@ -29,7 +29,7 @@ import javax.swing.text.PlainDocument;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.functional.ICharFilter;
 import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.lang.primitive.IBooleanProvider;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.utilities.validation.IValidationResult;

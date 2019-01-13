@@ -22,8 +22,12 @@
 package net.anwiba.commons.datasource.connection;
 
 import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 
 public interface IResourceReferenceConnectionDescription extends IConnectionDescription {
+
+  @Override
+  IResourceReferenceConnectionDescription adapt(IAuthentication authentication);
 
   IResourceReference getResourceReference();
 

@@ -35,6 +35,7 @@ import net.anwiba.commons.http.IObjectRequestExecutor;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.IResultProducer;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanModel;
@@ -114,7 +115,7 @@ public class GroupTableFactory {
           }
           return groups;
         }).launch(parentComponent);
-      } catch (final InterruptedException exception1) {
+      } catch (final CanceledException exception1) {
         return null;
       } catch (final IOException exception) {
         logger.log(ILevel.DEBUG, exception.getMessage(), exception);
@@ -148,7 +149,7 @@ public class GroupTableFactory {
   }
 
   private List<Group> getGroupStrings(final ICanceler canceler, final IHttpConnectionDescription description)
-      throws InterruptedException,
+      throws CanceledException,
       IOException {
     final IResultProducer<GroupListResultResponse> responseProducer = (
         c,
@@ -178,7 +179,7 @@ public class GroupTableFactory {
       return response.isSuccess() ? Arrays.asList(response.getResult()) : Collections.emptyList();
     } catch (SocketException | InterruptedIOException exception) {
       if (canceler.isCanceled()) {
-        throw new InterruptedException();
+        throw new CanceledException();
       }
       throw exception;
     }

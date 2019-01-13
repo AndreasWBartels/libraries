@@ -165,6 +165,15 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
     });
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <O> Set<O> asSet() throws E {
+    return this.iterable.aggregate(new LinkedHashSet<O>(), (l, t) -> {
+      l.add((O) t);
+      return l;
+    });
+  }
+
   @Override
   public IObjectList<T> asObjectList() throws E {
     return new ObjectList<>(asList());
@@ -188,7 +197,7 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
     try {
       final List<T> list = asList();
       Collections.reverse(list);
-      return Streams.create(this.exceptionClass, list);
+      return Streams.of(this.exceptionClass, list);
     } catch (final Exception exception) {
       return stream(this.exceptionClass, exception);
     }

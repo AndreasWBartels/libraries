@@ -29,7 +29,7 @@ import javax.swing.Action;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
-import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.lang.primitive.IBooleanProvider;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.table.action.AbstractTableActionFactory;
@@ -57,11 +57,12 @@ public class ObjectListTableConfigurationBuilder<T> {
   private final List<ITableTextFieldActionFactory<T>> textFieldActionFactories = new ArrayList<>();
   private ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory;
   private int preferredVisibleRowCount = 10;
-  private IMouseListenerFactory<T> mouseListenerFactory;
+  private IMouseListenerFactory<T> tableMouseListenerFactory;
   private IKeyListenerFactory<T> keyListenerFactory;
   private IColumToStringConverter columnToStringConverter;
   private int autoRizeMode = -1;
   private IStringSubstituter toolTipSubstituter = s -> StringUtilities.substitute(s, 8, 120);
+  private IMouseListenerFactory<T> headerMouseListenerFactory;
 
   public ObjectListTableConfigurationBuilder<T> setKeyListenerFactory(final IKeyListenerFactory<T> keyListenerFactory) {
     this.keyListenerFactory = keyListenerFactory;
@@ -132,16 +133,23 @@ public class ObjectListTableConfigurationBuilder<T> {
         this.selectionMode,
         this.preferredVisibleRowCount,
         this.columnConfigurations,
-        this.mouseListenerFactory,
+        this.headerMouseListenerFactory,
+        this.tableMouseListenerFactory,
         this.keyListenerFactory,
         actionConfiguration,
         textFieldActionConfiguration,
         this.textFieldKeyListenerFactory);
   }
 
-  public ObjectListTableConfigurationBuilder<T> setMouseListenerFactory(
+  public ObjectListTableConfigurationBuilder<T> setTableMouseListenerFactory(
       final IMouseListenerFactory<T> mouseListenerFactory) {
-    this.mouseListenerFactory = mouseListenerFactory;
+    this.tableMouseListenerFactory = mouseListenerFactory;
+    return this;
+  }
+
+  public ObjectListTableConfigurationBuilder<T> setHeaderMouseListenerFactory(
+      final IMouseListenerFactory<T> mouseListenerFactory) {
+    this.headerMouseListenerFactory = mouseListenerFactory;
     return this;
   }
 

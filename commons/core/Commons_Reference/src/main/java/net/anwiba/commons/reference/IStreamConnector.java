@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
+import net.anwiba.commons.lang.functional.IAcceptor;
+
 public interface IStreamConnector<T> {
 
   boolean exist(T uri);
@@ -34,10 +36,14 @@ public interface IStreamConnector<T> {
 
   boolean canWrite(T uri);
 
+  InputStream openInputStream(URI uri, IAcceptor<String> contentTypeAcceptor) throws IOException;
+
   InputStream openInputStream(T uri) throws IOException;
 
   OutputStream openOutputStream(T uri) throws IOException;
 
   long getContentLength(URI uri) throws IOException;
+
+  String getContentType(URI uri) throws IOException;
 
 }

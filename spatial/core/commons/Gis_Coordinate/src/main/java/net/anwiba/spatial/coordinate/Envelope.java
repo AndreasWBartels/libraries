@@ -22,8 +22,8 @@
 
 package net.anwiba.spatial.coordinate;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.anwiba.commons.lang.functional.IConverter;
@@ -217,8 +217,17 @@ public class Envelope implements IEnvelope {
     if (equals(Envelope.NULL_ENVELOPE)) {
       return new CoordinateSequenceFactory().createEmptyCoordinateSequence(2, false);
     }
+    if (steps <= 0) {
+      final List<ICoordinate> coordinates = new ArrayList<>(5);
+      coordinates.add(this.minimum);
+      coordinates.add(new Coordinate(this.minimum.getXValue(), this.maximum.getYValue()));
+      coordinates.add(this.maximum);
+      coordinates.add(new Coordinate(this.maximum.getXValue(), this.minimum.getYValue()));
+      coordinates.add(this.minimum);
+      return new CoordinateSequenceFactory().create(coordinates);
+    }
 
-    final List<ICoordinate> coordinates = new LinkedList<>();
+    final List<ICoordinate> coordinates = new ArrayList<>(5 + 4 * steps);
     coordinates.add(this.minimum);
     coordinates
         .addAll(steps(this.minimum.getXValue(), Axis.X, this.minimum.getYValue(), this.maximum.getYValue(), steps));
@@ -245,7 +254,7 @@ public class Envelope implements IEnvelope {
       final double min,
       final double max,
       final int steps) {
-    final List<ICoordinate> coordinates = new LinkedList<>();
+    final List<ICoordinate> coordinates = new ArrayList<>(steps);
     for (int i = 0; i < steps; i++) {
       final double other = min > max
           ? max + (((min - max) / (steps + 1)) * ((steps) - i))

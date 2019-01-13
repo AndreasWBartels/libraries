@@ -22,6 +22,13 @@
 
 package net.anwiba.commons.lang.collection;
 
+import net.anwiba.commons.lang.stream.IStream;
+import net.anwiba.commons.lang.stream.Streams;
+
 public interface IObjectList<T> extends IObjectListProvider<T>, IObjectCollection<T> {
 
+  @Override
+  default IStream<T, RuntimeException> stream() {
+    return Streams.of(values());
+  }
 }

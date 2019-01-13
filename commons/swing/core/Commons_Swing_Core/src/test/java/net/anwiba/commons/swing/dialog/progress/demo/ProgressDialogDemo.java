@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import de.jdemo.annotation.Demo;
 import de.jdemo.extensions.SwingDemoCase;
 import de.jdemo.junit.DemoAsTestRunner;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
@@ -47,13 +48,16 @@ public class ProgressDialogDemo extends SwingDemoCase {
     final AbstractProgressTask task = new AbstractProgressTask() {
 
       @Override
-      public void execute(final IProgressMonitor progressMonitor, final ICanceler canceler)
-          throws InterruptedException {
+      public void execute(final IProgressMonitor progressMonitor, final ICanceler canceler) throws CanceledException {
         int i = 0;
         while (i < 5) {
           canceler.check();
           progressMonitor.setNote("index " + i); //$NON-NLS-1$
-          Thread.sleep(1000);
+          try {
+            Thread.sleep(1000);
+          } catch (final InterruptedException exception) {
+            return;
+          }
           i++;
         }
       }
@@ -69,7 +73,7 @@ public class ProgressDialogDemo extends SwingDemoCase {
           task.run(progressMonitor, dialog.getCanceler());
         } catch (final InvocationTargetException exception) {
           // nothing to do
-        } catch (final InterruptedException exception) {
+        } catch (final CanceledException exception) {
           // nothing to do
         } finally {
           progressMonitor.finished();

@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.PlainDocument;
 
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.swing.icons.GuiIcons;
@@ -38,7 +39,8 @@ import net.anwiba.commons.swing.utilities.GuiUtilities;
 public class MessagePanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
-  private final JTextArea messageTextArea = new JTextArea();
+  PlainDocument messageDocument = new PlainDocument();
+  private final JTextArea messageTextArea = new JTextArea(this.messageDocument);
   private final JLabel messageTitleLabel = new JLabel();
   private final JLabel messageTypeLabel = new JLabel();
   private final IMessage defaultMessage;
@@ -47,8 +49,8 @@ public class MessagePanel extends JPanel {
   public MessagePanel(final IMessage defaultMessage, final Icon icon) {
     this.defaultMessage = defaultMessage;
     setIcon(icon);
-    setMessage(defaultMessage);
     createView();
+    doSetMessage(defaultMessage);
   }
 
   protected void createView() {
@@ -56,7 +58,6 @@ public class MessagePanel extends JPanel {
     textPanel.setLayout(new BorderLayout());
     textPanel.setBackground(Color.WHITE);
     textPanel.add(BorderLayout.NORTH, this.messageTitleLabel);
-
     this.messageTextArea.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
     this.messageTextArea.setBackground(Color.WHITE);
     this.messageTextArea.setOpaque(true);
@@ -96,12 +97,20 @@ public class MessagePanel extends JPanel {
       return;
     }
     GuiUtilities.invokeLater(() -> {
+      doSetMessage(message);
+    });
+  }
+
+  private void doSetMessage(final IMessage message) {
+    try {
       this.messageTitleLabel.setForeground(MessageUI.getColor(message));
       this.messageTitleLabel.setText(message.getText());
-      this.messageTextArea.setForeground(MessageUI.getColor(message));
-      this.messageTextArea.setText(message.getDescription());
       this.messageTypeLabel.setIcon(MessageUI.getIcon(message, getIcon()));
-    });
+      this.messageTextArea.setForeground(MessageUI.getColor(message));
+      this.messageDocument.replace(0, this.messageDocument.getLength(), message.getDescription(), null);
+    } catch (final Exception exception) {
+      // TODO_NOW: handle exception
+    }
   }
 
   final public Icon getIcon() {

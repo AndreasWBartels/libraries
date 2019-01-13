@@ -187,14 +187,15 @@ public abstract class AbstractDialog extends JDialog {
     this.actionButtonTextFactory = actionButtonTextFactory;
     setIcon(icon);
     createView(dialogType, additionalActionFactories, dataStateModel);
-    setMessage(message);
   }
 
   @Override
   public void setVisible(final boolean value) {
-    if (value) {
-      locate();
-    }
+    GuiUtilities.invokeLater(() -> {
+      if (value) {
+        locate();
+      }
+    });
     super.setVisible(value);
   }
 

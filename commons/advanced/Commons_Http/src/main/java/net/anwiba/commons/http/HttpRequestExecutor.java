@@ -31,6 +31,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import net.anwiba.commons.http.apache.HttpContextFactory;
 import net.anwiba.commons.http.apache.RequestToHttpUriRequestConverter;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IWatcher;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
@@ -54,7 +55,7 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
   }
 
   @Override
-  public IResponse execute(final ICanceler canceler, final IRequest request) throws InterruptedException, IOException {
+  public IResponse execute(final ICanceler canceler, final IRequest request) throws CanceledException, IOException {
     if (this.isClosed) {
       throw new IOException("executor is closed");
     }
@@ -73,7 +74,7 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
       }, method, httpResponse);
     } catch (final IllegalStateException exception) {
       logger.log(ILevel.ALL, exception.getMessage(), exception);
-      throw new InterruptedException(exception.getMessage());
+      throw new CanceledException(exception.getMessage());
     }
   }
 

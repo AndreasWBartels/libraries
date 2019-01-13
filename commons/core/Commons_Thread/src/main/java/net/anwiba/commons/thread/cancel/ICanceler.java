@@ -23,6 +23,7 @@ package net.anwiba.commons.thread.cancel;
 
 import java.io.Serializable;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.functional.IWatcher;
@@ -49,7 +50,7 @@ public interface ICanceler extends Serializable {
     }
 
     @Override
-    public void check() throws InterruptedException {
+    public void check() throws CanceledException {
       // nothing to do
     }
 
@@ -62,6 +63,11 @@ public interface ICanceler extends Serializable {
     public void removeCancelerListener(final ICancelerListener listener) {
       // nothing to do
     }
+
+    @Override
+    public void removeAllCancelerListener() {
+      // nothing to do
+    }
   };
 
   public void cancel();
@@ -70,7 +76,7 @@ public interface ICanceler extends Serializable {
 
   public boolean isEnabled();
 
-  public void check() throws InterruptedException;
+  public void check() throws CanceledException;
 
   void addCancelerListener(ICancelerListener listener);
 
@@ -89,10 +95,10 @@ public interface ICanceler extends Serializable {
       return new IWatcher() {
 
         @Override
-        public void check() throws InterruptedException {
+        public void check() throws CanceledException {
           if (isCanceled()) {
             removeCancelerListener(listener);
-            throw new InterruptedException();
+            throw new CanceledException();
           }
         }
 
@@ -103,5 +109,7 @@ public interface ICanceler extends Serializable {
       };
     };
   }
+
+  void removeAllCancelerListener();
 
 }

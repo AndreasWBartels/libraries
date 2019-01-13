@@ -6,7 +6,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-default</artifactId>
-    <version>1.0.154</version>
+    <version>1.0.180</version>
   </parent>
 
   <modules>

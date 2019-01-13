@@ -73,6 +73,9 @@ public class EnvelopeUtilities {
   }
 
   public static IEnvelope createEnvelope(final IEnvelope envelope, final double boundery) {
+    if (boundery == 0) {
+      return envelope;
+    }
     final double[] minValues = getMovedValues(envelope.getMinimum().getValues(), -boundery);
     final double[] maxValues = getMovedValues(envelope.getMaximum().getValues(), boundery);
     return new Envelope(minValues, maxValues, envelope.isMeasured());
@@ -97,6 +100,9 @@ public class EnvelopeUtilities {
   }
 
   public static IEnvelope scale(final IEnvelope envelope, final double scaleFactor) {
+    if (scaleFactor == 1) {
+      return envelope;
+    }
     final double[] oldMin = envelope.getMinimum().getValues();
     final double[] oldMax = envelope.getMaximum().getValues();
     final double[] min = new double[oldMin.length];

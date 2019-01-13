@@ -97,4 +97,9 @@ public class MessageBuilder implements IMessageBuilder {
     return text;
   }
 
+  @Override
+  public IMessageBuilder setQuery() {
+    return setType(MessageType.QUERY);
+  }
+
 }

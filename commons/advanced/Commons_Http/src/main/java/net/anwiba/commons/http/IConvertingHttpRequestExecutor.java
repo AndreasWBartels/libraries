@@ -24,6 +24,7 @@ package net.anwiba.commons.http;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public interface IConvertingHttpRequestExecutor extends AutoCloseable {
@@ -33,7 +34,7 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
       IRequest request,
       IApplicableResultProducer<T> resultProducer,
       IApplicableHttpResponseExceptionFactory... exceptionFactories)
-      throws InterruptedException,
+      throws CanceledException,
       HttpServerException,
       HttpRequestException,
       IOException;
@@ -43,7 +44,7 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
       IRequest request,
       IApplicableResultProducer<T> resultProducer,
       IResultProducer<IOException> errorProducer)
-      throws InterruptedException,
+      throws CanceledException,
       HttpServerException,
       HttpRequestException,
       IOException;
@@ -53,7 +54,7 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
       final IRequest request,
       final IResultProducer<T> resultProducer,
       final IResultProducer<IOException> errorProducer)
-      throws InterruptedException,
+      throws CanceledException,
       HttpServerException,
       HttpRequestException,
       IOException {
@@ -68,7 +69,7 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
           final String contentEncoding,
           final InputStream inputStream)
           throws IOException,
-          InterruptedException {
+          CanceledException {
         return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 

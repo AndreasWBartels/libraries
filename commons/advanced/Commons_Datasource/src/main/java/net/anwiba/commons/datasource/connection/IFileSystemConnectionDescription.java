@@ -21,14 +21,25 @@
  */
 package net.anwiba.commons.datasource.connection;
 
-import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
+
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 
 public interface IFileSystemConnectionDescription extends IResourceReferenceConnectionDescription {
 
-  File getFile();
+  @Override
+  IFileSystemConnectionDescription adapt(IAuthentication authentication);
+
+  // File getFile();
 
   @Override
   URI getURI();
+
+  Path getHomePath();
+
+  String getScheme();
+
+  Path getRootPath();
 
 }

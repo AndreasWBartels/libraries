@@ -21,17 +21,21 @@
  */
 package net.anwiba.commons.model;
 
-import net.anwiba.commons.lang.collection.IObjectListReceiver;
+import net.anwiba.commons.lang.collection.IMutableObjectList;
 
-public interface IObjectListModel<T> extends IObjectListReceiver<T>, IObjectListDistributor<T> {
+public interface IObjectListModel<T> extends IMutableObjectList<T>, IObjectListDistributor<T> {
 
+  @Override
   @SuppressWarnings("unchecked")
   void remove(T... objects);
 
+  @Override
   void remove(int... indices);
 
+  @Override
   void remove(final Iterable<T> objects);
 
+  @Override
   void removeAll();
 
 }

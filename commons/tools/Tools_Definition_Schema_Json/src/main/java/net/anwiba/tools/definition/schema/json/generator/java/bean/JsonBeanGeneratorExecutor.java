@@ -84,9 +84,10 @@ public class JsonBeanGeneratorExecutor {
         throwables.add(exception);
       } catch (final CreationException exception) {
         throwables.add(exception);
-        this.output.error(
-            "Couldn't create bean description from file: " + file + ", because: " + exception.getMessage(),
-            exception);
+        this.output
+            .error(
+                "Couldn't create bean description from file: " + file + ", because: " + exception.getMessage(),
+                exception);
       }
     }
     this.output.info("target: " + target);
@@ -101,11 +102,13 @@ public class JsonBeanGeneratorExecutor {
 
   public void throwException(final List<Throwable> throwables) throws IOException {
     final IOException exception = (IOException) throwables.stream().reduce((i, e) -> {
-      if (i == null) {
-        return new IOException(e.getMessage(), e);
+      if (i instanceof IOException) {
+        i.addSuppressed(e);
+        return i;
       }
-      i.addSuppressed(e);
-      return i;
+      final IOException ex = new IOException(i.getMessage(), i);
+      ex.addSuppressed(e);
+      return ex;
     }).orElse(null);
     if (exception == null) {
       return;

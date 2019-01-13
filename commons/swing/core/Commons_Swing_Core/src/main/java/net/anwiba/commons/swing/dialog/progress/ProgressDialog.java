@@ -31,6 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.object.IObjectContainer;
 import net.anwiba.commons.lang.object.ObjectContainer;
 import net.anwiba.commons.message.IMessage;
@@ -100,18 +101,12 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
 
     @Override
     public void setNote(final String note) {
-      GuiUtilities.invokeLater( //
-          () -> { //
-            this.parent.setMessage(Message.create(this.messageText, note, MessageType.DEFAULT));
-          });
+      this.parent.setMessage(Message.create(this.messageText, note, MessageType.DEFAULT));
     }
 
     @Override
     public void addMessage(final IMessage message) {
-      GuiUtilities.invokeLater( //
-          () -> { //
-            this.messages.add(message);
-          });
+      this.messages.add(message);
     }
   }
 
@@ -130,7 +125,6 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
     this.contentPane.setBorder(BorderFactory.createEmptyBorder(8, 4, 8, 4));
     setContentPane(this.contentPane);
     this.progressMonitor = new ProgressMonitor(this, message.getText());
-    setResizable(false);
   }
 
   @Override
@@ -152,7 +146,9 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
       final Window owner,
       final String title,
       final IMessage message,
-      final IProgressTask<O, E> task) throws E, InterruptedException {
+      final IProgressTask<O, E> task)
+      throws E,
+      CanceledException {
     final ProgressDialog dialog = new ProgressDialog(owner, title, message);
     final IProgressMonitor progressMonitor = dialog.getProgressMonitor();
     final IObjectContainer<Exception> exceptionContainer = new ObjectContainer<>();
@@ -166,6 +162,10 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
           final O result = task.run(progressMonitor, dialog.getCanceler());
           resultContainer.set(result);
         } catch (final Exception exception) {
+          if (dialog.getCanceler().isCanceled()) {
+            exceptionContainer.set(new CanceledException());
+            return;
+          }
           exceptionContainer.set(exception);
         } finally {
           progressMonitor.finished();
@@ -176,8 +176,8 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
     dialog.setVisible(true);
     final Exception exception = exceptionContainer.get();
     if (exception != null) {
-      if (exception instanceof InterruptedException) {
-        throw (InterruptedException) exception;
+      if (exception instanceof CanceledException) {
+        throw (CanceledException) exception;
       }
       if (exception instanceof RuntimeException) {
         throw (RuntimeException) exception;
@@ -185,7 +185,7 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
       throw (E) exception;
     }
     if (DialogResult.CANCEL.equals(dialog.getResult())) {
-      throw new InterruptedException();
+      throw new CanceledException();
     }
     return resultContainer.get();
   }
@@ -202,7 +202,9 @@ public class ProgressDialog extends MessageDialog implements IProgressBarParent 
   public static <O, E extends Exception> O show(
       final Window window,
       final IMessage message,
-      final IProgressTask<O, E> task) throws E, InterruptedException {
+      final IProgressTask<O, E> task)
+      throws E,
+      CanceledException {
     return show(window, message.getText(), message, task);
   }
 }

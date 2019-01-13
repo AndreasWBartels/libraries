@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.thread.process;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.thread.queue.IQueueNameConstans;
@@ -61,7 +62,7 @@ public class ProcessBuilder {
           final IMessageCollector processMonitor,
           final ICanceler canceler,
           final IProcessIdentfier processIdentfier)
-          throws InterruptedException {
+          throws CanceledException {
         ProcessBuilder.this.executable.execute(processMonitor, canceler, processIdentfier);
       }
     };

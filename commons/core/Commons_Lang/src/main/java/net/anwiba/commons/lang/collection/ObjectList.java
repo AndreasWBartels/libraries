@@ -22,8 +22,9 @@
 
 package net.anwiba.commons.lang.collection;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 public class ObjectList<T> extends AbstractObjectList<T> {
 
@@ -31,8 +32,20 @@ public class ObjectList<T> extends AbstractObjectList<T> {
     this(new LinkedList<>());
   }
 
-  public ObjectList(final List<T> objects) {
+  public ObjectList(final IObjectCollection<T> objects) {
+    super(objects.toCollection());
+  }
+
+  public ObjectList(final Collection<T> objects) {
     super(objects);
+  }
+
+  public static <T> IObjectList<T> empty() {
+    return new ObjectList<>();
+  }
+
+  public static <T> IObjectList<T> of(final T value) {
+    return new ObjectList<>(Arrays.asList(value));
   }
 
 }

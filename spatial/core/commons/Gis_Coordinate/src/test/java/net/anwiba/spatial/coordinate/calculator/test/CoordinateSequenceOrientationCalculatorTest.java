@@ -22,13 +22,13 @@
  
 package net.anwiba.spatial.coordinate.calculator.test;
 
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import net.anwiba.spatial.coordinate.CoordinateSequenceFactory;
 import net.anwiba.spatial.coordinate.ICoordinateSequenceFactory;
 import net.anwiba.spatial.coordinate.calculator.CoordinateSequenceOrientationCalculator;
-
-import static org.junit.Assert.*;
 
 public class CoordinateSequenceOrientationCalculatorTest {
 
@@ -36,20 +36,26 @@ public class CoordinateSequenceOrientationCalculatorTest {
 
   @Test
   public void orientationPositive() throws Exception {
-    final double[] xs = new double[] { 5, 0, 0, 5, 5 };
-    final double[] ys = new double[] { 5, 5, 0, 0, 5 };
-    assertTrue(CoordinateSequenceOrientationCalculator.isOrientationPositive(this.coordinateSequenceFactory.create(
-        xs,
-        ys)));
+    final double[] xs = new double[]{ 5, 0, 0, 5, 5 };
+    final double[] ys = new double[]{ 5, 5, 0, 0, 5 };
+    assertTrue(
+        CoordinateSequenceOrientationCalculator.isOrientationPositive(this.coordinateSequenceFactory.create(xs, ys)));
   }
 
   @Test
   public void orientationNegative() throws Exception {
-    final double[] xs = new double[] { 5, 5, 0, 0, 5 };
-    final double[] ys = new double[] { 5, 0, 0, 5, 5 };
-    assertFalse(CoordinateSequenceOrientationCalculator.isOrientationPositive(this.coordinateSequenceFactory.create(
-        xs,
-        ys)));
+    final double[] xs = new double[]{ 5, 5, 0, 0, 5 };
+    final double[] ys = new double[]{ 5, 0, 0, 5, 5 };
+    assertFalse(
+        CoordinateSequenceOrientationCalculator.isOrientationPositive(this.coordinateSequenceFactory.create(xs, ys)));
+  }
+
+  @Test
+  public void orientationAllPointsAreEquals() throws Exception {
+    final double[] xs = new double[]{ 5, 5, 5, 5, 5 };
+    final double[] ys = new double[]{ 5, 5, 5, 5, 5 };
+    assertFalse(
+        CoordinateSequenceOrientationCalculator.isOrientationPositive(this.coordinateSequenceFactory.create(xs, ys)));
   }
 
 }

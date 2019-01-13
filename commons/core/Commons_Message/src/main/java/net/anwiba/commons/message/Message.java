@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,7 +21,11 @@
  */
 package net.anwiba.commons.message;
 
+import java.time.LocalDateTime;
+import java.util.TimeZone;
+
 import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.commons.lang.optional.Optional;
 
 public class Message implements IMessage {
 
@@ -30,8 +34,18 @@ public class Message implements IMessage {
   private final String description;
   private final MessageType messageType;
   private final Throwable throwable;
+  LocalDateTime timeStamp = LocalDateTime.now(
+      Optional
+          .of(System.getProperty("user.timezone"))
+          .convert(z -> TimeZone.getTimeZone(z))
+          .getOr(() -> TimeZone.getDefault())
+          .toZoneId());
 
-  public Message(final String text, final String description, final Throwable throwable, final MessageType messageType) {
+  public Message(
+      final String text,
+      final String description,
+      final Throwable throwable,
+      final MessageType messageType) {
     Ensure.ensureArgumentNotNull(messageType);
     this.text = text;
     this.description = description;
@@ -74,5 +88,10 @@ public class Message implements IMessage {
   @Override
   public MessageType getMessageType() {
     return this.messageType;
+  }
+
+  @Override
+  public LocalDateTime getTimeStamp() {
+    return this.timeStamp;
   }
 }

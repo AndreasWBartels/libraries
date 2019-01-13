@@ -25,7 +25,7 @@ package net.anwiba.commons.injection.utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anwiba.commons.injection.IInjektionAnalyserResult;
+import net.anwiba.commons.injection.impl.IInjektionAnalyserResult;
 
 public final class ListValueHolder implements IValueHolder {
 

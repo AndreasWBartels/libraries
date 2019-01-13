@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public class CancelableInputStream extends FilterInputStream {
@@ -47,7 +48,7 @@ public class CancelableInputStream extends FilterInputStream {
     try {
       this.canceler.check();
       return super.read(b, off, len);
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       throw new InterruptedIOException();
     }
   }
@@ -57,7 +58,7 @@ public class CancelableInputStream extends FilterInputStream {
     try {
       this.canceler.check();
       return super.read();
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       throw new InterruptedIOException();
     }
   }

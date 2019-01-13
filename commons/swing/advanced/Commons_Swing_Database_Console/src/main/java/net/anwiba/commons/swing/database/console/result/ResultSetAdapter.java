@@ -77,7 +77,7 @@ public class ResultSetAdapter {
       } else {
         int counter = 0;
         final List<List<Object>> rows = new ArrayList<>();
-        final ReaultSetToRowConverter converter = new ReaultSetToRowConverter(
+        final ResultSetToRowConverter converter = new ResultSetToRowConverter(
             columnTypes,
             columnTypeNames,
             columnCount);

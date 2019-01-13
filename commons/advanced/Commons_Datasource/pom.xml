@@ -9,7 +9,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>anwiba-commons-maven-advanced</artifactId>
-    <version>1.0.154</version>
+    <version>1.0.180</version>
   </parent>
 
   <scm>
@@ -19,6 +19,12 @@
   </scm>
 
   <dependencies>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-thread</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>

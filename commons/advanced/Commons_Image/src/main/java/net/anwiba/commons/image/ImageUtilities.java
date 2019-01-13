@@ -22,12 +22,77 @@
 
 package net.anwiba.commons.image;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+
+import net.anwiba.commons.image.codec.IImageCodecVisitor;
+import net.anwiba.commons.image.codec.ImageCodec;
 
 public class ImageUtilities {
 
   public static BufferedImage create(final int width, final int height) {
     return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+  }
+
+  public static BufferedImage getEmptyImage(final Dimension size, final ImageCodec imageCodec) {
+    if (imageCodec == null) {
+      return getTransparentImage(size);
+    }
+    final IImageCodecVisitor<BufferedImage, RuntimeException> visitor = new IImageCodecVisitor<BufferedImage, RuntimeException>() {
+  
+      @Override
+      public BufferedImage visitUnknown() {
+        return getTransparentImage(size);
+      }
+  
+      @Override
+      public BufferedImage visitPng() {
+        return getTransparentImage(size);
+      }
+  
+      @Override
+      public BufferedImage visitJpeg() {
+        return getNonTransparentImage(size);
+      }
+  
+      @Override
+      public BufferedImage visitBmp() throws RuntimeException {
+        return getNonTransparentImage(size);
+      }
+  
+      @Override
+      public BufferedImage visitTiff() throws RuntimeException {
+        return getNonTransparentImage(size);
+      }
+  
+      @Override
+      public BufferedImage visitGif() throws RuntimeException {
+        return getTransparentImage(size);
+      }
+  
+    };
+    return imageCodec.accept(visitor);
+  }
+
+  public static BufferedImage getTransparentImage(final Dimension size) {
+    return new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+  }
+
+  public static BufferedImage getNonTransparentImage(final Dimension size) {
+    Graphics2D graphic = null;
+    try {
+      final BufferedImage image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_RGB);
+      graphic = (Graphics2D) image.getGraphics();
+      graphic.setColor(Color.WHITE);
+      graphic.fillRect(0, 0, size.width, size.height);
+      return image;
+    } finally {
+      if (graphic != null) {
+        graphic.dispose();
+      }
+    }
   }
 
 }

@@ -48,6 +48,7 @@ import net.anwiba.commons.jdbc.result.IResults;
 import net.anwiba.commons.jdbc.result.ResultSetToResultAdapter;
 import net.anwiba.commons.jdbc.result.ResultSetToResultsAdapter;
 import net.anwiba.commons.jdbc.value.IDatabaseValue;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IApplicable;
@@ -653,7 +654,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IInterruptableFunction<IResult, T, SQLException> resultFunction)
       throws SQLException,
-      InterruptedException {
+      CanceledException {
     return results(b -> () -> {
     }, connection, statementString, s -> {
     }, resultFunction);
@@ -665,7 +666,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IInterruptableFunction<IResult, T, SQLException> resultFunction)
       throws SQLException,
-      InterruptedException {
+      CanceledException {
     try (Connection connection = connector.connectReadOnly(connectionDescription);) {
       return results(b -> () -> {
       }, connection, statementString, s -> {
@@ -679,7 +680,7 @@ public class DatabaseUtilities {
       final IInterruptableProcedure<PreparedStatement, SQLException> prepareClosure,
       final IInterruptableFunction<IResult, T, SQLException> resultFunction)
       throws SQLException,
-      InterruptedException {
+      CanceledException {
     return results(b -> () -> {
     }, connection, statementString, prepareClosure, resultFunction);
   }
@@ -691,7 +692,7 @@ public class DatabaseUtilities {
       final IInterruptableProcedure<PreparedStatement, SQLException> prepareClosure,
       final IInterruptableFunction<IResult, T, SQLException> resultProcedure)
       throws SQLException,
-      InterruptedException {
+      CanceledException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
       try (final ICloseable<RuntimeException> cancler = cancelWatcherFactory.create(() -> {
@@ -860,7 +861,12 @@ public class DatabaseUtilities {
     return statement -> {
       for (int i = 0; i < objects.length; ++i) {
         logger.log(ILevel.DEBUG, "  value: " + toDebugString(objects[i]));
-        statement.setObject(i + 1, adjustValue(objects[i]));
+        final Object adjustValue = adjustValue(objects[i]);
+        if (adjustValue == null) {
+          statement.setNull(i + 1, 0);
+          continue;
+        }
+        statement.setObject(i + 1, adjustValue);
       }
     };
   }
@@ -928,26 +934,33 @@ public class DatabaseUtilities {
       throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      prepareProcedure.execute(statement);
-      if (statement.execute()) {
-        try (final ResultSet resultSet = statement.getResultSet()) {
-          if (resultSet.next()) {
-            final Object object = resultSet.getObject(1);
-            if (!(object instanceof Number)) {
-              return 0;
-            }
-            final Number number = (Number) object;
-            return number.intValue();
-          }
-        }
-      }
-      return 0;
+      return count(statement, prepareProcedure);
     } catch (final SQLException exception) {
       throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
     }
   }
 
-  public static boolean containts(
+  public static int count(
+      final PreparedStatement statement,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
+    prepareProcedure.execute(statement);
+    if (statement.execute()) {
+      try (final ResultSet resultSet = statement.getResultSet()) {
+        if (resultSet.next()) {
+          final Object object = resultSet.getObject(1);
+          if (!(object instanceof Number)) {
+            return 0;
+          }
+          final Number number = (Number) object;
+          return number.intValue();
+        }
+      }
+    }
+    return 0;
+  }
+
+  public static boolean contains(
       final Connection connection,
       final String statementString,
       final String columnName,
@@ -1073,20 +1086,24 @@ public class DatabaseUtilities {
       throws SQLException {
     logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
     try (PreparedStatement statement = connection.prepareStatement(statementString, Statement.RETURN_GENERATED_KEYS)) {
-      prepareProcedure.execute(statement);
-      final int numberOfChangedRows = statement.executeUpdate();
-      if (numberOfChangedRows == 0) {
-        return new ArrayList<>();
-      }
-      final ArrayList<Object> keys = new ArrayList<>();
-      try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-        while (generatedKeys.next()) {
-          final Object key = generatedKeys.getObject(1);
-          logger.log(ILevel.DEBUG, "    key: " + toDebugString(key)); //$NON-NLS-1$
-          keys.add(key);
+      try {
+        prepareProcedure.execute(statement);
+        final int numberOfChangedRows = statement.executeUpdate();
+        if (numberOfChangedRows == 0) {
+          return new ArrayList<>();
         }
+        final ArrayList<Object> keys = new ArrayList<>();
+        try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+          while (generatedKeys.next()) {
+            final Object key = generatedKeys.getObject(1);
+            logger.log(ILevel.DEBUG, "    key: " + toDebugString(key)); //$NON-NLS-1$
+            keys.add(key);
+          }
+        }
+        return keys;
+      } catch (final SQLException exception) {
+        throw exception;
       }
-      return keys;
     } catch (final SQLException exception) {
       throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -1188,6 +1205,30 @@ public class DatabaseUtilities {
         });
       }
     };
+  }
+
+  public static void add(final PreparedStatement statement, final Object... values) throws SQLException {
+    add(statement, setterProcedur(values));
+  }
+
+  public static void add(
+      final PreparedStatement statement,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
+    try {
+      prepareProcedure.execute(statement);
+      statement.addBatch();
+    } catch (final SQLException exception) {
+      throw exception;
+    }
+  }
+
+  public static int[] transfer(final PreparedStatement statement) throws SQLException {
+    try {
+      return statement.executeBatch();
+    } catch (final SQLException exception) {
+      throw exception;
+    }
   }
 
   public IDatabaseValue value(final Object object, final int type) {
@@ -1505,5 +1546,156 @@ public class DatabaseUtilities {
     } catch (final ConversionException exception) {
       throw new SQLException(exception);
     }
+  }
+
+  public static IBatchTransfer batchTransfer(
+      final Connection connection,
+      final String tableName,
+      final String[] identifierNames,
+      final String[] valueNames) {
+    final String selectExistsStatement = createSelectExistsStatement(tableName, identifierNames);
+    final String updateStatement = createUpdateStatement(tableName, identifierNames, valueNames);
+    final String insertStatement = createInsertStatement(tableName, identifierNames, valueNames);
+    return batchTransfer(connection, selectExistsStatement, insertStatement, updateStatement);
+  }
+
+  public static IBatchTransfer batchTransfer(
+      final Connection connection,
+      final String selectExistsStatement,
+      final String insertStatement,
+      final String updateStatement) {
+    final int numberOfIdentifiers = numberOfQuestionMarks(selectExistsStatement);
+    final int numberOfColumns = numberOfQuestionMarks(insertStatement);
+    return new BatchTransfer(
+        connection,
+        numberOfIdentifiers,
+        numberOfColumns,
+        selectExistsStatement,
+        insertStatement,
+        updateStatement);
+  }
+
+  @SuppressWarnings("nls")
+  private static String createInsertStatement(
+      final String tableName,
+      final String[] identifiers,
+      final String[] values) {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("insert into ");
+    builder.append("'");
+    builder.append(tableName);
+    builder.append("'");
+    builder.append(" (");
+    boolean nameFlag = false;
+    for (final String identifier : identifiers) {
+      if (nameFlag) {
+        builder.append(", ");
+      } else {
+        nameFlag = true;
+      }
+      builder.append("'");
+      builder.append(identifier);
+      builder.append("'");
+    }
+    for (final String value : values) {
+      if (nameFlag) {
+        builder.append(", ");
+      } else {
+        nameFlag = true;
+      }
+      builder.append("'");
+      builder.append(value);
+      builder.append("'");
+    }
+    builder.append(" )");
+    builder.append(" values ");
+    builder.append(" (");
+    boolean valueflags = false;
+    for (@SuppressWarnings("unused")
+    final String identifier : identifiers) {
+      if (valueflags) {
+        builder.append(", ");
+      } else {
+        valueflags = true;
+      }
+      builder.append("?");
+    }
+    for (@SuppressWarnings("unused")
+    final String value : values) {
+      if (valueflags) {
+        builder.append(", ");
+      } else {
+        valueflags = true;
+      }
+      builder.append("?");
+    }
+    builder.append(" )");
+    return builder.toString();
+  }
+
+  @SuppressWarnings("nls")
+  private static String createUpdateStatement(
+      final String tableName,
+      final String[] identifiers,
+      final String[] values) {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("update ");
+    builder.append("'");
+    builder.append(tableName);
+    builder.append("'");
+
+    builder.append(" set ");
+    boolean valueflags = false;
+    for (final String value : values) {
+      if (valueflags) {
+        builder.append(", ");
+      } else {
+        valueflags = true;
+      }
+      builder.append("'");
+      builder.append(value);
+      builder.append("' = ?");
+    }
+    builder.append(" )");
+
+    boolean clauseFlag = false;
+    for (final String identifier : identifiers) {
+      if (clauseFlag) {
+        builder.append(" and ");
+      } else {
+        builder.append(" where ");
+        clauseFlag = true;
+      }
+      builder.append("'");
+      builder.append(identifier);
+      builder.append("' = ?");
+    }
+    return builder.toString();
+  }
+
+  @SuppressWarnings("nls")
+  private static String createSelectExistsStatement(final String tableName, final String[] identifiers) {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("select count(*) ");
+    builder.append("'");
+    builder.append(tableName);
+    builder.append("'");
+    boolean flag = false;
+    for (final String identifier : identifiers) {
+      if (flag) {
+        builder.append(" and ");
+      } else {
+        builder.append(" where ");
+        flag = true;
+      }
+      builder.append("'");
+      builder.append(identifier);
+      builder.append("' = ?");
+    }
+    return builder.toString();
+  }
+
+  private static int numberOfQuestionMarks(final String string) {
+    return (int) string.chars().filter(ch -> ch == '?').count();
   }
 }

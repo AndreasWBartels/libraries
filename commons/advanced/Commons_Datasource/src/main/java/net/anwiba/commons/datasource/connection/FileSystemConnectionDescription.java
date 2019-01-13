@@ -23,32 +23,53 @@ package net.anwiba.commons.datasource.connection;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
 
 import net.anwiba.commons.datasource.DataSourceType;
 import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 
 public class FileSystemConnectionDescription extends AbstractConnectionDescription
     implements
     IFileSystemConnectionDescription {
 
   private static final long serialVersionUID = 5088280043009120362L;
-  private final File file;
+  private final Path rootPath;
+  private final Path homePath;
 
   public FileSystemConnectionDescription(final File file) {
-    super(DataSourceType.FILE);
-    Ensure.ensureArgumentNotNull(file);
-    if (!file.isDirectory()) {
-      throw new IllegalArgumentException("file isn't a directory " + file.getAbsolutePath()); //$NON-NLS-1$
+    this(file.toPath().getRoot(), file.toPath().toAbsolutePath());
+  }
+
+  public FileSystemConnectionDescription(final Path root, final Path homePath) {
+    super(DataSourceType.FILESYSTEM);
+    this.rootPath = root;
+    this.homePath = homePath;
+    Ensure.ensureArgumentNotNull(root);
+    Ensure.ensureArgumentNotNull(homePath);
+    if (!Files.isDirectory(homePath)) {
+      throw new IllegalArgumentException("homepath isn't a directory " + homePath.toAbsolutePath().toString()); //$NON-NLS-1$
     }
-    this.file = file;
+  }
+
+  @Override
+  public FileSystemConnectionDescription adapt(final IAuthentication authentication) {
+    return new FileSystemConnectionDescription(this.rootPath, this.homePath);
+  }
+
+  @Override
+  public IAuthentication getAuthentication() {
+    return null;
   }
 
   @Override
   public IResourceReference getResourceReference() {
-    return new ResourceReferenceFactory().create(this.file);
+    return new ResourceReferenceFactory().create(this.homePath);
   }
 
   @Override
@@ -57,28 +78,31 @@ public class FileSystemConnectionDescription extends AbstractConnectionDescripti
   }
 
   @Override
-  public File getFile() {
-    return this.file;
-  }
-
-  @Override
   public URI getURI() {
-    return getFile().toURI();
+    if (Objects.equals(getScheme(), "file")) { //$NON-NLS-1$
+      final URI uri = this.homePath.toAbsolutePath().toFile().toURI();
+      return uri;
+    }
+    return URI.create(getScheme() + ":" + this.rootPath.toString() + "!" + this.homePath.toAbsolutePath().toString()); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   @Override
   public String toString() {
-    return getFile().getPath();
+    if (Objects.equals(getScheme(), "file")) { //$NON-NLS-1$
+      return this.homePath.toAbsolutePath().toString();
+    }
+    return this.rootPath.toString() + "!" + this.homePath.toAbsolutePath().toString(); //$NON-NLS-1$
   }
 
   @Override
   public String getFormat() {
-    return "Folder"; //$NON-NLS-1$
+    return "Filesystem"; //$NON-NLS-1$
   }
 
   @Override
   public int hashCode() {
-    return 31 * ((this.file == null) ? 0 : this.file.hashCode());
+    return 31 * ((this.rootPath == null) ? 0 : this.rootPath.hashCode())
+        + ((this.homePath == null) ? 0 : this.homePath.hashCode());
   }
 
   @Override
@@ -90,7 +114,23 @@ public class FileSystemConnectionDescription extends AbstractConnectionDescripti
       return false;
     }
     final IFileSystemConnectionDescription other = (IFileSystemConnectionDescription) object;
-    return ObjectUtilities.equals(getURI(), other.getURI())
-        && ObjectUtilities.equals(getDataSourceType(), other.getDataSourceType());
+    return ObjectUtilities.equals(getDataSourceType(), other.getDataSourceType())
+        && ObjectUtilities.equals(getHomePath(), other.getHomePath())
+        && ObjectUtilities.equals(getRootPath(), other.getRootPath());
+  }
+
+  @Override
+  public Path getRootPath() {
+    return this.rootPath;
+  }
+
+  @Override
+  public Path getHomePath() {
+    return this.homePath;
+  }
+
+  @Override
+  public String getScheme() {
+    return this.homePath.getFileSystem().provider().getScheme();
   }
 }

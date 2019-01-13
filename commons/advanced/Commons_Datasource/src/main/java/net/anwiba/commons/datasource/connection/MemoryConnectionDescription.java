@@ -32,12 +32,13 @@ import java.time.format.DateTimeFormatter;
 import net.anwiba.commons.datasource.DataSourceType;
 import net.anwiba.commons.datasource.DataSourceVersion;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 
 public class MemoryConnectionDescription implements IMemoryConnectionDescription {
 
   private final ZonedDateTime timeStamp;
   private static final long serialVersionUID = 1L;
-  private final Object content;
+  private final Serializable content;
   private final String mimeType;
 
   public MemoryConnectionDescription(final Serializable content) {
@@ -59,6 +60,16 @@ public class MemoryConnectionDescription implements IMemoryConnectionDescription
     this.content = content;
     this.mimeType = mimeType;
     this.timeStamp = Optional.of(timeStamp).getOr(() -> ZonedDateTime.now());
+  }
+
+  @Override
+  public MemoryConnectionDescription adapt(final IAuthentication authentication) {
+    return new MemoryConnectionDescription(this.content, this.mimeType, this.timeStamp);
+  }
+
+  @Override
+  public IAuthentication getAuthentication() {
+    return null;
   }
 
   @Override

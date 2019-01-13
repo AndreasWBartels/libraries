@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.reference.utilities.IoUtilities;
@@ -64,6 +65,11 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
   @Override
   public File getFile(final IResourceReference resourceReference) throws URISyntaxException {
     return ResourceReferenceUtilities.getFile(resourceReference);
+  }
+
+  @Override
+  public Path getPath(final IResourceReference resourceReference) throws URISyntaxException {
+    return ResourceReferenceUtilities.getPath(resourceReference);
   }
 
   @Override
@@ -136,12 +142,20 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
 
   @Override
   public InputStream openInputStream(final IResourceReference resourceReference) throws IOException {
+    return openInputStream(resourceReference, s -> true);
+  }
+
+  @Override
+  public InputStream openInputStream(
+      final IResourceReference resourceReference,
+      final IAcceptor<String> contentTypeAcceptor)
+      throws IOException {
     if (resourceReference == null) {
       throw new IllegalArgumentException();
     }
     if (!(resourceReference instanceof FileResourceReference) && isFileSystemResource(resourceReference)) {
       try {
-        return openInputStream(this.factory.create(getFile(resourceReference)));
+        return openInputStream(this.factory.create(getFile(resourceReference)), contentTypeAcceptor);
       } catch (final URISyntaxException exception) {
         // nothing to do
       }
@@ -151,7 +165,8 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       @Override
       public InputStream visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
         try {
-          return ResourceReferenceHandler.this.connector.openInputStream(getUri(urlResourceReference));
+          return ResourceReferenceHandler.this.connector
+              .openInputStream(getUri(urlResourceReference), contentTypeAcceptor);
         } catch (final URISyntaxException exception) {
           throw new IOException(exception);
         }
@@ -159,21 +174,34 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
 
       @Override
       public InputStream visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
-        return ResourceReferenceHandler.this.connector.openInputStream(uriResourceReference.getUri());
+        return ResourceReferenceHandler.this.connector
+            .openInputStream(uriResourceReference.getUri(), contentTypeAcceptor);
       }
 
       @Override
       public InputStream visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
+        final String contentType = Files.probeContentType(fileResourceReference.getFile().toPath());
+        if (!contentTypeAcceptor.accept(contentType)) {
+          throw new IOException("Unexcepted mime type '" + contentType + "'"); //$NON-NLS-1$//$NON-NLS-2$
+        }
         return new FileInputStream(fileResourceReference.getFile());
       }
 
       @Override
       public InputStream visitMemoryResource(final MemoryResourceReference memoryResourceReference) throws IOException {
+        final String contentType = memoryResourceReference.getContentType();
+        if (!contentTypeAcceptor.accept(contentType)) {
+          throw new IOException("Unexcepted mime type '" + contentType + "'"); //$NON-NLS-1$//$NON-NLS-2$
+        }
         return new ByteArrayInputStream(memoryResourceReference.getBuffer());
       }
 
       @Override
       public InputStream visitPathResource(final PathResourceReference pathResourceReference) throws IOException {
+        final String contentType = Files.probeContentType(pathResourceReference.getPath());
+        if (!contentTypeAcceptor.accept(contentType)) {
+          throw new IOException("Unexcepted mime type '" + contentType + "'"); //$NON-NLS-1$//$NON-NLS-2$
+        }
         return Files.newInputStream(pathResourceReference.getPath());
       }
 
@@ -317,8 +345,8 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
   }
 
   @Override
-  public boolean hasLocation(final IResourceReference resourceReference) {
-    return ResourceReferenceUtilities.hasLocation(resourceReference);
+  public boolean isMemoryResource(final IResourceReference resourceReference) {
+    return ResourceReferenceUtilities.isMemoryResource(resourceReference);
   }
 
   @Override
@@ -462,5 +490,67 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
   @Override
   public String toString(final IResourceReference resourceReference) {
     return ResourceReferenceUtilities.toString(resourceReference);
+  }
+
+  @Override
+  public String getContentType(final IResourceReference resourceReference) {
+    final IResourceReferenceVisitor<String, RuntimeException> visitor = new IResourceReferenceVisitor<String, RuntimeException>() {
+
+      @Override
+      public String visitFileResource(final FileResourceReference fileResourceReference) throws RuntimeException {
+        return getContentType(fileResourceReference.getFile().toPath());
+      }
+
+      @Override
+      public String visitUrlResource(final UrlResourceReference urlResourceReference) throws RuntimeException {
+        try {
+          if (isFileSystemResource(resourceReference)) {
+            return getContentType(getPath(urlResourceReference));
+          }
+          return Optional
+              .of(
+                  IOException.class,
+                  ResourceReferenceHandler.this.connector.getContentType(urlResourceReference.getUrl().toURI()))
+              .getOr(() -> "application/octet-stream"); //$NON-NLS-1$
+        } catch (final URISyntaxException | IOException exception) {
+          return "application/octet-stream"; //$NON-NLS-1$
+        }
+      }
+
+      @Override
+      public String visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
+        try {
+          if (isFileSystemResource(resourceReference)) {
+            return getContentType(getPath(uriResourceReference));
+          }
+          return Optional
+              .of(
+                  IOException.class,
+                  ResourceReferenceHandler.this.connector.getContentType(uriResourceReference.getUri()))
+              .getOr(() -> "application/octet-stream"); //$NON-NLS-1$
+        } catch (final URISyntaxException | IOException exception) {
+          return "application/octet-stream"; //$NON-NLS-1$
+        }
+      }
+
+      @Override
+      public String visitMemoryResource(final MemoryResourceReference memoryResourceReference) throws RuntimeException {
+        return memoryResourceReference.getContentType();
+      }
+
+      @Override
+      public String visitPathResource(final PathResourceReference pathResourceReference) throws RuntimeException {
+        return getContentType(pathResourceReference.getPath());
+      }
+
+      private String getContentType(final Path path) {
+        try {
+          return Files.probeContentType(path);
+        } catch (final IOException exception) {
+          return "application/octet-stream"; //$NON-NLS-1$
+        }
+      }
+    };
+    return resourceReference.accept(visitor);
   }
 }

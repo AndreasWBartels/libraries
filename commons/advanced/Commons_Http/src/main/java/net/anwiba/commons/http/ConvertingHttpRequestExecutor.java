@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.io.NoneClosingInputStream;
 import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
@@ -44,7 +45,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
       final IRequest request,
       final IApplicableResultProducer<T> resultProducer,
       final IApplicableHttpResponseExceptionFactory... exceptionFactories)
-      throws InterruptedException,
+      throws CanceledException,
       HttpServerException,
       HttpRequestException,
       IOException {
@@ -57,7 +58,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
       final IRequest request,
       final IApplicableResultProducer<T> resultProducer,
       final IResultProducer<IOException> errorProducer)
-      throws InterruptedException,
+      throws CanceledException,
       HttpServerException,
       HttpRequestException,
       IOException {
@@ -86,7 +87,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
               } catch (final IOException exception) {
                 inputStream.reset();
                 throw new HttpRequestException(
-                    "Unexpected response content type '" + contentType + "'", // //$NON-NLS-1$ //$NON-NLS-2$
+                    exception.getMessage(), //
                     statusCode,
                     statusText,
                     IoUtilities.toByteArray(inputStream),
@@ -103,9 +104,9 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
         }
       }
     } catch (final InterruptedIOException exception) {
-      final InterruptedException interruptedException = new InterruptedException();
-      interruptedException.initCause(exception);
-      throw interruptedException;
+      final CanceledException CanceledException = new CanceledException();
+      CanceledException.initCause(exception);
+      throw CanceledException;
     }
   }
 

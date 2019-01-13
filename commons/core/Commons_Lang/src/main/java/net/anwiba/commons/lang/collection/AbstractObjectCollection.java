@@ -23,6 +23,7 @@ package net.anwiba.commons.lang.collection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,6 +42,20 @@ public abstract class AbstractObjectCollection<T> implements IMutableObjectColle
 
   public AbstractObjectCollection(final List<T> objects) {
     this.objects.addAll(objects);
+  }
+
+  @Override
+  public Collection<T> toCollection() {
+    synchronized (this.semaphor) {
+      return Collections.unmodifiableCollection(new ArrayList<>(this.objects));
+    }
+  }
+
+  @Override
+  public List<T> toList() {
+    synchronized (this.semaphor) {
+      return Collections.unmodifiableList(new ArrayList<>(this.objects));
+    }
   }
 
   @Override

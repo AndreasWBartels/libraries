@@ -21,11 +21,14 @@
  */
 package net.anwiba.commons.swing.process;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,6 +39,7 @@ import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
 import net.anwiba.commons.thread.cancel.CancelerProcess;
+import net.anwiba.commons.thread.cancel.ICancelerListener;
 import net.anwiba.commons.thread.process.IProcessManager;
 
 public class ProcessItemPanel extends JPanel {
@@ -52,6 +56,13 @@ public class ProcessItemPanel extends JPanel {
       this.manager = manager;
       this.model = model;
       setEnabled(model.isEnabled());
+      model.getCanceler().addCancelerListener(new ICancelerListener() {
+        @Override
+        public void canceled() {
+          setEnabled(model.isEnabled());
+          model.getCanceler().removeCancelerListener(this);
+        }
+      });
     }
 
     @SuppressWarnings("nls")
@@ -76,12 +87,15 @@ public class ProcessItemPanel extends JPanel {
     button.setBorder(BorderFactory.createEmptyBorder());
     button.setEnabled(model.isEnabled());
     final JProgressBar progressBar = new JProgressBar();
+    progressBar.setMinimumSize(new Dimension(200, 10));
+    progressBar.setMaximumSize(new Dimension(200, 20));
     final JPanel progessPanel = new JPanel();
-    final JLabel noteLable = new JLabel();
-    progessPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
+    final JLabel notePanel = new JLabel(model.getNote());
+    progessPanel.setLayout(new BoxLayout(progessPanel, BoxLayout.LINE_AXIS));
     progessPanel.add(button);
     progessPanel.add(progressBar);
-    progessPanel.add(noteLable);
+    progessPanel.add(Box.createRigidArea(new Dimension(4, 0)));
+    progessPanel.add(notePanel);
     setLayout(new SpringLayout());
     setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
     add(labelPanel);
@@ -92,14 +106,9 @@ public class ProcessItemPanel extends JPanel {
 
       @Override
       public void noteChanged(final String note) {
-        GuiUtilities.invokeLater(new Runnable() {
-
-          @Override
-          public void run() {
-            noteLable.setText(note);
-            progessPanel.revalidate();
-            ProcessItemPanel.this.revalidate();
-          }
+        GuiUtilities.invokeLater(() -> {
+          notePanel.setText(note);
+          progessPanel.revalidate();
         });
       }
 

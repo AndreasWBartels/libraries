@@ -21,6 +21,10 @@
  */
 package net.anwiba.commons.datasource.connection;
 
+import net.anwiba.commons.utilities.io.url.IAuthentication;
+
 public interface IFileConnectionDescription extends IResourceReferenceConnectionDescription {
-  // nothing to do
+
+  @Override
+  IFileConnectionDescription adapt(IAuthentication authentication);
 }

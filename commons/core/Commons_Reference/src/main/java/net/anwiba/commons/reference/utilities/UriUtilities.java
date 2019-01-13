@@ -31,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -315,6 +316,13 @@ public class UriUtilities {
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       return false;
     }
+  }
+
+  public static String getContentType(final URI uri) throws IOException {
+    if (UriUtilities.isFileUri(uri)) {
+      return Files.probeContentType(new File(uri).toPath());
+    }
+    return converter.convert(uri).openConnection().getContentType();
   }
 
   public static InputStream openInputStream(final URI uri) throws IOException {

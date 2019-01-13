@@ -27,6 +27,7 @@ import net.anwiba.commons.datasource.DataSourceType;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 
 public class FileConnectionDescription extends AbstractConnectionDescription implements IFileConnectionDescription {
 
@@ -41,6 +42,11 @@ public class FileConnectionDescription extends AbstractConnectionDescription imp
   @Override
   public IResourceReference getResourceReference() {
     return new ResourceReferenceFactory().create(this.uri);
+  }
+
+  @Override
+  public FileConnectionDescription adapt(final IAuthentication authentication) {
+    return new FileConnectionDescription(this.uri);
   }
 
   @Override
@@ -76,5 +82,10 @@ public class FileConnectionDescription extends AbstractConnectionDescription imp
   @Override
   public String getFormat() {
     return "File"; //$NON-NLS-1$
+  }
+
+  @Override
+  public IAuthentication getAuthentication() {
+    return null;
   }
 }

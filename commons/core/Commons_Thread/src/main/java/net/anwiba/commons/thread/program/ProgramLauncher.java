@@ -27,6 +27,7 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.logging.ILevel;
@@ -136,12 +137,12 @@ public class ProgramLauncher implements IProgramLauncher {
   }
 
   @Override
-  public Process launch() throws IOException, InterruptedException {
+  public Process launch() throws IOException, CanceledException {
     return launch(Canceler.DummyCanceler);
   }
 
   @Override
-  public Process launch(final ICanceler canceler) throws IOException, InterruptedException {
+  public Process launch(final ICanceler canceler) throws IOException, CanceledException {
     @SuppressWarnings("hiding")
     final List<String> command = new ArrayList<>();
     if (OperationSystemUtilities.isLinux() || OperationSystemUtilities.isBSD() || OperationSystemUtilities.isUnix()) {
@@ -166,6 +167,8 @@ public class ProgramLauncher implements IProgramLauncher {
       try {
         canceler.addCancelerListener(listener);
         process.waitFor();
+      } catch (final InterruptedException exception) {
+        throw new CanceledException();
       } finally {
         canceler.removeCancelerListener(listener);
       }

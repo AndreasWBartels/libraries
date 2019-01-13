@@ -26,6 +26,6 @@ public interface ICoordinateReferenceSystemRegistry {
 
   public void add(String srsName, ICoordinateReferenceSystem coordinateReferenceSystem);
 
-  boolean containts(String srsName);
+  boolean contains(String srsName);
 
 }

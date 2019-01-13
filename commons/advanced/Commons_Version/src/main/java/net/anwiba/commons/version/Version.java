@@ -21,13 +21,15 @@
  */
 package net.anwiba.commons.version;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.ZonedDateTime;
 import java.util.Objects;
+
+import net.anwiba.commons.utilities.time.ZonedDateTimeUtilities;
 
 public class Version implements IVersion {
 
-  public static final Date defaultDate = new GregorianCalendar(0, 0, 0).getTime();
+  public static final ZonedDateTime defaultDate = ZonedDateTime
+      .of(0, 1, 1, 0, 0, 0, 0, ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone());
   public static final IVersion DUMMY = new Version(
       0,
       0,
@@ -42,7 +44,7 @@ public class Version implements IVersion {
   private final int step;
   private final ReleaseState releaseState;
   private final ProductState productState;
-  private final Date date;
+  private final ZonedDateTime date;
   private final int buildCount;
 
   public Version(
@@ -51,20 +53,24 @@ public class Version implements IVersion {
       final ReleaseState releaseState,
       final int step,
       final ProductState productState,
-      final Date date,
+      final ZonedDateTime date,
       final int buildCount) {
     this.major = major;
     this.minor = minor;
     this.releaseState = releaseState;
     this.step = step;
     this.productState = productState;
-    this.date = new Date(date.getTime());
+    this.date = date;
     this.buildCount = buildCount;
   }
 
+  public static IVersion of(final String string) {
+    return new VersionParser().parse(string);
+  }
+
   @Override
-  public Date getDate() {
-    return new Date(this.date.getTime());
+  public ZonedDateTime getDate() {
+    return this.date;
   }
 
   @Override

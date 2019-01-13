@@ -35,7 +35,8 @@ public class ObjectTableConfigurationBuilder<T> {
   private final List<IColumnConfiguration> columnConfigurations = new ArrayList<>();
   private final List<ITableActionFactory<T>> actionFactories = new ArrayList<>();
   private int preferredVisibleRowCount = 10;
-  private IMouseListenerFactory<T> mouseListenerFactory;
+  private IMouseListenerFactory<T> headerMouseListenerFactory;
+  private IMouseListenerFactory<T> tableMouseListenerFactory;
   private IKeyListenerFactory<T> keyListenerFactory;
 
   public void setKeyListenerFactory(final IKeyListenerFactory<T> keyListenerFactory) {
@@ -66,12 +67,17 @@ public class ObjectTableConfigurationBuilder<T> {
         this.preferredVisibleRowCount,
         null,
         this.columnConfigurations,
-        this.mouseListenerFactory,
+        this.headerMouseListenerFactory,
+        this.tableMouseListenerFactory,
         this.keyListenerFactory,
         actionConfiguration);
   }
 
-  public void setMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
-    this.mouseListenerFactory = mouseListenerFactory;
+  public void setTableMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
+    this.tableMouseListenerFactory = mouseListenerFactory;
+  }
+
+  public void setHeaderMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
+    this.headerMouseListenerFactory = mouseListenerFactory;
   }
 }

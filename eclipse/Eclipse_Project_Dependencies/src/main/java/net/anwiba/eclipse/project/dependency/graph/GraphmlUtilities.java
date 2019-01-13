@@ -21,6 +21,7 @@
  */
 package net.anwiba.eclipse.project.dependency.graph;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.thread.program.ProgramLauncher;
 import net.anwiba.eclipse.project.dependency.java.LibraryType;
 import net.anwiba.tools.graphml.io.GraphMarkupLanguageWriter;
@@ -174,7 +175,7 @@ public class GraphmlUtilities {
             .argument(file.getAbsolutePath())
             .launch();
       }
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       // nothing to do
     }
   }

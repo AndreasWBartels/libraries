@@ -26,34 +26,38 @@ import net.anwiba.commons.reflection.CreationException;
 
 public interface IInjectionValueProviderBuilder {
 
-  public abstract <T, S extends T> IInjectionValueProviderBuilder set(IBinding<T> clazz, S object);
+  <T, S extends T> IInjectionValueProviderBuilder set(IBinding<T> clazz, S object);
 
-  public abstract <T, S extends T> IInjectionValueProviderBuilder add(IBinding<T> clazz, S object);
+  <T, S extends T> IInjectionValueProviderBuilder add(IBinding<T> clazz, S object);
 
-  public abstract <T> IInjectionValueProviderBuilder set(IBinding<T> clazz, Class<? extends T> objectClass);
+  <T> IInjectionValueProviderBuilder set(IBinding<T> clazz, Class<? extends T> objectClass);
 
-  public abstract <T> IInjectionValueProviderBuilder add(IBinding<T> clazz, Class<? extends T> objectClass);
+  <T> IInjectionValueProviderBuilder add(IBinding<T> clazz, Class<? extends T> objectClass);
 
-  public abstract <T> IInjectionValueProviderBuilder set(IBinding<T> clazz, IInjectingFactory<T> objectFactory);
+  <T> IInjectionValueProviderBuilder set(IBinding<T> clazz, IInjectingFactory<T> objectFactory);
 
-  public abstract <T> IInjectionValueProviderBuilder add(IBinding<T> clazz, IInjectingFactory<T> objectFactory);
+  <T> IInjectionValueProviderBuilder add(IBinding<T> clazz, IInjectingFactory<T> objectFactory);
 
-  public abstract <T> IInjectionValueProviderBuilder link(IBinding<T> clazz, IBinding<? extends T> link);
+  <T> IInjectionValueProviderBuilder link(IBinding<? extends T> clazz, IBinding<T> link);
 
-  public abstract <T, S extends T> IInjectionValueProviderBuilder set(Class<T> clazz, S object);
+  <T, S extends T> IInjectionValueProviderBuilder set(Class<T> clazz, S object);
 
-  public abstract <T, S extends T> IInjectionValueProviderBuilder add(Class<T> clazz, S object);
+  <T, S extends T> IInjectionValueProviderBuilder add(Class<T> clazz, S object);
 
-  public abstract <T> IInjectionValueProviderBuilder set(Class<T> clazz, Class<? extends T> objectClass);
+  <T> IInjectionValueProviderBuilder set(Class<T> clazz);
 
-  public abstract <T> IInjectionValueProviderBuilder add(Class<T> clazz, Class<? extends T> objectClass);
+  <T> IInjectionValueProviderBuilder set(Class<T> clazz, Class<? extends T> objectClass);
 
-  public abstract <T> IInjectionValueProviderBuilder set(Class<T> clazz, IInjectingFactory<T> objectFactory);
+  <T> IInjectionValueProviderBuilder add(Class<T> clazz);
 
-  public abstract <T> IInjectionValueProviderBuilder add(Class<T> clazz, IInjectingFactory<T> objectFactory);
+  <T> IInjectionValueProviderBuilder add(Class<T> clazz, Class<? extends T> objectClass);
 
-  public abstract <T> IInjectionValueProviderBuilder link(Class<T> clazz, Class<? extends T> link);
+  <T> IInjectionValueProviderBuilder set(Class<T> clazz, IInjectingFactory<T> objectFactory);
 
-  public abstract IInjectionValueProvider build() throws CreationException;
+  <T> IInjectionValueProviderBuilder add(Class<T> clazz, IInjectingFactory<T> objectFactory);
+
+  <T> IInjectionValueProviderBuilder link(Class<? extends T> clazz, Class<T> link);
+
+  IInjectionValueProvider build() throws CreationException;
 
 }

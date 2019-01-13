@@ -32,10 +32,11 @@ import java.util.Map;
 import org.junit.Test;
 
 import net.anwiba.commons.injection.binding.ClassBinding;
+import net.anwiba.commons.injection.impl.IInjectingObjectFactory;
 
 public class ValueInjektorTest {
 
-  private IValueInjector createInjector(final Object... objects) {
+  private IInjectingObjectFactory createInjector(final Object... objects) {
     @SuppressWarnings("rawtypes")
     final Map<IBinding, List<Object>> values = new HashMap<>();
     for (final Object object : objects) {
@@ -48,7 +49,7 @@ public class ValueInjektorTest {
   public void fields() throws Exception {
     final TestClass test = new TestClass();
     final TestValue value = new TestValue();
-    final IValueInjector injektor = createInjector(test, value);
+    final IInjectingObjectFactory injektor = createInjector(test, value);
     final TestObjectValues object = injektor.create(TestObjectValues.class);
     assertThat(object.getTest(), equalTo(test));
     assertThat(object.getValue(), equalTo(value));
@@ -62,7 +63,7 @@ public class ValueInjektorTest {
   public void constructor() throws Exception {
     final TestClass test = new TestClass();
     final TestValue value = new TestValue();
-    final IValueInjector injektor = createInjector(test, value);
+    final IInjectingObjectFactory injektor = createInjector(test, value);
     final TestObjectConstructor object = injektor.create(TestObjectConstructor.class);
     assertThat(object.getTest(), equalTo(test));
     assertThat(object.getValue(), equalTo(value));

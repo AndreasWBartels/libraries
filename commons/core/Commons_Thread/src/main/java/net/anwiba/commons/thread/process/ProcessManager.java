@@ -156,4 +156,10 @@ public class ProcessManager implements IProcessManager, IProcessList {
   public void remove(final IProcessIdentfier identfier) {
     this.workQueues.values().forEach(q -> q.remove(identfier));
   }
+
+  @Override
+  public void cancel(final IProcessIdentfier identfier) {
+    this.workQueues.values().forEach(q -> q.cancel(identfier));
+    remove(identfier);
+  }
 }

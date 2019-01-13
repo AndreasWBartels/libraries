@@ -52,7 +52,7 @@ public class GpsdFacade implements IGpsdFacade {
       final Iterable<IGpsDevice> gpsDevices = client.devices();
 
       final String deviceName = Streams
-          .create(IOException.class, gpsDevices)
+          .of(IOException.class, gpsDevices)
           .first(d -> "/dev/ttyUSB0".equals(d.getPath()))
           .convert(d -> d.getPath())
           .getOr(

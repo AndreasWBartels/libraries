@@ -32,16 +32,27 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import net.anwiba.commons.lang.stream.IStream;
-import net.anwiba.commons.lang.stream.Streams;
-
 public abstract class AbstractObjectList<T> implements IMutableObjectList<T> {
 
   private final Object semaphor = new Object();
   private final List<T> objects = new ArrayList<>();
 
-  public AbstractObjectList(final List<T> objects) {
+  public AbstractObjectList(final Collection<T> objects) {
     this.objects.addAll(objects);
+  }
+
+  @Override
+  public Collection<T> toCollection() {
+    synchronized (this.semaphor) {
+      return Collections.unmodifiableCollection(this.objects);
+    }
+  }
+
+  @Override
+  public List<T> toList() {
+    synchronized (this.semaphor) {
+      return Collections.unmodifiableList(this.objects);
+    }
   }
 
   @Override
@@ -195,10 +206,5 @@ public abstract class AbstractObjectList<T> implements IMutableObjectList<T> {
         return iterator.next();
       }
     };
-  }
-
-  @Override
-  public IStream<T, RuntimeException> stream() {
-    return Streams.of(this.objects);
   }
 }

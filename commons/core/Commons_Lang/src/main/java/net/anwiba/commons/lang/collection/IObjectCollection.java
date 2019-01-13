@@ -21,15 +21,25 @@
  */
 package net.anwiba.commons.lang.collection;
 
+import java.util.Collection;
+import java.util.List;
+
 import net.anwiba.commons.lang.stream.IStream;
+import net.anwiba.commons.lang.stream.Streams;
 
 public interface IObjectCollection<T> extends IObjectIterable<T> {
 
-  public int size();
+  int size();
 
-  public IStream<T, RuntimeException> stream();
+  default IStream<T, RuntimeException> stream() {
+    return Streams.of(values());
+  }
 
   IObjectIterable<T> values();
+
+  Collection<T> toCollection();
+
+  List<T> toList();
 
   boolean isEmpty();
 }

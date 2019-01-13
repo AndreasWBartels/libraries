@@ -22,12 +22,14 @@
 
 package net.anwiba.commons.swing.table;
 
+import java.awt.Image;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
@@ -52,6 +54,7 @@ import net.anwiba.commons.swing.table.renderer.LocalDateTimeTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.ObjectTableCellRenderer;
 import net.anwiba.commons.swing.ui.ObjectUiBuilder;
+import net.anwiba.commons.swing.ui.ObjectUiTableCellRenderer;
 
 public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
 
@@ -81,17 +84,12 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, String, RuntimeException> provider,
       final int size) {
-
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
-    }, new ObjectTableCellRenderer(), size, String.class, true, null));
+      return provider.execute(object);
+    }, new ObjectTableCellRenderer(), size, String.class, false, null));
     return this;
   }
 
@@ -100,16 +98,11 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, String, RuntimeException> provider,
       final int size) {
-
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new ObjectTableCellRenderer(), size, String.class, true, null));
     return this;
   }
@@ -120,27 +113,16 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final IFunction<T, String, RuntimeException> provider,
       final IAggregator<T, String, T, RuntimeException> adaptor,
       final int size) {
-
     final DefaultCellEditor cellEditor = new DefaultCellEditor(new JTextField());
     cellEditor.setClickCountToStart(2);
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, (IColumnValueProvider<T>) object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, //
         new ObjectTableCellRenderer(),
-        new IColumnValueAdaptor<T>() {
-
-          @Override
-          public T adapt(final T object, final Object value) {
-            return adaptor.aggregate(object, (String) value);
-          }
-        },
+        (object, value) -> adaptor.aggregate(object, (String) value),
         cellEditor,
         size,
         false,
@@ -149,20 +131,30 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   }
 
   @Override
-  public IObjectTableBuilder<T> addSortableDoubleConfiguration(
+  public IObjectTableBuilder<T> addSortableDoubleColumn(
       final String title,
       final IFunction<T, Double, RuntimeException> provider,
       final int size) {
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new NumberTableCellRenderer("0.0000"), size, Double.class, true, new NumberComparator())); //$NON-NLS-1$
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addDoubleColumn(
+      final String title,
+      final IFunction<T, Double, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
+      }
+      return provider.execute(object);
+    }, new NumberTableCellRenderer("0.0000"), size, Double.class, false, new NumberComparator())); //$NON-NLS-1$
     return this;
   }
 
@@ -204,15 +196,11 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, Integer, RuntimeException> provider,
       final int size) {
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new NumberTableCellRenderer("0"), size, Integer.class, false, new NumberComparator())); //$NON-NLS-1$
     return this;
   }
@@ -222,15 +210,11 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, Integer, RuntimeException> provider,
       final int size) {
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new NumberTableCellRenderer("0"), size, Integer.class, true, new NumberComparator())); //$NON-NLS-1$
     return this;
   }
@@ -240,15 +224,11 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, Long, RuntimeException> provider,
       final int size) {
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new NumberTableCellRenderer("0"), size, Long.class, true, new NumberComparator())); //$NON-NLS-1$
     return this;
   }
@@ -258,15 +238,11 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, LocalDateTime, RuntimeException> provider,
       final int size) {
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new LocalDateTimeTableCellRenderer(), size, LocalDateTime.class, true, new ComparableComparator<>()));
     return this;
   }
@@ -276,16 +252,43 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, Duration, RuntimeException> provider,
       final int size) {
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new DurationTableCellRenderer(), size, Duration.class, true, new ComparableComparator<>()));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addObjectColumn(
+      final String title,
+      final IFunction<T, Object, RuntimeException> provider,
+      final int size) {
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addImageColumn(
+      final String title,
+      final IFunction<T, Image, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
+      }
+      return provider.execute(object);
+    },
+        new ObjectUiTableCellRenderer<>(
+            new ObjectUiBuilder<Image>()
+                .text(o -> null)
+                .icon(o -> Optional.of(o).convert(i -> new ImageIcon(i)).get())
+                .build()),
+        size,
+        Image.class,
+        false,
+        null));
     return this;
   }
 
@@ -294,15 +297,11 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
       final String title,
       final IFunction<T, Boolean, RuntimeException> provider,
       final int size) {
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, new IColumnValueProvider<T>() {
-
-      @Override
-      public Object getValue(final T object) {
-        if (object == null) {
-          return null;
-        }
-        return provider.execute(object);
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
       }
+      return provider.execute(object);
     }, new BooleanRenderer(), size, Boolean.class, true, null));
     return this;
   }
@@ -334,8 +333,14 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   }
 
   @Override
-  public IObjectTableBuilder<T> setMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
-    this.builder.setMouseListenerFactory(mouseListenerFactory);
+  public IObjectTableBuilder<T> setHeaderMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
+    this.builder.setHeaderMouseListenerFactory(mouseListenerFactory);
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> setTableMouseListenerFactory(final IMouseListenerFactory<T> mouseListenerFactory) {
+    this.builder.setTableMouseListenerFactory(mouseListenerFactory);
     return this;
   }
 

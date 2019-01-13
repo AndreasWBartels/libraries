@@ -23,7 +23,12 @@ package net.anwiba.commons.datasource.connection;
 
 import java.time.ZonedDateTime;
 
+import net.anwiba.commons.utilities.io.url.IAuthentication;
+
 public interface IMemoryConnectionDescription extends IConnectionDescription {
+
+  @Override
+  IMemoryConnectionDescription adapt(IAuthentication authentication);
 
   ZonedDateTime getTimeStamp();
   // nothing to do

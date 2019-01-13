@@ -54,8 +54,10 @@ public class DialogConfigurationBuilder {
         @Override
         public JComponent getComponent() {
           final JPanel panel = new JPanel();
-          panel.setMinimumSize(new Dimension(200, 100));
-          panel.setPreferredSize(new Dimension(200, 100));
+          if (!DialogConfigurationBuilder.this.isMessagePanelEnabled) {
+            panel.setMinimumSize(new Dimension(200, 100));
+            panel.setPreferredSize(new Dimension(200, 100));
+          }
           return panel;
         }
       };
@@ -69,6 +71,7 @@ public class DialogConfigurationBuilder {
   private int dialogCloseKeyEvent = KeyEvent.KEY_LOCATION_UNKNOWN;
   private Dimension preferdSize;
   private IGuiIcon image;
+  private DataState dataState = DataState.UNKNOWN;
 
   public DialogConfigurationBuilder setMessage(final IMessage message) {
     this.message = message;
@@ -144,6 +147,7 @@ public class DialogConfigurationBuilder {
         this.isResizeable,
         this.dialogCloseKeyEvent,
         this.additionalActionFactories,
+        this.dataState,
         contentPaneBuilder);
   }
 
@@ -179,6 +183,11 @@ public class DialogConfigurationBuilder {
 
   public DialogConfigurationBuilder enableCloseOnEscape() {
     setDialogCloseKeyEvent(KeyEvent.VK_ESCAPE);
+    return this;
+  }
+
+  public DialogConfigurationBuilder setDataState(final DataState dataState) {
+    this.dataState = dataState;
     return this;
   }
 }

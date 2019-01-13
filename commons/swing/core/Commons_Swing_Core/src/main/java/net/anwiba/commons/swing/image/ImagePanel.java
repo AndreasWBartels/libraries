@@ -43,12 +43,13 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-import net.anwiba.commons.image.BufferedImageContainer;
 import net.anwiba.commons.image.IImageContainer;
+import net.anwiba.commons.image.IImageContainerFactory;
 import net.anwiba.commons.image.IImageReader;
 import net.anwiba.commons.image.ImageFileFilter;
 import net.anwiba.commons.image.graphic.ClosableGraphicsBuider;
 import net.anwiba.commons.image.graphic.IClosableGraphics;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.logging.ILevel;
@@ -67,22 +68,28 @@ public class ImagePanel extends JComponent implements Scrollable {
   private final IObjectModel<IImageContainer> imageContainerModel = new ObjectModel<>();
   private BufferedImage thumbnail = null;
   private Thread thread = null;
-  private final ImageScaleBehavior scaleUp;
+  private final ImageScaleBehavior scaleBehavior;
   private Rectangle bound;
   private int maxUnitIncrement = 2;
   private final IImageReader imageReader;
+  private final IImageContainerFactory imageContainerFactory;
 
-  public ImagePanel(final IImageReader imageReader, final IObjectModel<IResourceReference> imageFileModel) {
-    this(imageReader, imageFileModel, ImageScaleBehavior.FIT);
+  public ImagePanel(
+      final IImageContainerFactory imageContainerFactory,
+      final IImageReader imageReader,
+      final IObjectModel<IResourceReference> imageFileModel) {
+    this(imageContainerFactory, imageReader, imageFileModel, ImageScaleBehavior.FIT);
   }
 
   public ImagePanel(
+      final IImageContainerFactory imageContainerFactory,
       final IImageReader imageReader,
       final IObjectModel<IResourceReference> imageFileModel,
       final ImageScaleBehavior scaleUp) {
+    this.imageContainerFactory = imageContainerFactory;
     setAutoscrolls(true);
     this.imageReader = imageReader;
-    this.scaleUp = scaleUp;
+    this.scaleBehavior = scaleUp;
     final ImageFileFilter fileFilter = new ImageFileFilter();
     setPreferredSize(new Dimension(100, 100));
     setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -150,7 +157,7 @@ public class ImagePanel extends JComponent implements Scrollable {
                   return bufferdImage;
                 }
               }.convert(image);;
-          this.imageContainerModel.set(new BufferedImageContainer(bufferedImage));
+          this.imageContainerModel.set(this.imageContainerFactory.create(bufferedImage));
           if (update()) {
             GuiUtilities.invokeLater(() -> {
               repaint();
@@ -194,7 +201,7 @@ public class ImagePanel extends JComponent implements Scrollable {
             return false;
           }
           this.imageContainerModel.set(container);
-        } catch (final InterruptedException exception) {
+        } catch (final CanceledException exception) {
           return false;
         }
       }
@@ -254,7 +261,7 @@ public class ImagePanel extends JComponent implements Scrollable {
     int width = size.width - insets.left - insets.right;
     int height = size.height - insets.top - insets.bottom;
 
-    if (!ObjectUtilities.equals(this.scaleUp, ImageScaleBehavior.FIT) && imageWidth < width && imageHeight < height) {
+    if (!ObjectUtilities.equals(this.scaleBehavior, ImageScaleBehavior.FIT) && imageWidth < width && imageHeight < height) {
       setMinimumSize(new Dimension(width, height));
       setPreferredSize(new Dimension(width, height));
       setMaximumSize(new Dimension(width, height));
@@ -266,7 +273,7 @@ public class ImagePanel extends JComponent implements Scrollable {
       return new Rectangle(x, y, imageWidth, imageHeight);
     }
 
-    if (ObjectUtilities.equals(this.scaleUp, ImageScaleBehavior.ORGIN)) {
+    if (ObjectUtilities.equals(this.scaleBehavior, ImageScaleBehavior.ORGIN)) {
       setMinimumSize(new Dimension(imageWidth, imageHeight));
       setPreferredSize(new Dimension(imageWidth, imageHeight));
       setMaximumSize(new Dimension(imageWidth, imageHeight));
@@ -327,7 +334,7 @@ public class ImagePanel extends JComponent implements Scrollable {
     final Container parent = getParent();
     final Dimension size = parent != null ? parent.getSize() : new Dimension(256, 256);
     if (this.imageContainerModel.get() != null) {
-      switch (this.scaleUp) {
+      switch (this.scaleBehavior) {
         case ORGIN: {
           final IImageContainer imageContainer = this.imageContainerModel.get();
           final int imageWidth = imageContainer.getWidth();

@@ -77,4 +77,12 @@ public class LocalDateTimeUtilities {
             .toFormatter(Locale.getDefault()));
   }
 
+  public static LocalDateTime atCoordinatedUniversalTimeZone(final java.sql.Date date) {
+    return atCoordinatedUniversalTimeZone(new Date(date.getTime()));
+  }
+
+  private static LocalDateTime atCoordinatedUniversalTimeZone(final Date date) {
+    return LocalDateTime.ofInstant(date.toInstant(), ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone());
+  }
+
 }

@@ -36,6 +36,8 @@ public interface IImageContainer {
 
   IImageContainer crop(float x, float y, float width, float height);
 
+  IImageContainer crop(Rectangle rectangle);
+
   IImageContainer fit(int width, int height);
 
   IImageContainer scale(float widthFactor, float heightFactor);
@@ -44,13 +46,7 @@ public interface IImageContainer {
 
   IImageContainer invert();
 
-  //  IImageContainer rotate(float factor);
-  //
-  //  IImageContainer rotate(float x, float y);
-
-  BufferedImage asBufferImage(int x, int y, int w, int h);
-
-  BufferedImage asBufferImage(Rectangle rectangle);
+  int getNumberOfComponents();
 
   int getNumberOfBands();
 

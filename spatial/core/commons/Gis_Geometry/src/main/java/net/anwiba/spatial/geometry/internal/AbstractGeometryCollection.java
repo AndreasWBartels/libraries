@@ -38,6 +38,7 @@ public abstract class AbstractGeometryCollection<T extends IBaseGeometry> extend
 
   private static final long serialVersionUID = 1498634025534697222L;
   private final List<T> geometries = new ArrayList<>();
+  private ICoordinateSequence sequence;
 
   AbstractGeometryCollection(final ICoordinateReferenceSystem coordinateReferenceSystem, final T[] geometries) {
     super(coordinateReferenceSystem, 2, GeometryCalculator.createEnvelope(geometries));
@@ -66,11 +67,14 @@ public abstract class AbstractGeometryCollection<T extends IBaseGeometry> extend
 
   @Override
   public ICoordinateSequence getCoordinateSequence() {
-    ICoordinateSequence sequence = null;
-    for (final T geometry : this.geometries) {
-      sequence = CoordinateSequenceUtilities.concat(sequence, geometry.getCoordinateSequence());
+    if (this.sequence == null) {
+      ICoordinateSequence sequence = null;
+      for (final T geometry : this.geometries) {
+        sequence = CoordinateSequenceUtilities.concat(sequence, geometry.getCoordinateSequence());
+      }
+      this.sequence = sequence;
     }
-    return sequence;
+    return this.sequence;
   }
 
   @Override

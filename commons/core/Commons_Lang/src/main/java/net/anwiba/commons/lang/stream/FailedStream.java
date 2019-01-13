@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.IntFunction;
 
 import net.anwiba.commons.lang.collection.IObjectList;
@@ -76,7 +77,7 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   @Override
   public IStream<T, E> failed(final ISupplier<Iterable<T>, E> supplier) {
     try {
-      return Streams.create(this.exceptionClass, supplier.supply());
+      return Streams.of(this.exceptionClass, supplier.supply());
     } catch (final Exception exception) {
       return stream(this.exceptionClass, exception);
     }
@@ -124,6 +125,11 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
 
   @Override
   public <O> List<O> asList() throws E {
+    throw this.cause;
+  }
+
+  @Override
+  public <O> Set<O> asSet() throws E {
     throw this.cause;
   }
 

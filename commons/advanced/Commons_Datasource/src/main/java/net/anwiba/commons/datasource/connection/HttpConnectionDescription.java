@@ -23,6 +23,7 @@ package net.anwiba.commons.datasource.connection;
 
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 import net.anwiba.commons.utilities.parameter.IParameters;
 
 public class HttpConnectionDescription extends AbstractHttpConnectionDescription
@@ -40,6 +41,18 @@ public class HttpConnectionDescription extends AbstractHttpConnectionDescription
       final IParameters parameters,
       final boolean sslEnabled) {
     super(host, port, path, userName, password, parameters, sslEnabled);
+  }
+
+  @Override
+  public HttpConnectionDescription adapt(final IAuthentication authentication) {
+    return new HttpConnectionDescription(
+        getHost(),
+        getPort(),
+        getPath(),
+        authentication.getUsername(),
+        authentication.getPassword(),
+        getParameters(),
+        isSslEnabled());
   }
 
   @Override

@@ -77,8 +77,10 @@ public final class FieldValueFactory {
     if (isStatic) {
       final IResourceReference resourceReference = createResourceReference(resourceUrl);
       final byte[] buffer = read(resourceReference);
-      return resourceReferenceFactory
-          .create(buffer, ResourceReferenceUtilities.getExtension(resourceReference), Charset.defaultCharset().name());
+      return resourceReferenceFactory.create(
+          buffer,
+          this.resourceReferenceHandler.getContentType(resourceReference),
+          Charset.defaultCharset().name());
     }
     return createResourceReference(resourceUrl);
   }

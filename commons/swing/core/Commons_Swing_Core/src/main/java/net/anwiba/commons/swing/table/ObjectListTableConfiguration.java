@@ -49,7 +49,8 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
       final int selectionMode,
       final int preferredVisibleRowCount,
       final List<IObjectListColumnConfiguration<T>> columnConfigurations,
-      final IMouseListenerFactory<T> mouseListenerFactory,
+      final IMouseListenerFactory<T> headerMouseListenerFactory,
+      final IMouseListenerFactory<T> tableMouseListenerFactory,
       final IKeyListenerFactory<T> keyListenerFactory,
       final ITableActionConfiguration<T> actionConfiguration,
       final ITableTextFieldActionConfiguration<T> textFieldActionConfiguration,
@@ -60,7 +61,8 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
         preferredVisibleRowCount,
         toolTipSubstituter,
         columnConfigurations,
-        mouseListenerFactory,
+        headerMouseListenerFactory,
+        tableMouseListenerFactory,
         keyListenerFactory,
         actionConfiguration);
     this.columnToStringConverter = columnToStringConverter;

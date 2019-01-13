@@ -336,10 +336,14 @@ public class StringUtilities {
   }
 
   public static String[] tokens(final String string, final char seperator) {
+    return tokens(string, String.valueOf(seperator));
+  }
+
+  public static String[] tokens(final String string, final String seperator) {
     if (string == null) {
       return new String[0];
     }
-    final StringTokenizer tokenizer = new StringTokenizer(string, String.valueOf(seperator));
+    final StringTokenizer tokenizer = new StringTokenizer(string, seperator);
     final List<String> tokens = new ArrayList<>();
     while (tokenizer.hasMoreTokens()) {
       tokens.add(tokenizer.nextToken());
@@ -348,10 +352,14 @@ public class StringUtilities {
   }
 
   public static String[] trimedTokens(final String string, final char seperator) {
+    return trimedTokens(string, String.valueOf(seperator));
+  }
+
+  public static String[] trimedTokens(final String string, final String seperator) {
     if (string == null) {
       return new String[0];
     }
-    final StringTokenizer tokenizer = new StringTokenizer(string, String.valueOf(seperator));
+    final StringTokenizer tokenizer = new StringTokenizer(string, seperator);
     final List<String> tokens = new ArrayList<>();
     while (tokenizer.hasMoreTokens()) {
       final String token = tokenizer.nextToken().trim();

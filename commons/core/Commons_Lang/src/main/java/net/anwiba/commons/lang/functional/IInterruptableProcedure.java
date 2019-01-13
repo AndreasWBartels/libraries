@@ -21,9 +21,11 @@
  */
 package net.anwiba.commons.lang.functional;
 
+import net.anwiba.commons.lang.exception.CanceledException;
+
 @FunctionalInterface
 public interface IInterruptableProcedure<V, E extends Exception> {
 
-  void execute(V value) throws E, InterruptedException;
+  void execute(V value) throws E, CanceledException;
 
 }

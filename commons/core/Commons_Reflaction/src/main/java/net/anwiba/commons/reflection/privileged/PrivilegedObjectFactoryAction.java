@@ -41,7 +41,14 @@ final public class PrivilegedObjectFactoryAction<C> extends AbstractPrivilegedAc
   @Override
   public C invoke() throws InvocationTargetException, Exception {
     final Constructor<? extends C> constructor = this.clazz.getDeclaredConstructor(this.argumentTypes);
-    constructor.setAccessible(true);
-    return constructor.newInstance(this.arguments);
+    final boolean accessible = constructor.isAccessible();
+    try {
+      constructor.setAccessible(true);
+      return constructor.newInstance(this.arguments);
+    } catch (final IllegalArgumentException exception) {
+      throw exception;
+    } finally {
+      constructor.setAccessible(accessible);
+    }
   }
 }

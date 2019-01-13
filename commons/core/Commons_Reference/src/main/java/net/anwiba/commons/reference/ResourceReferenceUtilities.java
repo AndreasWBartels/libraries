@@ -26,6 +26,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -72,6 +74,40 @@ public class ResourceReferenceUtilities {
       @Override
       public File visitPathResource(final PathResourceReference pathResourceReference) throws URISyntaxException {
         return pathResourceReference.getPath().toFile();
+      }
+    });
+  }
+
+  public static Path getPath(final IResourceReference resourceReference) throws URISyntaxException {
+    if (resourceReference == null) {
+      throw new IllegalArgumentException();
+    }
+    final UrlToUriConverter urlToUriConverter = new UrlToUriConverter();
+    return resourceReference.accept(new IResourceReferenceVisitor<Path, URISyntaxException>() {
+
+      @Override
+      public Path visitUrlResource(final UrlResourceReference urlResourceReference) throws URISyntaxException {
+        return Paths.get(urlToUriConverter.convert(urlResourceReference.getUrl()));
+      }
+
+      @Override
+      public Path visitUriResource(final UriResourceReference uriResourceReference) {
+        return Paths.get(uriResourceReference.getUri());
+      }
+
+      @Override
+      public Path visitFileResource(final FileResourceReference fileResourceReference) {
+        return fileResourceReference.getFile().toPath();
+      }
+
+      @Override
+      public Path visitMemoryResource(final MemoryResourceReference memoryResourceReference) {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public Path visitPathResource(final PathResourceReference pathResourceReference) throws URISyntaxException {
+        return pathResourceReference.getPath();
       }
     });
   }
@@ -177,7 +213,7 @@ public class ResourceReferenceUtilities {
       @Override
       public String visitMemoryResource(final MemoryResourceReference memoryResourceReference) throws RuntimeException {
         try {
-          final String mimeType = memoryResourceReference.getMimeType();
+          final String mimeType = memoryResourceReference.getContentType();
           if (mimeType == null) {
             return null;
           }
@@ -195,7 +231,7 @@ public class ResourceReferenceUtilities {
     });
   }
 
-  public static boolean hasLocation(final IResourceReference resourceReference) {
+  public static boolean isMemoryResource(final IResourceReference resourceReference) {
     if (resourceReference == null) {
       return false;
     }
@@ -203,27 +239,27 @@ public class ResourceReferenceUtilities {
 
       @Override
       public Boolean visitUrlResource(final UrlResourceReference urlResourceReference) {
-        return Boolean.TRUE;
-      }
-
-      @Override
-      public Boolean visitUriResource(final UriResourceReference uriResourceReference) {
-        return Boolean.TRUE;
-      }
-
-      @Override
-      public Boolean visitFileResource(final FileResourceReference fileResourceReference) {
-        return Boolean.TRUE;
-      }
-
-      @Override
-      public Boolean visitMemoryResource(final MemoryResourceReference memoryResourceReference) {
         return Boolean.FALSE;
       }
 
       @Override
-      public Boolean visitPathResource(final PathResourceReference pathResourceReference) throws RuntimeException {
+      public Boolean visitUriResource(final UriResourceReference uriResourceReference) {
+        return Boolean.FALSE;
+      }
+
+      @Override
+      public Boolean visitFileResource(final FileResourceReference fileResourceReference) {
+        return Boolean.FALSE;
+      }
+
+      @Override
+      public Boolean visitMemoryResource(final MemoryResourceReference memoryResourceReference) {
         return Boolean.TRUE;
+      }
+
+      @Override
+      public Boolean visitPathResource(final PathResourceReference pathResourceReference) throws RuntimeException {
+        return Boolean.FALSE;
       }
     }).booleanValue();
   }

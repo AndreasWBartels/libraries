@@ -51,6 +51,7 @@ public final class DialogConfiguration extends AbstractDialogConfiguration {
       final boolean isResizeable,
       final int dialogCloseKeyEvent,
       final List<IAdditionalActionFactory> additionalActionFactories,
+      final DataState dataState,
       final IContentPaneBuilder contentPaneBuilder) {
     super(
         preferences,
@@ -66,7 +67,8 @@ public final class DialogConfiguration extends AbstractDialogConfiguration {
         actionButtonTextFactory,
         isResizeable,
         dialogCloseKeyEvent,
-        additionalActionFactories);
+        additionalActionFactories,
+        dataState);
     this.contentPaneBuilder = contentPaneBuilder;
   }
 

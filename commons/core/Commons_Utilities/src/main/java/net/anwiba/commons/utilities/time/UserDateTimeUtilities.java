@@ -45,11 +45,6 @@ public class UserDateTimeUtilities {
     return LocalDateTimeUtilities.atZone(dateTime, ZonedDateTimeUtilities.getUserZone());
   }
 
-  public static LocalDateTime atUserZone(final LocalDateTime localSystemDateTime) {
-    return LocalDateTimeUtilities
-        .atZone(localSystemDateTime, ZonedDateTimeUtilities.getSystemZone(), ZonedDateTimeUtilities.getUserZone());
-  }
-
   public static LocalDateTime atSystemZone(final LocalDateTime userDateTime) {
     return LocalDateTimeUtilities
         .atZone(userDateTime, ZonedDateTimeUtilities.getUserZone(), ZonedDateTimeUtilities.getSystemZone());
@@ -105,5 +100,4 @@ public class UserDateTimeUtilities {
                     .toFormatter(Locale.getDefault()))
             .toFormatter(Locale.getDefault()));
   }
-
 }

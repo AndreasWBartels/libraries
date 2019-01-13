@@ -76,7 +76,10 @@ public class ObjectTable<T> implements IComponentProvider {
         new SelectionListener<>(tableModel, tableSelectionModel, this.selectionModel, sortedRowMapper));
     this.selectionIndexModel = new SelectionIndexModel<>(tableSelectionModel, sortedRowMapper, this.selectionModel);
     this.sortStateModel = tableRowSorter == null ? new BooleanModel(false) : tableRowSorter.getSortStateModel();
-    final IMouseListenerFactory<T> mouseListenerFactory = configuration.getMouseListenerFactory();
+    Optional.of(configuration.getHeaderMouseListenerFactory()).consume(
+        f -> table.getTableHeader().addMouseListener(
+            f.create(tableModel, this.selectionIndexModel, this.selectionModel, this.sortStateModel)));
+    final IMouseListenerFactory<T> mouseListenerFactory = configuration.getTableMouseListenerFactory();
     table.addMouseListener(
         mouseListenerFactory
             .create(tableModel, this.selectionIndexModel, this.getSelectionModel(), this.sortStateModel));

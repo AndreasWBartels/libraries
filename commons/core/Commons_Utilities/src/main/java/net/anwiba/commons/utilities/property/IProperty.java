@@ -21,10 +21,12 @@
  */
 package net.anwiba.commons.utilities.property;
 
-public interface IProperty<T> {
+import java.io.Serializable;
 
-  public String getName();
+public interface IProperty extends Serializable {
 
-  public T getValue();
+  String getName();
+
+  String getValue();
 
 }

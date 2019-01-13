@@ -25,30 +25,43 @@ import java.time.Duration;
 
 import net.anwiba.commons.datasource.resource.IResourceDescription;
 
-@SuppressWarnings("nls")
 public interface IDatasourceEventLogger {
 
+  String COMPRESSED = "COMPRESSED"; //$NON-NLS-1$
+  String EXTRACTED = "EXTRACTED"; //$NON-NLS-1$
+  String COPIED = "COPIED"; //$NON-NLS-1$
+  String REMOVED = "REMOVED"; //$NON-NLS-1$
+  String CHANGED = "CHANGED"; //$NON-NLS-1$
+  String ADDED = "ADDED"; //$NON-NLS-1$
+  String RENAMED = "RENAMED"; //$NON-NLS-1$
+  String CLEANED = "CLEANED"; //$NON-NLS-1$
+  String RESTORED = "RESTORED"; //$NON-NLS-1$
+  String DELETED = "DELETED"; //$NON-NLS-1$
+  String ANALYZED = "ANALYZED"; //$NON-NLS-1$
+  String INDEXED = "INDEXED"; //$NON-NLS-1$
+  String CREATED = "CREATED"; //$NON-NLS-1$
+
   default void created(final IResourceDescription targetResourceDescription) {
-    log("CREATED", null, targetResourceDescription, null, null, null, null);
+    log(CREATED, null, targetResourceDescription, null, null, null, null);
   }
 
   default void indexed(final IResourceDescription targetResourceDescription, final Duration duration) {
-    log("INDEXED", null, targetResourceDescription, null, null, null, duration);
+    log(INDEXED, null, targetResourceDescription, null, null, null, duration);
   }
 
   default void renamed(
       final IResourceDescription sourceResourceDescription,
       final IResourceDescription targetResourceDescription,
       final Duration duration) {
-    log("RENAMED", sourceResourceDescription, targetResourceDescription, null, null, null, duration);
+    log(RENAMED, sourceResourceDescription, targetResourceDescription, null, null, null, duration);
   }
 
   default void analyzed(final IResourceDescription targetResourceDescription, final Duration duration) {
-    log("ANALYZED", null, targetResourceDescription, null, null, null, duration);
+    log(ANALYZED, null, targetResourceDescription, null, null, null, duration);
   }
 
   default void deleted(final IResourceDescription targetResourceDescription) {
-    log("DELETED", null, targetResourceDescription, null, null, null, null);
+    log(DELETED, null, targetResourceDescription, null, null, null, null);
   }
 
   default void added(
@@ -57,7 +70,7 @@ public interface IDatasourceEventLogger {
       final String condition,
       final Long numberOfRows,
       final Duration duration) {
-    log("ADDED", sourceResourceDescription, targetResourceDescription, null, condition, numberOfRows, duration);
+    log(ADDED, sourceResourceDescription, targetResourceDescription, null, condition, numberOfRows, duration);
   }
 
   default void changed(
@@ -67,21 +80,21 @@ public interface IDatasourceEventLogger {
       final String condition,
       final Long numberOfRows,
       final Duration duration) {
-    log("CHANGED", sourceResourceDescription, targetResourceDescription, join, condition, numberOfRows, duration);
+    log(CHANGED, sourceResourceDescription, targetResourceDescription, join, condition, numberOfRows, duration);
   }
 
   default void restored(
       final IResourceDescription targetResourceDescription,
       final Long numberOfRows,
       final Duration duration) {
-    log("RESTORED", null, targetResourceDescription, null, null, numberOfRows, duration);
+    log(RESTORED, null, targetResourceDescription, null, null, numberOfRows, duration);
   }
 
   default void cleaned(
       final IResourceDescription targetResourceDescription,
       final Long numberOfRows,
       final Duration duration) {
-    log("CLEANED", null, targetResourceDescription, null, null, numberOfRows, duration);
+    log(CLEANED, null, targetResourceDescription, null, null, numberOfRows, duration);
   }
 
   default void removed(
@@ -91,7 +104,7 @@ public interface IDatasourceEventLogger {
       final String condition,
       final Long numberOfRows,
       final Duration duration) {
-    log("REMOVED", sourceResourceDescription, targetResourceDescription, join, condition, numberOfRows, duration);
+    log(REMOVED, sourceResourceDescription, targetResourceDescription, join, condition, numberOfRows, duration);
   }
 
   void log(

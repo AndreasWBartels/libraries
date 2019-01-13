@@ -8,7 +8,7 @@
   <parent>
     <groupId>net.anwiba.database</groupId>
     <artifactId>anwiba-database-maven</artifactId>
-    <version>1.0.154</version>
+    <version>1.0.180</version>
   </parent>
 
   <scm>
@@ -34,6 +34,12 @@
     <dependency>
       <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-lang</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-nls</artifactId>
       <version>${net.anwiba.commons.version}</version>
     </dependency>
 

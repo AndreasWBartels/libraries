@@ -68,4 +68,6 @@ public interface IDialogConfiguration {
 
   ModalExclusionType getModalExclusionType();
 
+  DataState getDataState();
+
 }

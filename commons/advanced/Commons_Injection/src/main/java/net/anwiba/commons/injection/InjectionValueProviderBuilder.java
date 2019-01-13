@@ -28,9 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import net.anwiba.commons.injection.binding.ClassBinding;
+import net.anwiba.commons.injection.impl.BindingFactory;
+import net.anwiba.commons.injection.impl.IInjektionAnalyserResult;
+import net.anwiba.commons.injection.impl.IResolveableForecaster;
+import net.anwiba.commons.injection.impl.IValueInjectionAnalyser;
+import net.anwiba.commons.injection.impl.InjectionValueProvider;
+import net.anwiba.commons.injection.impl.InjektingObjectFactory;
+import net.anwiba.commons.injection.impl.ResolveableForecaster;
+import net.anwiba.commons.injection.impl.ValueInjectionAnalyser;
 import net.anwiba.commons.injection.utilities.IValueHolder;
 import net.anwiba.commons.injection.utilities.ListValueHolder;
 import net.anwiba.commons.injection.utilities.SingleValueHolder;
@@ -38,6 +44,7 @@ import net.anwiba.commons.reflection.CreationException;
 
 public class InjectionValueProviderBuilder implements IInjectionValueProviderBuilder {
 
+  private final IBindingFactory bindingFactory = new BindingFactory();
   private final IValueInjectionAnalyser analyser = new ValueInjectionAnalyser();
   @SuppressWarnings("rawtypes")
   private final Map<IBinding, IValueHolder> services = new HashMap<>();
@@ -47,69 +54,32 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
   private final Map<IBinding, IBinding> links = new HashMap<>();
 
   private final IInjectionValueProvider valueProvider;
+  private final IScope scope;
 
-  public InjectionValueProviderBuilder() {
-    this(new DefaultInjectionValueProvider());
+  public InjectionValueProviderBuilder(final IScope scope) {
+    this(scope, new DefaultInjectionValueProvider());
   }
 
-  public InjectionValueProviderBuilder(final IInjectionValueProvider valueProvider) {
+  public InjectionValueProviderBuilder(final IScope scope, final IInjectionValueProvider valueProvider) {
+    this.scope = scope;
     this.valueProvider = valueProvider;
   }
 
-  <T> T get(final Class<T> clazz) {
-    return get(binding(clazz));
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  <T> T get(final IBinding<T> binding) {
-    if (this.results.containsKey(binding)) {
-      throw new IllegalArgumentException();
-    }
-    if (this.links.containsKey(binding)) {
-      return (T) get(this.links.get(binding));
-    }
-    if (!this.services.containsKey(binding)) {
-      return this.valueProvider.get(binding);
-    }
-    final IValueHolder valueHolder = this.services.get(binding);
-    if (!(valueHolder instanceof SingleValueHolder)) {
-      throw new IllegalArgumentException();
-    }
-    return (T) ((SingleValueHolder) valueHolder).getValue();
-  }
-
-  <T> Iterable<T> getAll(final Class<T> clazz) {
-    return getAll(binding(clazz));
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  <T> Iterable<T> getAll(final IBinding<T> binding) {
-    if (this.results.containsKey(binding)) {
-      throw new IllegalArgumentException();
-    }
-    if (this.links.containsKey(binding)) {
-      return getAll(this.links.get(binding));
-    }
-    if (!this.services.containsKey(binding)) {
-      return this.valueProvider.getAll(binding);
-    }
-    final IValueHolder valueHolder = this.services.get(binding);
-    if (!(valueHolder instanceof ListValueHolder)) {
-      throw new IllegalArgumentException();
-    }
-    final List<T> values = ((ListValueHolder) valueHolder).getValue().stream().map(o -> (T) o).collect(
-        Collectors.toList());
-    values.addAll(this.valueProvider.getAll(binding));
-    return values;
-  }
-
   private <T> IBinding<T> binding(final Class<T> clazz) {
-    return new ClassBinding<>(clazz);
+    return this.bindingFactory.create(clazz, null);
   }
 
   @Override
   public <T, S extends T> IInjectionValueProviderBuilder set(final Class<T> clazz, final S service) {
     return set(binding(clazz), service);
+  }
+
+  @Override
+  public <T> IInjectionValueProviderBuilder set(final Class<T> clazz) {
+    if (clazz.isInterface()) {
+      throw new IllegalArgumentException();
+    }
+    return set(clazz, clazz);
   }
 
   @Override
@@ -123,13 +93,21 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
   }
 
   @Override
-  public <T> IInjectionValueProviderBuilder link(final Class<T> clazz, final Class<? extends T> link) {
+  public <T> IInjectionValueProviderBuilder link(final Class<? extends T> clazz, final Class<T> link) {
     return link(binding(clazz), binding(link));
   }
 
   @Override
   public <T> IInjectionValueProviderBuilder add(final Class<T> clazz, final IInjectingFactory<T> objectFactory) {
     return add(binding(clazz), objectFactory);
+  }
+
+  @Override
+  public <T> IInjectionValueProviderBuilder add(final Class<T> clazz) {
+    if (clazz.isInterface()) {
+      throw new IllegalArgumentException();
+    }
+    return add(clazz, clazz);
   }
 
   @Override
@@ -143,7 +121,7 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
   }
 
   @Override
-  public <T> IInjectionValueProviderBuilder link(final IBinding<T> binding, final IBinding<? extends T> link) {
+  public <T> IInjectionValueProviderBuilder link(final IBinding<? extends T> binding, final IBinding<T> link) {
     if (!this.results.containsKey(binding)
         && !this.services.containsKey(binding)
         && !this.valueProvider.contains(binding)) {
@@ -163,13 +141,32 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
   }
 
   private <T> void checkSingleValue(final IBinding<T> binding) {
-    if (this.results.containsKey(binding)
-        || this.services.containsKey(binding)
-        || this.valueProvider.contains(binding)) {
-      throw new IllegalArgumentException();
+    if (this.results.containsKey(binding) || this.services.containsKey(binding)) {
+      throw new IllegalArgumentException(
+          "Scope: '" //$NON-NLS-1$
+              + this.scope
+              + "', double registration of single value '" //$NON-NLS-1$
+              + binding.getBoundedClass().getName()
+              + "'"); //$NON-NLS-1$
     }
     if (this.links.containsKey(binding)) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(
+          "Scope: '" //$NON-NLS-1$
+              + this.scope
+              + "', double registration of single value '" //$NON-NLS-1$
+              + binding.getBoundedClass().getName()
+              + "'"); //$NON-NLS-1$
+    }
+
+    if (this.valueProvider.contains(binding)) {
+      if (this.valueProvider.getAll(binding).size() > 1) {
+        throw new IllegalArgumentException(
+            "Scope: '" //$NON-NLS-1$
+                + this.scope
+                + "', double registration of single value '" //$NON-NLS-1$
+                + binding.getBoundedClass().getName()
+                + "', can't overide list values"); //$NON-NLS-1$
+      }
     }
   }
 
@@ -250,75 +247,48 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
     return this;
   }
 
-  private boolean isResolveable(final IInjektionAnalyserResult analyserResult) {
-    if (analyserResult.isIndependent()) {
-      return true;
-    }
-    for (@SuppressWarnings("rawtypes")
-    final IBinding binding : analyserResult.getTypes()) {
-      if (!this.services.containsKey(binding) && !this.valueProvider.contains(binding)) {
-        if (this.results.containsKey(binding)) {
-          return false;
-        }
-        if (analyserResult.isNullable(binding)) {
-          continue;
-        }
-        if (analyserResult.isIterable(binding) && analyserResult.isEmptiable(binding)) {
-          continue;
-        }
-        return false;
-      }
-      if (!this.results.containsKey(binding)) {
-        continue;
-      }
-      if (analyserResult.isIterable(binding)) {
-        return false;
-      }
-      throw new IllegalStateException(
-          "Found listvalue of type '" //$NON-NLS-1$
-              + binding
-              + "' for singlevalue member of object '" //$NON-NLS-1$
-              + analyserResult.getType()
-              + "'"); //$NON-NLS-1$
-    }
-    return true;
-  }
-
   @SuppressWarnings("nls")
   @Override
   public IInjectionValueProvider build() throws CreationException {
     final InjektingObjectFactory factory = InjektingObjectFactory.create(this.valueProvider, this.services, this.links);
+    final IResolveableForecaster forecaster = new ResolveableForecaster(
+        this.valueProvider,
+        this.services,
+        this.links,
+        this.analyser,
+        this.results);
+
     int numberOfResults = 0;
     while (!this.results.isEmpty() && numberOfResults != this.results.size()) {
       @SuppressWarnings("rawtypes")
       final Set<IBinding> keySet = new HashSet<>(this.results.keySet());
       numberOfResults = this.results.size();
       for (@SuppressWarnings("rawtypes")
-      final IBinding clazz : keySet) {
-        final IValueHolder valueHolder = this.results.get(clazz);
+      final IBinding binding : keySet) {
+        final IValueHolder valueHolder = this.results.get(binding);
         if (valueHolder instanceof SingleValueHolder) {
           final IInjektionAnalyserResult result = (IInjektionAnalyserResult) ((SingleValueHolder) valueHolder)
               .getValue();
-          if (isResolveable(result)) {
+          if (forecaster.isResolveable(result)) {
             final Object object = factory.create(result);
-            this.services.put(clazz, new SingleValueHolder(object));
-            this.results.remove(clazz);
+            this.services.put(binding, new SingleValueHolder(object));
+            this.results.remove(binding);
           }
           continue;
         }
         if (valueHolder instanceof ListValueHolder) {
           final List<Object> analyserResults = ((ListValueHolder) valueHolder).getValue();
-          if (!this.services.containsKey(clazz)) {
-            this.services.put(clazz, new ListValueHolder());
+          if (!this.services.containsKey(binding)) {
+            this.services.put(binding, new ListValueHolder());
           }
           for (final Object resultObject : analyserResults) {
             final IInjektionAnalyserResult result = (IInjektionAnalyserResult) resultObject;
-            if (isResolveable(result)) {
+            if (forecaster.isResolveable(result)) {
               final Object object = factory.create(result);
-              ((ListValueHolder) this.services.get(clazz)).add(object);
+              ((ListValueHolder) this.services.get(binding)).add(object);
               ((ListValueHolder) valueHolder).remove(result);
               if (((ListValueHolder) valueHolder).isEmty()) {
-                this.results.remove(clazz);
+                this.results.remove(binding);
               }
             }
           }
@@ -327,48 +297,86 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
       }
     }
     if (!this.results.isEmpty()) {
+      final MissingBindingStringFactory stringFactory = new MissingBindingStringFactory(
+          forecaster,
+          this.results,
+          this.services,
+          this.links,
+          this.valueProvider);
       final Optional<String> classes = this.results
           .keySet()
           .stream()
           .filter(v -> v != null)
-          .map(v -> createNotResolveMessage(v))
+          .map(v -> stringFactory.create(v))
           .sorted()
           .reduce((i, v) -> i == null ? v : i + "\n" + v);
-      throw new CreationException("Couldn't create objects for '" + classes.orElse("---") + "'");
+      throw new CreationException(
+          "Scope: '" + this.scope + "', couldn't create objects for '" + classes.orElse("---") + "'");
     }
     return new InjectionValueProvider(this.valueProvider, new HashMap<>(this.services), new HashMap<>(this.links));
   }
 
-  @SuppressWarnings("nls")
-  private String createNotResolveMessage(@SuppressWarnings("rawtypes") final IBinding binding) {
-    final IValueHolder valueHolder = this.results.get(binding);
-    final StringBuilder builder = new StringBuilder();
-    builder.append(binding);
-    builder.append(" missing (");
-    if (valueHolder instanceof SingleValueHolder) {
-      final IInjektionAnalyserResult result = (IInjektionAnalyserResult) ((SingleValueHolder) valueHolder).getValue();
-      if (!isResolveable(result)) {
-        result.getTypes().forEach(b -> {
-          builder.append(b);
-          builder.append(" ");
-        });
+  @SuppressWarnings("rawtypes")
+  public static class MissingBindingStringFactory {
+
+    private final Map<IBinding, IValueHolder> results;
+    private final Map<IBinding, IValueHolder> services;
+    private final Map<IBinding, IBinding> links;
+    private final IInjectionValueProvider valueProvider;
+    private final IResolveableForecaster forecaster;
+
+    public MissingBindingStringFactory(
+        final IResolveableForecaster forecaster,
+        final Map<IBinding, IValueHolder> results,
+        final Map<IBinding, IValueHolder> services,
+        final Map<IBinding, IBinding> links,
+        final IInjectionValueProvider valueProvider) {
+      this.forecaster = forecaster;
+      this.results = results;
+      this.services = services;
+      this.links = links;
+      this.valueProvider = valueProvider;
+    }
+
+    @SuppressWarnings({ "nls" })
+    public String create(final IBinding binding) {
+      final IValueHolder valueHolder = this.results.get(binding);
+      final StringBuilder builder = new StringBuilder();
+      builder.append(binding);
+      builder.append(" missing (");
+      if (valueHolder instanceof SingleValueHolder) {
+        final IInjektionAnalyserResult result = (IInjektionAnalyserResult) ((SingleValueHolder) valueHolder).getValue();
+        addIfMissed(builder, result);
+        builder.append(")");
+        return builder.toString();
+      }
+      if (valueHolder instanceof ListValueHolder) {
+        final List<Object> analyserResults = ((ListValueHolder) valueHolder).getValue();
+        for (final Object resultObject : analyserResults) {
+          final IInjektionAnalyserResult result = (IInjektionAnalyserResult) resultObject;
+          addIfMissed(builder, result);
+        }
       }
       builder.append(")");
       return builder.toString();
     }
-    if (valueHolder instanceof ListValueHolder) {
-      final List<Object> analyserResults = ((ListValueHolder) valueHolder).getValue();
-      for (final Object resultObject : analyserResults) {
-        final IInjektionAnalyserResult result = (IInjektionAnalyserResult) resultObject;
-        if (!isResolveable(result)) {
-          result.getTypes().forEach(b -> {
+
+    private void addIfMissed(final StringBuilder builder, final IInjektionAnalyserResult result) {
+      if (!this.forecaster.isResolveable(result)) {
+        result.getBindings().forEach(b -> {
+          if (!contains(b)) {
             builder.append(b);
-            builder.append(" ");
-          });
-        }
+            builder.append(" "); //$NON-NLS-1$
+          }
+        });
       }
     }
-    builder.append(")");
-    return builder.toString();
+
+    boolean contains(final IBinding binding) {
+      return this.services.containsKey(binding)
+          || (this.links.containsKey(binding) && this.services.containsKey(this.links.get(binding)))
+          || this.valueProvider.contains(binding);
+    }
+
   }
 }

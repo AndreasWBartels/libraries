@@ -34,6 +34,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.message.Message;
@@ -197,7 +198,7 @@ public class ListChooserDialog<T> extends MessageDialog implements IValueDialog<
               MessageType.ERROR));
       setOkEnabled(false);
       return false;
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       return false;
     } catch (final InvocationTargetException exception) {
       setOkEnabled(false);

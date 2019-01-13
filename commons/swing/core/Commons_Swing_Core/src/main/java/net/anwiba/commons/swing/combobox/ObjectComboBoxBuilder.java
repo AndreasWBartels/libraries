@@ -112,8 +112,7 @@ public class ObjectComboBoxBuilder<T> {
   }
 
   public ObjectComboBox<T> build() {
-    this.model = Optional.ofNullable(this.model).orElseGet(
-        () -> new ObjectComboBoxModel<>(new ArrayList<T>()));
+    this.model = Optional.ofNullable(this.model).orElseGet(() -> new ObjectComboBoxModel<>(new ArrayList<T>()));
     this.model.setSelectedItem(null);
     return new ObjectComboBox<>(this.configurationBuilder.build(), this.model);
   }

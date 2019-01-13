@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.lang.primitive.IBooleanProvider;
 
 public interface IBooleanDistributor extends IBooleanProvider, IObjectChangedNotifier {
 

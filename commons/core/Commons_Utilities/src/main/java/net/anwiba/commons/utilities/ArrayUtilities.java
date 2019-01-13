@@ -199,19 +199,11 @@ public class ArrayUtilities {
     return false;
   }
 
-  public static <T> boolean contains(final T[] objects, final T value) {
-    for (final T object : objects) {
-      if (object.equals(value)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public static <I, O, E extends Exception> O[] convert(
       final IConverter<I, O, E> converter,
       final I[] values,
-      final Class<O> clazz) throws E {
+      final Class<O> clazz)
+      throws E {
     final List<O> list = new ArrayList<>();
     for (final I value : values) {
       final O result = converter.convert(value);
@@ -396,10 +388,10 @@ public class ArrayUtilities {
     return (T[]) Array.newInstance(clazz, size);
   }
 
-  public static <T> boolean containts(final T[] array, final T object) {
+  public static <T> boolean contains(final T[] array, final T object) {
     for (final T item : array) {
       if (ObjectUtilities.equals(item, object)) {
-        return false;
+        return true;
       }
     }
     return false;

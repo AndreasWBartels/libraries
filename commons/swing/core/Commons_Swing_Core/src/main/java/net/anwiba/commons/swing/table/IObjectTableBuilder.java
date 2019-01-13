@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.swing.table;
 
+import java.awt.Image;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,11 +44,11 @@ public interface IObjectTableBuilder<T> {
 
   IObjectTableBuilder<T> addTextFieldActionFactory(ITableTextFieldActionFactory<T> factory);
 
-  IObjectTableBuilder<T> addActionFactory(ITableActionFactory<T> factory);
-
   IObjectTableBuilder<T> setPreferredVisibleRowCount(int preferredVisibleRowCount);
 
-  IObjectTableBuilder<T> setMouseListenerFactory(IMouseListenerFactory<T> mouseListenerFactory);
+  IObjectTableBuilder<T> setHeaderMouseListenerFactory(IMouseListenerFactory<T> mouseListenerFactory);
+
+  IObjectTableBuilder<T> setTableMouseListenerFactory(IMouseListenerFactory<T> mouseListenerFactory);
 
   IObjectTableBuilder<T> addAddObjectAction(IColumnObjectFactory<T, T, RuntimeException> factory);
 
@@ -58,6 +59,8 @@ public interface IObjectTableBuilder<T> {
   IObjectTableBuilder<T> addMoveObjectUpAction();
 
   IObjectTableBuilder<T> addMoveObjectDownAction();
+
+  IObjectTableBuilder<T> addActionFactory(ITableActionFactory<T> factory);
 
   IObjectTableBuilder<T> addActionFactory(
       ITableActionFactory<T> factory,
@@ -84,6 +87,8 @@ public interface IObjectTableBuilder<T> {
 
   IObjectTableBuilder<T> addIntegerColumn(String title, IFunction<T, Integer, RuntimeException> provider, int size);
 
+  IObjectTableBuilder<T> addDoubleColumn(String title, IFunction<T, Double, RuntimeException> provider, int size);
+
   IObjectTableBuilder<T> addSortableStringColumn(
       String title,
       IFunction<T, String, RuntimeException> provider,
@@ -99,7 +104,7 @@ public interface IObjectTableBuilder<T> {
       IFunction<T, Duration, RuntimeException> provider,
       int size);
 
-  IObjectTableBuilder<T> addSortableDoubleConfiguration(
+  IObjectTableBuilder<T> addSortableDoubleColumn(
       String title,
       IFunction<T, Double, RuntimeException> provider,
       int size);
@@ -128,5 +133,9 @@ public interface IObjectTableBuilder<T> {
       IAggregator<T, Integer, T, RuntimeException> aggregator,
       JComponent component,
       int size);
+
+  IObjectTableBuilder<T> addObjectColumn(String title, IFunction<T, Object, RuntimeException> provider, int size);
+
+  IObjectTableBuilder<T> addImageColumn(String title, IFunction<T, Image, RuntimeException> provider, int size);
 
 }

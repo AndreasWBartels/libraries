@@ -40,6 +40,7 @@ import net.anwiba.commons.reference.PathResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
 import net.anwiba.commons.reference.UriResourceReference;
 import net.anwiba.commons.reference.UrlResourceReference;
+import net.anwiba.commons.utilities.io.url.IAuthentication;
 import net.anwiba.commons.utilities.io.url.IUrl;
 
 @SuppressWarnings("nls")
@@ -132,7 +133,7 @@ public class ResourceDescription implements IResourceDescription {
               throws RuntimeException {
             return new MemoryConnectionDescription(
                 memoryResourceReference,
-                memoryResourceReference.getMimeType(),
+                memoryResourceReference.getContentType(),
                 memoryResourceReference.getTimeStamp());
           }
 
@@ -157,6 +158,11 @@ public class ResourceDescription implements IResourceDescription {
   @Override
   public String getUrl() {
     return this.connectionDescription.getUrl();
+  }
+
+  @Override
+  public IResourceDescription adapt(final IAuthentication authentication) {
+    return new ResourceDescription(this.connectionDescription.adapt(authentication));
   }
 
 }

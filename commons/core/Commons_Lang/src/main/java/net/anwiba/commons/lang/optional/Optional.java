@@ -33,12 +33,12 @@ import net.anwiba.commons.lang.functional.ISupplier;
 
 public class Optional<T, E extends Exception> {
 
-  static class Filled<T, E extends Exception> implements IOptional<T, E> {
+  static class Value<T, E extends Exception> implements IOptional<T, E> {
 
     private final Class<E> exceptionClass;
     private final T value;
 
-    public Filled(final Class<E> exceptionClass, final T value) {
+    public Value(final Class<E> exceptionClass, final T value) {
       this.exceptionClass = Objects.requireNonNull(exceptionClass);
       this.value = Objects.requireNonNull(value);
     }
@@ -53,9 +53,9 @@ public class Optional<T, E extends Exception> {
       if (object == this) {
         return true;
       }
-      if (object instanceof Filled) {
+      if (object instanceof Value) {
         @SuppressWarnings("rawtypes")
-        final Filled other = (Filled) object;
+        final Value other = (Value) object;
         return Objects.equals(this.value, other.value);
       }
       return false;
@@ -112,7 +112,7 @@ public class Optional<T, E extends Exception> {
         consumer.consume(this.value);
         return this;
       } catch (final Exception exception) {
-        return Optional.failed(this.exceptionClass, exception, getCause());
+        return Optional.failed(this.exceptionClass, exception, null);
       }
     }
 
@@ -121,7 +121,7 @@ public class Optional<T, E extends Exception> {
       try {
         return of(this.exceptionClass, converter.convert(this.value));
       } catch (final Exception exception) {
-        return Optional.failed(this.exceptionClass, exception, getCause());
+        return Optional.failed(this.exceptionClass, exception, null);
       }
     }
 
@@ -133,7 +133,7 @@ public class Optional<T, E extends Exception> {
         }
         return empty(this.exceptionClass);
       } catch (final Exception exception) {
-        return Optional.failed(this.exceptionClass, exception, getCause());
+        return Optional.failed(this.exceptionClass, exception, null);
       }
     }
 
@@ -159,6 +159,11 @@ public class Optional<T, E extends Exception> {
     @Override
     public T getOr(final ISupplier<T, E> supplier) throws E {
       return this.value;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return false;
     }
 
     @Override
@@ -277,6 +282,11 @@ public class Optional<T, E extends Exception> {
     }
 
     @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
     public boolean isAccepted() {
       return false;
     }
@@ -321,7 +331,16 @@ public class Optional<T, E extends Exception> {
         block.execute();
         return this;
       } catch (final Exception exception) {
-        return Optional.failed(this.exceptionClass, exception, getCause());
+        return Optional.failed(this.exceptionClass, exception, null);
+      }
+    }
+
+    @Override
+    public IOptional<T, E> or(final ISupplier<T, E> supplier) {
+      try {
+        return of(this.exceptionClass, supplier.supply());
+      } catch (final Exception exception) {
+        return Optional.failed(this.exceptionClass, exception, null);
       }
     }
 
@@ -336,15 +355,6 @@ public class Optional<T, E extends Exception> {
         return true;
       }
       return object instanceof Empty;
-    }
-
-    @Override
-    public IOptional<T, E> or(final ISupplier<T, E> supplier) {
-      try {
-        return of(this.exceptionClass, supplier.supply());
-      } catch (final Exception exception) {
-        return Optional.failed(this.exceptionClass, exception, getCause());
-      }
     }
 
     @Override
@@ -408,6 +418,11 @@ public class Optional<T, E extends Exception> {
     }
 
     @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
     public boolean isAccepted() {
       return false;
     }
@@ -434,7 +449,7 @@ public class Optional<T, E extends Exception> {
   }
 
   public static <T> IOptional<T, RuntimeException> empty() {
-    return of(RuntimeException.class, null);
+    return empty(RuntimeException.class);
   }
 
   public static <T, E extends Exception> IOptional<T, E> empty(final Class<E> exceptionClass) {
@@ -453,7 +468,7 @@ public class Optional<T, E extends Exception> {
     if (value == null) {
       return empty(exceptionClass);
     }
-    return new Filled<>(exceptionClass, value);
+    return new Value<>(exceptionClass, value);
   }
 
   public static <I, O, E extends Exception> IOptional<O, E> bind(
@@ -471,7 +486,9 @@ public class Optional<T, E extends Exception> {
       final Class<E> exceptionClass,
       final Exception exception,
       final E cause) {
-    exception.addSuppressed(cause);
+    if (cause != null) {
+      exception.addSuppressed(cause);
+    }
     if (exceptionClass.isInstance(exception)) {
       return new Failed<>(exceptionClass, (E) exception);
     }

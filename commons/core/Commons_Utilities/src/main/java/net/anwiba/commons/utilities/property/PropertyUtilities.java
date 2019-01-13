@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -28,21 +28,19 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.Logging;
 
 public class PropertyUtilities {
 
-  private static ILogger logger = Logging.getLogger("PropertyUtilities.class"); //$NON-NLS-1$
+  private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
+      .getLogger(PropertyUtilities.class);
 
   public static Properties getProperties(final String propertiesFile) {
 
     final Properties properties = new Properties(System.getProperties());
 
     if (propertiesFile != null) {
-      try (InputStream inputstream = new FileInputStream(propertiesFile);) {
+      try (InputStream inputstream = new FileInputStream(propertiesFile)) {
         properties.load(inputstream);
-        inputstream.close();
         System.setProperties(properties);
       } catch (final FileNotFoundException exception) {
         logger.log(ILevel.WARNING, propertiesFile + " ist nicht vorhanden"); //$NON-NLS-1$

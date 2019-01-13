@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 
 public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOException>
     extends
@@ -42,7 +45,16 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
       final Class<R> errorResponseClass,
       final Map<String, Object> injectionValues,
       final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory) {
-    super(clazz, errorResponseClass, injectionValues);
+    this(clazz, errorResponseClass, injectionValues, Collections.emptyList(), exceptionFactory);
+  }
+
+  public AbstractJsonObjectsUnmarshaller(
+      final Class<T> clazz,
+      final Class<R> errorResponseClass,
+      final Map<String, Object> injectionValues,
+      final Collection<DeserializationProblemHandler> problemHandlers,
+      final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory) {
+    super(clazz, errorResponseClass, injectionValues, problemHandlers);
     this.clazz = clazz;
     this.injectionValues.putAll(injectionValues);
     this.exceptionFactory = exceptionFactory;

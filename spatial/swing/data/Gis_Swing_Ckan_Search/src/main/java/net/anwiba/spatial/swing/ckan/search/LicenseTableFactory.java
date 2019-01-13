@@ -35,6 +35,7 @@ import net.anwiba.commons.http.IObjectRequestExecutor;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.IResultProducer;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanModel;
@@ -112,7 +113,7 @@ public final class LicenseTableFactory {
           }
           return licenses;
         }).launch(parentComponent);
-      } catch (final InterruptedException exception1) {
+      } catch (final CanceledException exception1) {
         return null;
       } catch (final IOException exception) {
         logger.log(ILevel.DEBUG, exception.getMessage(), exception);
@@ -146,7 +147,7 @@ public final class LicenseTableFactory {
   }
 
   private List<License> getValues(final ICanceler canceler, final IHttpConnectionDescription description)
-      throws InterruptedException,
+      throws CanceledException,
       IOException {
     final IResultProducer<LicenseListResultResponse> responseProducer = (
         c,
@@ -175,7 +176,7 @@ public final class LicenseTableFactory {
       return response.isSuccess() ? Arrays.asList(response.getResult()) : Collections.emptyList();
     } catch (SocketException | InterruptedIOException exception) {
       if (canceler.isCanceled()) {
-        throw new InterruptedException();
+        throw new CanceledException();
       }
       throw exception;
     }

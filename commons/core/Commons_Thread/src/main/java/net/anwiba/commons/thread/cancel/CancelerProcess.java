@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.thread.cancel;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.process.IProcess;
 import net.anwiba.commons.thread.process.IProcessIdentfier;
@@ -51,7 +52,7 @@ public final class CancelerProcess implements IProcess {
       final IMessageCollector processMonitor,
       @SuppressWarnings("hiding") final ICanceler canceler,
       final IProcessIdentfier processIdentfier)
-      throws InterruptedException {
+      throws CanceledException {
     this.canceler.cancel();
   }
 

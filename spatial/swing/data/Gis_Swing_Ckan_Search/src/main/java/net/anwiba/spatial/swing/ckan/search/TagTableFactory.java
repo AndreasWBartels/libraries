@@ -39,6 +39,7 @@ import net.anwiba.commons.http.IObjectRequestExecutor;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.IResultProducer;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
@@ -272,7 +273,7 @@ public final class TagTableFactory {
         }
         return tags;
       }).launch(parentComponent);
-    } catch (final InterruptedException exception1) {
+    } catch (final CanceledException exception1) {
       return null;
     } catch (final IOException exception) {
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
@@ -288,7 +289,7 @@ public final class TagTableFactory {
   }
 
   private List<Tag> executeTagListQuery(final ICanceler canceler, final IHttpConnectionDescription description)
-      throws InterruptedException,
+      throws CanceledException,
       IOException {
     final IResultProducer<TagListResultResponse> responseProducer = (
         c,
@@ -313,7 +314,7 @@ public final class TagTableFactory {
       return response.isSuccess() ? Arrays.asList(response.getResult()) : Collections.emptyList();
     } catch (SocketException | InterruptedIOException exception) {
       if (canceler.isCanceled()) {
-        throw new InterruptedException();
+        throw new CanceledException();
       }
       throw exception;
     }
@@ -323,7 +324,7 @@ public final class TagTableFactory {
       final ICanceler canceler,
       final IHttpConnectionDescription description,
       final String string)
-      throws InterruptedException,
+      throws CanceledException,
       IOException {
     final IResultProducer<TagSearchResultResponse> responseProducer = (
         c,
@@ -353,7 +354,7 @@ public final class TagTableFactory {
       return response.isSuccess() ? Arrays.asList(response.getResult().getResults()) : Collections.emptyList();
     } catch (SocketException | InterruptedIOException exception) {
       if (canceler.isCanceled()) {
-        throw new InterruptedException();
+        throw new CanceledException();
       }
       throw exception;
     }

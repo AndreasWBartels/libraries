@@ -13,13 +13,13 @@ package net.anwiba.tools.definition.schema.json.generator.java.ant;
 import java.io.File;
 import java.io.IOException;
 
-import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
 
 public class JsonBeanGeneratorTask extends Task {
 
@@ -81,23 +81,28 @@ public class JsonBeanGeneratorTask extends Task {
       throw new BuildException("missing packge name"); //$NON-NLS-1$
     }
     try {
-      final JsonBeanGeneratorExecutor excecutor = new JsonBeanGeneratorExecutor(this.source, this.pakkage, this.comment, new IOutput() {
+      final JsonBeanGeneratorExecutor excecutor = new JsonBeanGeneratorExecutor(
+          this.source,
+          this.pakkage,
+          this.comment,
+          new IOutput() {
 
-        @Override
-        public void warn(final String message) {
-          getProject().log(message, Project.MSG_WARN);
-        }
+            @Override
+            public void warn(final String message) {
+              getProject().log(message, Project.MSG_WARN);
+            }
 
-        @Override
-        public void info(final String message) {
-          getProject().log(message, Project.MSG_INFO);
-        }
+            @Override
+            public void info(final String message) {
+              getProject().log(message, Project.MSG_INFO);
+            }
 
-        @Override
-        public void error(final String message, final Throwable throwable) {
-          getProject().log(message, throwable, Project.MSG_ERR);
-        }
-      });
+            @Override
+            public void error(final String message, final Throwable throwable) {
+              getProject().log(message, throwable, Project.MSG_ERR);
+              throwable.printStackTrace();
+            }
+          });
       excecutor.excecute(this.destination);
     } catch (final Throwable exception) {
       exception.printStackTrace();

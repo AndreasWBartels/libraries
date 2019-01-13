@@ -26,7 +26,6 @@ import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -35,7 +34,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 
-import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionListener;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.SelectionEvent;
@@ -43,10 +41,7 @@ import net.anwiba.commons.swing.process.action.ProcessMessagePropertiesAction;
 import net.anwiba.commons.swing.process.action.ProcessMessageRemoveAction;
 import net.anwiba.commons.swing.process.action.ProcessMessageRemoveAllAction;
 import net.anwiba.commons.swing.table.ColumnConfiguration;
-import net.anwiba.commons.swing.table.IMouseListenerFactory;
 import net.anwiba.commons.swing.table.IObjectTableConfiguration;
-import net.anwiba.commons.swing.table.IObjectTableModel;
-import net.anwiba.commons.swing.table.ISelectionIndexModel;
 import net.anwiba.commons.swing.table.ObjectTable;
 import net.anwiba.commons.swing.table.ObjectTableConfigurationBuilder;
 import net.anwiba.commons.swing.utilities.ContainerUtilities;
@@ -130,20 +125,14 @@ public class ProcessMessageTablePanel extends JPanel {
     final ObjectTableConfigurationBuilder<IProcessMessageContext> configurationBuilder = new ObjectTableConfigurationBuilder<>();
     configurationBuilder
         .addColumnConfiguration(new ColumnConfiguration(ProcessMessages.TYPE, cellRenderer, 20, true, null));
-    configurationBuilder.addColumnConfiguration(new ColumnConfiguration(ProcessMessages.DATE, cellRenderer, 100, true, null));
+    configurationBuilder
+        .addColumnConfiguration(new ColumnConfiguration(ProcessMessages.DATE, cellRenderer, 100, true, null));
     configurationBuilder
         .addColumnConfiguration(new ColumnConfiguration(ProcessMessages.PROCESS, cellRenderer, 100, true, null));
     configurationBuilder
         .addColumnConfiguration(new ColumnConfiguration(ProcessMessages.MESSAGE, cellRenderer, 150, true, null));
-    configurationBuilder.setMouseListenerFactory(new IMouseListenerFactory<IProcessMessageContext>() {
-
-      @Override
-      public MouseListener create(
-          final IObjectTableModel<IProcessMessageContext> tableModel,
-          final ISelectionIndexModel<IProcessMessageContext> selectionIndexModel,
-          final ISelectionModel<IProcessMessageContext> selectionModel,
-          final IBooleanDistributor sortStateModel) {
-        return new MouseAdapter() {
+    configurationBuilder.setTableMouseListenerFactory(
+        (tableModel, selectionIndexModel, selectionModel, sortStateModel) -> new MouseAdapter() {
           @Override
           public void mouseClicked(final MouseEvent event) {
             if (event.getClickCount() == 2) {
@@ -155,9 +144,7 @@ public class ProcessMessageTablePanel extends JPanel {
               }
             }
           }
-        };
-      }
-    });
+        });
     return configurationBuilder.build();
   }
 }

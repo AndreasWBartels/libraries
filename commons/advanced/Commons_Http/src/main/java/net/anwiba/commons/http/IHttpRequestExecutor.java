@@ -23,11 +23,12 @@ package net.anwiba.commons.http;
 
 import java.io.IOException;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public interface IHttpRequestExecutor extends AutoCloseable {
 
-  IResponse execute(ICanceler cancelable, IRequest request) throws InterruptedException, IOException;
+  IResponse execute(ICanceler cancelable, IRequest request) throws CanceledException, IOException;
 
   @Override
   void close() throws IOException;

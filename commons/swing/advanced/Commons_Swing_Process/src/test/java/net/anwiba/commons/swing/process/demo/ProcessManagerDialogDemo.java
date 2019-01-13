@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -25,6 +25,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.runner.RunWith;
+
+import de.jdemo.annotation.Demo;
+import de.jdemo.extensions.SwingDemoCase;
+import de.jdemo.junit.DemoAsTestRunner;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.message.Message;
@@ -42,12 +48,6 @@ import net.anwiba.commons.thread.process.ProcessSequencer;
 import net.anwiba.commons.thread.queue.IWorkQueue;
 import net.anwiba.commons.thread.queue.IWorkQueueFactory;
 import net.anwiba.commons.thread.queue.WorkQueue;
-
-import org.junit.runner.RunWith;
-
-import de.jdemo.annotation.Demo;
-import de.jdemo.extensions.SwingDemoCase;
-import de.jdemo.junit.DemoAsTestRunner;
 
 @RunWith(DemoAsTestRunner.class)
 public class ProcessManagerDialogDemo extends SwingDemoCase {
@@ -91,8 +91,11 @@ public class ProcessManagerDialogDemo extends SwingDemoCase {
     }
 
     @Override
-    public void execute(final IMessageCollector processMonitor, final ICanceler canceler, final IProcessIdentfier processIdentfier)
-        throws InterruptedException {
+    public void execute(
+        final IMessageCollector processMonitor,
+        final ICanceler canceler,
+        final IProcessIdentfier processIdentfier)
+        throws CanceledException {
       processMonitor.setNote("started"); //$NON-NLS-1$
       for (int i = 0; i < 10; i++) {
         canceler.check();
@@ -135,16 +138,18 @@ public class ProcessManagerDialogDemo extends SwingDemoCase {
     });
     final ProcessContextModelListModel processContextModelListModel = new ProcessContextModelListModel();
     processManager.addProcessListener(new ProcessListener(processContextModelListModel));
-    processContextModelListModel.addMessage(DemoProcessMessageContextFactory.createProsessMessageContext(
-        ProcessSequencer.getNextId(),
-        "Test Process 0", //$NON-NLS-1$
-        "Warning test 0", //$NON-NLS-1$
-        MessageType.WARNING));
-    processContextModelListModel.addMessage(DemoProcessMessageContextFactory.createProsessMessageContext(
-        ProcessSequencer.getNextId(),
-        "Test Process 1", //$NON-NLS-1$
-        "Warning test 1", //$NON-NLS-1$
-        MessageType.WARNING));
+    processContextModelListModel.addMessage(
+        DemoProcessMessageContextFactory.createProsessMessageContext(
+            ProcessSequencer.getNextId(),
+            "Test Process 0", //$NON-NLS-1$
+            "Warning test 0", //$NON-NLS-1$
+            MessageType.WARNING));
+    processContextModelListModel.addMessage(
+        DemoProcessMessageContextFactory.createProsessMessageContext(
+            ProcessSequencer.getNextId(),
+            "Test Process 1", //$NON-NLS-1$
+            "Warning test 1", //$NON-NLS-1$
+            MessageType.WARNING));
     final ProcessManagerDialog window = new ProcessManagerDialog(
         createFrame(),
         processManager,

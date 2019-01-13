@@ -100,7 +100,7 @@ public class JTreeUtilities {
       final DefaultMutableTreeNode root,
       final DefaultMutableTreeNode node,
       final int index) {
-    GuiUtilities.invokeLater(() -> internalInsertNode(model, tree, root, node, index));
+    internalInsertNode(model, tree, root, node, index);
   }
 
   static void internalInsertNode(
@@ -110,7 +110,11 @@ public class JTreeUtilities {
       final DefaultMutableTreeNode node,
       final int index) {
     synchronized (tree) {
-      model.insertNodeInto(node, root, index);
+      if (index >= root.getChildCount()) {
+        model.insertNodeInto(node, root, index);
+      } else {
+        model.insertNodeInto(node, root, index);
+      }
       selectPath(tree, new TreePath(node.getPath()));
     }
   }

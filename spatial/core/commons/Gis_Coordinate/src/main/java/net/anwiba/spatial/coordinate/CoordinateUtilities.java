@@ -272,8 +272,9 @@ public class CoordinateUtilities {
       final double tolerance) {
     final double abs = abs(calculateDistance(coordinate, otherCoordinate));
     if (Double.isNaN(tolerance) || tolerance == 0) {
-      final double cLog10 = max(log10(coordinate.getXValue()), log10(coordinate.getYValue()));
-      return cLog10 - log10(abs) > 12;
+      final double cLog10 = max(log10(abs(coordinate.getXValue())), log10(abs(coordinate.getYValue())));
+      final double log10 = log10(abs);
+      return cLog10 - log10 > 12;
     }
     return tolerance > abs || (tolerance == 0 && abs == 0);
   }
@@ -318,6 +319,9 @@ public class CoordinateUtilities {
       final ICoordinate c1,
       final ICoordinate coordinate,
       final double tolerance) {
+    if (!EnvelopeUtilities.createEnvelope(EnvelopeUtilities.createEnvelope(c0, c1), tolerance).interact(coordinate)) {
+      return false;
+    } ;
     if (interact(coordinate, c0, tolerance)) {
       return true;
     }

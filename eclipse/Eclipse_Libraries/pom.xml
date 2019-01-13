@@ -13,7 +13,7 @@
   <parent>
     <groupId>net.anwiba.eclipse</groupId>
     <artifactId>anwiba-eclipse-maven-default</artifactId>
-    <version>1.0.154</version>
+    <version>1.0.180</version>
   </parent>
 
   <scm>
@@ -105,6 +105,13 @@
                   <version>${net.anwiba.commons.version}</version>
                   <type>jar</type>
                   <destFileName>anwiba-commons-utilities-${net.anwiba.commons.version}.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons.tools</groupId>
+                  <artifactId>anwiba-tools-graphml</artifactId>
+                  <version>${net.anwiba.commons.version}</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-tools-graphml-${net.anwiba.commons.version}.jar</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>lib</outputDirectory>

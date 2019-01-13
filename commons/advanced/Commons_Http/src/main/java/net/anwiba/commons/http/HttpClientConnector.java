@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
@@ -60,14 +62,14 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
         logger.log(ILevel.DEBUG, response.getBody());
       }
       return false;
-    } catch (InterruptedException | IOException exception) {
+    } catch (CanceledException | IOException exception) {
       logger.log(ILevel.WARNING, "connect to '" + uri.toString() + "' faild " + exception.getMessage());
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       return false;
     }
   }
 
-  private IResponse response(final URI uri) throws InterruptedException, IOException {
+  private IResponse response(final URI uri) throws CanceledException, IOException {
     final IRequest request = request(uri);
     return requestExecutor().execute(ICanceler.DummyCanceler, request);
   }
@@ -91,12 +93,20 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
     return false;
   }
 
-  @SuppressWarnings({ "nls", "resource" })
   @Override
   public InputStream openInputStream(final URI uri) throws IOException {
+    return openInputStream(uri, s -> true);
+  }
+
+  @SuppressWarnings({ "nls", "resource" })
+  @Override
+  public InputStream openInputStream(final URI uri, final IAcceptor<String> contentTypeAcceptor) throws IOException {
     try {
       final IResponse response = response(uri);
       if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+        if (!contentTypeAcceptor.accept(response.getContentType())) {
+          throw HttpRequestException.create("Unexcepted mime type '" + response.getContentType() + "'", response);
+        }
         return new FilterInputStream(response.getInputStream()) {
 
           @Override
@@ -111,8 +121,8 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
       if (logger.isLoggable(ILevel.DEBUG)) {
         logger.log(ILevel.DEBUG, response.getBody());
       }
-      throw new IOException(response.getStatusText());
-    } catch (InterruptedException | IOException exception) {
+      throw HttpRequestException.create(response.getStatusCode() + " - " + response.getStatusText(), response);
+    } catch (CanceledException | IOException exception) {
       logger.log(ILevel.DEBUG, "connect to '" + uri.toString() + "' faild " + exception.getMessage());
       throw new IOException(exception);
     }
@@ -131,8 +141,21 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
         return response.getContentLength();
       }
       return -1;
-    } catch (InterruptedException | IOException exception) {
+    } catch (CanceledException | IOException exception) {
       return -1;
+    }
+  }
+
+  @Override
+  public String getContentType(final URI uri) throws IOException {
+    try (final IResponse response = response(uri);) {
+      final int statusCode = response.getStatusCode();
+      if (200 <= statusCode && statusCode < 300) {
+        return response.getContentType();
+      }
+      return null;
+    } catch (CanceledException | IOException exception) {
+      return null;
     }
   }
 }

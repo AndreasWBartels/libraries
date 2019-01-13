@@ -28,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.object.IObjectProvider;
 import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
@@ -58,7 +59,7 @@ public abstract class AbstractProgressAction extends AbstractAction {
     }
     try {
       ProgressDialog.show(getOwner(), this.title, configuration.getMessage(), configuration.getProgressTask());
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       // nothing to do
     } catch (final InvocationTargetException exception) {
       ExceptionDialog.show(getOwner(), exception.getCause());

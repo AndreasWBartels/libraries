@@ -36,7 +36,8 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
   private final int selectionMode;
   private final ITableActionConfiguration<T> actionConfiguration;
   private final int preferredVisibleRowCount;
-  private final IMouseListenerFactory<T> mouseListenerFactory;
+  private final IMouseListenerFactory<T> headerMouseListenerFactory;
+  private final IMouseListenerFactory<T> tableMouseListenerFactory;
   private final IKeyListenerFactory<T> keyListenerFactory;
   private final int autoResizeMode;
   private final IStringSubstituter toolTipSubstituter;
@@ -47,7 +48,8 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
       final int preferredVisibleRowCount,
       final IStringSubstituter toolTipSubstituter,
       final List<? extends IColumnConfiguration> columnConfigurations,
-      final IMouseListenerFactory<T> mouseListenerFactory,
+      final IMouseListenerFactory<T> headerMouseListenerFactory,
+      final IMouseListenerFactory<T> tableMouseListenerFactory,
       final IKeyListenerFactory<T> keyListenerFactory,
       final ITableActionConfiguration<T> actionConfiguration) {
     this.autoResizeMode = autoizeMode;
@@ -55,6 +57,7 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
     this.preferredVisibleRowCount = preferredVisibleRowCount;
     this.toolTipSubstituter = toolTipSubstituter;
     this.columnConfigurations = columnConfigurations;
+    this.headerMouseListenerFactory = headerMouseListenerFactory;
     this.keyListenerFactory = keyListenerFactory == null ? new IKeyListenerFactory<T>() {
 
       @Override
@@ -66,7 +69,7 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
         return null;
       }
     } : keyListenerFactory;
-    this.mouseListenerFactory = mouseListenerFactory == null ? new IMouseListenerFactory<T>() {
+    this.tableMouseListenerFactory = tableMouseListenerFactory == null ? new IMouseListenerFactory<T>() {
 
       @Override
       public MouseListener create(
@@ -76,7 +79,7 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
           final IBooleanDistributor sortStateModel) {
         return null;
       }
-    } : mouseListenerFactory;
+    } : tableMouseListenerFactory;
     this.actionConfiguration = actionConfiguration;
   }
 
@@ -130,12 +133,17 @@ public class ObjectTableConfiguration<T> implements IObjectTableConfiguration<T>
   }
 
   @Override
-  public IMouseListenerFactory<T> getMouseListenerFactory() {
-    return this.mouseListenerFactory;
+  public IMouseListenerFactory<T> getTableMouseListenerFactory() {
+    return this.tableMouseListenerFactory;
   }
 
   @Override
   public IKeyListenerFactory<T> getKeyListenerFactory() {
     return this.keyListenerFactory;
+  }
+
+  @Override
+  public IMouseListenerFactory<T> getHeaderMouseListenerFactory() {
+    return this.headerMouseListenerFactory;
   }
 }

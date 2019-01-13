@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
+import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.reference.IStreamConnector;
 
 public final class UrlStreamConnector implements IStreamConnector<URI> {
@@ -45,8 +46,13 @@ public final class UrlStreamConnector implements IStreamConnector<URI> {
   }
 
   @Override
-  public InputStream openInputStream(final URI uri) throws IOException {
+  public InputStream openInputStream(final URI uri, final IAcceptor<String> contentTypeAcceptor) throws IOException {
     return UriUtilities.openInputStream(uri);
+  }
+
+  @Override
+  public InputStream openInputStream(final URI uri) throws IOException {
+    return openInputStream(uri, s -> true);
   }
 
   @Override
@@ -58,4 +64,10 @@ public final class UrlStreamConnector implements IStreamConnector<URI> {
   public long getContentLength(final URI uri) throws IOException {
     return UriUtilities.getContentLength(uri);
   }
+
+  @Override
+  public String getContentType(final URI uri) throws IOException {
+    return UriUtilities.getContentType(uri);
+  }
+
 }

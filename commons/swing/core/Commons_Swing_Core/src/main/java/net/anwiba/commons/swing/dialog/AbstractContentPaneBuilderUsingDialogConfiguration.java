@@ -61,7 +61,8 @@ public abstract class AbstractContentPaneBuilderUsingDialogConfiguration<T> exte
         s -> s,
         isResizeable,
         KeyEvent.KEY_LOCATION_UNKNOWN,
-        new ArrayList<>());
+        new ArrayList<>(),
+        dataState);
     this.preferences = preferences;
     this.dataState = dataState;
     this.model = model;

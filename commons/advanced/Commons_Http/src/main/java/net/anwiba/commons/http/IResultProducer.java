@@ -25,6 +25,7 @@ package net.anwiba.commons.http;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public interface IResultProducer<T> {
@@ -35,6 +36,8 @@ public interface IResultProducer<T> {
       String statusMessage,
       String contentType,
       String contentEncoding,
-      InputStream inputStream) throws IOException, InterruptedException;
+      InputStream inputStream)
+      throws IOException,
+      CanceledException;
 
 }

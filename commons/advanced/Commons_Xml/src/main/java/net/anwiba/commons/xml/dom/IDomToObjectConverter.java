@@ -69,7 +69,7 @@ public interface IDomToObjectConverter<T> {
     if (element == null) {
       return defaultText;
     }
-    return element.getText();
+    return element.getTextTrim();
   }
 
   default String value(final Element element, final String attributeName, final String defaultValue) {
@@ -127,7 +127,8 @@ public interface IDomToObjectConverter<T> {
     return Integer.valueOf(attributeValue);
   }
 
-  default int intValue(final Element element, final String attributeName, final int defaultValue) {
+  default int intValue(final Element element, final String attributeName, final int defaultValue)
+      throws DomConverterException {
     if (element == null) {
       return defaultValue;
     }
@@ -135,10 +136,15 @@ public interface IDomToObjectConverter<T> {
     if (attributeValue == null) {
       return defaultValue;
     }
-    return Integer.valueOf(attributeValue);
+    try {
+      return Integer.valueOf(attributeValue);
+    } catch (final NumberFormatException exception) {
+      throw new DomConverterException("Number format exception for attribut '" + attributeName + "'");
+    }
   }
 
-  default float floatValue(final Element element, final String attributeName, final float defaultValue) {
+  default float floatValue(final Element element, final String attributeName, final float defaultValue)
+      throws DomConverterException {
     if (element == null) {
       return defaultValue;
     }
@@ -146,7 +152,11 @@ public interface IDomToObjectConverter<T> {
     if (attributeValue == null) {
       return defaultValue;
     }
-    return Float.valueOf(attributeValue);
+    try {
+      return Float.valueOf(attributeValue);
+    } catch (final NumberFormatException exception) {
+      throw new DomConverterException("Number format exception for attribut '" + attributeName + "'");
+    }
   }
 
   default double doubleValue(final Element element, final String attributeName) throws DomConverterException {
@@ -157,10 +167,15 @@ public interface IDomToObjectConverter<T> {
     if (attributeValue == null) {
       throw new DomConverterException("Missing attribute '" + attributeName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
     }
-    return Double.valueOf(attributeValue);
+    try {
+      return Double.valueOf(attributeValue);
+    } catch (final NumberFormatException exception) {
+      throw new DomConverterException("Number format exception for attribut '" + attributeName + "'");
+    }
   }
 
-  default double doubleValue(final Element element, final String attributeName, final double defaultValue) {
+  default double doubleValue(final Element element, final String attributeName, final double defaultValue)
+      throws DomConverterException {
     if (element == null) {
       return defaultValue;
     }
@@ -168,7 +183,26 @@ public interface IDomToObjectConverter<T> {
     if (attributeValue == null) {
       return defaultValue;
     }
-    return Double.valueOf(attributeValue);
+    try {
+      return Double.valueOf(attributeValue);
+    } catch (final NumberFormatException exception) {
+      throw new DomConverterException("Number format exception for attribut '" + attributeName + "'");
+    }
+  }
+
+  default double doubleValue(final Element element, final double defaultValue) throws DomConverterException {
+    if (element == null) {
+      return defaultValue;
+    }
+    final String value = element.getTextTrim();
+    if (value == null) {
+      return defaultValue;
+    }
+    try {
+      return Double.valueOf(value);
+    } catch (final NumberFormatException exception) {
+      throw new DomConverterException("Number format exception for attribut '" + element.getName() + "'");
+    }
   }
 
   default <V> void addTo(final List<V> list, final V value) {

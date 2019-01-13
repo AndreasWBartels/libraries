@@ -23,7 +23,7 @@ package net.anwiba.commons.swing.table.action;
 
 import javax.swing.Action;
 
-import net.anwiba.commons.lang.primativ.IBooleanProvider;
+import net.anwiba.commons.lang.primitive.IBooleanProvider;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IChangeableListListener;
 import net.anwiba.commons.model.IChangeableObjectListener;

@@ -58,7 +58,7 @@ public class CoordinateReferenceSystemRegistry
   }
 
   @Override
-  public boolean containts(final String srsName) {
+  public boolean contains(final String srsName) {
     if (!this.systems.containsKey(srsName)) {
       final Authority authority = Authority.valueOf(srsName);
       if (authority == null) {

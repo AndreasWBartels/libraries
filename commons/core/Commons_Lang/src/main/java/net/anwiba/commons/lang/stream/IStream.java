@@ -25,6 +25,7 @@ package net.anwiba.commons.lang.stream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.IntFunction;
 
 import net.anwiba.commons.lang.collection.IObjectList;
@@ -78,5 +79,7 @@ public interface IStream<T, E extends Exception> {
   IOptional<T, E> first(IAcceptor<T> acceptor);
 
   <O> IOptional<O, E> aggregate(O inital, IAggregator<O, T, O, E> aggregator);
+
+  <O> Set<O> asSet() throws E;
 
 }

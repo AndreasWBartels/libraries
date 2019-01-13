@@ -46,7 +46,8 @@ import javax.swing.JSplitPane;
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
 import net.anwiba.commons.http.HttpRequestException;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
-import net.anwiba.commons.lang.object.ObjectPair;
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.object.IObjectReceiver;
 import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.lang.stream.Streams;
@@ -91,9 +92,15 @@ import net.anwiba.spatial.ckan.json.schema.v1_0.Resource;
 import net.anwiba.spatial.ckan.json.schema.v1_0.Tag;
 import net.anwiba.spatial.ckan.json.types.DateString;
 import net.anwiba.spatial.ckan.json.types.I18String;
-import net.anwiba.spatial.ckan.request.IPackageQueryCondition;
-import net.anwiba.spatial.ckan.request.IPackageQueryExecutor;
-import net.anwiba.spatial.ckan.request.PackageQueryConditionBuilder;
+import net.anwiba.spatial.ckan.query.IPackageQueryExecutor;
+import net.anwiba.spatial.ckan.query.IPackageSearchCondition;
+import net.anwiba.spatial.ckan.query.IPackageSearchResult;
+import net.anwiba.spatial.ckan.query.PackageSearchConditionBuilder;
+import net.anwiba.spatial.ckan.request.sort.ISortOrder;
+import net.anwiba.spatial.ckan.request.sort.Order;
+import net.anwiba.spatial.ckan.request.sort.SortOrderList;
+import net.anwiba.spatial.ckan.request.sort.SortOrderTerm;
+import net.anwiba.spatial.ckan.request.time.Event;
 import net.anwiba.spatial.ckan.utilities.CkanUtilities;
 import net.anwiba.spatial.ckan.values.Envelope;
 import net.anwiba.spatial.swing.ckan.search.message.Messages;
@@ -122,18 +129,21 @@ public final class CkanSearchContentPane extends AbstractContentPane {
   private final IDataSetResultsConsumer dataSetResultsConsumer;
   private final IDataSetConsumer dataSetConsumer;
   private final IObjectDistributor<String> datasetIdentifierDistributor;
-  private final IObjectModel<IPackageQueryCondition> packageQueryConditionModel;
+  private final IObjectModel<IPackageSearchCondition> packageQueryConditionModel;
+  private final IObjectReceiver<Envelope> envelopeReceiver;
 
   public CkanSearchContentPane(
       final IPreferences preferences,
       final IObjectRequestExecutorBuilderFactory requestExecutorBuilderFactory,
-      final IObjectModel<IPackageQueryCondition> packageQueryConditionModel,
+      final IObjectModel<IPackageSearchCondition> packageQueryConditionModel,
       final IDataSetResultsConsumer dataSetResultsConsumer,
       final IDataSetConsumer dataSetConsumer,
       final IResourceOpenConsumer resourceOpenConsumer,
       final IZoomToConsumer zoomToConsumer,
       final IObjectDistributor<String> datasetIdentifierDistributor,
       final IObjectDistributor<Envelope> envelopeDistributor,
+      final IObjectReceiver<Envelope> envelopeReceiver,
+      final IObjectDistributor<Envelope> envelopeSetter,
       final IPackageQueryExecutor packageQueryExecutor,
       final IHttpConnectionDescription description,
       final int numberOfResultRows,
@@ -148,6 +158,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     this.zoomToConsumer = zoomToConsumer;
     this.datasetIdentifierDistributor = datasetIdentifierDistributor;
     this.envelopeDistributor = envelopeDistributor;
+    this.envelopeReceiver = envelopeReceiver;
     this.packageQueryExecutor = packageQueryExecutor;
     this.datasets = datasets;
     this.numberOfResultRows = numberOfResultRows;
@@ -162,6 +173,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
         this.envelopeModel.set(this.envelopeDistributor.get());
       }
     };
+    envelopeSetter.addChangeListener(() -> this.envelopeModel.set(envelopeSetter.get()));
   }
 
   @Override
@@ -171,7 +183,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
 
     final JPanel contentPanel = new JPanel();
 
-    final IPackageQueryCondition condition = new PackageQueryConditionBuilder(this.packageQueryConditionModel.get())
+    final IPackageSearchCondition condition = new PackageSearchConditionBuilder(this.packageQueryConditionModel.get())
         .build();
 
     final IObjectModel<Dataset> datasetModel = new ObjectModel<>();
@@ -180,6 +192,12 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     final IObjectModel<DateString> resourceCreateDateModel = new ObjectModel<>();
     final IObjectModel<License> datasetLicenceModel = new ObjectModel<>();
     final IObjectModel<String> queryModel = new ObjectModel<>(condition.getQueryString());
+    final IObjectModel<ISortOrder> sortOrderModel = new ObjectModel<>(
+        new SortOrderList(
+            Arrays.asList(
+                new SortOrderTerm(Order.asc, "relevance"),
+                new SortOrderTerm(Order.desc, "metadata_modified"))));
+    final IObjectModel<Event> eventModel = new ObjectModel<>(Event.MODIFIED);
     final IObjectModel<LocalDateTime> fromDateModel = new ObjectModel<>(condition.getFromDate());
     final IObjectModel<LocalDateTime> toDateModel = new ObjectModel<>(condition.getToDate());
     final IntegerModel resultCountModel = new IntegerModel(this.results);
@@ -191,6 +209,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             && !Objects.equals(this.envelopeDistributor.get(), this.envelopeModel.get()));
     isTakeCurrentEnabledModelController.objectChanged();
     this.envelopeModel.addChangeListener(isTakeCurrentEnabledModelController);
+    this.envelopeModel.addChangeListener(() -> this.envelopeReceiver.set(this.envelopeModel.get()));
     this.envelopeDistributor.addChangeListener(isTakeCurrentEnabledModelController);
 
     final ObjectListTable<String> formatsTable = new FormatTableFactory(this.requestExecutorBuilderFactory)
@@ -264,7 +283,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
     final IntegerModel selectedIndexModel = new IntegerModel();
 
     final ObjectListTable<Dataset> datasetTable = new DatasetTableFactory(this.numberOfResultRows)
-        .create(this.description, offsetModel, resultCountModel, selectedIndexModel, this.datasets);
+        .create(this.description, offsetModel, resultCountModel, selectedIndexModel, sortOrderModel, this.datasets);
     final ISelectionModel<Dataset> dataSetSelectionModel = datasetTable.getSelectionModel();
 
     final JPanel datasetsPanel = new JPanel();
@@ -403,7 +422,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
 
     final IObjectField<String> queryField = new StringFieldBuilder()
         .setModel(queryModel)
-        .setColumns(40)
+        .setColumns(30)
         .setToolTip(Messages.query_string)
         .setKeyListenerFactory((model, document, clearBlock) -> new KeyAdapter() {
           @Override
@@ -423,6 +442,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                     organizationsTable.getTableModel(),
                     licensesTable.getTableModel(),
                     datasetTable.getTableModel(),
+                    sortOrderModel,
+                    eventModel,
                     fromDateModel,
                     toDateModel);
                 return;
@@ -449,6 +470,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                         organizationsTable.getTableModel(),
                         licensesTable.getTableModel(),
                         datasetTable.getTableModel(),
+                        sortOrderModel,
+                        eventModel,
                         fromDateModel,
                         toDateModel);
                     return;
@@ -479,6 +502,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                       organizationsTable.getTableModel(),
                       licensesTable.getTableModel(),
                       datasetTable.getTableModel(),
+                      sortOrderModel,
+                      eventModel,
                       fromDateModel,
                       toDateModel);
                   return;
@@ -558,12 +583,33 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             .build()
             .getComponent());
     queryPanel.add(createGap());
+
+    queryPanel.add(
+        new GenericObjectFieldBuilder<Event>()
+            .setColumns(7)
+            .setToolTip("event")
+            .setModel(eventModel)
+            .setToStringConverter(c -> Optional.of(c).convert(v -> v.name().toLowerCase()).get())
+            .addActionFactory(
+                (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
+                    .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.VIEW_WRAPPED)
+                    .setProcedure(component -> {
+                      final Event event = model.get();
+                      final Event[] values = Event.values();
+                      final int ordinal = (event.ordinal() + 1) % values.length;
+                      model.set(values[ordinal]);
+                    })
+                    .build())
+            .build()
+            .getComponent());
+
     queryPanel.add(
         new GenericObjectFieldBuilder<LocalDateTime>()
             .setColumns(12)
             .setToolTip("form")
             .setModel(fromDateModel)
-            .setToStringConverter(c -> Optional.of(c).convert(v -> SystemDateTimeUtilities.toStringAtUserTimeZone(v)).get())
+            .setToStringConverter(
+                c -> Optional.of(c).convert(v -> SystemDateTimeUtilities.toStringAtUserTimeZone(v)).get())
             .addActionFactory(
                 (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
                     .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
@@ -587,7 +633,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             .setColumns(12)
             .setToolTip("until")
             .setModel(toDateModel)
-            .setToStringConverter(c -> Optional.of(c).convert(v -> SystemDateTimeUtilities.toStringAtUserTimeZone(v)).get())
+            .setToStringConverter(
+                c -> Optional.of(c).convert(v -> SystemDateTimeUtilities.toStringAtUserTimeZone(v)).get())
             .addActionFactory(
                 (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
                     .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
@@ -642,6 +689,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                         organizationsTable.getTableModel(),
                         licensesTable.getTableModel(),
                         datasetTable.getTableModel(),
+                        sortOrderModel,
+                        eventModel,
                         fromDateModel,
                         toDateModel);
                     return;
@@ -688,6 +737,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             datasetTable,
             contentPanel,
             queryModel,
+            sortOrderModel,
+            eventModel,
             fromDateModel,
             toDateModel,
             this.envelopeModel));
@@ -705,6 +756,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             datasetTable,
             contentPanel,
             queryModel,
+            sortOrderModel,
+            eventModel,
             fromDateModel,
             toDateModel,
             this.envelopeModel));
@@ -724,6 +777,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                 datasetTable,
                 contentPanel,
                 queryModel,
+                sortOrderModel,
+                eventModel,
                 fromDateModel,
                 toDateModel,
                 this.envelopeModel));
@@ -743,6 +798,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                 datasetTable,
                 contentPanel,
                 queryModel,
+                sortOrderModel,
+                eventModel,
                 fromDateModel,
                 toDateModel,
                 this.envelopeModel));
@@ -760,6 +817,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             datasetTable,
             contentPanel,
             queryModel,
+            sortOrderModel,
+            eventModel,
             fromDateModel,
             toDateModel,
             this.envelopeModel));
@@ -781,6 +840,54 @@ public final class CkanSearchContentPane extends AbstractContentPane {
           organizationsTable.getTableModel(),
           licensesTable.getTableModel(),
           datasetTable.getTableModel(),
+          sortOrderModel,
+          eventModel,
+          fromDateModel,
+          toDateModel);
+    });
+
+    eventModel.addChangeListener(() -> {
+      if (!this.isQueryEnabledModel.get() || (fromDateModel.get() == null && toDateModel.get() == null)) {
+        return;
+      }
+      query(
+          contentPanel,
+          this.description,
+          offsetModel,
+          resultCountModel,
+          queryModel,
+          this.envelopeModel,
+          formatsTable.getTableModel(),
+          groupsTable.getTableModel(),
+          tagsTable.getTableModel(),
+          organizationsTable.getTableModel(),
+          licensesTable.getTableModel(),
+          datasetTable.getTableModel(),
+          sortOrderModel,
+          eventModel,
+          fromDateModel,
+          toDateModel);
+    });
+
+    sortOrderModel.addChangeListener(() -> {
+      if (!this.isQueryEnabledModel.get()) {
+        return;
+      }
+      query(
+          contentPanel,
+          this.description,
+          offsetModel,
+          resultCountModel,
+          queryModel,
+          this.envelopeModel,
+          formatsTable.getTableModel(),
+          groupsTable.getTableModel(),
+          tagsTable.getTableModel(),
+          organizationsTable.getTableModel(),
+          licensesTable.getTableModel(),
+          datasetTable.getTableModel(),
+          sortOrderModel,
+          eventModel,
           fromDateModel,
           toDateModel);
     });
@@ -803,12 +910,15 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             organizationsTable.getTableModel(),
             licensesTable.getTableModel(),
             datasetTable.getTableModel(),
+            sortOrderModel,
+            eventModel,
             fromDateModel,
             toDateModel);
         return;
       }
       offsetModel.setValue(0);
     };
+
     fromDateModel.addChangeListener(queryExecutingListener);
     toDateModel.addChangeListener(queryExecutingListener);
 
@@ -831,6 +941,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             organizationsTable.getTableModel(),
             licensesTable.getTableModel(),
             datasetTable.getTableModel(),
+            sortOrderModel,
+            eventModel,
             fromDateModel,
             toDateModel);
         return;
@@ -919,12 +1031,15 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       final IObjectTableModel<Organization> organizationTableModel,
       final IObjectTableModel<License> licenseTableModel,
       final IObjectTableModel<Dataset> datasetTableModel,
+      final IObjectModel<ISortOrder> sortOrderModel,
+      final IObjectModel<Event> eventModel,
       final IObjectModel<LocalDateTime> fromDateModel,
       final IObjectModel<LocalDateTime> toDateModel) {
     final int offset = offsetModel.getValue();
     try {
-      final IPackageQueryCondition condition = new PackageQueryConditionBuilder()
+      final IPackageSearchCondition condition = new PackageSearchConditionBuilder()
           .setQuery(queryModel.get())
+          .setEvent(eventModel.get())
           .setFromDate(fromDateModel.get())
           .setToDate(toDateModel.get())
           .setEnvelope(envelopeModel.get())
@@ -933,14 +1048,16 @@ public final class CkanSearchContentPane extends AbstractContentPane {
           .setTags(IterableUtilities.asList(tagTableModel.values()))
           .setGroups(IterableUtilities.asList(groupTableModel.values()))
           .setFormats(IterableUtilities.asList(formatsTableModel.values()))
+          .setOffset(offset)
+          .setRows(this.numberOfResultRows)
+          .setSortOrder(sortOrderModel.get())
           .build();
-      final ObjectPair<List<Dataset>, Integer> result = new ProgressDialogLauncher<>(
-          (progressMonitor, canceler) -> this.packageQueryExecutor
-              .query(canceler, connectionDescription, condition, offset, this.numberOfResultRows))
-                  .launch(parentCompoment);
+      final IPackageSearchResult result = new ProgressDialogLauncher<>(
+          (progressMonitor, canceler) -> this.packageQueryExecutor.query(canceler, connectionDescription, condition))
+              .launch(parentCompoment);
       this.packageQueryConditionModel.set(condition);
-      resultCountModel.setValue(result.getSecondObject());
-      datasetTableModel.set(result.getFirstObject());
+      resultCountModel.setValue(result.getCount());
+      datasetTableModel.set(result.getResults());
     } catch (final HttpRequestException exception) {
       logger.log(ILevel.DEBUG, Messages.format_query_faild, exception);
       new ConfigurableDialogLauncher() //
@@ -963,7 +1080,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
           .description(exception.getMessage())
           .throwable(exception)
           .launch(parentCompoment);
-    } catch (final InterruptedException exception) {
+    } catch (final CanceledException exception) {
       // nothing to do
     }
   }
@@ -980,6 +1097,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       final ObjectListTable<Dataset> datasetsTable,
       final JPanel contentPanel,
       final IObjectModel<String> queryModel,
+      final IObjectModel<ISortOrder> sortOrderModel,
+      final IObjectModel<Event> eventModel,
       final IObjectModel<LocalDateTime> fromDateModel,
       final IObjectModel<LocalDateTime> toDateModel,
       @SuppressWarnings("hiding") final IObjectModel<Envelope> envelopeModel) {
@@ -1003,6 +1122,8 @@ public final class CkanSearchContentPane extends AbstractContentPane {
               organizationsTable.getTableModel(),
               licensesTable.getTableModel(),
               datasetsTable.getTableModel(),
+              sortOrderModel,
+              eventModel,
               fromDateModel,
               toDateModel);
           return;

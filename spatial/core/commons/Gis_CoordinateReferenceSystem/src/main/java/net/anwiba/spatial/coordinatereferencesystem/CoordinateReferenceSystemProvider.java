@@ -48,13 +48,13 @@ public class CoordinateReferenceSystemProvider implements ICoordinateReferenceSy
     if (StringUtilities.isNullOrEmpty(srsName)) {
       return ICoordinateReferenceSystemConstants.NULL_COORDIANTE_REFERENCE_SYSTEM;
     }
-    if (!this.registry.containts(srsName)) {
+    if (!this.registry.contains(srsName)) {
       try {
         final Authority authority = Authority.valueOf(srsName);
         if (authority == null) {
           return ICoordinateReferenceSystemConstants.NULL_COORDIANTE_REFERENCE_SYSTEM;
         }
-        if (this.registry.containts(authority.getValue())) {
+        if (this.registry.contains(authority.getValue())) {
           return this.registry.getSystem(authority.getValue());
         }
         return this.coordinateReferenceSystemFactory.createFromId(String.valueOf(authority.getNumber()));

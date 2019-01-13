@@ -150,7 +150,7 @@ public class LinearRingBuilder implements ILinearRingBuilder {
 
     void remove(ICoordinateSequence sequence);
 
-    boolean containts(ICoordinate coordinate);
+    boolean contains(ICoordinate coordinate);
 
     ICoordinateSequence get(ICoordinate coordinate);
 
@@ -197,8 +197,8 @@ public class LinearRingBuilder implements ILinearRingBuilder {
       if (isEmpty()) {
         return false;
       }
-      return containts(sequence.getCoordinateN(0))
-          || containts(sequence.getCoordinateN(sequence.getNumberOfCoordinates() - 1));
+      return contains(sequence.getCoordinateN(0))
+          || contains(sequence.getCoordinateN(sequence.getNumberOfCoordinates() - 1));
     }
 
     @Override
@@ -222,17 +222,17 @@ public class LinearRingBuilder implements ILinearRingBuilder {
       final Set<ICoordinateSequence> result = new HashSet<>();
       final ICoordinate firstCoordinate = sequence.getCoordinateN(0);
       final ICoordinate lastCoordinate = sequence.getCoordinateN(sequence.getNumberOfCoordinates() - 1);
-      if (containts(firstCoordinate)) {
+      if (contains(firstCoordinate)) {
         result.add(get(firstCoordinate));
       }
-      if (containts(lastCoordinate)) {
+      if (contains(lastCoordinate)) {
         result.add(get(lastCoordinate));
       }
       return new ArrayList<>(result);
     }
 
     @Override
-    public boolean containts(final ICoordinate coordinate) {
+    public boolean contains(final ICoordinate coordinate) {
       return this.sequencesByFirstCoordinate.containsKey(coordinate)
           || this.sequencesByLastCoordinate.containsKey(coordinate);
     }

@@ -38,6 +38,7 @@ import net.anwiba.commons.http.IObjectRequestExecutor;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.http.IResultProducer;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.lang.stream.Streams;
@@ -242,7 +243,7 @@ public class FormatTableFactory {
 
         @Override
         public List<String> run(final IProgressMonitor progressMonitor, final ICanceler canceler)
-            throws InterruptedException,
+            throws CanceledException,
             IOException {
           final List<String> result = new ArrayList<>();
           if (values.isEmpty()) {
@@ -259,7 +260,7 @@ public class FormatTableFactory {
           return values;
         }
       }).launch(parentComponent);
-    } catch (final InterruptedException exception1) {
+    } catch (final CanceledException exception1) {
       return null;
     } catch (final IOException exception) {
       logger.log(ILevel.DEBUG, Messages.format_query_faild, exception);
@@ -278,7 +279,7 @@ public class FormatTableFactory {
       final ICanceler canceler,
       final IHttpConnectionDescription description,
       final String string)
-      throws InterruptedException,
+      throws CanceledException,
       IOException {
     final IResultProducer<StringListResultResponse> responseProducer = (
         c,
@@ -309,7 +310,7 @@ public class FormatTableFactory {
       return response.isSuccess() ? Arrays.asList(response.getResult()) : Collections.emptyList();
     } catch (SocketException | InterruptedIOException exception) {
       if (canceler.isCanceled()) {
-        throw new InterruptedException();
+        throw new CanceledException();
       }
       throw exception;
     }

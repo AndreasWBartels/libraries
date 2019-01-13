@@ -29,41 +29,51 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+
+import net.anwiba.commons.lang.functional.IAcceptor;
 
 public interface IResourceReferenceHandler {
 
-  public abstract File getFile(IResourceReference resourceReference) throws URISyntaxException;
+  File getFile(IResourceReference resourceReference) throws URISyntaxException;
 
-  public abstract URL getUrl(IResourceReference resourceReference) throws MalformedURLException;
+  URL getUrl(IResourceReference resourceReference) throws MalformedURLException;
 
-  public abstract URI getUri(IResourceReference resourceReference) throws URISyntaxException;
+  URI getUri(IResourceReference resourceReference) throws URISyntaxException;
 
-  public abstract String getExtension(IResourceReference resourceReference);
+  String getExtension(IResourceReference resourceReference);
 
-  public abstract OutputStream openOnputStream(IResourceReference resourceReference) throws IOException;
+  OutputStream openOnputStream(IResourceReference resourceReference) throws IOException;
 
-  public abstract InputStream openInputStream(IResourceReference resourceReference) throws IOException;
+  InputStream openInputStream(IResourceReference resourceReference) throws IOException;
 
-  public abstract boolean exsits(IResourceReference resourceReference);
+  InputStream openInputStream(IResourceReference resourceReference, IAcceptor<String> contentTypeAcceptor)
+      throws IOException;
 
-  public abstract boolean canRead(IResourceReference resourceReference);
+  boolean exsits(IResourceReference resourceReference);
 
-  public abstract boolean canWrite(IResourceReference resourceReference);
+  boolean canRead(IResourceReference resourceReference);
 
-  public abstract boolean canDelete(IResourceReference resourceReference);
+  boolean canWrite(IResourceReference resourceReference);
 
-  public abstract void delete(IResourceReference resourceReference) throws IOException;
+  boolean canDelete(IResourceReference resourceReference);
 
-  public abstract boolean hasLocation(IResourceReference resourceReference);
+  void delete(IResourceReference resourceReference) throws IOException;
 
-  public abstract String getContent(IResourceReference resourceReference) throws IOException;
+  boolean isMemoryResource(IResourceReference resourceReference);
 
-  public abstract boolean isFileSystemResource(IResourceReference resourceReference);
+  String getContent(IResourceReference resourceReference) throws IOException;
 
-  public abstract long getContentLength(IResourceReference resourceReference);
+  boolean isFileSystemResource(IResourceReference resourceReference);
 
-  public abstract String toString(IResourceReference resourceReference);
+  long getContentLength(IResourceReference resourceReference);
 
-  //  public abstract IResourceReference getParent(IResourceReference resourceReference);
+  String toString(IResourceReference resourceReference);
+
+  String getContentType(IResourceReference resourceReference);
+
+  Path getPath(IResourceReference resourceReference) throws URISyntaxException;
+
+  //   IResourceReference getParent(IResourceReference resourceReference);
 
 }

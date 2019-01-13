@@ -24,7 +24,14 @@ package net.anwiba.commons.lang.collection;
 
 import java.util.Collection;
 
+import net.anwiba.commons.lang.stream.IStream;
+import net.anwiba.commons.lang.stream.Streams;
+
 public interface IObjectListProvider<T> {
+
+  default IStream<T, RuntimeException> stream() {
+    return Streams.of(values());
+  }
 
   Collection<T> get(int... indices);
 

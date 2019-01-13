@@ -34,11 +34,11 @@ public class Graph<T> {
     return this.nodes.get(object);
   }
 
-  public boolean containts(final T object) {
+  public boolean contains(final T object) {
     return this.nodes.containsKey(object);
   }
 
-  public boolean containts(final Node<T> node) {
+  public boolean contains(final Node<T> node) {
     return this.nodes.containsKey(node.getObject());
   }
 

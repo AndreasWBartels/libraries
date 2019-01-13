@@ -34,11 +34,13 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IClosure;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.message.IMessage;
+import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.preferences.IPreferences;
@@ -122,6 +124,9 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
   public ConfigurableDialogLauncher setMessage(final IMessage message) {
     this.dialogConfigurationBuilder.setMessage(message);
     this.dialogConfigurationBuilder.setMessagePanelEnabled(message != null);
+    if (message != null && message.getMessageType().equals(MessageType.QUERY)) {
+      setEnableOk();
+    }
     return this;
   }
 
@@ -179,7 +184,7 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
         dialog.toFront();
         dialog.setVisible(true);
         model.set(dialog.getResult());
-      } catch (final InterruptedException exception) {
+      } catch (final CanceledException exception) {
         model.set(DialogResult.CANCEL);
       }
     });
@@ -239,6 +244,11 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
 
   public ConfigurableDialogLauncher setProgressDialogDisabled() {
     this.isProgressDialogEnabled = false;
+    return this;
+  }
+
+  public ConfigurableDialogLauncher setEnableOk() {
+    this.dialogConfigurationBuilder.setDataState(DataState.MODIFIED);
     return this;
   }
 

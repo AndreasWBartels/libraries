@@ -89,7 +89,7 @@ public final class DataSetDescriptionTextFactory {
       text.append("<b>" + Messages.maintainer + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
       if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getMaintainer_email())) {
         text.append(
-            "<a href=\"" + converToUrl(dataset.getMaintainer_email()) + "\">" + dataset.getMaintainer() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            "<a href=\"" + converToUrl(dataset.getMaintainer_email()) + "\">" + dataset.getMaintainer() + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       } else {
         text.append(dataset.getMaintainer());
       }
@@ -99,7 +99,7 @@ public final class DataSetDescriptionTextFactory {
       text.append("<p>"); //$NON-NLS-1$
       text.append("<b>" + Messages.author + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
       if (!StringUtilities.isNullOrTrimmedEmpty(dataset.getAuthor_email())) {
-        text.append("<a href=\"" + converToUrl(dataset.getAuthor_email()) + "\">" + dataset.getAuthor() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        text.append("<a href=\"" + converToUrl(dataset.getAuthor_email()) + "\">" + dataset.getAuthor() + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       } else {
         text.append(dataset.getAuthor());
       }
@@ -112,12 +112,35 @@ public final class DataSetDescriptionTextFactory {
         text.append("<p>"); //$NON-NLS-1$
         text.append("<b>" + Messages.publisher + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
         if (!StringUtilities.isNullOrTrimmedEmpty(publisher.getResource())) {
-          text.append("<a href=\"" + publisher.getResource().trim() + "\">" + string.trim() + "</a"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+          text.append("<a href=\"" + publisher.getResource().trim() + "\">" + string.trim() + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         } else {
           text.append(string.trim());
         }
         text.append("</p>"); //$NON-NLS-1$
       }
+    }
+
+    final String[] identifiers = dataset.getIdentifier();
+    if (identifiers != null) {
+      text.append("<p>"); //$NON-NLS-1$
+      text.append("<b>Identifier: </b>");
+      text.append("<br>"); //$NON-NLS-1$
+      for (final String identifier : identifiers) {
+        text.append("&nbsp;&nbsp;&nbsp;&nbsp;"); //$NON-NLS-1$
+        final String trimmedIdentifier = identifier.trim();
+        if (trimmedIdentifier.startsWith("http:") || trimmedIdentifier.startsWith("https:")) { //$NON-NLS-1$//$NON-NLS-2$
+          text.append("<a href=\"" + trimmedIdentifier + "\">" + trimmedIdentifier + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        } else {
+          text.append(identifier);
+        }
+        text.append("<br>"); //$NON-NLS-1$
+      }
+      text.append("</p>"); //$NON-NLS-1$
+    } else {
+      text.append("<p>"); //$NON-NLS-1$
+      text.append("<b>Identifier: </b>");
+      text.append(dataset.getId());
+      text.append("</p>"); //$NON-NLS-1$
     }
 
     final DateString modified = dataset.getMetadata_modified();
