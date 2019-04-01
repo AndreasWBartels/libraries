@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.0.180
+Bundle-Version: 1.0.185
 Bundle-Name: Dependencies
 Bundle-SymbolicName: net.anwiba.eclipse.project.dependencies;singleton:=true
 Bundle-Activator: net.anwiba.eclipse.project.dependency.plugin.DependenciesPlugin
@@ -37,4 +37,4 @@ Import-Package:
  net.anwiba.commons.thread.cancel,
  net.anwiba.commons.thread.program
 Bundle-ClassPath: .,
- lib/anwiba-tools-graphml-1.0.180.jar
+ lib/anwiba-tools-graphml-1.0.185.jar

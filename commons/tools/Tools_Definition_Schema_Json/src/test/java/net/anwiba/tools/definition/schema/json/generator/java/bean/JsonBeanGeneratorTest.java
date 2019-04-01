@@ -10,8 +10,9 @@
  */
 package net.anwiba.tools.definition.schema.json.generator.java.bean;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,11 +38,27 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   }
 
   @Test
+  public void defaultValueBean() throws CreationException, JssdParserException, IOException {
+    final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.defaultValueBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.DefaultValue");
+    final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
+    generator.generate(ouputStream);
+    assertThat(ouputStream.size(), greaterThan(0));
+    final String actual = ouputStream.toString();
+    final String expected = JsonBeanGeneratorTestResources.defaultValueBeanSource;
+    assertThat(actual, equalTo(expected));
+  }
+
+  @Test
   public void typeInfoFactoryBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.typeInfoFactoryBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.typeInfoFactoryBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -53,9 +70,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void typeInfoWithNameFactoryBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.typeInfoWithNameFactoryBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.typeInfoWithNameFactoryBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -67,9 +85,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void valueBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.valueBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.valueBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -81,9 +100,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void patternBean() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.patternBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.patternBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -95,13 +115,14 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void reflactionFactoryWithConfiguredArgumentNameBuilder()
       throws CreationException,
-      JssdParserException,
-      IOException {
+        JssdParserException,
+        IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(
-            JsonBeanGeneratorTestResources.reflactionFactoryWithConfiguredArgumentNameBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(
+                JsonBeanGeneratorTestResources.reflactionFactoryWithConfiguredArgumentNameBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -114,9 +135,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   public void classMemberBuilder() throws CreationException, JssdParserException, IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
     final String classMemberBeanDefinition = JsonBeanGeneratorTestResources.classMemberBeanDefinition;
-    generator.add(
-        new ByteArrayInputStream(classMemberBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.MemberClass");
+    generator
+        .add(
+            new ByteArrayInputStream(classMemberBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.MemberClass");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -127,9 +149,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void errorBeanAndBuilder() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, true);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.errorBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Error");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.errorBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Error");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -139,9 +162,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void errorBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.errorBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Error");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.errorBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Error");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -151,12 +175,14 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void featureBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.envelopeBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Envelope");
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.featureBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Feature");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.envelopeBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Envelope");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.featureBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Feature");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -166,9 +192,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void entityBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.entityBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Entity");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.entityBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Entity");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -178,9 +205,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void factoryBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.factoryBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.factoryBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -190,9 +218,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void factoryWithUnknownMembersBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.factoryWithUnknownMembersBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.factoryWithUnknownMembersBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -202,10 +231,11 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void factoryWithIgnoreUnknownMembersBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(
-            JsonBeanGeneratorTestResources.factoryWithIgnoreUnknownMembersBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(
+                JsonBeanGeneratorTestResources.factoryWithIgnoreUnknownMembersBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -217,9 +247,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void injectTypeFactoryBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.injectTypeFactoryBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.injectTypeFactoryBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -229,9 +260,10 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void complexFactoryBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.complexFactoryBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Factory");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.complexFactoryBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Factory");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));
@@ -241,15 +273,18 @@ public class JsonBeanGeneratorTest extends AbstractResourceFactory {
   @Test
   public void pointBean() throws CreationException, IOException, JssdParserException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(NET_ANWIBA_GENERATED_TEST_BEAN, COPYRIGHT, false);
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.geometryBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Geometry");
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.pointBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.Point");
-    generator.add(
-        new ByteArrayInputStream(JsonBeanGeneratorTestResources.spatialReferenceBeanDefinition.getBytes()),
-        "net.anwiba.generated.test.bean.SpatialReference");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.geometryBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Geometry");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.pointBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.Point");
+    generator
+        .add(
+            new ByteArrayInputStream(JsonBeanGeneratorTestResources.spatialReferenceBeanDefinition.getBytes()),
+            "net.anwiba.generated.test.bean.SpatialReference");
     final ByteArrayOutputStream ouputStream = new ByteArrayOutputStream();
     generator.generate(ouputStream);
     assertThat(ouputStream.size(), greaterThan(0));

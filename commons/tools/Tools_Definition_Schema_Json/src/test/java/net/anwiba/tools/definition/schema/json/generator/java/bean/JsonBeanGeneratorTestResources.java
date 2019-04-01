@@ -30,6 +30,12 @@ public class JsonBeanGeneratorTestResources extends AbstractResourceFactory {
     initialize(JsonBeanGeneratorTestResources.class);
   }
 
+  @Location("defaultValue.jssd")
+  public static String defaultValueBeanDefinition;
+
+  @Location("defaultValue.source")
+  public static String defaultValueBeanSource;
+
   @Location("typeInfoFactory.jssd")
   public static String typeInfoFactoryBeanDefinition;
 
@@ -137,4 +143,5 @@ public class JsonBeanGeneratorTestResources extends AbstractResourceFactory {
 
   @Location("reflactionFactoryWithConfiguredArgumentName.source")
   public static String reflactionFactoryWithConfiguredArgumentNameBeanSource;
+
 }

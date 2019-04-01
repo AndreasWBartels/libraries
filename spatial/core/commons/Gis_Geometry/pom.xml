@@ -8,7 +8,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>anwiba-spatial-maven-core-commons</artifactId>
-    <version>1.0.180</version>
+    <version>1.0.185</version>
   </parent>
 
   <scm>

@@ -1,0 +1,98 @@
+-----------------------------------net.anwiba.generated.test.bean.DefaultValue.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class DefaultValue {
+
+    private String string = null;
+    private boolean _boolean = false;
+    private Boolean Boolean = null;
+    private int _int = 0;
+    private Integer Integer = null;
+    private double _double = 0.0D;
+    private Double Double = null;
+    private String value = null;
+
+    @JsonProperty("string")
+    public void setString(final String string) {
+        this.string = string;
+    }
+
+    @JsonProperty("string")
+    public String getString() {
+        return this.string;
+    }
+
+    @JsonProperty("boolean")
+    public void setBoolean(final boolean _boolean) {
+        this._boolean = _boolean;
+    }
+
+    @JsonProperty("boolean")
+    public boolean isBoolean() {
+        return this._boolean;
+    }
+
+    @JsonProperty("Boolean")
+    public void setBoolean(final Boolean Boolean) {
+        this.Boolean = Boolean;
+    }
+
+    @JsonProperty("Boolean")
+    public Boolean getBoolean() {
+        return this.Boolean;
+    }
+
+    @JsonProperty("int")
+    public void setInt(final int _int) {
+        this._int = _int;
+    }
+
+    @JsonProperty("int")
+    public int getInt() {
+        return this._int;
+    }
+
+    @JsonProperty("Integer")
+    public void setInteger(final Integer Integer) {
+        this.Integer = Integer;
+    }
+
+    @JsonProperty("Integer")
+    public Integer getInteger() {
+        return this.Integer;
+    }
+
+    @JsonProperty("double")
+    public void setDouble(final double _double) {
+        this._double = _double;
+    }
+
+    @JsonProperty("double")
+    public double getDouble() {
+        return this._double;
+    }
+
+    @JsonProperty("Double")
+    public void setDouble(final Double Double) {
+        this.Double = Double;
+    }
+
+    @JsonProperty("Double")
+    public Double getDouble() {
+        return this.Double;
+    }
+
+    @JsonProperty("value")
+    public void setValue(final String value) {
+        this.value = value;
+    }
+
+    @JsonProperty("value")
+    public String getValue() {
+        return this.value;
+    }
+
+}

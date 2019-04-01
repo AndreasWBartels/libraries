@@ -70,24 +70,29 @@ public class JsonBeanGeneratorExecutor {
     }
     final List<Throwable> throwables = new ArrayList<>();
     for (final File file : files) {
-      try (final FileInputStream inputStream = new FileInputStream(file);) {
+      try (final FileInputStream inputStream = new FileInputStream(file)) {
         this.output.info("schema definition: " + file);
         generator.add(inputStream, FileUtilities.getFileWithoutExtension(file).getName());
       } catch (final FileNotFoundException exception) {
-        this.output.error("Couldn't find file: " + file, exception);
-        throwables.add(exception);
+        final String message = "Couldn't find file: " + file;
+        this.output.error(message, exception);
+        throwables.add(new IOException(message, exception));
       } catch (final SecurityException exception) {
-        this.output.error("Couldn't read file: " + file, exception);
-        throwables.add(exception);
+        final String message = "Couldn't read file: " + file + ", because " + exception.getMessage();
+        this.output.error(message, exception);
+        throwables.add(new IOException(message, exception));
       } catch (final JssdParserException exception) {
-        this.output.error(exception.getMessage() + ", in file: " + file, exception);
-        throwables.add(exception);
+        final String message = exception.getMessage() + ", in file: " + file;
+        this.output.error(message, exception);
+        throwables.add(new IOException(message, exception));
       } catch (final CreationException exception) {
         throwables.add(exception);
-        this.output
-            .error(
-                "Couldn't create bean description from file: " + file + ", because: " + exception.getMessage(),
-                exception);
+        final String message = "Couldn't create bean description from file: "
+            + file
+            + ", because: "
+            + exception.getMessage();
+        this.output.error(message, exception);
+        throwables.add(new CreationException(message, exception));
       }
     }
     this.output.info("target: " + target);

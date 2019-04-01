@@ -1,5 +1,7 @@
 @JssdBuilder
 {
+  @JssdIncludeNonNull
+  "id" : <Object>  null,
   @JssdNotNullable
   "envelope" : <envelope>  null,
   "geometry" : <Object>  null,

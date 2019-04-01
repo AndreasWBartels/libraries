@@ -1,0 +1,11 @@
+@JssdPrimitivesEnabled
+{
+  "string" : <String>,
+  "boolean" : <boolean>,
+  "Boolean" : <Boolean>,
+  "int" : <int>,
+  "Integer" : <Integer>,
+  "double" : <double>,
+  "Double" : <Double>,
+  "value" : <String>
+}

@@ -14,9 +14,9 @@ object
     :  ( annotation )*  '{' member ( ',' member )* '}'
     |  ( annotation )*  '{'  '}' // empty object
     ;
-
+ 
 member
-    : (annotation)* membername ':' type value ;
+    : (annotation)* membername ':' type value? ;
 
 type: '<' classname generics? dimension* '>';
 

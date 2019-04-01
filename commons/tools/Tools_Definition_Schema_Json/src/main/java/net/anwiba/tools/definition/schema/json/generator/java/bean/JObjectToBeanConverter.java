@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
@@ -99,6 +100,8 @@ public class JObjectToBeanConverter {
   private static final String JSSD_NAME = "JssdName";
   private static final String JSSD_PATTERN = "JssdPattern";
   private static final String JSSD_VALUE = "JssdValue";
+  private static final String JSSD_INLUDE_ALLWAYS = "JssdIncludeAllways";
+  private static final String JSSD_INLUDE_NON_NULL = "JssdIncludeNonNull";
 
   private static final String JSSD_SERIALIZER = "JssdSerializer";
 
@@ -126,6 +129,9 @@ public class JObjectToBeanConverter {
       .getName();
   private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_VALUE = com.fasterxml.jackson.annotation.JsonValue.class
       .getName();
+  private static final String ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_INLUDE = com.fasterxml.jackson.annotation.JsonInclude.class
+      .getName();
+
   private static final String ORG_CODEHAUS_JACKSON_DATABIND_ANNOTATE_JSON_SERIALIZER = com.fasterxml.jackson.databind.annotation.JsonSerialize.class
       .getName();
   private static final String ORG_CODEHAUS_JACKSON_DATABIND_ANNOTATE_JSON_DESERIALIZER = com.fasterxml.jackson.databind.annotation.JsonDeserialize.class
@@ -179,8 +185,9 @@ public class JObjectToBeanConverter {
   }
 
   private void addIgnoreUnknownMembersMethod(final BeanBuilder builder) {
-    builder.annotation(
-        annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE_PROPERTIES).parameter("ignoreUnknown", true).build());
+    builder
+        .annotation(
+            annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE_PROPERTIES).parameter("ignoreUnknown", true).build());
   }
 
   private Set<String> getFactoryMembers(final JAnnotation annotation) {
@@ -247,12 +254,13 @@ public class JObjectToBeanConverter {
     final JParameter typeParameter = annotation.parameter(TYPE);
     if (typeParameter != null && typeParameter.value().equals(TYPE_INFO)) {
       final JParameter propertyParameter = annotation.parameter(PROPERTY);
-      builder.annotation(
-          annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_TYPE_INFO)
-              .parameter("use", JsonTypeInfo.Id.NAME)
-              .parameter("include", JsonTypeInfo.As.PROPERTY)
-              .parameter("property", propertyParameter == null ? TYPE : propertyParameter.value().toString())
-              .build());
+      builder
+          .annotation(
+              annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_TYPE_INFO)
+                  .parameter("use", JsonTypeInfo.Id.NAME)
+                  .parameter("include", JsonTypeInfo.As.PROPERTY)
+                  .parameter("property", propertyParameter == null ? TYPE : propertyParameter.value().toString())
+                  .build());
       final JParameter typesParameter = annotation.parameter(TYPES);
       if (typesParameter != null) {
         final AnnotationBuilder annotationBuilder = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE);
@@ -278,13 +286,14 @@ public class JObjectToBeanConverter {
                         .build());
             continue;
           }
-          annotations.add(
-              annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
-                  .parameter(
-                      VALUE,
-                      net.anwiba.commons.utilities.string.StringUtilities.setFirstTrimedCharacterToUpperCase(token),
-                      ValueType.CLASS)
-                  .build());
+          annotations
+              .add(
+                  annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
+                      .parameter(
+                          VALUE,
+                          net.anwiba.commons.utilities.string.StringUtilities.setFirstTrimedCharacterToUpperCase(token),
+                          ValueType.CLASS)
+                      .build());
         }
         annotationBuilder.parameter(VALUE, annotations);
         builder.annotation(annotationBuilder.build());
@@ -292,18 +301,22 @@ public class JObjectToBeanConverter {
       return;
     }
 
-    final CreatorBuilder createMethodeBuilder = creator(CREATE).annotation(
-        annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_CREATOR).parameter("mode", JsonCreator.Mode.PROPERTIES).build());
+    final CreatorBuilder createMethodeBuilder = creator(CREATE)
+        .annotation(
+            annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_CREATOR)
+                .parameter("mode", JsonCreator.Mode.PROPERTIES)
+                .build());
     if (!annotation.hasParameters() || (typeParameter == null || typeParameter.value().equals(REFLECTION))) {
       final String anotationName = getAnnotationName(annotation.parameter(SOURCE));
       final JParameter argumentParameter = annotation.parameter(ARGUMENT);
       if (argumentParameter == null) {
         builder.creator(createMethodeBuilder.addArgument(argument(anotationName, TYPE, JAVA_LANG_STRING)).build());
       } else {
-        builder.creator(
-            createMethodeBuilder
-                .addArgument(argument(anotationName, argumentParameter.value().toString(), JAVA_LANG_STRING))
-                .build());
+        builder
+            .creator(
+                createMethodeBuilder
+                    .addArgument(argument(anotationName, argumentParameter.value().toString(), JAVA_LANG_STRING))
+                    .build());
       }
     } else if (typeParameter.value().equals(DELEGATION)) {
       final JParameter factoryParameter = annotation.parameter(FACTORY);
@@ -384,11 +397,12 @@ public class JObjectToBeanConverter {
         final PropertiesBuilder properties = properties(
             type(this.beanNameConverter.convert(field.type().name())).build(),
             field.name());
-        final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY)
-            .parameter(VALUE, field.name())
-            .build();
-        properties.getterAnnotation(jsonPropertyAnnotation);
-        properties.setterAnnotation(jsonPropertyAnnotation);
+        properties
+            .getterAnnotation(
+                annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY).parameter(VALUE, field.name()).build());
+        properties
+            .setterAnnotation(
+                annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_PROPERTY).parameter(VALUE, field.name()).build());
         properties.isNullable(true);
         properties.setSingleValueSetterEnabled(true);
         properties.setNamedValueGetterEnabled(true);
@@ -437,13 +451,15 @@ public class JObjectToBeanConverter {
           final JBlock body = method.body();
           final JTryBlock _try = body._try();
           final JExpression dotclass = ref.dotclass();
-          _try.body()._return(
-              JExpr
-                  ._new(model.ref(com.fasterxml.jackson.databind.ObjectMapper.class.getName()))
-                  .invoke("readerFor")
-                  .arg(dotclass)
-                  .invoke("readValue")
-                  .arg(member));
+          _try
+              .body()
+              ._return(
+                  JExpr
+                      ._new(model.ref(com.fasterxml.jackson.databind.ObjectMapper.class.getName()))
+                      .invoke("readerFor")
+                      .arg(dotclass)
+                      .invoke("readValue")
+                      .arg(member));
           final JCatchBlock _catch = _try._catch(model.ref(Exception.class));
           final JVar exception = _catch.param("exception");
           _catch.body()._throw(JExpr._new(model.ref(IllegalStateException.class)).arg(exception));
@@ -461,6 +477,17 @@ public class JObjectToBeanConverter {
       final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_IGNORE).build();
       builder.getterAnnotation(jsonPropertyAnnotation);
       builder.setterAnnotation(jsonPropertyAnnotation);
+    }
+    if (field.hasAnnotation(JSSD_INLUDE_NON_NULL)) {
+      final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_INLUDE)
+          .parameter("value", JsonInclude.Include.NON_NULL)
+          .build();
+      builder.getterAnnotation(jsonPropertyAnnotation);
+    } else if (field.hasAnnotation(JSSD_INLUDE_ALLWAYS)) {
+      final Annotation jsonPropertyAnnotation = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_INLUDE)
+          .parameter("value", JsonInclude.Include.ALWAYS)
+          .build();
+      builder.getterAnnotation(jsonPropertyAnnotation);
     }
     builder.isNullable(!field.hasAnnotation(JSSD_NOT_NULLABLE));
     builder.isImutable((field.hasAnnotation(JSSD_IMMUTABLE)));

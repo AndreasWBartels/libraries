@@ -20,6 +20,14 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.Interval;
+
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.tools.definition.schema.json.gramma.JSSDParser;
 import net.anwiba.tools.definition.schema.json.gramma.JSSDParser.AnnotationContext;
@@ -50,14 +58,7 @@ import net.anwiba.tools.definition.schema.json.gramma.element.JTypeBuilder;
 import net.anwiba.tools.definition.schema.json.gramma.element.JValue;
 import net.anwiba.tools.definition.schema.json.gramma.parser.JSSDParserFactory;
 import net.anwiba.tools.definition.schema.json.gramma.parser.JssdParserException;
-
-import org.antlr.v4.runtime.BaseErrorListener;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.Interval;
+import net.anwiba.tools.generator.java.bean.JavaConstants;
 
 public class JSSDReader {
 
@@ -74,8 +75,8 @@ public class JSSDReader {
         final int charPositionInLine,
         final String msg,
         final RecognitionException exception) {
-      Optional.ofNullable(exception).ifPresent(e -> this.exceptions.add(e));
-      this.messages.add("line " + line + ":" + charPositionInLine + ", " + msg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      Optional.ofNullable(exception).ifPresent(e -> exceptions.add(e));
+      messages.add("line " + line + ":" + charPositionInLine + ", " + msg); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override
@@ -86,8 +87,8 @@ public class JSSDReader {
         final int stopIndex,
         final int prediction,
         final ATNConfigSet configs) {
-      this.messages
-          .add("Context sensitivity violation, at " + startIndex + " until " + stopIndex + ", " + recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      messages
+      .add("Context sensitivity violation, at " + startIndex + " until " + stopIndex + ", " + recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     @Override
@@ -99,20 +100,20 @@ public class JSSDReader {
         final boolean exact,
         final BitSet ambigAlts,
         final ATNConfigSet configs) {
-      this.messages
-          .add("ambiguity, at " + startIndex + " until " + stopIndex + ", " + recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      messages
+      .add("ambiguity, at " + startIndex + " until " + stopIndex + ", " + recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     public List<RecognitionException> getExceptions() {
-      return this.exceptions;
+      return exceptions;
     }
 
     public List<String> getMessages() {
-      return this.messages;
+      return messages;
     }
 
     public boolean isEmpty() {
-      return this.messages.isEmpty();
+      return messages.isEmpty();
     }
   }
 
@@ -135,7 +136,7 @@ public class JSSDReader {
       IOException {
     try {
       final ErrorListener errorListener = new ErrorListener();
-      final JSSDParser parser = this.factory.create(byteArrayInputStream, encoding, errorListener);
+      final JSSDParser parser = factory.create(byteArrayInputStream, encoding, errorListener);
       final JssdContext jssd = parser.jssd();
       if (!errorListener.isEmpty()) {
         final String message = StringUtilities.concatenatedString("\n", errorListener.getMessages()); //$NON-NLS-1$
@@ -185,8 +186,9 @@ public class JSSDReader {
 
     final MembernameContext name = member.membername();
     builder.name(convert(name));
-    builder.type(convert(member.type()));
-    builder.value(convert(member.value()));
+    JType type = convert(member.type());
+    builder.type(type);
+    builder.value(convert(type, member.value()));
 
     return builder.build();
   }
@@ -196,11 +198,31 @@ public class JSSDReader {
     return text.substring(1, text.length() - 1);
   }
 
-  private JValue convert(final ValueContext value) {
+  private JValue convert(JType type, final ValueContext value) {
+    if (value == null) {
+      if (type.isArray()) {
+        return null;
+      }
+      switch (type.name()) {
+        case JavaConstants.BOOLEAN: {
+          return new JValue(false);
+        }
+        case JavaConstants.SHORT:
+        case JavaConstants.INT:
+        case JavaConstants.LONG: {
+          return new JValue(0);
+        }
+        case JavaConstants.FLOAT:
+        case JavaConstants.DOUBLE: {
+          return new JValue(0.);
+        }
+      }
+      return null;
+    }
     if (value.array() != null) {
       final ArrayList<Object> array = new ArrayList<>();
       for (final ValueContext valueContext : value.array().value()) {
-        final JValue arrayValue = convert(valueContext);
+        final JValue arrayValue = convert(type, valueContext);
         array.add(arrayValue.value());
       }
       return new JValue(array);

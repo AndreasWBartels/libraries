@@ -16,11 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.commons.reference.utilities.FileUtilities;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -29,6 +24,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
+
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.commons.reference.utilities.FileUtilities;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
 
 @SuppressWarnings("nls")
 @Mojo(name = "generate")
@@ -122,30 +122,41 @@ public class JsonBeanGeneratorMojo extends AbstractMojo {
     if (this.sourceDirectory == null) {
       throw new MojoExecutionException("missing source folder value"); //$NON-NLS-1$
     }
+    if (!this.sourceDirectory.exists()) {
+      throw new MojoExecutionException("source folder doesn't exists"); //$NON-NLS-1$
+    }
+
     if (this.pakkage == null) {
       throw new MojoExecutionException("missing packge name"); //$NON-NLS-1$equals
     }
     final List<File> sources = getChildren(this.sourceDirectory);
+    if (sources.isEmpty()) {
+      getLog().warn("found no description files");
+    }
 
     if (!checkUpToDate(sources)) {
       try {
-        final JsonBeanGeneratorExecutor excecutor = new JsonBeanGeneratorExecutor(this.sourceDirectory, this.pakkage, this.comment, new IOutput() {
+        final JsonBeanGeneratorExecutor excecutor = new JsonBeanGeneratorExecutor(
+            this.sourceDirectory,
+            this.pakkage,
+            this.comment,
+            new IOutput() {
 
-          @Override
-          public void warn(final String message) {
-            getLog().warn(message);
-          }
+              @Override
+              public void warn(final String message) {
+                getLog().warn(message);
+              }
 
-          @Override
-          public void info(final String message) {
-            getLog().info(message);
-          }
+              @Override
+              public void info(final String message) {
+                getLog().info(message);
+              }
 
-          @Override
-          public void error(final String message, final Throwable throwable) {
-            getLog().error(message, throwable);
-          }
-        });
+              @Override
+              public void error(final String message, final Throwable throwable) {
+                getLog().error(message, throwable);
+              }
+            });
         excecutor.excecute(this.outputDirectory);
         this.buildContext.refresh(this.outputDirectory);
       } catch (final Exception e) {
@@ -169,6 +180,9 @@ public class JsonBeanGeneratorMojo extends AbstractMojo {
         return "jssd".equalsIgnoreCase(FileUtilities.getExtension(pathname)); //$NON-NLS-1$
       }
     });
+    if (sourceFiles == null) {
+      return children;
+    }
     for (final File file : sourceFiles) {
       if (file.isDirectory()) {
         children.addAll(getChildren(file));
