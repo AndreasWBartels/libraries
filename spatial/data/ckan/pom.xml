@@ -1,0 +1,114 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>spatial ckan</name>
+  <description>spatial ckan project</description>
+  <url>${url.net.anwiba}/libraries/spatial/data/arcgis_rest</url>
+
+  <artifactId>anwiba-spatial-data-ckan</artifactId>
+
+  <parent>
+    <groupId>net.anwiba.spatial</groupId>
+    <artifactId>spatial-data</artifactId>
+    <version>1.1.121</version>
+  </parent>
+
+  <scm>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/spatial/data/ckan</url>
+  </scm>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.spatial</groupId>
+      <artifactId>anwiba-spatial-data-geo-json</artifactId>
+      <version>${net.anwiba.spatial.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-utilities</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-logging</artifactId>
+    </dependency>
+    <dependency>
+      <artifactId>anwiba-commons-http</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>anwiba-commons-lang</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>anwiba-commons-json</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-datasource</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-thread</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-resource</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+    <groupId>org.hamcrest</groupId>
+    <artifactId>hamcrest</artifactId>
+    <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <groupId>net.anwiba.commons.tools</groupId>
+        <artifactId>anwiba-tools-definition-schema-json</artifactId>
+        <executions>
+          <execution>
+            <id>generate</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <pakkage>net.anwiba.spatial.ckan.json.schema.v1_0</pakkage>
+              <comment>Copyright (c) 2017 by Andreas W. Bartels</comment>
+              <addJSSDFilesToCompileSourceRoot>true</addJSSDFilesToCompileSourceRoot>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+</project>

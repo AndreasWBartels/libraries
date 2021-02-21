@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>spatial swing ckan search</name>
+  <description>spatial ckan search swing project</description>
+  <url>${url.net.anwiba}/libraries/spatial/swing/data/swing_ckan_search</url>
+
+  <artifactId>anwiba-spatial-swing-data-ckan-search</artifactId>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>net.anwiba.spatial</groupId>
+    <artifactId>spatial-swing-data</artifactId>
+    <version>1.1.121</version>
+  </parent>
+
+  <scm>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/spatial/swing/data/swing_ckan_search</url>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-message</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-thread</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-nls</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-preferences</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-datasource</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-utilities</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-http</artifactId>
+    </dependency>
+
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-icon</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.anwiba.commons.swing.icons</groupId>
+      <artifactId>org.gnome.gtk-contrast-high-icons</artifactId>
+      <version>3.22.1-${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>anwiba-spatial-data-geo-json</artifactId>
+      <groupId>net.anwiba.spatial</groupId>
+      <version>${net.anwiba.spatial.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>anwiba-spatial-data-ckan</artifactId>
+      <groupId>net.anwiba.spatial</groupId>
+      <version>${net.anwiba.spatial.version}</version>
+    </dependency>
+
+
+  </dependencies>
+
+</project>

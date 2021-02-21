@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>anwiba database project</name>
+  <description>anwiba commons database project</description>
+  <url>${url.net.anwiba}/libraries/database</url>
+
+  <groupId>net.anwiba.database</groupId>
+  <artifactId>database</artifactId>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>net.anwiba</groupId>
+    <artifactId>anwiba-maven-default</artifactId>
+    <version>1.1.121</version>
+  </parent>
+
+  <properties>
+    <net.anwiba.commons.version>1.1.121</net.anwiba.commons.version>
+  </properties>
+
+  <scm>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/database</url>
+  </scm>
+
+  <modules>
+    <module>data</module>
+    <module>swing</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-reference</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-logging</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-lang</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-utilities</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-jdbc</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-version</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-ensure</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-nls</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-message</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-thread</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-preferences</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-model</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <licenseName>lgpl_v2_1</licenseName>
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+          <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
+          <projectName>anwiba database</projectName>
+          <roots>
+            <root>src/main/java</root>
+            <root>src/test/java</root>
+          </roots>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

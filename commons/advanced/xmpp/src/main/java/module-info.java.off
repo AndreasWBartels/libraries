@@ -1,0 +1,11 @@
+module net.anwiba.commons.xmpp {
+  exports net.anwiba.commons.xmpp.notification;
+  exports net.anwiba.commons.xmpp;
+
+  requires net.anwiba.commons.lang;
+  requires net.anwiba.commons.logging;
+  requires net.anwiba.commons.message;
+  requires net.anwiba.commons.reference;
+  requires net.anwiba.commons.utilities;
+  requires smack;
+}

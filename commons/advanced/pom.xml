@@ -1,44 +1,103 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <name>anwiba commons advanced</name>
   <description>anwiba commons advanced libraries project</description>
-  <url>${scm.url.net.anwiba.master}/commons/advanced</url>
+  <url>${url.net.anwiba}/libraries/commons/advanced</url>
 
-  <artifactId>anwiba-commons-maven-advanced</artifactId>
+  <artifactId>commons-advanced</artifactId>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
-    <artifactId>anwiba-commons-maven-default</artifactId>
-    <version>1.0.185</version>
+    <artifactId>commons</artifactId>
+    <version>1.1.121</version>
   </parent>
 
   <scm>
     <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
     <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
     <url>${scm.url.net.anwiba.master}/commons/advanced</url>
-   </scm>
+  </scm>
 
   <modules>
-    <module>Commons_Advanced</module>
-    <module>Commons_Annotation</module>
-    <module>Commons_Crypto</module>
-    <module>Commons_Datasource</module>
-    <module>Commons_Jdbc</module>
-    <module>Commons_Json</module>
-    <module>Commons_Http</module>
-    <module>Commons_Mail</module>
-    <module>Commons_Preferences</module>
-    <module>Commons_Image</module>
-    <module>Commons_Injection</module>
-    <module>Commons_Version</module>
-    <module>Commons_Workflow</module>
-    <module>Commons_Xml</module>
-    <module>Commons_XMPP</module>
+    <module>annotation</module>
+    <module>crypto</module>
+    <module>datasource</module>
+    <module>http</module>
+    <module>image</module>
+    <module>injection</module>
+    <module>jdbc</module>
+    <module>json</module>
+    <module>mail</module>
+    <module>preferences</module>
+    <module>version</module>
+    <module>workflow</module>
+    <module>xml</module>
+    <module>xmpp</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-logging</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-utilities</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-lang</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-ensure</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-reference</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-message</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-thread</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-nls</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-reflection</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-resource</artifactId>
+        <scope>test</scope>
+        <version>${project.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 </project>

@@ -1,0 +1,37 @@
+-----------------------------------net.anwiba.generated.test.bean.Factory.java-----------------------------------
+
+package net.anwiba.generated.test.bean;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class Factory {
+
+    private String value = null;
+
+    public Factory(final String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    public net.anwiba.generated.test.bean.Instance asInstance() {
+        try {
+            return new ObjectMapper().findAndRegisterModules().readerFor(net.anwiba.generated.test.bean.Instance.class).readValue(value);
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    public static Factory valueOf(net.anwiba.generated.test.bean.Instance object) {
+        try {
+            return new Factory(new ObjectMapper().findAndRegisterModules().writerFor(net.anwiba.generated.test.bean.Instance.class).writeValueAsString(object));
+        } catch (Exception exception) {
+            throw new IllegalArgumentException(exception);
+        }
+    }
+
+}

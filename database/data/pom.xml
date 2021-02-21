@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>anwiba database data project</name>
+  <description>anwiba commons database data project</description>
+  <url>${url.net.anwiba}/libraries/database/data</url>
+
+  <artifactId>database-data</artifactId>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>net.anwiba.database</groupId>
+    <artifactId>database</artifactId>
+    <version>1.1.121</version>
+  </parent>
+
+  <properties>
+    <net.anwiba.commons.version>1.1.121</net.anwiba.commons.version>
+  </properties>
+
+  <scm>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/database/data</url>
+  </scm>
+
+  <modules>
+    <module>oracle</module>
+    <module>postgresql</module>
+    <module>sqlite</module>
+  </modules>
+
+</project>

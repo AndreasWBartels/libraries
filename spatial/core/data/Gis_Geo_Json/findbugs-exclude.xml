@@ -1,8 +1,0 @@
-<FindBugsFilter>
-  <Match>
-    <Match>
-      <Package name="net.anwiba.gis.geo.json.v01_0" />
-      <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
-    </Match>
-  </Match>
-</FindBugsFilter>

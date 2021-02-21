@@ -1,18 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <name>anwiba commons core</name>
   <description>anwiba commons core libraries project</description>
-  <url>${scm.url.net.anwiba.master}/commons/core</url>
+  <url>${url.net.anwiba}/libraries/commons/core</url>
 
-  <artifactId>anwiba-commons-maven-core</artifactId>
+  <artifactId>commons-core</artifactId>
   <packaging>pom</packaging>
+
+  <properties>
+    <revision>1.1.121</revision>
+  </properties>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
-    <artifactId>anwiba-commons-maven-default</artifactId>
-    <version>1.0.185</version>
+    <artifactId>commons</artifactId>
+    <version>1.1.121</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <scm>
@@ -21,18 +27,21 @@
     <url>${scm.url.net.anwiba.master}/commons/core</url>
   </scm>
 
+
   <modules>
-    <module>Commons_Reflaction</module>
-    <module>Commons_Logging</module>
-    <module>Commons_Lang</module>
-    <module>Commons_Ensure</module>
-    <module>Commons_Reference</module>
-    <module>Commons_Resource</module>
-    <module>Commons_Utilities</module>
-    <module>Commons_Message</module>
-    <module>Commons_Model</module>
-    <module>Commons_NLS</module>
-    <module>Commons_Thread</module>
-    <module>Commons_Core</module>
+    <module>ensure</module>
+    <module>graphics</module>
+    <module>lang</module>
+    <module>logging</module>
+    <module>message</module>
+    <module>model</module>
+    <module>nls</module>
+    <module>reference</module>
+    <module>reflection</module>
+    <module>resource</module>
+    <module>thread</module>
+    <module>testing</module>
+    <module>utilities</module>
   </modules>
+
 </project>

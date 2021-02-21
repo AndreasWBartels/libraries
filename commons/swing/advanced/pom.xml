@@ -3,18 +3,19 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>anwiba commons swing advanced</name>
-  <description>anwiba commons swing advanced libraries project</description>
-  <url>${scm.url.net.anwiba.master}/commons/swing/advanced</url>
+  <name>commons swing advanced</name>
+  <description>anwiba commons swing advanced project</description>
+  <url>${url.net.anwiba}/libraries/commons/swing/advanced</url>
 
-  <artifactId>anwiba-commons-maven-swing-advanced</artifactId>
+  <artifactId>commons-swing-advanced</artifactId>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
-    <artifactId>anwiba-commons-maven-swing</artifactId>
-    <version>1.0.185</version>
+    <artifactId>commons-swing</artifactId>
+    <version>1.1.121</version>
   </parent>
+
 
   <scm>
     <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
@@ -23,9 +24,31 @@
   </scm>
 
   <modules>
-    <module>Commons_Swing_Process</module>
-    <module>Commons_Swing_Preferences</module>
-    <module>Commons_Swing_Database_Console</module>
+    <module>preferences</module>
+    <module>process</module>
   </modules>
 
+<dependencyManagement>
+  <dependencies>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-icon</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons.swing.icons</groupId>
+      <artifactId>org.gnome.gtk-contrast-high-icons</artifactId>
+      <version>3.22.1-${project.version}</version>
+    </dependency>
+
+  </dependencies>
+</dependencyManagement>
 </project>

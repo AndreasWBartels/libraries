@@ -1,0 +1,17 @@
+/*
+* javadoc text 
+* this is for testing 
+*/
+@JssdPrimitivesEnabled
+{
+  /*
+  * javadoc text 
+  * this is for testing 
+  */
+  "class": <String> null,
+  /*
+  * javadoc text 
+  * this is for testing 
+  */
+  "flag": <boolean> false,
+}

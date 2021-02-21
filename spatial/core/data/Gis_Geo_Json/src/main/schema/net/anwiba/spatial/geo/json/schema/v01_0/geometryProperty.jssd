@@ -1,8 +1,0 @@
-@JssdExtends(type="net.anwiba.commons.json.schema.v1_0.Property")
-{
-  "type": <java.lang.String> null,
-  "dimension": <int> 2,
-  "isMeasured": <boolean> false,
-  "bbox": <double[]> null,
-  "crs": <net.anwiba.spatial.geo.json.v01_0.Crs> null
-}

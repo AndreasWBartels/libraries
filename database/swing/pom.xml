@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>anwiba database swing project</name>
+  <description>anwiba commons database swing project</description>
+  <url>${url.net.anwiba}/libraries/database/swing</url>
+
+  <artifactId>database-swing</artifactId>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>net.anwiba.database</groupId>
+    <artifactId>database</artifactId>
+    <version>1.1.121</version>
+  </parent>
+
+  <properties>
+    <net.anwiba.commons.version>1.1.121</net.anwiba.commons.version>
+  </properties>
+
+  <scm>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/database/swing</url>
+  </scm>
+
+  <modules>
+    <module>console</module>
+  </modules>
+
+  <dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-core</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons.swing.icons</groupId>
+      <artifactId>org.gnome.gtk-contrast-high-icons</artifactId>
+      <version>3.22.1-${net.anwiba.commons.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-swing-icon</artifactId>
+      <version>${net.anwiba.commons.version}</version>
+    </dependency>
+  </dependencies>
+  </dependencyManagement>
+
+</project>

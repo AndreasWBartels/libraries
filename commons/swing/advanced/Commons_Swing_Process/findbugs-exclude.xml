@@ -1,6 +1,0 @@
-<FindBugsFilter>
-  <Match>
-    <Class name="net.anwiba.commons.swing.process.ProcessMessages"/>
-    <Bug pattern="MS_SHOULD_BE_FINAL"/>
-  </Match>
-</FindBugsFilter>

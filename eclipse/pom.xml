@@ -13,36 +13,31 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.0.185</version>
+    <version>1.1.121</version>
   </parent>
 
   <properties>
-    <net.anwiba.eclipse.version>${net.anwiba.commons.version}</net.anwiba.eclipse.version>
-    <tycho.version>0.26.0</tycho.version>
-    <eclipse.jdt.core.version>3.13.100.xx-201711101938-e47</eclipse.jdt.core.version>
-    <eclipse.osgi.version>3.12.50.v20170928-1321</eclipse.osgi.version>
+    <net.anwiba.eclipse.version>1.1.121</net.anwiba.eclipse.version>
+    <tycho.version>1.6.0</tycho.version>
+    <eclipse.jdt.core.version>3.14.0.v20171206-0802</eclipse.jdt.core.version>
+    <eclipse.osgi.version>3.13.0.v20180226-1711</eclipse.osgi.version>
     <strictVersions>false</strictVersions>
   </properties>
 
   <modules>
-    <module>Eclipse_Commons</module>
-    <module>Eclipse_Libraries</module>
-    <module>Eclipse_Icons</module>
-    <module>Eclipse_Project_Dependencies</module>
-    <module>Eclipse_Distribution</module>
+    <module>commons</module>
+    <module>distribution</module>
+    <module>libraries</module>
+    <module>icons</module>
+    <module>project_dependencies</module>
   </modules>
 
   <repositories>
     <repository>
-      <id>eclipse-oxygen</id>
-      <url>http://download.eclipse.org/releases/oxygen/</url>
+      <id>eclipse-2020-12</id>
+      <url>https://download.eclipse.org/releases/2020-12/</url>
       <layout>p2</layout>
     </repository>
-<!--     <repository> -->
-<!--       <id>eclipse-neon</id> -->
-<!--       <url>http://download.eclipse.org/releases/neon/</url> -->
-<!--       <layout>p2</layout> -->
-<!--     </repository> -->
   </repositories>
 
   <build>
@@ -55,7 +50,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.2.0</version>
           <configuration>
             <descriptors>
               <descriptor>assembly.xml</descriptor>
@@ -64,31 +59,7 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <configuration>
-          <licenseName>lgpl_v2_1</licenseName>
-          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
-          <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
-          <projectName>anwiba commons core</projectName>
-          <roots>
-            <root>src/main/java</root>
-            <root>src/test/java</root>
-          </roots>
-        </configuration>
-        <executions>
-          <execution>
-            <id>first</id>
-            <goals>
-              <goal>update-file-header</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-director-plugin</artifactId>
@@ -113,19 +84,19 @@
         <version>${tycho.version}</version>
         <configuration>
           <compilerArgument>-warn:+discouraged,forbidden</compilerArgument>
-          <compilerVersion>1.8</compilerVersion>
-          <source>1.8</source>
-          <target>1.8</target>
+          <compilerVersion>11</compilerVersion>
+          <source>11</source>
+          <target>11</target>
         </configuration>
       </plugin>
       <plugin>
         <inherited>true</inherited>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.8.1</version>
         <configuration>
           <compilerId>jdt</compilerId>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>11</source>
+          <target>11</target>
           <maxmem>512</maxmem>
           <meminitial>64</meminitial>
           <encoding>UTF-8</encoding>

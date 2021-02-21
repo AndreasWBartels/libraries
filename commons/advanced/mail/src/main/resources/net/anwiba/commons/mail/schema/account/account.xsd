@@ -1,0 +1,100 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0" targetNamespace="http://www.anwiba.net/mail/account"
+  xmlns:this="http://www.anwiba.net/mail/account"
+  elementFormDefault="qualified">
+  <xsd:annotation>
+    <xsd:appinfo>
+      <jaxb:schemaBindings>
+        <jaxb:package name="net.anwiba.commons.mail.schema.account" />
+      </jaxb:schemaBindings>
+    </xsd:appinfo>
+  </xsd:annotation>
+
+  <xsd:element name="account" type="this:Account">
+  </xsd:element>
+
+  <xsd:complexType name="Account">
+    <xsd:sequence>
+      <xsd:element name="email" type="this:EMail" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="outgoing" type="this:Server" minOccurs="1" maxOccurs="1" nillable="false"  />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="EMail">
+    <xsd:sequence>
+      <xsd:element name="senderAddress" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="false" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Server">
+    <xsd:sequence>
+      <xsd:element name="host" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false" />
+      <xsd:element name="port" type="xsd:int" minOccurs="1" maxOccurs="1" nillable="false" />
+      <xsd:element name="encryption" type="this:Encryption" minOccurs="1" maxOccurs="1" nillable="false" />
+      <xsd:element name="authorization" type="this:Authorization" minOccurs="1" maxOccurs="1" nillable="false" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="Encryption">
+    <xsd:restriction base="xsd:string" >
+      <xsd:enumeration value="NONE"/>
+      <xsd:enumeration value="TLS"/>
+      <xsd:enumeration value="STARTTLS"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Authorization">
+    <xsd:sequence>
+      <xsd:element ref="this:authentification" minOccurs="1" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+  
+  <xsd:element name="authentification" type="this:AbstractAuthentification" abstract="true"/>
+
+  <xsd:complexType name="AbstractAuthentification">
+  </xsd:complexType>
+  
+  <xsd:complexType name="AbstractUserPasswordAuthentification">
+    <xsd:complexContent>
+      <xsd:extension base="this:AbstractAuthentification">
+        <xsd:sequence>
+          <xsd:element name="user" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false" />
+          <xsd:element name="password" type="this:Password" minOccurs="1" maxOccurs="1" nillable="false" />
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="plain" type="this:PlainAuthentification" substitutionGroup="this:authentification"/>
+
+  <xsd:complexType name="PlainAuthentification">
+    <xsd:complexContent>
+      <xsd:extension base="this:AbstractUserPasswordAuthentification" />
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="login" type="this:LoginAuthentification" substitutionGroup="this:authentification"/>
+
+  <xsd:complexType name="LoginAuthentification">
+    <xsd:complexContent>
+      <xsd:extension base="this:AbstractUserPasswordAuthentification" />
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:element name="none" type="this:NoneAuthentification" substitutionGroup="this:authentification"/>
+
+  <xsd:complexType name="NoneAuthentification">
+    <xsd:complexContent>
+      <xsd:extension base="this:AbstractAuthentification" />
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Password">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="encrypted" type="xsd:boolean" default="true"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+</xsd:schema>

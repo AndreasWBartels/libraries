@@ -1,0 +1,78 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>spatial gpsd</name>
+
+  <description>spatial gpsd client project</description>
+  <url>${url.net.anwiba}/libraries/spatial/data/gpsd</url>
+
+  <artifactId>anwiba-spatial-data-gpsd</artifactId>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>net.anwiba.spatial</groupId>
+    <artifactId>spatial-data</artifactId>
+    <version>1.1.121</version>
+  </parent>
+
+  <scm>
+    <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
+    <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
+    <url>${scm.url.net.anwiba.master}/spatial/data/gpsd</url>
+  </scm>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>net.anwiba.commons.tools</groupId>
+        <artifactId>anwiba-tools-definition-schema-json</artifactId>
+        <executions>
+          <execution>
+            <id>generate</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <pakkage>net.anwiba.spatial.gps.gpsd.response</pakkage>
+              <comment>// Copyright (c) 2012 by Andreas W. Bartels</comment>
+              <addJSSDFilesToCompileSourceRoot>true</addJSSDFilesToCompileSourceRoot>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <artifactId>jackson-annotations</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>anwiba-commons-logging</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>anwiba-commons-lang</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>anwiba-commons-reference</artifactId>
+      <groupId>net.anwiba.commons</groupId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.commons</groupId>
+      <artifactId>anwiba-commons-json</artifactId>
+    </dependency>
+
+  </dependencies>
+
+</project>

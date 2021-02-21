@@ -1,0 +1,85 @@
+-----------------------------------net.anwiba.test.Bean.java-----------------------------------
+
+package net.anwiba.test;
+
+import java.util.Objects;
+
+
+/**
+ * javadoc text
+ * this is for testing
+ * 
+ */
+public class Bean {
+
+    /**
+     * javadoc text
+     * this is for testing
+     * 
+     */
+    private String name = null;
+    private String[] labels = new String[] { };
+    private int[] values = new int[] { 1, 2 };
+    private String type = "Bean";
+
+    /**
+     * javadoc text
+     * this is for testing
+     * 
+     */
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    /**
+     * javadoc text
+     * this is for testing
+     * 
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    public void setLabels(final String[] labels) {
+        Objects.requireNonNull(labels);
+        this.labels = labels;
+    }
+
+    public String[] getLabels() {
+        return this.labels;
+    }
+
+    public void setValues(final int[] values) {
+        if (values == null) {
+            this.values = new int[] {};
+            return ;
+        }
+        this.values = values;
+    }
+
+    public int[] getValues() {
+        return this.values;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Bean)) {
+            return false;
+        }
+        Bean other = ((Bean) object);
+        return (((Objects.equals(this.name, other.name)&&Objects.equals(this.labels, other.labels))&&Objects.equals(this.values, other.values))&&Objects.equals(this.type, other.type));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.name, this.labels, this.values, this.type);
+    }
+
+}

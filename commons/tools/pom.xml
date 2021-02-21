@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -8,13 +7,13 @@
   <url>${scm.url.net.anwiba.master}/commons/tools</url>
 
   <groupId>net.anwiba.commons.tools</groupId>
-  <artifactId>anwiba-commons-tools</artifactId>
+  <artifactId>commons-tools</artifactId>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
-    <artifactId>anwiba-commons-maven-default</artifactId>
-    <version>1.0.185</version>
+    <artifactId>commons</artifactId>
+    <version>1.1.121</version>
   </parent>
 
   <scm>
@@ -24,10 +23,52 @@
   </scm>
 
   <modules>
-    <module>Tools_Generator_Java</module>
-    <module>Tools_Definition_Schema_Json</module>
-    <module>Tools_Icons</module>
-    <module>Tools_Graphml</module>
+    <module>definition_schema_json</module>
+    <module>generator_java</module>
+    <module>graphml</module>
+    <module>icons</module>
   </modules>
 
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-resource</artifactId>
+      <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-reference</artifactId>
+      <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-ensure</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-lang</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-logging</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-utilities</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 </project>

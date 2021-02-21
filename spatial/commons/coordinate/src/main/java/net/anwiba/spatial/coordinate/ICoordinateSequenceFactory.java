@@ -1,0 +1,69 @@
+/*
+ * #%L
+ * anwiba spatial
+ * %%
+ * Copyright (C) 2007 - 2019 Andreas Bartels
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+
+package net.anwiba.spatial.coordinate;
+
+import java.io.Serializable;
+import java.util.List;
+
+public interface ICoordinateSequenceFactory extends Serializable {
+
+  public abstract ICoordinateSequence createEmptyCoordinateSequence(int dimension, boolean isMeasured);
+
+  public abstract double[][] create(int dimension, int length, boolean isMeasured);
+
+  public abstract ICoordinateSequence create(double[] values, int dimension, boolean isMeasured);
+
+  public abstract ICoordinateSequence create(double xs, double ys);
+
+  public abstract ICoordinateSequence create(double xs, double ys, double zs);
+
+  public abstract ICoordinateSequence create(double xs, double ys, double ns, boolean isMeasured);
+
+  public abstract ICoordinateSequence create(double xs, double ys, double zs, double ms);
+
+  public abstract ICoordinateSequence create(double[] xs, double[] ys);
+
+  public abstract ICoordinateSequence create(double[] xs, double[] ys, double[] ns, boolean isMeasured);
+
+  public abstract ICoordinateSequence create(double[] xs, double[] ys, double[] zs, double[] ms);
+
+  public abstract ICoordinateSequence create(double[][] coordinates);
+
+  public abstract ICoordinateSequence create(double[][] coordinates, boolean isMeasured);
+
+  public abstract ICoordinateSequence create(ICoordinate... coordinates);
+
+  public abstract ICoordinateSequence
+      create(double[] ordinates, int numberOfPoints, int dimensions, boolean isMeasured);
+
+  public abstract ICoordinateSequence create(List<ICoordinate> coordinates);
+
+  public abstract ICoordinateSequence create(
+      int coordinateDimension,
+      double[] coordinates,
+      boolean is3D,
+      boolean isMeasured);
+
+  public abstract ICoordinateSequence create(int dimension, boolean isMeasured, double... values);
+
+}
