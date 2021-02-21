@@ -61,6 +61,28 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <licenseName>lgpl_v2_1</licenseName>
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+          <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
+          <projectName>anwiba eclipse java tools</projectName>
+          <roots>
+            <root>src/main/java</root>
+            <root>src/test/java</root>
+          </roots>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-director-plugin</artifactId>
       </plugin>

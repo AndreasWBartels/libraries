@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: net.anwiba.eclipse.commons
+Bundle-ManifestVersion: 2
+Bundle-Version: 1.1.121
+Bundle-Vendor: Andreas Bartels
+Bundle-Name: Commons
+Bundle-SymbolicName: net.anwiba.eclipse.commons;singleton:=true
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui
+Bundle-ActivationPolicy: lazy
+Export-Package: net.anwiba.commons.eclipse.logging,
+ net.anwiba.commons.eclipse.utilities,
+ net.anwiba.commons.internal.eclipse.logging
+Bundle-ClassPath: .
