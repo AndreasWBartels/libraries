@@ -16,7 +16,9 @@ Bundle-ClassPath: lib/anwiba-commons-ensure-1.1.121.jar,
  lib/anwiba-commons-utilities-1.1.121.jar,
  lib/anwiba-tools-graphml-1.1.121.jar,
  lib/commons-lang3-3.11.jar,
- lib/commons-logging-1.2.jar
+ lib/commons-logging-1.2.jar,
+ lib/log4j-api-2.14.0.jar,
+ lib/log4j-core-2.14.0.jar
 Eclipse-BuddyPolicy: dependent
 Eclipse-BundleShape: dir
 Export-Package: 
