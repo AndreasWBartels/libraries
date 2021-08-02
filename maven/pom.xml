@@ -87,7 +87,7 @@
     <xml-apis.version>2.0.2</xml-apis.version>
 
     <org.antlr4.version>4.9.1</org.antlr4.version>
-    <org.apache.ant.version>1.10.9</org.apache.ant.version>
+    <org.apache.ant.version>1.10.11</org.apache.ant.version>
     <org.apache.logging.version>2.14.0</org.apache.logging.version>
     <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
     <org.apache.derby.version>10.14.2.0</org.apache.derby.version>
