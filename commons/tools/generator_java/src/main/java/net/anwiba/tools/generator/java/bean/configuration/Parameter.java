@@ -21,10 +21,10 @@
  */
 package net.anwiba.tools.generator.java.bean.configuration;
 
-import net.anwiba.tools.generator.java.bean.value.ValueType;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import net.anwiba.tools.generator.java.bean.value.ValueType;
 
 public class Parameter {
 

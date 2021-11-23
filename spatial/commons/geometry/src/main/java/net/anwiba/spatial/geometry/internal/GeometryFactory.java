@@ -25,6 +25,7 @@ package net.anwiba.spatial.geometry.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
@@ -60,6 +61,13 @@ public class GeometryFactory implements IGeometryFactory {
 
   public GeometryFactory(final ICoordinateReferenceSystem coordianteReferenceSystem) {
     this.coordianteReferenceSystem = coordianteReferenceSystem;
+  }
+
+  @Override
+  public IPoint createPoint(final Number x, final Number y) {
+    return createPoint(new Coordinate(
+        Optional.of(x).convert(v -> v.doubleValue()).getOr(() -> Double.NaN).doubleValue(),
+        Optional.of(y).convert(v -> v.doubleValue()).getOr(() -> Double.NaN).doubleValue()));
   }
 
   @Override

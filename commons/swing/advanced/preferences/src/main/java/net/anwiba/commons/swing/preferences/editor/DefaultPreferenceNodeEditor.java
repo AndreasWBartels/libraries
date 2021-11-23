@@ -27,12 +27,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameters;
 import net.anwiba.commons.swing.parameter.ParameterTable;
 import net.anwiba.commons.swing.parameter.ParameterTableModel;
 import net.anwiba.commons.swing.preferences.tree.IPreferenceNode;
 import net.anwiba.commons.swing.preferences.tree.PreferenceNode;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameters;
 
 public class DefaultPreferenceNodeEditor implements IPreferenceNodeEditor {
 

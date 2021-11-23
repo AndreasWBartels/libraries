@@ -21,8 +21,6 @@
  */
 package net.anwiba.commons.image.operation;
 
-import net.anwiba.commons.image.IImageMetadata;
-import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
@@ -43,12 +41,6 @@ public class ImageScaleOperation implements IImageOperation {
 
   public float getHeightFactor() {
     return this.heightFactor;
-  }
-
-  @Override
-  public IImageMetadata adjust(final IImageMetadata metadata, final IImageMetadataAdjustor metadataAdjustor) {
-    return metadataAdjustor
-        .adjust(metadata, metadata.getWidth() * this.widthFactor, metadata.getHeight() * this.heightFactor);
   }
 
   public static IOptional<ImageScaleOperation, RuntimeException>

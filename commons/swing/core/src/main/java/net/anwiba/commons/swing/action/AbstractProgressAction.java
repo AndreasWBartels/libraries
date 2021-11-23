@@ -30,7 +30,7 @@ import javax.swing.Icon;
 
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.object.IObjectProvider;
-import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
+import net.anwiba.commons.swing.dialog.MessageDialogUtilities;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
 
 public abstract class AbstractProgressAction extends AbstractAction {
@@ -62,7 +62,7 @@ public abstract class AbstractProgressAction extends AbstractAction {
     } catch (final CanceledException exception) {
       // nothing to do
     } catch (final InvocationTargetException exception) {
-      ExceptionDialog.show(getOwner(), exception.getCause());
+      MessageDialogUtilities.show(getOwner(), exception.getCause());
     }
   }
 }

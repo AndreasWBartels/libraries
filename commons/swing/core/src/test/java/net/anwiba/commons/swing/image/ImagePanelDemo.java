@@ -54,6 +54,7 @@ import net.anwiba.commons.model.SelectionEvent;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
 import net.anwiba.commons.reference.ResourceReferenceHandler;
+import net.anwiba.commons.reference.ResourceReferenceUtilities;
 import net.anwiba.commons.swing.filechooser.FileFieldBuilder;
 import net.anwiba.commons.swing.list.ObjectListComponent;
 import net.anwiba.commons.swing.list.ObjectListComponentBuilder;
@@ -70,10 +71,7 @@ public class ImagePanelDemo {
       new HttpClientConnector(this.httpRequestExcecutorFactory));
   private final ImageContainerFactory imageContainerFactory =
       ImageContainerFactory.of(null, this.resourceReferenceHandler);
-  private final IImageReader imageReader = new ImageReader(
-      this.imageContainerFactory,
-      this.resourceReferenceHandler,
-      this.httpRequestExcecutorFactory);
+  private final IImageReader imageReader = new ImageReader(this.imageContainerFactory);
 
   @Test
   public void showTifImage() throws Exception {
@@ -84,11 +82,12 @@ public class ImagePanelDemo {
         this.imageReader,
         model,
         ImageScaleBehavior.SCALE_DOWN);
+    imagePanel.setPreferredSize(new Dimension(400, 400));
     show(Duration.ofMinutes(5), imagePanel, frame -> {
       try {
         Thread.sleep(500);
         model.set(resourceReference);
-        Thread.sleep(2000);
+        Thread.sleep(1000);
       } catch (InterruptedException exception) {
       }
     });
@@ -181,8 +180,17 @@ public class ImagePanelDemo {
 
     component.add(imageContainer, BorderLayout.CENTER);
     component.add(listComponent, BorderLayout.WEST);
-    show(component);
-//    model.set(ImageResourceProviders.tiffImage);
+    final IResourceReference resourceReference = create("image.tif");
+    final File file = ResourceReferenceUtilities.getFile(resourceReference);
+    fileModel.set(file.getParentFile());
+    show(component, f -> {
+      try {
+        Thread.sleep(500);
+        selectionModel.setSelectedObject(file);
+        Thread.sleep(1000);
+      } catch (InterruptedException exception) {
+      }
+    });
   }
 
 }

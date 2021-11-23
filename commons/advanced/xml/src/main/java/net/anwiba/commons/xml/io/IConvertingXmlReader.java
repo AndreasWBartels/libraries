@@ -25,7 +25,7 @@ package net.anwiba.commons.xml.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.IParameters;
 
 public interface IConvertingXmlReader {
 

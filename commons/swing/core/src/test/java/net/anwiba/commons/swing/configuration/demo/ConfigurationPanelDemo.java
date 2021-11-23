@@ -28,13 +28,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameter;
+import net.anwiba.commons.lang.parameter.Parameters;
 import net.anwiba.commons.swing.configuration.Configuration;
 import net.anwiba.commons.swing.configuration.ConfigurationPanel;
 import net.anwiba.commons.swing.configuration.IConfiguration;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameter;
-import net.anwiba.commons.utilities.parameter.Parameters;
 
 public class ConfigurationPanelDemo {
 

@@ -22,11 +22,11 @@
 package net.anwiba.commons.swing.preferences.tree;
 
 import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.preferences.PreferenceUtilities;
 import net.anwiba.commons.swing.tree.ITreeNode;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
-import net.anwiba.commons.utilities.parameter.IParameters;
 
 public class PreferenceNode implements ITreeNode<PreferenceNode>, IPreferenceNode {
 

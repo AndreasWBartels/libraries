@@ -24,10 +24,10 @@ package net.anwiba.commons.swing.preferences.tree;
 import java.util.List;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.swing.tree.ITreeNodeFilter;
 import net.anwiba.commons.utilities.collection.ListUtilities;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class PreferenceNodeTreeFilter implements ITreeNodeFilter<PreferenceNode> {

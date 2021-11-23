@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.swing.menu;
 
-import net.anwiba.commons.model.AbstractObjectListModel;
-
 import java.util.ArrayList;
 
 import javax.swing.Action;
+
+import net.anwiba.commons.model.AbstractObjectListModel;
 
 public class ActionListModel extends AbstractObjectListModel<Action> {
 

@@ -27,6 +27,6 @@ module net.anwiba.tools.graphml {
   exports net.anwiba.tools.yworks.shapenode.generated;
 
   requires java.xml;
-  requires java.xml.bind;
+  requires jakarta.xml.bind;
   requires net.anwiba.commons.lang;
 }

@@ -32,7 +32,8 @@ import java.awt.image.LookupOp;
 import java.awt.image.LookupTable;
 import java.awt.image.RasterFormatException;
 
-import net.anwiba.commons.image.IImageOperator;
+import net.anwiba.commons.image.IImageMetadata;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.image.operation.ImageCropOperation;
 import net.anwiba.commons.image.operation.ImageInvertOperation;
@@ -43,9 +44,13 @@ import net.anwiba.commons.image.operation.ImageToGrayScaleOperation;
 import net.anwiba.commons.lang.collection.IMutableObjectList;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.object.ObjectPair;
 import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.stream.Streams;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
-class BufferedImageOperatorFactory {
+public class BufferedImageOperatorFactory {
 
   private interface IBufferedImageFactory {
 
@@ -53,20 +58,28 @@ class BufferedImageOperatorFactory {
 
   }
 
-  private static final class AggregatedBufferedImageOperator implements IImageOperator {
-    private final IObjectList<IImageOperator> collection;
+  private static final class AggregatedBufferedImageOperator implements IBufferedImageOperator {
+    private final IObjectList<IBufferedImageOperator> collection;
 
-    public AggregatedBufferedImageOperator(final IObjectList<IImageOperator> collection) {
+    public AggregatedBufferedImageOperator(final IObjectList<IBufferedImageOperator> collection) {
       this.collection = collection;
     }
 
     @Override
-    public BufferedImage execute(final BufferedImage source) {
-      return this.collection.stream().aggregate(source, (s, o) -> o.execute(s)).get();
+    public BufferedImage execute(final ICanceler canceler, final BufferedImage source) throws CanceledException {
+      return Streams
+          .of(CanceledException.class, this.collection)
+          .aggregate(source, (s, o) -> {
+            if (canceler.isCanceled()) {
+              return null;
+            }
+            return s == null ? null : o.execute(canceler, s);
+          })
+          .get();
     }
   }
 
-  private static final class BufferedImageOpOperator implements IImageOperator {
+  private static final class BufferedImageOpOperator implements IBufferedImageOperator {
 
     private final IBufferedImageFactory bufferedImageFactory;
     private final BufferedImageOp bufferedImageOp;
@@ -83,49 +96,77 @@ class BufferedImageOperatorFactory {
     }
 
     @Override
-    public BufferedImage execute(final BufferedImage source) {
+    public BufferedImage execute(final ICanceler canceler, final BufferedImage source) {
       return this.bufferedImageOp.filter(source, this.bufferedImageFactory.create(source));
     }
 
   }
 
-  public IImageOperator create(
+  private static IBufferedImageOperator doNothingOperation = new IBufferedImageOperator() {
+
+    @Override
+    public BufferedImage execute(final ICanceler canceler, final BufferedImage source) {
+      return source;
+    }
+  };
+
+  private final IImageMetadataAdjustor metadataAdjustor;
+
+  public BufferedImageOperatorFactory() {
+    this(new BufferedImageMetadataAdjustor());
+  }
+
+  public BufferedImageOperatorFactory(final IImageMetadataAdjustor metadataAdjustor) {
+    this.metadataAdjustor = metadataAdjustor;
+  }
+
+  public ObjectPair<IBufferedImageOperator, BufferedImageMetadata> create(
       final BufferedImageMetadata metadata,
       final IImageOperation operation,
       final RenderingHints hints) {
     if (operation instanceof ImageScaleOperation) {
       final ImageScaleOperation o = (ImageScaleOperation) operation;
-      return createImageScaleOperation(hints, o);
+      return ObjectPair.of(createImageScaleOperation(hints, o), adapt(metadata, operation));
     } else if (operation instanceof ImageCropOperation) {
       final ImageCropOperation o = (ImageCropOperation) operation;
-      return createImageCropOperation(o);
+      return ObjectPair.of(createImageCropOperation(o), adapt(metadata, operation));
     } else if (operation instanceof ImageMapBandsOperation) {
       final ImageMapBandsOperation o = (ImageMapBandsOperation) operation;
-      return createImageMapBandsOperation(metadata, hints, o);
+      return ObjectPair.of(createImageMapBandsOperation(metadata, hints, o), adapt(metadata, operation));
     } else if (operation instanceof ImageOpacityOperation) {
       final ImageOpacityOperation o = (ImageOpacityOperation) operation;
-      return createImageOpacityOperation(metadata, hints, o);
-    } else if (operation instanceof ImageInvertOperation) {
-      return createImageInvertOperation(metadata, hints);
-    } else if (operation instanceof ImageToGrayScaleOperation) {
-      return createImageToGrayScaleOperation(hints);
-    }
-    return new IImageOperator() {
-
-      @Override
-      public BufferedImage execute(final BufferedImage source) {
-        return source;
+      if (o.getFactor() >= 1f) {
+        return ObjectPair.of(doNothingOperation, metadata);
       }
-    };
+      //      if (metadata.getNumberOfComponents() == 3) {
+      //        return (canceler, source) -> Optional.of(ImagenImageContainerUtilities.toOpacity(hints, source, o.getFactor()))
+      //            .convert(p -> p.getAsBufferedImage())
+      //            .get();
+      //      }
+      return ObjectPair.of(createImageOpacityOperation(metadata, hints, o), adapt(metadata, operation));
+    } else if (operation instanceof ImageInvertOperation) {
+      //      return (canceler, source) -> Optional.of(ImagenImageContainerUtilities.toInverted(hints, source))
+      //          .convert(p -> p.getAsBufferedImage())
+      //          .get();
+      return ObjectPair.of(createImageInvertOperation(metadata, hints), metadata);
+    } else if (operation instanceof ImageToGrayScaleOperation) {
+      return ObjectPair.of(createImageToGrayScaleOperation(hints), adapt(metadata, operation));
+    }
+    return ObjectPair.of(doNothingOperation, metadata);
   }
 
-  private IImageOperator createImageScaleOperation(final RenderingHints hints, final ImageScaleOperation o) {
+  private BufferedImageMetadata adapt(final IImageMetadata metadata, final IImageOperation operation) {
+    return (BufferedImageMetadata) this.metadataAdjustor.adjust(metadata, operation);
+  }
+
+  public static IBufferedImageOperator createImageScaleOperation(final RenderingHints hints,
+      final ImageScaleOperation o) {
     return new BufferedImageOpOperator(
         new AffineTransformOp(AffineTransform.getScaleInstance(o.getWidthFactor(), o.getHeightFactor()), hints));
   }
 
-  private IImageOperator createImageCropOperation(final ImageCropOperation o) {
-    return source -> {
+  private IBufferedImageOperator createImageCropOperation(final ImageCropOperation o) {
+    return (canceler, source) -> {
       try {
         final int x = Math.round(o.getX());
         final int y = Math.round(o.getY());
@@ -142,8 +183,8 @@ class BufferedImageOperatorFactory {
     };
   }
 
-  private IImageOperator createImageMapBandsOperation(
-      final BufferedImageMetadata metadata,
+  public static IBufferedImageOperator createImageMapBandsOperation(
+      final IImageMetadata metadata,
       final RenderingHints hints,
       final ImageMapBandsOperation o) {
     int[] mappings = o.getBandMapping();
@@ -164,43 +205,105 @@ class BufferedImageOperatorFactory {
     return new BufferedImageOpOperator(new LookupOp(lookupTable, hints));
   }
 
-  private IImageOperator createImageOpacityOperation(
-      final BufferedImageMetadata metadata,
+  public static IBufferedImageOperator createImageOpacityOperation(
+      final IImageMetadata metadata,
       final RenderingHints hints,
       final ImageOpacityOperation o) {
     final float factor = o.getFactor();
-    final LookupTable lookupTable = new LookupTable(0, metadata.getNumberOfBands()) {
+    if (metadata.getNumberOfBands() == 1 || metadata.getNumberOfBands() == 3) {
+      return new IBufferedImageOperator() {
+
+        @Override
+        public BufferedImage execute(final ICanceler canceler, final BufferedImage source) {
+          BufferedImage image = new ColorConvertOp(hints).filter(source,
+              new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB));
+          BufferedImage result = new LookupOp(new LookupTable(0, 4) {
+
+            @Override
+            public int[] lookupPixel(final int[] src, final int[] dest) {
+              dest[0] = src[0];
+              dest[1] = src[1];
+              dest[2] = src[2];
+              dest[3] = Math.round(src[3] * factor);
+              return dest;
+            }
+          }, hints).filter(image, null);
+          return result;
+        }
+      };
+    }
+    final LookupTable lookupTable = createColorOpacityLookupTable(metadata, factor);
+    return new BufferedImageOpOperator(new LookupOp(lookupTable, hints));
+  }
+
+  private static LookupTable createColorOpacityLookupTable(final IImageMetadata metadata, final float factor) {
+    return new LookupTable(0, metadata.getNumberOfBands()) {
 
       @Override
       public int[] lookupPixel(final int[] src, final int[] dest) {
-        for (int i = 0; i < dest.length; i++) {
-          if (i == 3) {
-            if (src.length < 3) {
-              dest[i] = Math.round(255 * factor);
-              continue;
-            }
-            dest[i] = Math.round(src[i] * factor);
-            continue;
-          }
+        for (int i = 0; i < dest.length - 1; i++) {
           dest[i] = src[i];
         }
+        dest[dest.length - 1] = Math.round(src[dest.length - 1] * factor);
         return dest;
       }
     };
-    return new BufferedImageOpOperator(new IBufferedImageFactory() {
-
-      @Override
-      public BufferedImage create(final BufferedImage image) {
-        if (image.getType() != BufferedImage.TYPE_INT_ARGB) {
-          return null;
-        }
-        return new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-      }
-    }, new LookupOp(lookupTable, hints));
   }
 
-  private IImageOperator createImageInvertOperation(final BufferedImageMetadata metadata, final RenderingHints hints) {
-    final LookupTable lookupTable = new LookupTable(0, metadata.getNumberOfBands()) {
+  public static IBufferedImageOperator createImageInvertOperation(final IImageMetadata metadata,
+      final RenderingHints hints) {
+    final LookupTable lookupTable = createColorInvertLookupTable(metadata);
+    return new BufferedImageOpOperator(new LookupOp(lookupTable, hints));
+  }
+
+  private static LookupTable createColorInvertLookupTable(final IImageMetadata metadata) {
+    if (ColorSpace.TYPE_GRAY == metadata.getColorSpaceType() && metadata.getNumberOfBands() == 1) {
+      return new LookupTable(0, metadata.getNumberOfBands()) {
+
+        @Override
+        public int[] lookupPixel(final int[] src, final int[] dest) {
+          dest[0] = 255 - src[0];
+          return dest;
+        }
+      };
+    }
+    if (ColorSpace.TYPE_GRAY == metadata.getColorSpaceType() && metadata.getNumberOfBands() == 2) {
+      return new LookupTable(0, metadata.getNumberOfBands()) {
+
+        @Override
+        public int[] lookupPixel(final int[] src, final int[] dest) {
+          dest[0] = 255 - src[0];
+          dest[1] = src[1];
+          return dest;
+        }
+      };
+    }
+    if (metadata.getNumberOfColorComponents() == 3) {
+      return new LookupTable(0, metadata.getNumberOfBands()) {
+
+        @Override
+        public int[] lookupPixel(final int[] src, final int[] dest) {
+          dest[0] = 255 - src[0];
+          dest[1] = 255 - src[1];
+          dest[2] = 255 - src[2];
+          return dest;
+        }
+      };
+    }
+    if (metadata.getNumberOfColorComponents() == 4) {
+      return new LookupTable(0, metadata.getNumberOfBands()) {
+
+        @Override
+        public int[] lookupPixel(final int[] src, final int[] dest) {
+          dest[0] = 255 - src[0];
+          dest[1] = 255 - src[1];
+          dest[2] = 255 - src[2];
+          dest[3] = src[3];
+          return dest;
+        }
+      };
+    }
+    return new LookupTable(0, metadata.getNumberOfBands()) {
 
       @Override
       public int[] lookupPixel(final int[] src, final int[] dest) {
@@ -214,20 +317,19 @@ class BufferedImageOperatorFactory {
         return dest;
       }
     };
-    return new BufferedImageOpOperator(new LookupOp(lookupTable, hints));
   }
 
-  private IImageOperator createImageToGrayScaleOperation(final RenderingHints hints) {
+  public static IBufferedImageOperator createImageToGrayScaleOperation(final RenderingHints hints) {
     return new BufferedImageOpOperator(new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), hints));
   }
 
-  IImageOperator create(
+  IBufferedImageOperator create(
       final BufferedImageMetadata metadata,
       final IObjectList<IImageOperation> imageOperations,
       final RenderingHints hints) {
 
     if (imageOperations.isEmpty()) {
-      return new AggregatedBufferedImageOperator(new ObjectList<IImageOperator>());
+      return new AggregatedBufferedImageOperator(new ObjectList<IBufferedImageOperator>());
     }
     IOptional<ImageScaleOperation, RuntimeException> scaleOperation = ImageScaleOperation.aggregate(imageOperations);
     IOptional<ImageCropOperation, RuntimeException> cropOperation = ImageCropOperation.aggregate(imageOperations);
@@ -251,8 +353,13 @@ class BufferedImageOperatorFactory {
       operations.add(scaleOperation.get());
     }
 
-    final IObjectList<IImageOperator> collection =
-        operations.stream().convert(o -> create(metadata, o, hints)).asObjectList();
+    IMutableObjectList<IBufferedImageOperator> collection = new ObjectList<>();
+    BufferedImageMetadata imageMetadata = metadata;
+    for (IImageOperation operation : operations) {
+      ObjectPair<IBufferedImageOperator, BufferedImageMetadata> pair = create(imageMetadata, operation, hints);
+      collection.add(pair.getFirstObject());
+      imageMetadata = pair.getSecondObject();
+    }
     return new AggregatedBufferedImageOperator(collection);
   }
 }

@@ -279,43 +279,14 @@ public class JObjectToBeanConverter {
           .annotation(
               annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_TYPE_INFO)
                   .parameter("use", JsonTypeInfo.Id.NAME)
-                  .parameter("include", JsonTypeInfo.As.PROPERTY)
+                  .parameter("include", JsonTypeInfo.As.EXISTING_PROPERTY)
                   .parameter(
                       "property",
                       propertyParameter == null
                           ? TYPE
                           : propertyParameter.value().toString())
                   .build());
-      final JParameter typesParameter = annotation.parameter(TYPES);
-      if (typesParameter != null) {
-        final AnnotationBuilder annotationBuilder = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE);
-
-        final List<Annotation> annotations = new ArrayList<>();
-
-        final StringTokenizer typeTokenizer = new StringTokenizer(typesParameter.value().toString(), ",");
-        while (typeTokenizer.hasMoreTokens()) {
-          final String token = typeTokenizer.nextToken().trim();
-          final int index = token.indexOf(':');
-          if (index > -1) {
-            final String value = token.substring(0, index).trim();
-            final String name = token.substring(index + 1, token.length()).trim();
-            annotations
-                .add(
-                    annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
-                        .parameter(VALUE, convertToClassName(value), ValueType.CLASS)
-                        .parameter(NAME, name)
-                        .build());
-            continue;
-          }
-          annotations
-              .add(
-                  annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
-                      .parameter(VALUE, convertToClassName(token), ValueType.CLASS)
-                      .build());
-        }
-        annotationBuilder.parameter(VALUE, annotations);
-        builder.annotation(annotationBuilder.build());
-      }
+      addSubTypes(builder, annotation);
       return;
     }
 
@@ -352,6 +323,39 @@ public class JObjectToBeanConverter {
         }
       }
       builder.creator(createMethodeBuilder.build());
+    }
+  }
+
+  protected void addSubTypes(final BeanBuilder builder, final JAnnotation annotation) {
+    final JParameter typesParameter = annotation.parameter(TYPES);
+    if (typesParameter != null) {
+      final AnnotationBuilder annotationBuilder = annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE);
+
+      final List<Annotation> annotations = new ArrayList<>();
+
+      final StringTokenizer typeTokenizer = new StringTokenizer(typesParameter.value().toString(), ",");
+      while (typeTokenizer.hasMoreTokens()) {
+        final String token = typeTokenizer.nextToken().trim();
+        final int index = token.indexOf(':');
+        if (index > -1) {
+          final String value = token.substring(0, index).trim();
+          final String name = token.substring(index + 1, token.length()).trim();
+          annotations
+              .add(
+                  annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
+                      .parameter(VALUE, convertToClassName(value), ValueType.CLASS)
+                      .parameter(NAME, name)
+                      .build());
+          continue;
+        }
+        annotations
+            .add(
+                annotation(ORG_CODEHAUS_JACKSON_ANNOTATE_JSON_SUB_TYPE_TYPE)
+                    .parameter(VALUE, convertToClassName(token), ValueType.CLASS)
+                    .build());
+      }
+      annotationBuilder.parameter(VALUE, annotations);
+      builder.annotation(annotationBuilder.build());
     }
   }
 

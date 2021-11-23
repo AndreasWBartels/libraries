@@ -27,7 +27,7 @@ import net.anwiba.commons.lang.object.ObjectUtilities;
 public class ObjectModel<T> extends AbstractObjectChangedNotifier implements IObjectModel<T> {
 
   private final Object monitor = new Object();
-  private T value;
+  private volatile T value;
   private final boolean isNullable;
   private IEqualComperator<T> comperator;
 

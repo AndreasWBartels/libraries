@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.swing.preference;
 
+import java.awt.Rectangle;
+
 import net.anwiba.commons.preferences.DummyPreferences;
 import net.anwiba.commons.preferences.IPreferences;
-
-import java.awt.Rectangle;
 
 public class BoundsPreference {
 

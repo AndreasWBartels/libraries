@@ -199,7 +199,7 @@ public class GuiIconDecorator {
     final Graphics2D graphic = (Graphics2D) image.getGraphics();
     try {
       graphic.drawImage(icon.getImage(), 0, 0, new ImageObserver() {
-
+        
         @Override
         public boolean imageUpdate(
             final Image img,
@@ -210,9 +210,46 @@ public class GuiIconDecorator {
             final int height) {
           return true;
         }
-
+        
       });
       graphic.drawImage(decoration.getImage(), 0, 0, new ImageObserver() {
+        
+        @Override
+        public boolean imageUpdate(
+            final Image img,
+            final int infoflags,
+            final int x,
+            final int y,
+            final int width,
+            final int height) {
+          return true;
+        }
+        
+      });
+      return new ImageIcon(image);
+    } finally {
+      graphic.dispose();
+    }
+  }
+
+  public static ImageIcon add(final ImageIcon icon, final ImageIcon decoration, DecorationPosition position) {
+    if (icon.getIconWidth() == decoration.getIconWidth() && icon.getIconHeight() == decoration.getIconHeight()) {
+      int width = icon.getIconWidth()/2;
+      int height = icon.getIconHeight()/2;
+      return add(icon, resize(decoration, width, height), position);
+    }
+    int width = decoration.getIconWidth();
+    int height = decoration.getIconHeight();
+    final Point point = getPosition(icon.getIconWidth(), position, width, height);
+    return add(icon, decoration, point.x, point.y, width, height);
+  }
+
+  private static ImageIcon resize(ImageIcon icon, int width, int height) {
+    final BufferedImage image =
+        new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    final Graphics2D graphic = (Graphics2D) image.getGraphics();
+    try {
+      graphic.drawImage(icon.getImage(), 0, 0, width, height, new ImageObserver() {
 
         @Override
         public boolean imageUpdate(

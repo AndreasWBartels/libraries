@@ -2,7 +2,6 @@
 @JssdPrimitivesEnabled
 {
   @JssdImmutable
-  @JssdNoProperty
   "class": <String> "GST",
   "tag": <String> null,
   "device": <String> null,

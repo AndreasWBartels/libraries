@@ -21,13 +21,13 @@
  */
 package net.anwiba.tools.generator.java.bean.writer;
 
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.writer.FileCodeWriter;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import com.sun.codemodel.JPackage;
+import com.sun.codemodel.writer.FileCodeWriter;
 
 public class SourceCodeWriter extends FileCodeWriter {
 

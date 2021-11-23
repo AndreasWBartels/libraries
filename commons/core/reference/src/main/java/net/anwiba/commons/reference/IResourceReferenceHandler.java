@@ -30,8 +30,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.reference.io.IRandomInputAccess;
+import net.anwiba.commons.reference.io.IRandomOutputAccess;
 
 public interface IResourceReferenceHandler {
 
@@ -43,9 +46,7 @@ public interface IResourceReferenceHandler {
 
   Path getPath(IResourceReference resourceReference) throws URISyntaxException;
 
-  String getExtension(IResourceReference resourceReference);
-
-//  String getMimeType(IResourceReference resourceReference);
+  String toString(IResourceReference resourceReference);
 
   OutputStream openOnputStream(IResourceReference resourceReference) throws IOException;
 
@@ -54,7 +55,7 @@ public interface IResourceReferenceHandler {
   InputStream openInputStream(IResourceReference resourceReference, IAcceptor<String> contentTypeAcceptor)
       throws IOException;
 
-  boolean exsits(IResourceReference resourceReference);
+  boolean exists(IResourceReference resourceReference);
 
   boolean canRead(IResourceReference resourceReference);
 
@@ -62,22 +63,36 @@ public interface IResourceReferenceHandler {
 
   boolean canDelete(IResourceReference resourceReference);
 
+  boolean canAccessRandom(IResourceReference resourceReference);
+
+  IRandomInputAccess getRandomInputAccess(IResourceReference resourceReference) throws IOException;
+
+  IRandomOutputAccess getRandomOutputAccess(IResourceReference resourceReference) throws IOException;
+
   void delete(IResourceReference resourceReference) throws IOException;
 
   boolean isMemoryResource(IResourceReference resourceReference);
 
+  boolean isFileSystemResource(IResourceReference resourceReference);
+  
   String getContent(IResourceReference resourceReference) throws IOException;
 
-  boolean isFileSystemResource(IResourceReference resourceReference);
+  String getExtension(IResourceReference resourceReference);
+  
+  String getContentType(IResourceReference resourceReference);
 
   long getContentLength(IResourceReference resourceReference);
 
-  String toString(IResourceReference resourceReference);
-
-  String getContentType(IResourceReference resourceReference);
-
   String getFileName(IResourceReference reference);
 
-  long lastModified(IResourceReference resourceReference) throws IOException;
+  FileTime lastModified(IResourceReference resourceReference) throws IOException;
+
+  FileTime lastAccessed(IResourceReference resourceReference) throws IOException;
+
+  FileTime created(IResourceReference resourceReference) throws IOException;
+
+  IResourceReference toInMemoryReference(IResourceReference resourceReference) throws IOException;
+
+  IResourceReference toInMemoryReference(IResourceReference resourceReference, String  contentType, String encoding) throws IOException;
 
 }

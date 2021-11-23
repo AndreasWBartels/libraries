@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.utilities.date;
 
-import net.anwiba.commons.lang.functional.IConverter;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import net.anwiba.commons.lang.functional.IConverter;
 
 public final class DateToStringConverter implements IConverter<Date, String, RuntimeException> {
   private final SimpleDateFormat format;

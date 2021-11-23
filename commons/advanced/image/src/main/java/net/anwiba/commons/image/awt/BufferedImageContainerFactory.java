@@ -25,10 +25,12 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 import net.anwiba.commons.image.IImageContainer;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.lang.collection.ObjectList;
 
 public class BufferedImageContainerFactory {
 
+  private final IImageMetadataAdjustor metadataAdjustor = new BufferedImageMetadataAdjustor();
   private final RenderingHints hints;
 
   public BufferedImageContainerFactory(final RenderingHints hints) {
@@ -37,6 +39,6 @@ public class BufferedImageContainerFactory {
 
   public IImageContainer create(final BufferedImage image) {
     final BufferedImageMetadata metadata = new BufferedImageMetadataFactory().create(image);
-    return new BufferedImageContainer(this.hints, metadata, image, new ObjectList<>());
+    return new BufferedImageContainer(this.hints, metadata, image, new ObjectList<>(), metadataAdjustor);
   }
 }

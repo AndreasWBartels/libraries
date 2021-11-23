@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.model;
 
-import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.commons.lang.functional.IProcedure;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.commons.lang.functional.IProcedure;
 
 public class ListenerList<L> {
   private final List<L> listeners;

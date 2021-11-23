@@ -295,7 +295,12 @@ public class ImagePanel extends JComponent implements Scrollable {
           .setDitheringEnabled()
           .setRenderingQuality()
           .build()) {
-        graphic.drawImage(this.thumbnail, this.bound.x, this.bound.y, this);
+        try {
+          graphic.drawImage(this.thumbnail, this.bound.x, this.bound.y, this);
+        } catch (RuntimeException exception) {
+          logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+          this.exceptionModel.set(exception);
+        }
       }
     }
   }

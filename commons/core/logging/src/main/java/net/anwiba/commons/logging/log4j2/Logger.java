@@ -23,6 +23,9 @@ package net.anwiba.commons.logging.log4j2;
 
 import java.util.Objects;
 
+import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.util.MessageSupplier;
+
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.IMessageFactory;
@@ -36,39 +39,57 @@ public class Logger implements ILogger {
   }
 
   @Override
-  public void log(final ILevel level, final IMessageFactory factory) {
+  public void doLog(ILevel level, IMessageFactory message, Throwable throwable) {
     if (!isLoggable(level)) {
       return;
     }
-    log(level, factory.create());
-  }
-
-  @Override
-  public void log(final ILevel level, final String message) {
-    log(level, message, null);
-  }
-
-  @Override
-  public void log(final ILevel level, final String message, final Throwable throwable) {
+    MessageSupplier supplier = new MessageSupplier() {
+      
+      @Override
+      public Message get() {
+        return new Message() {
+          
+          @Override
+          public Throwable getThrowable() {
+            return throwable;
+          }
+          
+          @Override
+          public Object[] getParameters() {
+            return null;
+          }
+          
+          @Override
+          public String getFormattedMessage() {
+            return message.create();
+          }
+          
+          @Override
+          public String getFormat() {
+            return null;
+          }
+        };
+      }
+    };
     if (Objects.equals(ILevel.ALL, level)
         || Objects.equals(ILevel.FINE, level)) {
-      this.logger.trace(message, throwable);
+      this.logger.trace(supplier);
     }
     if (Objects.equals(ILevel.DEBUG, level)) {
-      this.logger.debug(message, throwable);
+      this.logger.debug(supplier);
     }
     if (Objects.equals(ILevel.INFO, level)) {
-      this.logger.info(message, throwable);
+      this.logger.info(supplier);
     }
     if (Objects.equals(ILevel.WARNING, level)) {
-      this.logger.warn(message, throwable);
+      this.logger.warn(supplier);
     }
     if (Objects.equals(ILevel.ERROR, level)) {
-      this.logger.error(message, throwable);
+      this.logger.error(supplier);
     }
     if (Objects.equals(ILevel.SEVERE, level)
         || Objects.equals(ILevel.FATAL, level)) {
-      this.logger.fatal(message, throwable);
+      this.logger.fatal(supplier);
     }
   }
 

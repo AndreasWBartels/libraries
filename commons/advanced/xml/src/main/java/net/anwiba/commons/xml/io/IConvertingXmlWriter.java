@@ -25,8 +25,8 @@ package net.anwiba.commons.xml.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameters;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameters;
 
 public interface IConvertingXmlWriter<C> {
 

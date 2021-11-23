@@ -21,10 +21,17 @@
  */
 package net.anwiba.spatial.coordinate.calculator;
 
+import java.util.List;
+
+import net.anwiba.spatial.coordinate.CoordinateSequenceFactory;
+import net.anwiba.spatial.coordinate.ICoordinate;
 import net.anwiba.spatial.coordinate.ICoordinateSequence;
 
 public interface ICoordinateSequenceValueCalculator {
 
   double calculate(ICoordinateSequence coordinateSequence);
 
+  default double calculate(final List<ICoordinate> coordinates) {
+    return calculate(new CoordinateSequenceFactory().create(coordinates));
+  }
 }

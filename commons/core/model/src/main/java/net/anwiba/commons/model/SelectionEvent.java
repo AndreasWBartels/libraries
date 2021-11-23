@@ -23,14 +23,14 @@ package net.anwiba.commons.model;
 
 public class SelectionEvent<T> {
 
-  private final SelectionModel<T> source;
+  private final ISelectionModel<T> source;
 
-  public SelectionEvent(final SelectionModel<T> source) {
+  public SelectionEvent(final ISelectionModel<T> source) {
     assert source != null;
     this.source = source;
   }
 
-  public SelectionModel<T> getSource() {
+  public ISelectionModel<T> getSource() {
     return this.source;
   }
 }

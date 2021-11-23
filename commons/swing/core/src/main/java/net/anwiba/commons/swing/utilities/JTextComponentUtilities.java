@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
 import java.awt.font.FontRenderContext;
 import java.io.File;
 import java.io.IOException;
@@ -81,11 +82,11 @@ public class JTextComponentUtilities {
     return font.getStringBounds(value, fontRenderContext).getWidth();
   }
 
-  public static void enableHyperlinks(final JEditorPane area) {
-    if (Desktop.isDesktopSupported() && area.getDocument() instanceof HTMLDocument) {
+  public static void enableHyperlinks(final JEditorPane pane) {
+    if (Desktop.isDesktopSupported() && pane.getDocument() instanceof HTMLDocument) {
       final Desktop desktop = Desktop.getDesktop();
       if (desktop.isSupported(Desktop.Action.BROWSE)) {
-        area.addHyperlinkListener(hyperlinkEvent -> {
+        pane.addHyperlinkListener(hyperlinkEvent -> {
           if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             final String descriptionString = hyperlinkEvent.getDescription();
             logger.log(ILevel.DEBUG, "href '" + descriptionString + "'"); //$NON-NLS-1$//$NON-NLS-2$
@@ -108,4 +109,33 @@ public class JTextComponentUtilities {
       }
     }
   }
+
+  public static void enableHyperlinks(final Component label, final String link, final int clicks) {
+    if (Desktop.isDesktopSupported()) {
+      final Desktop desktop = Desktop.getDesktop();
+      if (desktop.isSupported(Desktop.Action.BROWSE)) {
+        try {
+          URI uri = new java.net.URI(link);
+          label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final java.awt.event.MouseEvent event) {
+              if (event.getClickCount() != clicks) {
+                return;
+              }
+              try {
+                desktop.browse(uri);
+              } catch (final IOException exception) {
+                logger.log(ILevel.WARNING, "Couldn't browse '" + link + "'"); //$NON-NLS-1$//$NON-NLS-2$
+                logger.log(ILevel.WARNING, exception.getMessage(), exception);
+              }
+            }
+          });
+        } catch (final URISyntaxException exception) {
+          logger.log(ILevel.WARNING, "Couldn't browse '" + link + "'"); //$NON-NLS-1$//$NON-NLS-2$
+          logger.log(ILevel.WARNING, exception.getMessage(), exception);
+        }
+      }
+    }
+  }
+
 }

@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.swing.utilities;
 
-import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
-
 import java.awt.Component;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+
+import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 
 public class JComboBoxUtilities {
 

@@ -62,6 +62,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
       @Override
       public T execute(
           final ICanceler canceler,
+          final String url,
           final int statusCode,
           final String statusMessage,
           final String contentType,
@@ -69,7 +70,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           final InputStream inputStream)
           throws IOException,
           CanceledException {
-        return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
+        return resultProducer.execute(canceler, url, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 
       @Override
@@ -125,6 +126,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           @Override
           public T execute(
               final ICanceler canceler,
+              final String url,
               final int statusCode,
               final String statusMessage,
               final String contentType,
@@ -136,10 +138,10 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
               if (!producer.isApplicable(statusCode, contentType)) {
                 continue;
               }
-              return producer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
+              return producer.execute(canceler, url, statusCode, statusMessage, contentType, contentEncoding, inputStream);
             }
-            final IResultProducer<T> producer = (c, sc, sm, t, e, i) -> null;
-            return producer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
+            final IResultProducer<T> producer = (c, u, sc, sm, t, e, i) -> null;
+            return producer.execute(canceler, url, statusCode, statusMessage, contentType, contentEncoding, inputStream);
           }
 
           @Override
@@ -170,6 +172,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
       @Override
       public T execute(
           final ICanceler canceler,
+          final String url,
           final int statusCode,
           final String statusMessage,
           final String contentType,
@@ -177,7 +180,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           final InputStream inputStream)
           throws IOException,
           CanceledException {
-        return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
+        return resultProducer.execute(canceler, url, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 
       @Override
@@ -197,6 +200,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
       @Override
       public T execute(
           final ICanceler canceler,
+          final String url,
           final int statusCode,
           final String statusMessage,
           final String contentType,
@@ -204,7 +208,7 @@ public class ObjectRequestExecutorBuilder<T> implements IObjectRequestExecutorBu
           final InputStream inputStream)
           throws IOException,
           CanceledException {
-        return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
+        return resultProducer.execute(canceler, url, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 
       @Override

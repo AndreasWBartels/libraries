@@ -75,16 +75,18 @@ public interface IValidationResult {
 
   boolean isValid();
 
-  default <E extends Exception> void ifValid(final IBlock<E> block) throws E {
+  default <E extends Exception> IValidationResult ifValid(final IBlock<E> block) throws E {
     if (isValid()) {
       block.execute();
     }
+    return this;
   }
 
-  default <E extends Exception> void otherwise(final IConsumer<String, E> consumer) throws E {
+  default <E extends Exception> IValidationResult otherwise(final IConsumer<String, E> consumer) throws E {
     if (!isValid()) {
       consumer.consume(getMessage());
     }
+    return this;
   }
 
   String getMessage();

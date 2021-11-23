@@ -1,6 +1,6 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="2.0" targetNamespace="http://www.anwiba.net/mail/account"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+  targetNamespace="http://www.anwiba.net/mail/account"
   xmlns:this="http://www.anwiba.net/mail/account"
   elementFormDefault="qualified">
   <xsd:annotation>

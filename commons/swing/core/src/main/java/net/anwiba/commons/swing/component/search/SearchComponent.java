@@ -91,7 +91,7 @@ public class SearchComponent<C, R> implements IComponentProvider {
   public JComponent getComponent() {
     if (this.contentPane == null) {
       this.contentPane = new JPanel(new BorderLayout());
-      this.contentPane.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 2));;
+      this.contentPane.setBorder(BorderFactory.createEmptyBorder(2, 2, 0, 2));
       final JPanel controllPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
       @SuppressWarnings("hiding")
       final ISearchEngine<C, R> engine = this.engine;
@@ -114,8 +114,9 @@ public class SearchComponent<C, R> implements IComponentProvider {
           .setTask(() -> {
             engine.reset();
             engine.search(
-                Optional.ofNullable(searchFeatureAcceptorModel.get()).orElseGet(
-                    () -> this.stringConditionFactory.create(searchStringModel.get())));
+                Optional.ofNullable(searchFeatureAcceptorModel.get())
+                    .orElseGet(
+                        () -> this.stringConditionFactory.create(searchStringModel.get())));
           })
           .build();
       final BooleanModel resetActionEnabledModel = new BooleanModel(!engine.getSearchResultsModel().isEmpty());

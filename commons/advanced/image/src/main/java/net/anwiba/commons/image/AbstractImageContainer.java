@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -39,81 +39,46 @@ import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.collection.ObjectListBuilder;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.message.IMessageCollector;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public abstract class AbstractImageContainer implements IImageContainer {
 
-  final IImageMetadataAdjustor metadataAdjustor = new IImageMetadataAdjustor() {
-
-    @Override
-    public IImageMetadata adjust(final IImageMetadata metadata, final float width, final float height) {
-      if (metadata == null || metadata instanceof InvalidImageMetadata) {
-        return metadata;
-      }
-      if (metadata.getWidth() <= 0) {
-        return new InvalidImageMetadata(new MessageBuilder().setText("width <= 0").setError().build());
-      }
-      if (metadata.getHeight() <= 0) {
-        return new InvalidImageMetadata(new MessageBuilder().setText("height <= 0").setError().build());
-      }
-      return AbstractImageContainer.this.adjust(metadata, width, height);
-    }
-
-    @Override
-    public IImageMetadata
-        adjust(final IImageMetadata metadata,
-            final int numberOfComponents,
-            final int numberOfBands,
-            final int colorSpaceType) {
-      if (metadata == null || metadata instanceof InvalidImageMetadata) {
-        return metadata;
-      }
-      if (metadata.getNumberOfBands() <= 0) {
-        return new InvalidImageMetadata(new MessageBuilder().setText("number of bands <= 0").setError().build());
-      }
-      if (metadata.getNumberOfComponents() <= 0) {
-        return new InvalidImageMetadata(new MessageBuilder().setText("number of components <= 0").setError().build());
-      }
-      if (metadata.getColorSpaceType() < 0 || metadata.getColorSpaceType() > 25) {
-        return new InvalidImageMetadata(new MessageBuilder().setText("number of components <= 0").setError().build());
-      }
-
-      return AbstractImageContainer.this.adjust(metadata, numberOfComponents, numberOfBands, colorSpaceType);
-    }
-
-    @Override
-    public IImageMetadata copy(final IImageMetadata metadata) {
-      if (metadata == null || metadata instanceof InvalidImageMetadata) {
-        return metadata;
-      }
-      return AbstractImageContainer.this.copy(metadata);
-    }
-  };
 
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
       .getLogger(AbstractImageContainer.class);
   private final IMutableObjectList<IImageOperation> operations = new ObjectList<>();
   private IImageMetadata metadata;
   private final RenderingHints hints;
+  private IImageMetadataAdjustor metadataAdjustor;
 
   public AbstractImageContainer(final RenderingHints hints,
       final IImageMetadata metadata,
-      final IObjectList<IImageOperation> operations) {
+      final IObjectList<IImageOperation> operations, IImageMetadataAdjustor metadataAdjustor) {
     this.hints = hints;
     this.metadata = metadata;
+    this.metadataAdjustor = metadataAdjustor;
     this.operations.add(operations);
   }
 
-  protected abstract IImageMetadata
-      adjust(IImageMetadata metadata2, int numberOfComponents, int numberOfBands, int colorSpaceType);
-
   @Override
-  public final BufferedImage asBufferImage(final ICanceler canceler) throws CanceledException {
+  public BufferedImage asBufferImage(final IMessageCollector messageCollector, final ICanceler canceler)
+      throws CanceledException {
     try {
-      return read(canceler, this.hints, this.operations);
+      final BufferedImage image = read(messageCollector, canceler, this.hints, this.operations, metadataAdjustor);
+      canceler.check();
+      return image;
+    } catch (IllegalArgumentException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+      messageCollector
+          .addMessage(Message.builder().setText(exception.getMessage()).setThrowable(exception).setError().build());
+      return null;
     } catch (IOException exception) {
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+      messageCollector
+          .addMessage(Message.builder().setText(exception.getMessage()).setThrowable(exception).setError().build());
       return null;
     }
   }
@@ -199,7 +164,7 @@ public abstract class AbstractImageContainer implements IImageContainer {
                   .build());
         }
         for (IImageOperation operation : this.operations) {
-          metadata = operation.adjust(metadata, this.metadataAdjustor);
+          metadata = metadataAdjustor.adjust(metadata, operation);
         }
         this.metadata = metadata;
       }
@@ -231,7 +196,7 @@ public abstract class AbstractImageContainer implements IImageContainer {
 
   @Override
   public final int getNumberOfComponents() {
-    return getMetadata().getNumberOfComponents();
+    return getMetadata().getNumberOfColorComponents();
   }
 
   @Override
@@ -241,8 +206,8 @@ public abstract class AbstractImageContainer implements IImageContainer {
 
   private IImageContainer create(final IImageMetadata metadata, final IImageOperation operation) {
     return adapt(this.hints,
-        metadata == null ? null : operation.adjust(metadata, this.metadataAdjustor),
-        addTo(this.operations, operation));
+        metadata == null ? null : this.metadataAdjustor.adjust(metadata, operation),
+        addTo(this.operations, operation), metadataAdjustor);
   }
 
   private IObjectList<IImageOperation> addTo(final IObjectList<IImageOperation> operations,
@@ -254,24 +219,13 @@ public abstract class AbstractImageContainer implements IImageContainer {
       IOException;
 
   protected abstract BufferedImage
-      read(final ICanceler canceler,
+      read(final IMessageCollector messageCollector,
+          final ICanceler canceler,
           final RenderingHints hints,
-          final IObjectList<IImageOperation> operations)
+          final IObjectList<IImageOperation> operations, IImageMetadataAdjustor metadataAdjustor)
           throws CanceledException,
           IOException;
 
-  protected abstract IImageMetadata adjust(IImageMetadata metadata, float width, float height);
-
-  protected abstract IImageMetadata
-      adjust(IImageMetadata metadata,
-          final int numberOfComponents,
-          final int numberOfBands,
-          final int colorSpaceType,
-          final int dataType,
-          final int transparency);
-
-  protected abstract IImageMetadata copy(IImageMetadata metadata);
-
   protected abstract IImageContainer
-      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations);
+      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations, IImageMetadataAdjustor metadataAdjustor);
 }

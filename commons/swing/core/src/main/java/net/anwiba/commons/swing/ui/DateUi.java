@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.ui;
 
-import net.anwiba.commons.swing.dialog.DialogMessages;
-import net.anwiba.commons.swing.icons.GuiIcons;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.Icon;
+
+import net.anwiba.commons.swing.dialog.DialogMessages;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 public class DateUi extends AbstractObjectUi<Date> {
 

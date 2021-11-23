@@ -31,6 +31,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -136,7 +137,7 @@ public class ToolBarManagerDemo {
     comboBoxModel.setSelectedItem(Double.valueOf(1.5));
     final JComboBoxActionProvider<Double> actionContainerProvider = new JComboBoxActionProvider<>(
         comboBoxModel,
-        action,
+        new JButton(action),
         "Test"); //$NON-NLS-1$
     final JComboBox<Double> comboBox = actionContainerProvider.getContainer();
     comboBox.addActionListener(new NullActionListener());

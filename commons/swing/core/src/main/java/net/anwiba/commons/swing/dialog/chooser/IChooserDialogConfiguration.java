@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.swing.dialog.chooser;
 
-import net.anwiba.commons.swing.dialog.DialogType;
-
 import java.util.List;
+
+import net.anwiba.commons.swing.dialog.DialogType;
 
 public interface IChooserDialogConfiguration<T> {
 

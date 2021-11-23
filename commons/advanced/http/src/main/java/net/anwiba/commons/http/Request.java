@@ -24,8 +24,11 @@ package net.anwiba.commons.http;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.anwiba.commons.cache.resource.ILifeTime;
 import net.anwiba.commons.lang.functional.IClosure;
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.parameter.IParameters;
 
 public final class Request implements IRequest {
 
@@ -42,6 +45,7 @@ public final class Request implements IRequest {
   private final String host;
   private final int port;
   private final String protocoll;
+  private ILifeTime cacheTime;
 
   Request(
       final HttpMethodType methodType,
@@ -56,7 +60,8 @@ public final class Request implements IRequest {
       final IClosure<InputStream, IOException> inputStreamClosure,
       final long contentLength,
       final String encoding,
-      final String mimeType) {
+      final String mimeType,
+      final ILifeTime cacheTime) {
     super();
     this.methodType = methodType;
     this.protocoll = protocoll;
@@ -71,6 +76,7 @@ public final class Request implements IRequest {
     this.contentLength = contentLength;
     this.encoding = encoding;
     this.mimeType = mimeType;
+    this.cacheTime = cacheTime;
   }
 
   @Override
@@ -131,5 +137,9 @@ public final class Request implements IRequest {
   @Override
   public int getPort() {
     return this.port;
+  }
+
+  public IOptional<ILifeTime, RuntimeException> getCacheTime() {
+    return Optional.of(cacheTime);
   }
 }

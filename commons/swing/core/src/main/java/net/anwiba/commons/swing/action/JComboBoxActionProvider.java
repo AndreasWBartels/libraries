@@ -43,22 +43,24 @@ import net.anwiba.commons.swing.utilities.JComboBoxUtilities;
 public class JComboBoxActionProvider<T> implements IActionContainerProvider<JComboBox> {
 
   final JComboBox<T> comboBox;
-  JButton button;
-  private final Action action;
+  AbstractButton button;
+//  private final Action action;
 
-  public JComboBoxActionProvider(final ComboBoxModel<T> comboBoxModel, final Action action) {
+  public JComboBoxActionProvider(final ComboBoxModel<T> comboBoxModel, final AbstractButton action) {
     this(comboBoxModel, action, null);
   }
 
   @SuppressWarnings("unchecked")
-  public JComboBoxActionProvider(final ComboBoxModel<T> comboBoxModel, final Action action, final String toolTip) {
-    this.action = action;
+  public JComboBoxActionProvider(final ComboBoxModel<T> comboBoxModel,
+      final AbstractButton action,
+      final String toolTip) {
+    this.button = action;
     this.comboBox = new JComboBox(comboBoxModel);
     final JButton comboBoxButton = JComboBoxUtilities.getComboBoxButton(this.comboBox);
     final JToolBar toolBar = new JToolBar();
     toolBar.setFloatable(false);
     toolBar.setBorder(BorderFactory.createEmptyBorder());
-    this.button = toolBar.add(action);
+    toolBar.add(action);
     this.comboBox.setEditor(new ComboBoxEditor() {
 
       @Override
@@ -130,7 +132,7 @@ public class JComboBoxActionProvider<T> implements IActionContainerProvider<JCom
 
   @Override
   public Action getAction() {
-    return this.action;
+    return this.button.getAction();
   }
 
   @Override

@@ -30,7 +30,7 @@ module net.anwiba.tools.icons {
 
   requires ant;
   requires java.xml;
-  requires java.xml.bind;
+  requires jakarta.xml.bind;
   requires net.anwiba.commons.ensure;
   requires net.anwiba.commons.lang;
   requires net.anwiba.commons.reference;
@@ -40,6 +40,6 @@ module net.anwiba.tools.icons {
   requires maven.project;
   requires plexus.build.api;
 
-  opens net.anwiba.tools.icons.schema.configuration to java.xml.bind;
-  opens net.anwiba.tools.icons.schema.eclipse.classpath to java.xml.bind;
+  opens net.anwiba.tools.icons.schema.configuration to jakarta.xml.bind;
+  opens net.anwiba.tools.icons.schema.eclipse.classpath to jakarta.xml.bind;
 }

@@ -21,11 +21,11 @@
  */
 package net.anwiba.tools.definition.schema.json.gramma.element;
 
-import net.anwiba.commons.lang.object.ObjectUtilities;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public class JType {
 

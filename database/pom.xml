@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -14,11 +13,11 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.1.121</version>
+    <version>1.1.158</version>
   </parent>
 
   <properties>
-    <net.anwiba.commons.version>1.1.121</net.anwiba.commons.version>
+    <net.anwiba.commons.version>1.1.158</net.anwiba.commons.version>
   </properties>
 
   <scm>
@@ -34,71 +33,82 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-reference</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-logging</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-lang</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-utilities</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-jdbc</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-version</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
+
+      <!-- commons-core -->
+
       <dependency>
         <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-ensure</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-lang</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-logging</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-message</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-model</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-nls</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-message</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-reference</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
 
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-thread</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
 
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-thread</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-utilities</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
 
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-preferences</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-version</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
 
-    <dependency>
-      <groupId>net.anwiba.commons</groupId>
-      <artifactId>anwiba-commons-model</artifactId>
-      <version>${net.anwiba.commons.version}</version>
-    </dependency>
+      <!-- commons-advanced -->
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-jdbc</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.anwiba.commons</groupId>
+        <artifactId>anwiba-commons-preferences</artifactId>
+        <version>${net.anwiba.commons.version}</version>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>

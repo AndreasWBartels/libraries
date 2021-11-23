@@ -23,6 +23,7 @@
 package net.anwiba.spatial.geometry.internal;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import net.anwiba.spatial.coordinate.CoordinateSequenceUtilities;
 import net.anwiba.spatial.coordinate.ICoordinateSequence;
@@ -88,5 +89,26 @@ public class Polygon extends AbstractGeometry implements IPolygon {
   @Override
   public Iterable<ILinearRing> getInnerRings() {
     return Arrays.asList(this.innerRings);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + Arrays.hashCode(this.innerRings);
+    result = prime * result + Objects.hash(outerRing);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Polygon other = (Polygon) obj;
+    return Arrays.equals(this.innerRings, other.innerRings) && Objects.equals(this.outerRing, other.outerRing);
   }
 }

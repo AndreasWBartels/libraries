@@ -24,6 +24,8 @@ package net.anwiba.commons.datasource.resource;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.time.Clock;
+import java.time.ZonedDateTime;
 
 import net.anwiba.commons.datasource.connection.FileConnectionDescription;
 import net.anwiba.commons.datasource.connection.HttpConnectionDescription;
@@ -98,7 +100,7 @@ public class ResourceDescription implements IResourceDescription {
           @Override
           public IConnectionDescription visitUriResource(final UriResourceReference uriResourceReference)
               throws RuntimeException,
-                CreationException {
+              CreationException {
             final URI uri = uriResourceReference.getUri();
             if ("file".equals(uri.getScheme())) {
               return new FileConnectionDescription(new ResourceReferenceFactory().create(new File(uri.getPath())));
@@ -134,7 +136,8 @@ public class ResourceDescription implements IResourceDescription {
             return new MemoryConnectionDescription(
                 memoryResourceReference,
                 memoryResourceReference.getContentType(),
-                memoryResourceReference.getTimeStamp());
+                ZonedDateTime.ofInstant(memoryResourceReference.creationTime().toInstant(),
+                    Clock.systemDefaultZone().getZone()));
           }
 
           @Override
@@ -143,6 +146,10 @@ public class ResourceDescription implements IResourceDescription {
             return new FileConnectionDescription(pathResourceReference);
           }
         });
+    return new ResourceDescription(connectionDescription);
+  }
+
+  public static ResourceDescription of(final IConnectionDescription connectionDescription) {
     return new ResourceDescription(connectionDescription);
   }
 

@@ -296,7 +296,7 @@ public class CoordinateSequenceUtilities {
     final SmallPointCalculator calculator = new SmallPointCalculator(segment.from, segment.to);
     final ICoordinate from = calculator.calculate(0, distance);
     final ICoordinate to = calculator
-        .calculate(DISTANCE_CALCULATOR.calculateDistance(segment.from, segment.to), distance);
+        .calculate(DISTANCE_CALCULATOR.calculate(segment.from, segment.to), distance);
     return new Segment(from, to);
   }
 

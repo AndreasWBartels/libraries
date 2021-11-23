@@ -21,14 +21,14 @@
  */
 package net.anwiba.commons.swing.component.search.action;
 
-import net.anwiba.commons.lang.functional.IProcedure;
-import net.anwiba.commons.swing.icons.GuiIcons;
-
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
+
+import net.anwiba.commons.lang.functional.IProcedure;
+import net.anwiba.commons.swing.icons.GuiIcons;
 
 public final class CloseAction extends AbstractAction {
   private final IProcedure<Component, RuntimeException> closeStrategy;

@@ -21,6 +21,12 @@
  */
 package net.anwiba.commons.swing.combobox;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
@@ -28,11 +34,6 @@ import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.object.IActionNotifier;
 import net.anwiba.commons.swing.object.IObjectField;
 import net.anwiba.commons.utilities.validation.IValidationResult;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 
 public class BooleanComboBoxField implements IObjectField<Boolean> {
   final ObjectModel<Boolean> model = new ObjectModel<>();

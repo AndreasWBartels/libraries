@@ -29,11 +29,17 @@ public class HttpServerException extends IOException {
   private static final long serialVersionUID = 1L;
   private final int statusCode;
   private final String statusText;
+  private final String url;
 
-  public HttpServerException(final String message, final int statusCode, final String statusText) {
+  public HttpServerException(final String message, String url, final int statusCode, final String statusText) {
     super(message);
+    this.url = url;
     this.statusCode = statusCode;
     this.statusText = statusText;
+  }
+
+  public String getUrl() {
+    return this.url;
   }
 
   public int getStatusCode() {

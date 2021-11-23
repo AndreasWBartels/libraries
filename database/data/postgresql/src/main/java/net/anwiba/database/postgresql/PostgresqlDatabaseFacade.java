@@ -53,6 +53,7 @@ import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.database.postgresql.utilities.PostgresqlUtilities;
 
 public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistrableDatabaseFacade {
 
@@ -338,4 +339,14 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
     return true;
   }
 
+  @Override
+  public String getTableStatement(final Connection connection, final IDatabaseTableName tableName)
+      throws SQLException {
+    return PostgresqlUtilities.createStatement(connection, tableName.getSchemaName(), tableName.getTableName());
+  }
+
+  @Override
+  public boolean supportsTableStatement() {
+    return true;
+  }
 }

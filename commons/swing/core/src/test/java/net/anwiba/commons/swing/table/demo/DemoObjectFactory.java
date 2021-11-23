@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.swing.table.demo;
 
-import net.anwiba.commons.lang.random.RandomIsNullDecider;
-import net.anwiba.commons.lang.random.RandomObjectGenerator;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.anwiba.commons.lang.random.RandomIsNullDecider;
+import net.anwiba.commons.lang.random.RandomObjectGenerator;
 
 public class DemoObjectFactory {
 

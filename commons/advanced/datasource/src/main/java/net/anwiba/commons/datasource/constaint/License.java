@@ -21,17 +21,22 @@
  */
 package net.anwiba.commons.datasource.constaint;
 
+import java.util.Collections;
+import java.util.List;
+
 public class License implements ILicense {
 
   private final String identifier;
   private final String name;
   private final String reference;
+  private List<String> attributes;
 
-  public License(final String identifier, final String name, final String reference) {
+  public License(final String identifier, final String name, final String reference, List<String> attributes) {
     super();
     this.identifier = identifier;
     this.name = name;
     this.reference = reference;
+    this.attributes = Collections.unmodifiableList(attributes);
   }
 
   @Override
@@ -49,8 +54,13 @@ public class License implements ILicense {
     return this.reference;
   }
 
-  public static ILicense of(final String identifier, final String name, final String reference) {
-    return new License(identifier, name, reference);
+  @Override
+  public List<String> getAttributes() {
+    return attributes;
+  }
+
+  public static ILicense of(final String identifier, final String name, final String reference, List<String> attributes) {
+    return new License(identifier, name, reference, attributes);
   }
 
   @Override
@@ -60,7 +70,7 @@ public class License implements ILicense {
     result = prime * result + ((this.identifier == null) ? 0 : this.identifier.hashCode());
     return result;
   }
-
+  
   @Override
   public boolean equals(final Object obj) {
     if (this == obj) {

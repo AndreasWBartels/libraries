@@ -24,12 +24,10 @@ package net.anwiba.commons.swing.dialog;
 import java.awt.Component;
 import java.awt.Window;
 
-import javax.swing.Icon;
-
 import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.Message;
-import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
+import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
@@ -48,19 +46,16 @@ public class MessageDialogUtilities {
       final String title,
       final IMessage message,
       final DialogType dialogType) {
-    final Icon icon = null;
-    return show(owner, title, message, icon, dialogType);
+    return show(owner, title, message, GuiIcons.EMPTY_ICON, dialogType);
   }
 
   private static IDialogResult show(
       final Component owner,
       final String title,
       final IMessage message,
-      final Icon icon,
+      final IGuiIcon icon,
       final DialogType dialogType) {
-    final MessageDialog dialog = create(GuiUtilities.getParentWindow(owner), title, message, icon, dialogType);
-    dialog.setVisible(true);
-    return dialog.getResult();
+    return launch(GuiUtilities.getParentWindow(owner), title, message, icon, dialogType);
   }
 
   public static IDialogResult showUnsupportedOperationDialog(final Window owner) {
@@ -68,25 +63,29 @@ public class MessageDialogUtilities {
         owner,
         DialogMessages.ERROR,
         Message.create("Unsupported operation", "Not yet implemented"), //$NON-NLS-1$ //$NON-NLS-2$
-        GuiIcons.EMPTY_ICON.getLargeIcon(),
+        GuiIcons.EMPTY_ICON,
         DialogType.CLOSE);
   }
 
-  private static MessageDialog create(
+  private static IDialogResult launch(
       final Window owner,
       final String title,
       final IMessage message,
-      final Icon icon,
+      final IGuiIcon icon,
       final DialogType dialogType) {
-    if (message instanceof ExceptionMessage) {
-      return new ExceptionDialog(owner, (ExceptionMessage) message);
-    }
-    return new MessageDialog(owner, title, message, icon, dialogType);
+    return MessageDialog.launcher()
+        .title(title)
+        .icon(icon)
+        .message(message)
+        .dialogType(dialogType)
+        .launch(owner);
   }
 
-  public static MessageDialogLauncher setTitle(final String text) {
-    final MessageDialogLauncher launcher = new MessageDialogLauncher();
-    return launcher.title(text);
+  public static void show(final Window owner, final ExceptionMessage message) {
+    MessageDialog.launcher().message(message).launch(owner);
   }
 
+  public static void show(final Window owner, final Throwable e) {
+    MessageDialog.launcher().throwable(e).error().launch(owner);
+  }
 }

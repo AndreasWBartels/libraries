@@ -23,7 +23,6 @@ package net.anwiba.commons.utilities.string;
 
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.object.IObjectProvider;
-import net.anwiba.commons.utilities.string.HexStringToByteArrayConverter;
 
 public final class HexStringByteArrayProvider implements IObjectProvider<byte[]> {
   private final String key;

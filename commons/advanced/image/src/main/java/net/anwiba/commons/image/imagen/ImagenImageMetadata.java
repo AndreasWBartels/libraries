@@ -32,6 +32,7 @@ class ImagenImageMetadata implements IImageMetadata {
   private final int colorSpaceType;
   private final int dataType;
   private final int transparency;
+  private final boolean isIndexed;
 
   public ImagenImageMetadata(
       final float width,
@@ -40,7 +41,8 @@ class ImagenImageMetadata implements IImageMetadata {
       final int numberOfBands,
       final int colorSpaceType,
       final int dataType,
-      final int transparency) {
+      final int transparency,
+      final boolean isIndexed) {
     this.width = width;
     this.height = height;
     this.numberOfComponents = numberOfComponents;
@@ -48,6 +50,7 @@ class ImagenImageMetadata implements IImageMetadata {
     this.colorSpaceType = colorSpaceType;
     this.dataType = dataType;
     this.transparency = transparency;
+    this.isIndexed = isIndexed;
   }
 
   @Override
@@ -61,7 +64,7 @@ class ImagenImageMetadata implements IImageMetadata {
   }
 
   @Override
-  public int getNumberOfComponents() {
+  public int getNumberOfColorComponents() {
     return this.numberOfComponents;
   }
 
@@ -83,5 +86,10 @@ class ImagenImageMetadata implements IImageMetadata {
   @Override
   public int getTransparency() {
     return this.transparency;
+  }
+  
+  @Override
+  public boolean isIndexed() {
+    return isIndexed;
   }
 }

@@ -31,37 +31,41 @@ public final class Properties implements IProperties {
 
   private static final long serialVersionUID = 655956184779585973L;
   private final List<String> names = new ArrayList<>();
-  private final List<IProperty> parameters = new ArrayList<>();
+  private final List<IProperty> properties = new ArrayList<>();
   private final Map<String, IProperty> map = new HashMap<>();
 
-  public Properties(final List<IProperty> parameters) {
-    for (final IProperty parameter : parameters) {
-      this.names.add(parameter.getName());
-      this.map.put(parameter.getName(), parameter);
+  public static PropertiesBuilder builder() {
+    return new PropertiesBuilder();
+  }
+
+  public Properties(final List<IProperty> properties) {
+    for (final IProperty property : properties) {
+      this.names.add(property.getName());
+      this.map.put(property.getName(), property);
     }
-    this.names.forEach(name -> this.parameters.add(this.map.get(name)));
+    this.names.forEach(name -> this.properties.add(this.map.get(name)));
   }
 
   @Override
   public int getNumberOfProperties() {
-    return this.parameters.size();
+    return this.properties.size();
   }
 
   @Override
   public IProperty getProperty(final int index) {
-    return this.parameters.get(index);
+    return this.properties.get(index);
   }
 
   @Override
-  public IProperties adapt(final int index, final IProperty parameter) {
-    final IProperty[] array = this.parameters.toArray(new IProperty[this.parameters.size()]);
-    array[index] = parameter;
+  public IProperties adapt(final int index, final IProperty property) {
+    final IProperty[] array = this.properties.toArray(new IProperty[this.properties.size()]);
+    array[index] = property;
     return new Properties(Arrays.asList(array));
   }
 
   @Override
   public Iterable<IProperty> properties() {
-    return this.parameters;
+    return this.properties;
   }
 
   @Override
@@ -86,15 +90,9 @@ public final class Properties implements IProperties {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((this.map == null)
+    result = prime * result + ((this.properties == null)
         ? 0
-        : this.map.hashCode());
-    result = prime * result + ((this.names == null)
-        ? 0
-        : this.names.hashCode());
-    result = prime * result + ((this.parameters == null)
-        ? 0
-        : this.parameters.hashCode());
+        : this.properties.hashCode());
     return result;
   }
 
@@ -110,25 +108,11 @@ public final class Properties implements IProperties {
       return false;
     }
     final Properties other = (Properties) obj;
-    if (this.map == null) {
-      if (other.map != null) {
+    if (this.properties == null) {
+      if (other.properties != null) {
         return false;
       }
-    } else if (!this.map.equals(other.map)) {
-      return false;
-    }
-    if (this.names == null) {
-      if (other.names != null) {
-        return false;
-      }
-    } else if (!this.names.equals(other.names)) {
-      return false;
-    }
-    if (this.parameters == null) {
-      if (other.parameters != null) {
-        return false;
-      }
-    } else if (!this.parameters.equals(other.parameters)) {
+    } else if (!this.properties.equals(other.properties)) {
       return false;
     }
     return true;

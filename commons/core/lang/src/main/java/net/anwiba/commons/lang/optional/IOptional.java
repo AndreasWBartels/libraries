@@ -74,4 +74,6 @@ public interface IOptional<T, E extends Exception> {
 
   boolean isEmpty();
 
+  void throwIfFaild() throws E;
+
 }

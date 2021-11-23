@@ -51,14 +51,14 @@ public class ContainsLinearRingOperatorTest {
   }
 
   @Test
-  public void testRingContaints() throws Exception {
+  public void testRingContains() throws Exception {
     final ILinearRing ring = TestGeometryFactory.createShellLinearRing();
     final ContainsLinearRingOperator operator = new ContainsLinearRingOperator(ring);
     assertTrue(operator.contains(TestGeometryFactory.createHoleLinearRing(), false));
   }
 
   @Test
-  public void testRingContaintsNot() throws Exception {
+  public void testRingContainsNot() throws Exception {
     final ILinearRing ring = TestGeometryFactory.createHoleLinearRing();
     final ContainsLinearRingOperator operator = new ContainsLinearRingOperator(ring);
     assertFalse(operator.contains(TestGeometryFactory.createShellLinearRing(), false));

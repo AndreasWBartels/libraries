@@ -22,6 +22,37 @@
 package net.anwiba.commons.utilities.io.url;
 
 public final class Authentication implements IAuthentication {
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.password == null) ? 0 : this.password.hashCode());
+    result = prime * result + ((this.userName == null) ? 0 : this.userName.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Authentication other = (Authentication) obj;
+    if (this.password == null) {
+      if (other.password != null)
+        return false;
+    } else if (!this.password.equals(other.password))
+      return false;
+    if (this.userName == null) {
+      if (other.userName != null)
+        return false;
+    } else if (!this.userName.equals(other.userName))
+      return false;
+    return true;
+  }
+
   private final String userName;
   private final String password;
 

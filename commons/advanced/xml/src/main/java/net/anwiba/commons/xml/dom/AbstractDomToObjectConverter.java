@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.xml.dom;
 
-import net.anwiba.commons.utilities.factory.IFactory;
-
 import org.dom4j.Element;
+
+import net.anwiba.commons.utilities.factory.IFactory;
 
 public abstract class AbstractDomToObjectConverter<T, E extends DomConverterException> implements
     IDomToObjectConverter<T> {

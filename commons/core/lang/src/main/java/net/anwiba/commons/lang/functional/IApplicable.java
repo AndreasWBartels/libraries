@@ -28,7 +28,12 @@ public interface IApplicable<T> {
 
   boolean isApplicable(T context);
 
-  default IAcceptor<T> not() {
+  static <T> IApplicable<T> not(IApplicable<T> applicable) {
+    Objects.requireNonNull(applicable);
+    return applicable.not();
+  }
+
+  default IApplicable<T> not() {
     return (t) -> !isApplicable(t);
   }
 

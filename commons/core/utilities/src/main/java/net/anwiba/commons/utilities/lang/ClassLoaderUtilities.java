@@ -171,6 +171,7 @@ public class ClassLoaderUtilities {
   private static Set<String> licenseFileNames = new HashSet<>();
   static {
     licenseFileNames.add("META-INF/LICENSE.txt"); //$NON-NLS-1$
+    licenseFileNames.add("META-INF/LICENSE.md"); //$NON-NLS-1$
     licenseFileNames.add("META-INF/LICENSE"); //$NON-NLS-1$
     licenseFileNames.add("META-INF/COPYING"); //$NON-NLS-1$
     licenseFileNames.add("license/LICENSE.txt"); //$NON-NLS-1$
@@ -178,6 +179,7 @@ public class ClassLoaderUtilities {
     licenseFileNames.add("license.html"); //$NON-NLS-1$
     licenseFileNames.add("LICENSE.txt"); //$NON-NLS-1$
     licenseFileNames.add("LICENSE"); //$NON-NLS-1$
+    licenseFileNames.add("LICENSE.md"); //$NON-NLS-1$
     licenseFileNames.add("COPYING"); //$NON-NLS-1$
   }
 
@@ -191,14 +193,19 @@ public class ClassLoaderUtilities {
   private static Set<String> readMeFileNames = new HashSet<>();
   static {
     readMeFileNames.add("META-INF/README.txt"); //$NON-NLS-1$
+    readMeFileNames.add("META-INF/README.md"); //$NON-NLS-1$
     readMeFileNames.add("META-INF/README"); //$NON-NLS-1$
     readMeFileNames.add("META-INF/NOTICE.txt"); //$NON-NLS-1$
+    readMeFileNames.add("META-INF/NOTICE.md"); //$NON-NLS-1$
     readMeFileNames.add("META-INF/NOTICE"); //$NON-NLS-1$
     readMeFileNames.add("license/README.txt"); //$NON-NLS-1$
+    readMeFileNames.add("license/README.md"); //$NON-NLS-1$
     readMeFileNames.add("license/README"); //$NON-NLS-1$
     readMeFileNames.add("README.txt"); //$NON-NLS-1$
+    readMeFileNames.add("README.md"); //$NON-NLS-1$
     readMeFileNames.add("README"); //$NON-NLS-1$
     readMeFileNames.add("NOTICE.txt"); //$NON-NLS-1$
+    readMeFileNames.add("NOTICE.md"); //$NON-NLS-1$
     readMeFileNames.add("NOTICE"); //$NON-NLS-1$
   }
 
@@ -212,8 +219,10 @@ public class ClassLoaderUtilities {
   private static Set<String> authorsNames = new HashSet<>();
   static {
     authorsNames.add("META-INF/AUTHORS.txt"); //$NON-NLS-1$
+    authorsNames.add("META-INF/AUTHORS.md"); //$NON-NLS-1$
     authorsNames.add("META-INF/AUTHORS"); //$NON-NLS-1$
     authorsNames.add("AUTHORS.txt"); //$NON-NLS-1$
+    authorsNames.add("AUTHORS.md"); //$NON-NLS-1$
     authorsNames.add("AUTHORS"); //$NON-NLS-1$
   }
 
@@ -227,8 +236,10 @@ public class ClassLoaderUtilities {
   private static Set<String> newsNames = new HashSet<>();
   static {
     newsNames.add("META-INF/NEWS.txt"); //$NON-NLS-1$
+    newsNames.add("META-INF/NEWS.md"); //$NON-NLS-1$
     newsNames.add("META-INF/NEWS"); //$NON-NLS-1$
     newsNames.add("NEWS.txt"); //$NON-NLS-1$
+    newsNames.add("NEWS.md"); //$NON-NLS-1$
     newsNames.add("NEWS"); //$NON-NLS-1$
   }
 

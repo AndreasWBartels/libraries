@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.utilities.regex.tokenizer;
 
-import net.anwiba.commons.lang.functional.ConversionException;
-
 import java.util.regex.Pattern;
+
+import net.anwiba.commons.lang.functional.ConversionException;
 
 public interface IRegExpTokenConverter {
 

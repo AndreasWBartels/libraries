@@ -26,11 +26,14 @@ import java.awt.event.MouseListener;
 import javax.swing.DropMode;
 import javax.swing.TransferHandler;
 
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.ui.IObjectUi;
 import net.anwiba.commons.swing.ui.IObjectUiCellRendererConfiguration;
 
 public interface IObjectListConfiguration<T> {
+
+  IBooleanDistributor getEnabledDistributor();
 
   int getLayoutOrientation();
 
@@ -53,5 +56,7 @@ public interface IObjectListConfiguration<T> {
   boolean isDragEnabled();
 
   T getPrototype();
+
+  boolean isEditable();
 
 }

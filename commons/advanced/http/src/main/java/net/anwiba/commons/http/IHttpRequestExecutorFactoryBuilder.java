@@ -29,6 +29,8 @@ public interface IHttpRequestExecutorFactoryBuilder {
 
   IHttpRequestExecutorFactoryBuilder usePoolingConnection();
 
+  IHttpRequestExecutorFactoryBuilder setProxy(String scheme, String hostname, int port);
+
   IHttpRequestExecutorFactory build();
 
 }

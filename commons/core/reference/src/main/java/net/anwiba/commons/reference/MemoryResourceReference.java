@@ -23,23 +23,25 @@ package net.anwiba.commons.reference;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
+import java.nio.file.attribute.FileTime;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Base64;
-import java.util.TimeZone;
+import java.util.Objects;
 
 import net.anwiba.commons.reference.utilities.StringUtilities;
 
 public class MemoryResourceReference implements IResourceReference {
 
   private static final long serialVersionUID = 1L;
-  private final ZonedDateTime timeStamp;
+  private final FileTime timeStamp;
   private final byte[] buffer;
   private final String mimeType;
   private final String encoding;
 
-  public MemoryResourceReference(final byte[] buffer, final String mimeType, final String encoding) {
-    this.timeStamp = ZonedDateTime.now(TimeZone.getDefault().toZoneId());
-    this.buffer = buffer;
+  MemoryResourceReference(final byte[] buffer, final String mimeType, final String encoding) {
+    this.timeStamp = FileTime.from(Instant.now(Clock.systemDefaultZone()));
+    this.buffer = Objects.requireNonNull(buffer);
     this.mimeType = mimeType;
     this.encoding = encoding;
   }
@@ -66,7 +68,7 @@ public class MemoryResourceReference implements IResourceReference {
     return this.buffer == other.buffer;
   }
 
-  public ZonedDateTime getTimeStamp() {
+  public FileTime creationTime() {
     return this.timeStamp;
   }
 

@@ -129,6 +129,8 @@ import net.anwiba.commons.swing.object.IObjectField;
 import net.anwiba.commons.swing.object.StringFieldBuilder;
 import net.anwiba.commons.swing.table.Table;
 import net.anwiba.commons.swing.tree.FilteredDefaultTreeModel;
+import net.anwiba.commons.swing.ui.ObjectUiBuilder;
+import net.anwiba.commons.swing.ui.ObjectUiListCellRenderer;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.thread.process.IProcessManager;
@@ -339,8 +341,8 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
                     if (this.isTableSelectedModel.isTrue()) {
                       getMetadataResult(
                           (metaData, tableName) -> {
-                            if (databaseFacade.supportsTables()) {
-                              return databaseFacade.getTableMetadata(this.connectionModel.get(), tableName);
+                            if (this.databaseFacade.supportsTables()) {
+                              return this.databaseFacade.getTableMetadata(this.connectionModel.get(), tableName);
                             }
                             return metaData
                                 .getColumns(
@@ -542,6 +544,9 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
       treeContainerPane.add(treeScrollPane, BorderLayout.CENTER);
 
       final JComboBox<String> historyComboBox = new JComboBox<>(this.historyComboBoxModel);
+      historyComboBox.setRenderer(new ObjectUiListCellRenderer<String>(new ObjectUiBuilder<String>()
+          .tooltip(t -> toHtml(t))
+          .build()));
       historyComboBox.addActionListener(e -> {
         if (this.historyComboBoxModel.getSelectedItem() != null) {
           setEditorContent(document, (String) this.historyComboBoxModel.getSelectedItem());
@@ -673,7 +678,7 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
       final ResultSetTableModel tableModel = new ResultSetTableModel(
           this.statusModel,
           this.resultSetModel);
-      final JTable resultTable = new Table(tableModel, s -> StringUtilities.substitute(s, 8, 120));
+      final JTable resultTable = new Table(tableModel, s -> StringUtilities.reduce(s, 8, 120));
       final DragSource source = DragSource.getDefaultDragSource();
 
       resultTable.addKeyListener(new KeyAdapter() {
@@ -699,7 +704,6 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
 
                 @Override
                 public void dragGestureRecognized(final DragGestureEvent dge) {
-                  @SuppressWarnings("resource")
                   final ResultSet result = SqlConsoleContentPane.this.resultSetModel.get();
                   if (result == null) {
                     return;
@@ -807,6 +811,17 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
       this.contentPane = panel;
     }
     return this.contentPane;
+  }
+
+  private String toHtml(final String string) {
+    if (StringUtilities.isNullOrTrimmedEmpty(string)) {
+      return null;
+    }
+    StringBuilder builder = new StringBuilder();
+    builder.append("<html><body>");
+    builder.append(string.replaceAll("\\n", "<br>"));
+    builder.append("</html></body>");
+    return builder.toString();
   }
 
   private String createTableSelectStatement(final IDatabaseTableName tableName) {
@@ -992,7 +1007,6 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
       SqlConsoleContentPane.this.statusModel.set(SqlConsoleMessages.working);
       final DatabaseMetaData metaData = this.connectionModel.get().getMetaData();
       final IDatabaseTableName tableName = this.selectedTable.get();
-      @SuppressWarnings("resource")
       final ResultSet result = metadataProvider.aggregate(metaData, tableName);
       if (result == null) {
         SqlConsoleContentPane.this.statusModel.set(SqlConsoleMessages.noResult);
@@ -1008,7 +1022,6 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
     }
   }
 
-  @SuppressWarnings("resource")
   private void querySequenceMetadata(final IDatabaseSequenceName name) {
     try {
       SqlConsoleContentPane.this.statusModel.set(SqlConsoleMessages.working);
@@ -1031,7 +1044,6 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
   private void queryTriggerMetadata(final IDatabaseTriggerName name) {
     try {
       SqlConsoleContentPane.this.statusModel.set(SqlConsoleMessages.working);
-      @SuppressWarnings("resource")
       final ResultSet result = SqlConsoleContentPane.this.databaseFacade
           .getTriggerMetadata(SqlConsoleContentPane.this.connectionModel.get(), name);
       if (result == null) {
@@ -1048,7 +1060,6 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
     }
   }
 
-  @SuppressWarnings("resource")
   private void queryIndexMetadata(final IDatabaseIndexName name) {
     try {
       SqlConsoleContentPane.this.statusModel.set(SqlConsoleMessages.working);
@@ -1071,7 +1082,6 @@ public final class SqlConsoleContentPane extends AbstractContentPane {
   private void queryConstraintMetadata(final IDatabaseConstraintName name) {
     try {
       SqlConsoleContentPane.this.statusModel.set(SqlConsoleMessages.working);
-      @SuppressWarnings("resource")
       final ResultSet result = SqlConsoleContentPane.this.databaseFacade
           .getConstraintMetadata(SqlConsoleContentPane.this.connectionModel.get(), name);
       if (result == null) {

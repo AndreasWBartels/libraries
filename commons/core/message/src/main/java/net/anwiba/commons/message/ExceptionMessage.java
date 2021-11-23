@@ -25,11 +25,20 @@ public class ExceptionMessage extends Message {
 
   private static final long serialVersionUID = -2319712092631361613L;
 
-  public ExceptionMessage(final String title, final String text, final Throwable throwable) {
-    super(title, text, throwable, MessageType.ERROR);
+  ExceptionMessage(final String text,
+      final String description,
+      final Throwable throwable,
+      final Object goal) {
+    super(text, description, throwable, MessageType.ERROR, goal);
   }
 
-  public ExceptionMessage(final Throwable throwable) {
+  ExceptionMessage(final String text,
+      final String description,
+      final Throwable throwable) {
+    this(text, description, throwable, null);
+  }
+
+  ExceptionMessage(final Throwable throwable) {
     this(throwable.getClass().getName(), throwable.getMessage(), throwable);
   }
 

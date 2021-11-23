@@ -21,9 +21,12 @@
  */
 package net.anwiba.commons.http;
 
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public class HttpRequestExecutorFactoryBuilder implements IHttpRequestExecutorFactoryBuilder {
 
@@ -41,6 +44,36 @@ public class HttpRequestExecutorFactoryBuilder implements IHttpRequestExecutorFa
   };
 
   @Override
+  public IHttpRequestExecutorFactoryBuilder setProxy(final String scheme, final String hostname, final int port) {
+    this.proxyConfiguration = new IHttpProxyConfiguration() {
+
+      @Override
+      public int getPort() {
+        return port;
+      }
+
+      @Override
+      public String getHost() {
+        return hostname;
+      }
+
+      @Override
+      public String getScheme() {
+        return scheme;
+      }
+    };
+    return this;
+  }
+
+  final PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
+      new PoolingHttpClientConnectionManager();
+  private IHttpProxyConfiguration proxyConfiguration = null;
+
+  public HttpRequestExecutorFactoryBuilder() {
+    super();
+  }
+
+  @Override
   public IHttpRequestExecutorFactoryBuilder usePoolingConnection() {
     this.configuration = new IHttpClientConfiguration() {
 
@@ -51,7 +84,7 @@ public class HttpRequestExecutorFactoryBuilder implements IHttpRequestExecutorFa
 
       @Override
       public HttpClientConnectionManager getManager() {
-        return new PoolingHttpClientConnectionManager();
+        return HttpRequestExecutorFactoryBuilder.this.poolingHttpClientConnectionManager;
       }
     };
     return this;
@@ -61,6 +94,8 @@ public class HttpRequestExecutorFactoryBuilder implements IHttpRequestExecutorFa
   public IHttpRequestExecutorFactoryBuilder useAlwaysTheSameConnection() {
     this.configuration = new IHttpClientConfiguration() {
 
+      final BasicHttpClientConnectionManager basicHttpClientConnectionManager = new BasicHttpClientConnectionManager();
+
       @Override
       public HttpConnectionMode getMode() {
         return HttpConnectionMode.KEEP_ALIVE;
@@ -68,7 +103,7 @@ public class HttpRequestExecutorFactoryBuilder implements IHttpRequestExecutorFa
 
       @Override
       public HttpClientConnectionManager getManager() {
-        return new BasicHttpClientConnectionManager();
+        return this.basicHttpClientConnectionManager;
       }
     };
     return this;
@@ -93,7 +128,23 @@ public class HttpRequestExecutorFactoryBuilder implements IHttpRequestExecutorFa
 
   @Override
   public IHttpRequestExecutorFactory build() {
-    return new HttpRequestExecutorFactory(this.configuration);
+    return new HttpRequestExecutorFactory(new IHttpClientConfiguration() {
+
+      @Override
+      public HttpConnectionMode getMode() {
+        return HttpRequestExecutorFactoryBuilder.this.configuration.getMode();
+      }
+
+      @Override
+      public HttpClientConnectionManager getManager() {
+        return HttpRequestExecutorFactoryBuilder.this.configuration.getManager();
+      }
+
+      @Override
+      public IOptional<IHttpProxyConfiguration, RuntimeException> getProxyConfiguration() {
+        return Optional.of(HttpRequestExecutorFactoryBuilder.this.proxyConfiguration);
+      }
+    });
   }
 
 }

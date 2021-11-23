@@ -21,12 +21,19 @@
  */
 package net.anwiba.commons.http;
 
-import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public interface IHttpClientConfiguration {
 
   HttpConnectionMode getMode();
 
   HttpClientConnectionManager getManager();
+
+  default IOptional<IHttpProxyConfiguration, RuntimeException> getProxyConfiguration() {
+    return Optional.empty();
+  }
 
 }

@@ -227,4 +227,5 @@ public class GuiIcon implements IGuiIcon {
     };
     return size.accept(visitor);
   }
+
 }

@@ -41,6 +41,7 @@ public final class ExceptionProducer implements IResultProducer<IOException> {
   @Override
   public IOException execute(
       final ICanceler canceler,
+      final String url,
       final int statusCode,
       final String statusMessage,
       final String contentType,
@@ -56,6 +57,7 @@ public final class ExceptionProducer implements IResultProducer<IOException> {
     final byte[] array = IoUtilities.toByteArray(inputStream);
     throw new HttpRequestException(
         "Unexpected response content type '" + contentType + "'", // //$NON-NLS-1$ //$NON-NLS-2$
+        url,
         statusCode,
         statusMessage,
         array,

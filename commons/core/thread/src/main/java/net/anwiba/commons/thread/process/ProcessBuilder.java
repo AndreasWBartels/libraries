@@ -56,6 +56,11 @@ public class ProcessBuilder {
     this.isCancelable = isCancelable;
     return this;
   }
+  
+  public ProcessBuilder setDelay(final Duration delay) {
+    this.delay = delay;
+    return this;
+  }
 
   public IProcess build() {
     return new AbstractProcess(this.queueName, this.description, this.isCancelable) {
@@ -79,11 +84,6 @@ public class ProcessBuilder {
         ProcessBuilder.this.executable.execute(processMonitor, canceler, processIdentfier);
       }
     };
-  }
-
-  public ProcessBuilder setDelay(final Duration delay) {
-    this.delay = delay;
-    return this;
   }
 
 }

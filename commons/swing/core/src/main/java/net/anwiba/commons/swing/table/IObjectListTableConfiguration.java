@@ -57,4 +57,6 @@ public interface IObjectListTableConfiguration<T> extends IObjectTableConfigurat
 
   IFactory<IObjectTableModel<T>, JComponent, RuntimeException> getAccessoryHeaderPanelFactory();
 
+  IFactory<IObjectTableModel<T>, JComponent, RuntimeException> getAccessoryFooterPanelFactory();
+
 }

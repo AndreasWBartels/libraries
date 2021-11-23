@@ -32,5 +32,5 @@ module net.anwiba.database.sqlite {
   requires net.anwiba.commons.nls;
   requires net.anwiba.commons.utilities;
   requires net.anwiba.commons.version;
-  requires sqlite.jdbc;
+  requires org.xerial.sqlitejdbc;
 }

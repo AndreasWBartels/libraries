@@ -23,8 +23,16 @@ package net.anwiba.commons.lang.object;
 
 public final class ObjectContainer<T> implements IObjectContainer<T> {
 
-  private T object;
+  private volatile T object;
 
+  public ObjectContainer() {
+    this(null);
+  }
+
+  public ObjectContainer(final T object) {
+    this.object = object;
+  }
+  
   @Override
   public synchronized void set(final T object) {
     this.object = object;

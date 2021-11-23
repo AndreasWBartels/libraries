@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -79,8 +80,8 @@ public abstract class AbstractDialog extends JDialog {
   private static final long serialVersionUID = 1L;
   private Action applyAction;
   private final JPanel buttomPanel = new JPanel();
-  private final JPanel contentContainerPanel = new JPanel(new BorderLayout());
-  private final JPanel detailContainerPanel = new JPanel(new BorderLayout());
+  private final JPanel contentContainerPanel = new JPanel(new GridLayout(1, 1));
+  private final JPanel detailContainerPanel = new JPanel(new GridLayout(1, 1));
   private Container contentPane;
   private final IObjectModel<IDialogResult> dialogResultModel = new ObjectModel<>(DialogResult.NONE);
   private boolean isDetailsVisible;
@@ -104,13 +105,19 @@ public abstract class AbstractDialog extends JDialog {
     this(
         owner,
         new WindowPreferences(new DummyPreferences()),
+        null,
         title,
         message,
         icon,
+        true,
         dialogType,
+        s -> s,
         Collections.emptyList(),
         new ObjectModel<>(),
-        modal);
+        modal
+            ? DEFAULT_MODALITY_TYPE
+            : ModalityType.MODELESS,
+        null);
   }
 
   public AbstractDialog(

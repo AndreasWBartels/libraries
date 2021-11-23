@@ -21,7 +21,19 @@
  */
 package net.anwiba.commons.xml.jaxb;
 
-import static net.anwiba.commons.xml.xsd.XsdElementsFactory.*;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.CLASS;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.ELEMENT_FORM_DEFAULT;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.GENERATE_IS_SET_METHOD;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.GLOBAL_BINDINGS;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.NAME;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.PACKAGE;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.QUALIFIED;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.SCHEMA;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.SCHEMA_BINDINGS;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.TRUE;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.VERSION;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.createApplicationInfoAnnotation;
+import static net.anwiba.commons.xml.xsd.XsdElementsFactory.createName;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -32,13 +44,13 @@ import net.anwiba.commons.xml.xsd.XsdElementsFactory;
 
 public class JaxbElementsFactory {
 
-  public static final Namespace JAXB_NAMESPACE = new Namespace("jaxb", "http://java.sun.com/xml/ns/jaxb"); //$NON-NLS-1$ //$NON-NLS-2$
+  public static final Namespace JAXB_NAMESPACE = new Namespace("jaxb", "https://jakarta.ee/xml/ns/jaxb"); //$NON-NLS-1$ //$NON-NLS-2$
 
   public static Element createSchemaElement(final String packageName) {
     final Element element = DocumentHelper.createElement(SCHEMA);
     element.add(JAXB_NAMESPACE);
     element.addAttribute(createName(ELEMENT_FORM_DEFAULT), QUALIFIED);
-    element.addAttribute(createJaxbName(VERSION), "1.0"); //$NON-NLS-1$
+    element.addAttribute(createJaxbName(VERSION), "3.0"); //$NON-NLS-1$
     element.add(createGlobalBindingsAnnotation(packageName));
     return element;
   }

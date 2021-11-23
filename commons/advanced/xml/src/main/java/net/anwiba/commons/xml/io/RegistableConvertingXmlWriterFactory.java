@@ -28,8 +28,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -37,11 +35,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXTransformerFactory;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.IApplicable;
 import net.anwiba.commons.lang.functional.IFunction;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.reference.utilities.IoUtilities;
-import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.property.IProperties;
 import net.anwiba.commons.xml.jaxb.IJaxbContext;
 import net.anwiba.commons.xml.jaxb.JaxbTransformer;

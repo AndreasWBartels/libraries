@@ -24,7 +24,7 @@ package net.anwiba.commons.message;
 public class MessageException extends Exception {
 
   private static final long serialVersionUID = 1L;
-  private final MessageType messageType;
+  private IMessage message;
 
   public MessageException(final String message, final Throwable throwable) {
     this(message, throwable, MessageType.ERROR);
@@ -32,7 +32,7 @@ public class MessageException extends Exception {
 
   public MessageException(final IMessage message) {
     super(message.getText(), message.getThrowable());
-    this.messageType = message.getMessageType();
+    this.message = message;
   }
 
   public MessageException(final String message, final Throwable throwable, final MessageType type) {
@@ -40,7 +40,10 @@ public class MessageException extends Exception {
   }
 
   public MessageType getMessageType() {
-    return this.messageType;
+    return this.message.getMessageType();
   }
 
+  public IMessage getMessageObject() {
+    return this.message;
+  }
 }

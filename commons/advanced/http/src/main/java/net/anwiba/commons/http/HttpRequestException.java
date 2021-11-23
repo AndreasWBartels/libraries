@@ -35,15 +35,18 @@ public class HttpRequestException extends IOException {
   private final byte[] content;
   private final String contentType;
   private final String contentEncoding;
+  private String url;
 
   public HttpRequestException(
       final String message,
+      final String url,
       final int statusCode,
       final String statusText,
       final byte[] content,
       final String contentType,
       final String contentEncoding) {
     super(message);
+    this.url = url;
     this.statusCode = statusCode;
     this.statusText = statusText;
     this.content = content;
@@ -53,6 +56,7 @@ public class HttpRequestException extends IOException {
 
   public HttpRequestException(
       final String message,
+      final String url,
       final int statusCode,
       final String statusText,
       final byte[] content,
@@ -60,6 +64,7 @@ public class HttpRequestException extends IOException {
       final String contentEncoding,
       final Throwable throwable) {
     super(message, throwable);
+    this.url = url;
     this.statusCode = statusCode;
     this.statusText = statusText;
     this.content = content;
@@ -67,8 +72,17 @@ public class HttpRequestException extends IOException {
     this.contentEncoding = contentEncoding;
   }
 
+  public String getUrl() {
+    return this.url;
+  }
+
   public byte[] getContent() {
     return this.content;
+  }
+
+
+  public int getContentLength() {
+    return this.content.length;
   }
 
   public String getContentAsString() {
@@ -95,10 +109,22 @@ public class HttpRequestException extends IOException {
     return this.statusText;
   }
 
+  public static HttpRequestException create(final String message, final IResponse response, final byte[] body) {
+    return new HttpRequestException(
+        message,
+        response.getUri(),
+        response.getStatusCode(),
+        response.getStatusText(),
+        body,
+        response.getContentType(),
+        response.getContentEncoding());
+  }
+
   public static HttpRequestException create(final String message, final IResponse response) throws IOException {
     try (InputStream inputStream = response.getInputStream()) {
       return new HttpRequestException(
           message,
+          response.getUri(),
           response.getStatusCode(),
           response.getStatusText(),
           IoUtilities.toByteArray(inputStream),
@@ -106,5 +132,4 @@ public class HttpRequestException extends IOException {
           response.getContentEncoding());
     }
   }
-
 }

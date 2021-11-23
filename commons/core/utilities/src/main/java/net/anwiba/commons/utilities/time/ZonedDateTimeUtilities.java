@@ -88,7 +88,7 @@ public class ZonedDateTimeUtilities {
   }
 
   public static ZoneId getCoordinatedUniversalTimeZone() {
-    return ZoneId.of("UTC"); //$NON-NLS-1$
+    return TimeZoneUtilities.getUniversalTimeZone().toZoneId(); //$NON-NLS-1$
   }
 
   public static Date toDate(final ZonedDateTime dateTime) {

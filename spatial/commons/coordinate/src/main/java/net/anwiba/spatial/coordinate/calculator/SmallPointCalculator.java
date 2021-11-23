@@ -44,7 +44,7 @@ public class SmallPointCalculator {
     this.y0 = c0.getYValue();
     this.x1 = c1.getXValue();
     this.y1 = c1.getYValue();
-    final double d = this.coordinateDistanceCalculator.calculateDistance(this.x0, this.y0, this.x1, this.y1);
+    final double d = this.coordinateDistanceCalculator.calculate(this.x0, this.y0, this.x1, this.y1);
     if (Math.abs(d) <= tolerance) {
       throw new IllegalArgumentException("base points are equal"); //$NON-NLS-1$
     }

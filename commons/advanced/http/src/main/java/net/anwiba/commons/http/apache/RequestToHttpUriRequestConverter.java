@@ -25,22 +25,24 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.protocol.HTTP;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HeaderElements;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpMessage;
 
 import net.anwiba.commons.http.HttpConnectionMode;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.functional.ConversionException;
+import net.anwiba.commons.lang.parameter.IParameter;
 import net.anwiba.commons.utilities.io.url.IUrl;
 import net.anwiba.commons.utilities.io.url.UrlBuilder;
 import net.anwiba.commons.utilities.io.url.parser.UrlParser;
-import net.anwiba.commons.utilities.parameter.IParameter;
 
 public final class RequestToHttpUriRequestConverter {
 
@@ -58,18 +60,18 @@ public final class RequestToHttpUriRequestConverter {
       IUrl url = urlBuilder.build();
       switch (request.getMethodType()) {
         case POST: {
-          final RequestBuilder requestBuilder = RequestBuilder.post(url.encoded());
-          addToHeader(request.getProperties().parameters(), requestBuilder);
-          Optional.ofNullable(request.getUserAgent()).ifPresent(value -> requestBuilder.addHeader("User-Agent", value));
+          HttpPost post = new HttpPost(url.encoded());
+          addToHeader(request.getProperties().parameters(), post);
+          Optional.ofNullable(request.getUserAgent()).ifPresent(value -> post.addHeader("User-Agent", value));
           final HttpEntity entity = createEntity(request);
-          requestBuilder.setEntity(entity);
-          return requestBuilder.build();
+          post.setEntity(entity);
+          return post;
         }
         case GET: {
-          final RequestBuilder requestBuilder = RequestBuilder.get(url.encoded());
-          addToHeader(request.getProperties().parameters(), requestBuilder);
-          Optional.ofNullable(request.getUserAgent()).ifPresent(value -> requestBuilder.addHeader("User-Agent", value));
-          return requestBuilder.build();
+          HttpGet get = new HttpGet(url.encoded());
+          addToHeader(request.getProperties().parameters(), get);
+          Optional.ofNullable(request.getUserAgent()).ifPresent(value -> get.addHeader("User-Agent", value));
+          return get;
         }
       }
     } catch (CreationException | IllegalArgumentException exception) {
@@ -78,13 +80,7 @@ public final class RequestToHttpUriRequestConverter {
     throw new UnreachableCodeReachedException();
   }
 
-  private void addToQuery(final IRequest request, final RequestBuilder requestBuilder) {
-    for (final IParameter parameter : request.getParameters().parameters()) {
-      requestBuilder.addParameter(parameter.getName(), parameter.getValue());
-    }
-  }
-
-  private void addToHeader(final Iterable<IParameter> parameters, final RequestBuilder requestBuilder) {
+  private void addToHeader(final Iterable<IParameter> parameters, final HttpMessage requestBuilder) {
     for (final IParameter parameter : parameters) {
       if (Objects.equals(HttpHeaders.CONNECTION, parameter.getName())
           && HttpConnectionMode.CLOSE.equals(this.httpConnectionMode)) {
@@ -93,7 +89,7 @@ public final class RequestToHttpUriRequestConverter {
       requestBuilder.addHeader(parameter.getName(), parameter.getValue());
     }
     if (HttpConnectionMode.CLOSE.equals(this.httpConnectionMode)) {
-      requestBuilder.addHeader(HttpHeaders.CONNECTION, HTTP.CONN_CLOSE);
+      requestBuilder.addHeader(HttpHeaders.CONNECTION, HeaderElements.CLOSE);
     }
   }
 
@@ -101,6 +97,6 @@ public final class RequestToHttpUriRequestConverter {
     final String encoding = request.getEncoding();
     final Charset charset = encoding == null ? null : Charset.forName(encoding);
     final ContentType contentType = ContentType.create(request.getMimeType(), charset);
-    return new InputStreamEntity(request.getContent(), request.getContentLength(), contentType);
+    return new InputStreamEntity(request.getContent(), request.getContentLength(), contentType, encoding);
   }
 }

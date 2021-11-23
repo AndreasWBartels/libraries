@@ -21,14 +21,14 @@
  */
 package net.anwiba.commons.utilities.regex.tokenizer;
 
-import net.anwiba.commons.lang.functional.ConversionException;
-import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.utilities.string.IStringAppender;
+import static net.anwiba.commons.ensure.Conditions.notNull;
+import static net.anwiba.commons.ensure.Ensure.ensureThatArgument;
 
 import java.util.regex.Matcher;
 
-import static net.anwiba.commons.ensure.Conditions.*;
-import static net.anwiba.commons.ensure.Ensure.*;
+import net.anwiba.commons.lang.functional.ConversionException;
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.utilities.string.IStringAppender;
 
 public class RegExpTokenizingConverter {
 

@@ -21,8 +21,6 @@
  */
 package net.anwiba.commons.thread.cancel;
 
-import net.anwiba.commons.thread.cancel.ICanceler;
-
 public interface ICancelerReceiver {
 
   void set(ICanceler canceler);

@@ -9,7 +9,6 @@ import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -120,7 +119,7 @@ public class Factory {
         return (value.substring(0, 1).toUpperCase()+ value.substring(1, value.length()));
     }
 
-    @JsonIgnore
+    @JsonProperty("type")
     public String getType() {
         return this.type;
     }

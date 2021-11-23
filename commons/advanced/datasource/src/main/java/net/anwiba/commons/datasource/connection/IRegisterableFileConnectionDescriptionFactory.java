@@ -24,7 +24,6 @@ package net.anwiba.commons.datasource.connection;
 
 import java.io.File;
 
-import net.anwiba.commons.datasource.connection.IConnectionDescription;
 import net.anwiba.commons.lang.exception.CreationException;
 
 public interface IRegisterableFileConnectionDescriptionFactory extends IFileConnectionDescriptionFactory {

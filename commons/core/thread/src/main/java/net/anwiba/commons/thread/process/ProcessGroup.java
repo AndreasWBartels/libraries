@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.thread.process;
 
-import net.anwiba.commons.utilities.collection.IterableUtilities;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import net.anwiba.commons.utilities.collection.IterableUtilities;
 
 public class ProcessGroup implements IProcessGroup {
 

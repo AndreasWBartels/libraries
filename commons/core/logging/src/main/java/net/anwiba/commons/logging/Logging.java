@@ -28,6 +28,18 @@ public class Logging {
 
   private static LoggingFactory factory = new LoggingFactory();
   private static ILogging logging = factory.create(net.anwiba.commons.logging.log4j2.Log4j2Logging.class);
+  private static ILogger doNothingLogger = new ILogger() {
+
+    @Override
+    public boolean isLoggable(final ILevel level) {
+      return false;
+    }
+
+    @Override
+    public void doLog(ILevel level, IMessageFactory message, Throwable throwable) {
+      // nothing to do
+    }
+  };
 
   public static void setLogging(final String className) {
     logging = factory.create(className);
@@ -42,28 +54,7 @@ public class Logging {
 
   public static ILogger getLogger(final String name) {
     if (logging == null) {
-      return new ILogger() {
-
-        @Override
-        public void log(final ILevel level, final String message, final Throwable throwable) {
-          // nothing to do
-        }
-
-        @Override
-        public void log(final ILevel level, final String message) {
-          // nothing to do
-        }
-
-        @Override
-        public boolean isLoggable(final ILevel level) {
-          return false;
-        }
-
-        @Override
-        public void log(final ILevel level, final IMessageFactory messageFactory) {
-          // nothing to do
-        }
-      };
+      return doNothingLogger;
     }
     return logging.getLogger(name);
   }

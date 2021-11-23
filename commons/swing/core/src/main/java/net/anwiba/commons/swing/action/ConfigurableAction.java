@@ -40,6 +40,10 @@ import net.anwiba.commons.swing.utilities.GuiUtilities;
 @SuppressWarnings("serial")
 public class ConfigurableAction extends AbstractCustomizedAction {
 
+  public static ConfigurableActionBuilder builder() {
+    return new ConfigurableActionBuilder();
+  }
+
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
       .getLogger(ConfigurableAction.class.getName());
   private final IActionProcedure closure;

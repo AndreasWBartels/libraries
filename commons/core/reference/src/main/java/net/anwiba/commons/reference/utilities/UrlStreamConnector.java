@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.net.URI;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
-import net.anwiba.commons.reference.IStreamConnector;
+import net.anwiba.commons.reference.io.IStreamConnector;
 
 public final class UrlStreamConnector implements IStreamConnector<URI> {
   @Override

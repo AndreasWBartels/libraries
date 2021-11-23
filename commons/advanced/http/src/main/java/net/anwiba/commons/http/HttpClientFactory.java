@@ -21,18 +21,22 @@
  */
 package net.anwiba.commons.http;
 
-import org.apache.http.Header;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolException;
-import org.apache.http.client.RedirectStrategy;
-import org.apache.http.impl.NoConnectionReuseStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultClientConnectionReuseStrategy;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.Args;
+import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.protocol.RedirectStrategy;
+import org.apache.hc.core5.http.ConnectionReuseStrategy;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.ProtocolException;
+import org.apache.hc.core5.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.util.Args;
+import org.apache.hc.core5.util.TimeValue;
 
 public class HttpClientFactory implements IHttpClientFactory {
 
@@ -48,18 +52,13 @@ public class HttpClientFactory implements IHttpClientFactory {
         throws ProtocolException {
       Args.notNull(request, "HTTP request");
       Args.notNull(response, "HTTP response");
+      return super.isRedirected(request, response, context)
+          || isRedirectedHttp308(request, response);
+    }
 
-      if (!super.isRedirected(request, response, context)) {
-        final int statusCode = response.getStatusLine().getStatusCode();
-        final String method = request.getRequestLine().getMethod();
-        final Header locationHeader = response.getFirstHeader("location");
-        switch (statusCode) {
-          case 308: // Permanent Redirect
-            return isRedirectable(method) && locationHeader != null;
-        }
-        return false;
-      }
-      return true;
+    private boolean isRedirectedHttp308(final HttpRequest request, final HttpResponse response) {
+      final int statusCode = response.getCode();
+      return statusCode == 308;
     }
   }
 
@@ -71,24 +70,43 @@ public class HttpClientFactory implements IHttpClientFactory {
 
   @Override
   public CloseableHttpClient create() {
+    final HttpClientBuilder builder = HttpClients
+        .custom()
+        .setRedirectStrategy(new RedirectStrategyImplementation())
+        .setConnectionManager(this.configuration.getManager());
+    this.configuration.getProxyConfiguration().consume(c -> addProxies(builder, c));
     switch (this.configuration.getMode()) {
       case CLOSE: {
-        return HttpClients
-            .custom()
-            .setRedirectStrategy(new RedirectStrategyImplementation())
-            .setConnectionReuseStrategy(NoConnectionReuseStrategy.INSTANCE)
-            .setConnectionManager(this.configuration.getManager())
+        return builder
+            .setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
+
+              @Override
+              public TimeValue getKeepAliveDuration(final HttpResponse response, final HttpContext context) {
+                return TimeValue.ZERO_MILLISECONDS;
+              }
+            })
+            .setConnectionReuseStrategy(new ConnectionReuseStrategy() {
+              @Override
+              public boolean keepAlive(
+                  final HttpRequest request,
+                  final HttpResponse response,
+                  final HttpContext context) {
+                return false;
+              }
+            })
             .build();
       }
-      case KEEP_ALIVE: {
-        return HttpClients
-            .custom()
-            .setConnectionReuseStrategy(DefaultClientConnectionReuseStrategy.INSTANCE)
-            .setConnectionManager(this.configuration.getManager())
+      default: {
+        return builder
+            .setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE)
+            .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
             .build();
       }
     }
-    return HttpClients.custom().setConnectionManager(this.configuration.getManager()).build();
+  }
+
+  private void addProxies(final HttpClientBuilder builder, final IHttpProxyConfiguration configuration) {
+    builder.setProxy(new HttpHost(configuration.getScheme(), configuration.getHost(), configuration.getPort()));
   }
 
   @Override

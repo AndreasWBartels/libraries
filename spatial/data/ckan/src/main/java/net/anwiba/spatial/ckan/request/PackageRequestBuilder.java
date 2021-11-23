@@ -40,9 +40,9 @@ import net.anwiba.commons.http.RequestBuilder;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.lang.stream.Streams;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.spatial.ckan.request.sort.ISortOrder;
 import net.anwiba.spatial.ckan.request.sort.ISortOrderTerm;
@@ -244,6 +244,8 @@ public class PackageRequestBuilder {
 
           // +spatial_geom:"Intersects(ENVELOPE(-180.0, -197.067608389, 46.937575538, 27.0033887294))"
 
+          // https://solr.apache.org/guide/8_8/spatial-search.html
+          
           final RequestBuilder builder = RequestBuilder
               .get(CkanUtilities.getBaseUrl(this.url, "package_search"))
               .query("start", String.valueOf(this.start))

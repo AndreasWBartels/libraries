@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.table.action;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+
 import net.anwiba.commons.swing.action.AbstractCustomizedAction;
 import net.anwiba.commons.swing.action.IActionCustomization;
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
-
-import java.awt.Component;
-import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
 public final class TableActionClosureAction<T> extends AbstractCustomizedAction {

@@ -46,7 +46,7 @@ public class LocalDateTimeTableCellRenderer extends DefaultTableCellRenderer {
       final int row,
       final int column) {
     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-    setHorizontalAlignment(SwingConstants.RIGHT);
+    setHorizontalAlignment(SwingConstants.LEFT);
     if (value instanceof LocalDateTime) {
       final LocalDateTime time = (LocalDateTime) value;
       setText(LocalDateTimeUtilities.toString(time));

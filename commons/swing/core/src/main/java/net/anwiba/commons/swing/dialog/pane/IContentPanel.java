@@ -41,6 +41,6 @@ public interface IContentPanel extends IComponentProvider {
   void close();
 
   default void dispose() {
-  };
+  }
 
 }

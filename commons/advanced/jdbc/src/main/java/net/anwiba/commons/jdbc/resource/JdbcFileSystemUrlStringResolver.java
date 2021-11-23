@@ -23,6 +23,8 @@ package net.anwiba.commons.jdbc.resource;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 
 import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.lang.exception.CreationException;
@@ -49,7 +51,7 @@ public class JdbcFileSystemUrlStringResolver implements Serializable {
       return new StringResolverBuilder()
           .errorHandler(errorHandler)
           .add(PLACEHOLDER_PROTOCOL, protocol)
-          .add(PLACEHOLDER_DATABASE, database.getPath())
+          .add(PLACEHOLDER_DATABASE, addFileProtocoll(database))
           .build()
           .resolve(this.urlPattern);
     } catch (final ResolvingException exception) {
@@ -59,5 +61,9 @@ public class JdbcFileSystemUrlStringResolver implements Serializable {
         throw new CreationException(errorHandler.toString());
       }
     }
+  }
+
+  private String addFileProtocoll(File file) {
+    return "file://" + file.toPath().normalize().toAbsolutePath().toString();
   }
 }

@@ -21,36 +21,38 @@
  */
 package net.anwiba.commons.http.apache;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.protocol.HttpContext;
 
 import net.anwiba.commons.http.IAuthentication;
 import net.anwiba.commons.http.IRequest;
+import net.anwiba.commons.lang.optional.Optional;
 
 public final class HttpContextFactory {
 
   @SuppressWarnings("nls")
   public HttpContext create(final IRequest request) {
-    final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     final IAuthentication authentication = request.getAuthentication();
+    final char[] password = Optional.of(authentication.getPassword())
+        .convert(p -> p.toCharArray())
+        .get();
+    final HttpHost host = new HttpHost(
+        request.getUriString().toLowerCase().startsWith("https:") ? "https" : "http",
+        request.getHost(),
+        request.getPort());
     credentialsProvider.setCredentials(
-        AuthScope.ANY,
-        new UsernamePasswordCredentials(authentication.getUsername(), authentication.getPassword()));
+        new AuthScope(host),
+        new UsernamePasswordCredentials(authentication.getUsername(), password));
     final AuthCache authCache = new BasicAuthCache();
-    authCache.put(
-        new HttpHost(
-            request.getHost(),
-            request.getPort(),
-            request.getUriString().toLowerCase().startsWith("https:") ? "https" : "http"),
-        new BasicScheme());
+    authCache.put(host, new BasicScheme());
     final HttpClientContext context = HttpClientContext.create();
     context.setCredentialsProvider(credentialsProvider);
     context.setAuthCache(authCache);

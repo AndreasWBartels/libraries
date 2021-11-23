@@ -25,13 +25,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.ParametersBuilder;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.ParametersBuilder;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class Url implements IUrl {
@@ -41,6 +42,31 @@ public class Url implements IUrl {
   private final IParameters parameters;
   private final String fragment;
   private final IAuthority authority;
+  private final static Set<String> commonEscapeSymbols = Set.of(
+      "%20", // SPACE
+      "%3C", // <
+      "%3E", // >
+      "%23", // #
+      "%25", // %
+      "%2B", // +
+      "%7B", // {
+      "%7D", // }
+      "%7C", // |
+      "%5C", // \
+      "%5E", // ^
+      "%7E", // ~
+      "%5B", // [
+      "%5D", // ]
+      "%60", // `
+      "%3B", // ;
+      "%2F", // /
+      "%3F", // ?
+      "%3A", // ;
+      "%40", // @
+      "%3D", // =
+      "%26", // &
+      "%24" // $
+  );
 
   public Url(
       final List<String> scheme,
@@ -265,6 +291,10 @@ public class Url implements IUrl {
       StringBuilder builder = new StringBuilder();
       for (int i = 0; i < string.length(); i++) {
         char c = string.charAt(i);
+        if (isCommonEscapeSequence(string, c, i)) {
+          builder.append(c);
+          continue;
+        }
         if (c != '/') {
           encode(builder, c);
         } else {
@@ -285,12 +315,22 @@ public class Url implements IUrl {
       StringBuilder builder = new StringBuilder();
       for (int i = 0; i < string.length(); i++) {
         char c = string.charAt(i);
+        if (isCommonEscapeSequence(string, c, i)) {
+          builder.append(c);
+          continue;
+        }
         encode(builder, c);
       }
       return builder.toString();
     } catch (UnsupportedEncodingException exception) {
       return string;
     }
+  }
+
+  protected boolean isCommonEscapeSequence(final String string, final char c, final int index) {
+    return c == '%'
+        && index + 2 < string.length()
+        && commonEscapeSymbols.contains(string.subSequence(index, index + 3));
   }
 
   private void encode(final StringBuilder builder, final char c) throws UnsupportedEncodingException {

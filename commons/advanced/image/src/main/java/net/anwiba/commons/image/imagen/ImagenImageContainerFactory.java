@@ -24,13 +24,9 @@ package net.anwiba.commons.image.imagen;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Set;
 
-import org.eclipse.imagen.media.codec.ByteArraySeekableStream;
-import org.eclipse.imagen.media.codec.FileSeekableStream;
 import org.eclipse.imagen.media.codec.ImageCodec;
-import org.eclipse.imagen.media.codec.MemoryCacheSeekableStream;
 import org.eclipse.imagen.media.codec.SeekableStream;
 import org.eclipse.imagen.media.codec.TIFFDirectory;
 import org.eclipse.imagen.media.codec.TIFFField;
@@ -39,37 +35,29 @@ import org.eclipse.imagen.media.codecimpl.TIFFImageDecoder;
 
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageContainerSettings;
-import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.message.MessageType;
-import net.anwiba.commons.reference.FileResourceReference;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.IResourceReferenceHandler;
-import net.anwiba.commons.reference.IResourceReferenceVisitor;
-import net.anwiba.commons.reference.MemoryResourceReference;
-import net.anwiba.commons.reference.PathResourceReference;
-import net.anwiba.commons.reference.UriResourceReference;
-import net.anwiba.commons.reference.UrlResourceReference;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.UrlBuilder;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
 
 public class ImagenImageContainerFactory {
 
   private final RenderingHints hints;
-  private final IResourceReferenceHandler resourceReferenceHandler;
+  private final InputStreamConnectorFactory inputStreamConnectorFactory;
+  private final IImageMetadataAdjustor metadataAdjustor = new ImagenImageMetadataAdjustor();
 
   public ImagenImageContainerFactory(final RenderingHints hints,
       final IResourceReferenceHandler resourceReferenceHandler) {
     this.hints = hints;
-    this.resourceReferenceHandler = resourceReferenceHandler;
+    this.inputStreamConnectorFactory = new InputStreamConnectorFactory(resourceReferenceHandler);
   }
 
   public IImageContainer create(final ISeekableStreamConnector seekableStreamConnector) {
-    return new ImagenImageContainer(this.hints, null, seekableStreamConnector);
+    return new ImagenImageContainer(this.hints, null, seekableStreamConnector, this.metadataAdjustor);
   }
 
   public IImageContainer create(final BufferedImage image) {
-    return new RenderedImageContainer(this.hints, image);
+    return new RenderedImageContainer(this.hints, image, this.metadataAdjustor);
   }
 
   public boolean isSupported(final SeekableStream inputStream) {
@@ -160,77 +148,7 @@ public class ImagenImageContainerFactory {
   }
 
   public ISeekableStreamConnector createInputStreamConnector(final IResourceReference reference) {
-    return () -> connect(reference);
+    return this.inputStreamConnectorFactory.create(reference);
   }
 
-  private SeekableStream connect(final IResourceReference resourceReference) throws IOException {
-    try {
-      return resourceReference.accept(new IResourceReferenceVisitor<SeekableStream, IOException>() {
-
-        @Override
-        public SeekableStream visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
-          return new FileSeekableStream(fileResourceReference.getFile());
-        }
-
-        @Override
-        public SeekableStream visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
-          if (ImagenImageContainerFactory.this.resourceReferenceHandler.isFileSystemResource(resourceReference)) {
-            return openAsFileIfPossible(resourceReference);
-          }
-          return new MemoryCacheSeekableStream(
-              ImagenImageContainerFactory.this.resourceReferenceHandler.openInputStream(resourceReference,
-                  value -> value != null && value.startsWith("image")));
-        }
-
-        @Override
-        public SeekableStream visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
-          if (ImagenImageContainerFactory.this.resourceReferenceHandler.isFileSystemResource(resourceReference)) {
-            return openAsFileIfPossible(resourceReference);
-          }
-          return new MemoryCacheSeekableStream(
-              ImagenImageContainerFactory.this.resourceReferenceHandler.openInputStream(resourceReference,
-                  value -> value != null && value.startsWith("image")));
-        }
-
-        @Override
-        public SeekableStream visitMemoryResource(final MemoryResourceReference memoryResourceReference)
-            throws IOException {
-          return new ByteArraySeekableStream(memoryResourceReference.getBuffer());
-        }
-
-        @Override
-        public SeekableStream visitPathResource(final PathResourceReference pathResourceReference) throws IOException {
-          return visitFileResource(new FileResourceReference(pathResourceReference.getPath().toFile()));
-        }
-
-      });
-    } catch (final IOException e) {
-      throw new IOException(
-          String.format("Failed reading the provided resource reference: %s",
-              toPrintableString(resourceReference)),
-          e);
-    }
-  }
-
-  private SeekableStream openAsFileIfPossible(final IResourceReference reference) throws IOException {
-    try {
-      return new FileSeekableStream(ImagenImageContainerFactory.this.resourceReferenceHandler.getFile(reference));
-    } catch (URISyntaxException e) {
-      return new MemoryCacheSeekableStream(
-          ImagenImageContainerFactory.this.resourceReferenceHandler.openInputStream(reference));
-    }
-  }
-
-  private String toPrintableString(final IResourceReference resourceReference) {
-    final String string = this.resourceReferenceHandler.toString(resourceReference);
-    try {
-      final IUrl url = new UrlParser().parse(string);
-      if (url.getPassword() != null) {
-        return new UrlBuilder(url).setPassword("**********").build().toString();
-      }
-      return new UrlBuilder(url).build().toString();
-    } catch (final CreationException exception) {
-      return string;
-    }
-  }
 }

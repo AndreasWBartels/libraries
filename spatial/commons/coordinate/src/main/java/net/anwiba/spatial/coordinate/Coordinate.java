@@ -29,6 +29,10 @@ import net.anwiba.commons.utilities.ArrayUtilities;
 
 public class Coordinate implements ICoordinate {
 
+  public static ICoordinate of(final double x, final double y) {
+    return new Coordinate(x, y);
+  }
+
   private static final long serialVersionUID = 1L;
   private final boolean isMeasured;
   private final double[] values;

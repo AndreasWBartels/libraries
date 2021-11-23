@@ -186,6 +186,10 @@ public class Optional<T, E extends Exception> {
       return java.util.Optional.of(this.value);
     }
 
+    @Override
+    public void throwIfFaild() throws E {
+      // nothing to do
+    }
   }
 
   static class Failed<T, E extends Exception> implements IOptional<T, E> {
@@ -309,6 +313,11 @@ public class Optional<T, E extends Exception> {
     @Override
     public java.util.Optional<T> toOptional() {
       throw new RuntimeException(this.cause.getMessage(), this.cause);
+    }
+
+    @Override
+    public void throwIfFaild() throws E {
+      throw this.cause;
     }
   }
 
@@ -445,6 +454,11 @@ public class Optional<T, E extends Exception> {
     @Override
     public java.util.Optional<T> toOptional() {
       return java.util.Optional.empty();
+    }
+
+    @Override
+    public void throwIfFaild() throws E {
+      // nothing to do
     }
   }
 

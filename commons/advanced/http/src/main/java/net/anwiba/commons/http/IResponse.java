@@ -24,7 +24,10 @@ package net.anwiba.commons.http;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.util.List;
+
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public interface IResponse extends Closeable {
 
@@ -49,8 +52,19 @@ public interface IResponse extends Closeable {
   @Override
   public void close() throws IOException;
 
-  URI getUri();
+  String getUri();
 
   void abort();
 
+  default IOptional<List<String>, RuntimeException> cacheControl() {
+    return Optional.empty();
+  }
+
+  default IOptional<String, RuntimeException> expires() {
+    return Optional.empty();
+  }
+
+  default IOptional<String, RuntimeException> pragma() {
+    return Optional.empty();
+  }
 }

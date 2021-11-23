@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -12,7 +13,7 @@
   <parent>
     <groupId>net.anwiba.eclipse</groupId>
     <artifactId>anwiba-eclipse-maven-default</artifactId>
-    <version>1.1.121</version>
+    <version>1.1.158</version>
   </parent>
 
   <scm>
@@ -26,23 +27,25 @@
     <dependency>
       <groupId>net.anwiba.eclipse</groupId>
       <artifactId>net.anwiba.eclipse.commons</artifactId>
-      <version>1.1.121</version>
+      <version>1.1.158</version>
     </dependency>
 
     <dependency>
       <groupId>net.anwiba.eclipse</groupId>
       <artifactId>net.anwiba.eclipse.libraries</artifactId>
-      <version>1.1.121</version>
+      <version>1.1.158</version>
     </dependency>
 
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
+      <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-core</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
   </dependencies>

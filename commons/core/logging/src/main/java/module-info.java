@@ -26,4 +26,5 @@ module net.anwiba.commons.logging {
   requires java.xml;
   requires org.apache.logging.log4j;
   requires org.apache.logging.log4j.core;
+  requires net.anwiba.commons.lang;
 }

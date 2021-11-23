@@ -14,7 +14,7 @@
   <parent>
     <groupId>net.anwiba.eclipse</groupId>
     <artifactId>anwiba-eclipse-maven-default</artifactId>
-    <version>1.1.121</version>
+    <version>1.1.158</version>
   </parent>
 
   <scm>
@@ -38,102 +38,123 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>commons-logging</groupId>
-                  <artifactId>commons-logging</artifactId>
-                  <version>1.2</version>
+                  <groupId>net.jafama</groupId>
+                  <artifactId>jafama</artifactId>
+                  <version>2.3.2</version>
                   <type>jar</type>
-                  <destFileName>commons-logging-1.2.jar</destFileName>
+                  <destFileName>jafama-2.3.2.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.apache.commons</groupId>
-                  <artifactId>commons-lang3</artifactId>
-                  <version>3.11</version>
+                  <groupId>jakarta.xml.bind</groupId>
+                  <artifactId>jakarta.xml.bind-api</artifactId>
+                  <version>3.0.1</version>
                   <type>jar</type>
-                  <destFileName>commons-lang3-3.11.jar</destFileName>
+                  <destFileName>jakarta.xml.bind-api-3.0.1.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.sun.activation</groupId>
+                  <artifactId>jakarta.activation</artifactId>
+                  <version>2.0.1</version>
+                  <type>jar</type>
+                  <destFileName>jakarta.activation-2.0.1.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.logging.log4j</groupId>
                   <artifactId>log4j-api</artifactId>
-                  <version>2.14.0</version>
+                  <version>2.14.1</version>
                   <type>jar</type>
-                  <destFileName>log4j-api-2.14.0.jar</destFileName>
+                  <destFileName>log4j-api-2.14.1.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.logging.log4j</groupId>
                   <artifactId>log4j-core</artifactId>
-                  <version>2.14.0</version>
+                  <version>2.14.1</version>
                   <type>jar</type>
-                  <destFileName>log4j-core-2.14.0.jar</destFileName>
+                  <destFileName>log4j-core-2.14.1.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.commons</groupId>
+                  <artifactId>commons-lang3</artifactId>
+                  <version>3.12.0</version>
+                  <type>jar</type>
+                  <destFileName>commons-lang3-3.12.0.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-ensure</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-ensure-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-ensure-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-ensure</artifactId>
-                  <version>1.1.121</version>
+                  <artifactId>anwiba-commons-version</artifactId>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-ensure-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-version-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-lang</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-lang-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-lang-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-logging</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-logging-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-logging-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-message</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-message-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-message-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-model</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-model-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-model-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-thread</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-thread-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-thread-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-reference</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-reference-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-reference-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons</groupId>
                   <artifactId>anwiba-commons-utilities</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-commons-utilities-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-commons-utilities-1.1.158.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.anwiba.commons.tools</groupId>
                   <artifactId>anwiba-tools-graphml</artifactId>
-                  <version>1.1.121</version>
+                  <version>1.1.158</version>
                   <type>jar</type>
-                  <destFileName>anwiba-tools-graphml-1.1.121.jar</destFileName>
+                  <destFileName>anwiba-tools-graphml-1.1.158.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.anwiba.commons.tools</groupId>
+                  <artifactId>anwiba-tools-icons</artifactId>
+                  <version>1.1.158</version>
+                  <type>jar</type>
+                  <destFileName>anwiba-tools-icons-1.1.158.jar</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>lib</outputDirectory>

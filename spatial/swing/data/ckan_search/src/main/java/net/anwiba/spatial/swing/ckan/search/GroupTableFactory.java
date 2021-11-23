@@ -157,6 +157,7 @@ public class GroupTableFactory {
       IOException {
     final IResultProducer<GroupListResultResponse> responseProducer = (
         c,
+        url,
         statusCode,
         statusMessage,
         contentType,

@@ -23,6 +23,7 @@ package net.anwiba.commons.swing.combobox;
 
 import javax.swing.JComboBox;
 
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.component.IComponentProvider;
 import net.anwiba.commons.swing.list.IObjectListConfiguration;
@@ -49,6 +50,12 @@ public class ObjectComboBox<T> implements IComponentProvider {
     list.setPrototypeDisplayValue(configuration.getPrototype());
     list.setMaximumRowCount(configuration.getVisibleRowCount());
     list.setSelectedItem(this.objectModel.get());
+    IBooleanDistributor enabledDistributor = configuration.getEnabledDistributor();
+    list.setEditable(configuration.isEditable());
+    list.setEnabled(enabledDistributor.isTrue());
+    enabledDistributor.addChangeListener(() ->  {
+      list.setEnabled(enabledDistributor.isTrue());
+    });
     this.component = list;
   }
 

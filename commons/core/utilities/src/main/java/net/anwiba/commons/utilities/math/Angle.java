@@ -23,39 +23,58 @@ package net.anwiba.commons.utilities.math;
 
 public final class Angle {
 
+  public static Angle of(final double value, final AngleUnit unit) {
+    switch (unit) {
+      case DEGREE: {
+        return degree(value);
+      }
+      case GON: {
+        return gon(value);
+      }
+      case RADIAN: {
+        return radian(value);
+      }
+      case SEMI_CIRCLE: {
+        return semiCircle(value);
+      }
+      default:
+        throw new IllegalArgumentException();
+    }
+  }
+
+  public static Angle radian(final double x) {
+    return new Angle(x);
+  }
+
+  public static Angle gon(final double value) {
+    return new Angle((value / RHO_GON));
+  }
+
+  public static Angle degree(final double value) {
+    return new Angle((value / RHO_DEGREE));
+  }
+
+  public static Angle semiCircle(final double value) {
+    return new Angle((value / RHO_SEMI_CIRCLE));
+  }
+
+  public static Angle degree(final int degree, final int minute, final double second) {
+    return degree(degree + minute / 60. + second / 3600.0);
+  }
+
   public static final double TWO_PI = 2. * MathWrapper.PI;
   public static final double RHO_DEGREE = 180. / MathWrapper.PI;
   public static final double RHO_GON = 200. / MathWrapper.PI;
   public static final double RHO_SEMI_CIRCLE = 1. / MathWrapper.PI;
 
-  private double value;
+  private final double value;
 
   public Angle() {
     this.value = 0.;
   }
 
   private Angle(final double value) {
-    this.value = value;
-  }
-
-  public static Angle radian(final double x) {
-    return new Angle(x % TWO_PI);
-  }
-
-  public static Angle gon(final double value) {
-    return new Angle((value / RHO_GON) % TWO_PI);
-  }
-
-  public static Angle degree(final double value) {
-    return new Angle((value / RHO_DEGREE) % TWO_PI);
-  }
-
-  public static Angle semiCircle(final double value) {
-    return new Angle((value / RHO_SEMI_CIRCLE) % TWO_PI);
-  }
-
-  public static Angle degree(final int degree, final int minute, final double second) {
-    return degree(degree + minute / 60. + second / 3600.0);
+    this.value = value % TWO_PI;
   }
 
   public double radian() {
@@ -78,16 +97,37 @@ public final class Angle {
     return radian() * RHO_SEMI_CIRCLE;
   }
 
+  public double as(final AngleUnit unit) {
+    return radian() * unit.fromRadians();
+  }
+
+  private boolean isUndefined() {
+    return Double.isNaN(this.value) || Double.isInfinite(this.value);
+  }
+
   public Angle add(final Angle angle) {
-    this.value += angle.radian();
-    this.value %= TWO_PI;
-    return this;
+    if (isUndefined() || angle.isUndefined()) {
+      return Angle.radian(Double.NaN);
+    }
+    return Angle.radian(nonNegativ(radian()) + angle.nonNegativ().radian());
   }
 
   public Angle subtract(final Angle angle) {
-    this.value -= angle.radian();
-    this.value %= TWO_PI;
-    return this;
+    if (isUndefined() || angle.isUndefined()) {
+      return Angle.radian(Double.NaN);
+    }
+    return Angle.radian(nonNegativ(radian()) - angle.nonNegativ().radian());
+  }
+
+  public Angle nonNegativ() {
+    if (isUndefined()) {
+      return this;
+    }
+    return Angle.radian(nonNegativ(radian()));
+  }
+
+  private static double nonNegativ(final double radian) {
+    return radian > 0 ? radian : ((radian % TWO_PI) + TWO_PI) % TWO_PI;
   }
 
   public static double sin(final Angle value) {
@@ -96,5 +136,9 @@ public final class Angle {
 
   public static double cos(final Angle value) {
     return MathWrapper.cos(value.radian());
+  }
+
+  public static double tan(final Angle value) {
+    return MathWrapper.tan(value.radian());
   }
 }

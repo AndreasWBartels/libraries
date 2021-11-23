@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import net.anwiba.commons.lang.object.ObjectPair;
 import net.anwiba.commons.lang.optional.Optional;
@@ -42,6 +43,7 @@ public class MulitSegmentCoordinateSequence implements ICoordinateSequence {
   int numberOfCoordinates;
   private final boolean isMeasured;
   private final int dimension;
+  private int hashcode = -1;
 
   public MulitSegmentCoordinateSequence(final List<ICoordinateSequenceSegment> segments) {
     this.segments = segments;
@@ -269,5 +271,27 @@ public class MulitSegmentCoordinateSequence implements ICoordinateSequence {
   @Override
   public boolean isCompouned() {
     return this.segments.size() > 1;
+  }
+
+  @Override
+  public int hashCode() {
+    if (hashcode  == -1) {
+      hashcode = Objects.hash(dimension, envelope, isEmpty, isMeasured, numberOfCoordinates, segments);
+    }
+    return hashcode;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    MulitSegmentCoordinateSequence other = (MulitSegmentCoordinateSequence) obj;
+    return this.dimension == other.dimension && Objects.equals(this.envelope, other.envelope)
+        && this.isEmpty == other.isEmpty && this.isMeasured == other.isMeasured
+        && this.numberOfCoordinates == other.numberOfCoordinates && Objects.equals(this.segments, other.segments);
   }
 }

@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels 
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -32,7 +32,8 @@ import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.swing.icon.GuiIcon;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
-public abstract class AbstractAlgebraicObjectFieldBuilder<O, C extends AbstractObjectFieldConfigurationBuilder<O, C>, B extends AbstractObjectFieldBuilder<O, C, B>>
+public abstract class AbstractAlgebraicObjectFieldBuilder<O, C extends AbstractObjectFieldConfigurationBuilder<O, C>,
+    B extends AbstractObjectFieldBuilder<O, C, B>>
     extends
     AbstractObjectFieldBuilder<O, C, B> {
 
@@ -56,7 +57,7 @@ public abstract class AbstractAlgebraicObjectFieldBuilder<O, C extends AbstractO
         @Override
         public void setEnabled(final boolean value) {
           super.setEnabled(enabledDistributor.isTrue() && enabledModel.isTrue() && value);
-        };
+        }
       };
       final ButtonModel buttonModel = button.getModel();
 

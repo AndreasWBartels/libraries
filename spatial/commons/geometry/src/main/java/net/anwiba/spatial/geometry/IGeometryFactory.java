@@ -33,94 +33,96 @@ import net.anwiba.spatial.coordinatereferencesystem.ICoordinateReferenceSystem;
 
 public interface IGeometryFactory extends Serializable {
 
-  public ICoordinateReferenceSystem getCoordinateReferenceSystem();
+  ICoordinateReferenceSystem getCoordinateReferenceSystem();
 
-  public IPoint createPoint(final ICoordinate coordinate);
+  IPoint createPoint(final ICoordinate coordinate);
 
-  public IPoint createPoint(final ICoordinate coordinate, IEnvelope envelope);
+  IPoint createPoint(final ICoordinate coordinate, IEnvelope envelope);
 
-  public IPoint createPoint(double x, double y);
+  IPoint createPoint(Number x, Number y);
 
-  public ILineString createLineString(final double[] xs, final double[] ys);
+  IPoint createPoint(double x, double y);
 
-  public ILineString createLineString(final ICoordinateSequence coordinateSequence);
+  ILineString createLineString(final double[] xs, final double[] ys);
 
-  public ILinearRing createLinearRing(final double[] xs, final double[] ys);
+  ILineString createLineString(final ICoordinateSequence coordinateSequence);
 
-  public ILinearRing createLinearRing(final ICoordinateSequence sequence);
+  ILinearRing createLinearRing(final double[] xs, final double[] ys);
 
-  public IPolygon createPolygon(final double[] xs, final double[] ys);
+  ILinearRing createLinearRing(final ICoordinateSequence sequence);
 
-  public IPolygon createPolygon(final ICoordinateSequence coordinateSequence);
+  IPolygon createPolygon(final double[] xs, final double[] ys);
 
-  public IPolygon createPolygon(final double[] xs, final double[] ys, final double[][] hxs, final double[][] hys);
+  IPolygon createPolygon(final ICoordinateSequence coordinateSequence);
 
-  public IPolygon createPolygon(final ICoordinateSequence sequence, final ICoordinateSequence[] sequences);
+  IPolygon createPolygon(final double[] xs, final double[] ys, final double[][] hxs, final double[][] hys);
 
-  public IPolygon createPolygon(final ILinearRing outerRing, final ILinearRing[] innerRings);
+  IPolygon createPolygon(final ICoordinateSequence sequence, final ICoordinateSequence[] sequences);
 
-  public IPolygon createPolygon(final ILinearRing outerRing, final List<ILinearRing> innerRings);
+  IPolygon createPolygon(final ILinearRing outerRing, final ILinearRing[] innerRings);
 
-  public IMultiPoint createMultiPoint(final double[] xs, final double[] ys);
+  IPolygon createPolygon(final ILinearRing outerRing, final List<ILinearRing> innerRings);
 
-  public IMultiPoint createMultiPoint(IPoint points);
+  IMultiPoint createMultiPoint(final double[] xs, final double[] ys);
 
-  public IMultiPoint createMultiPoint(final List<IPoint> points);
+  IMultiPoint createMultiPoint(IPoint points);
 
-  public IMultiPoint createMultiPoint(final IPoint[] points);
+  IMultiPoint createMultiPoint(final List<IPoint> points);
 
-  public IMultiPoint createMultiPoint(final ICoordinateSequence coordinateSequence);
+  IMultiPoint createMultiPoint(final IPoint[] points);
 
-  public IMultiLineString createMultiLineString(final double[][] xs, final double[][] ys);
+  IMultiPoint createMultiPoint(final ICoordinateSequence coordinateSequence);
 
-  public IMultiLineString createMultiLineString(final double[][] xs, final double[][] ys, final double[][] zs);
+  IMultiLineString createMultiLineString(final double[][] xs, final double[][] ys);
 
-  public IMultiLineString createMultiLineString(
+  IMultiLineString createMultiLineString(final double[][] xs, final double[][] ys, final double[][] zs);
+
+  IMultiLineString createMultiLineString(
       final double[][] xs,
       final double[][] ys,
       final double[][] zs,
       final boolean isMesured);
 
-  public IMultiLineString createMultiLineString(
+  IMultiLineString createMultiLineString(
       final double[][] xs,
       final double[][] ys,
       final double[][] zs,
       final double[][] ms);
 
-  public IMultiLineString createMultiLineString(final ICoordinateSequence[] coordinateSequences);
+  IMultiLineString createMultiLineString(final ICoordinateSequence[] coordinateSequences);
 
-  public IMultiLineString createMultiLineString(ILineString geometry);
+  IMultiLineString createMultiLineString(ILineString geometry);
 
-  public IMultiLineString createMultiLineString(final ILineString[] lineStrings);
+  IMultiLineString createMultiLineString(final ILineString[] lineStrings);
 
-  public IMultiLineString createMultiLineString(List<ILineString> lineStrings);
+  IMultiLineString createMultiLineString(List<ILineString> lineStrings);
 
-  public IMultiPolygon createMultiPolygon(final double[][] xs, final double[][] ys);
+  IMultiPolygon createMultiPolygon(final double[][] xs, final double[][] ys);
 
-  public IMultiPolygon createMultiPolygon(
+  IMultiPolygon createMultiPolygon(
       final double[][] xs,
       final double[][] ys,
       final double[][][] hxs,
       final double[][][] hys);
 
-  public IMultiPolygon createMultiPolygon(
+  IMultiPolygon createMultiPolygon(
       final ICoordinateSequence[] outerRingSequences,
       final ICoordinateSequence[][] innerRingSequences);
 
-  public IMultiPolygon createMultiPolygon(IPolygon polygon);
+  IMultiPolygon createMultiPolygon(IPolygon polygon);
 
-  public IMultiPolygon createMultiPolygon(final IPolygon[] polygons);
+  IMultiPolygon createMultiPolygon(final IPolygon[] polygons);
 
-  public IMultiPolygon createMultiPolygon(List<IPolygon> polygons);
+  IMultiPolygon createMultiPolygon(List<IPolygon> polygons);
 
-  public IGeometryCollection createCollection(final IBaseGeometry[] geometries);
+  IGeometryCollection createCollection(final IBaseGeometry[] geometries);
 
-  public IGeometryCollection createCollection(List<IBaseGeometry> geometries);
+  IGeometryCollection createCollection(List<IBaseGeometry> geometries);
 
-  public ICoordinateSequenceFactory getCoordinateSequenceFactory();
+  ICoordinateSequenceFactory getCoordinateSequenceFactory();
 
-  public IPolygon createPolygon(IEnvelope envelope);
+  IPolygon createPolygon(IEnvelope envelope);
 
-  public IRectangle createRectangle(IEnvelope envelope);
+  IRectangle createRectangle(IEnvelope envelope);
 
 }

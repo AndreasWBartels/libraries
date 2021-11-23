@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.utilities.string;
 
-import net.anwiba.commons.utilities.provider.INamedValueProvider;
-
 import java.util.regex.Pattern;
+
+import net.anwiba.commons.utilities.provider.INamedValueProvider;
 
 public class StringResolver extends AbstractStringResolver {
 

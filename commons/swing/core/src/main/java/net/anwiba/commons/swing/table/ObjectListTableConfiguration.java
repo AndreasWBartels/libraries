@@ -47,6 +47,7 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
   private final ITableTextFieldActionConfiguration<T> textFieldActionConfiguration;
   private final ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory;
   private final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryHeaderPanelFactory;
+  private final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryFooterPanelFactory;
   private final IObjectDistributor<IAcceptor<T>> rowFilterDistributor;
 
   public ObjectListTableConfiguration(
@@ -63,6 +64,7 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
       final ITableActionConfiguration<T> actionConfiguration,
       final ITableTextFieldActionConfiguration<T> textFieldActionConfiguration,
       final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryHeaderPanelFactory,
+      final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryFooterPanelFactory,
       final ITableTextFieldKeyListenerFactory<T> textFieldKeyListenerFactory) {
     super(
         autoRizeMode,
@@ -78,6 +80,7 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
     this.rowFilterDistributor = filterModel;
     this.textFieldActionConfiguration = textFieldActionConfiguration;
     this.accessoryHeaderPanelFactory = accessoryHeaderPanelFactory;
+    this.accessoryFooterPanelFactory = accessoryFooterPanelFactory;
     this.textFieldKeyListenerFactory = textFieldKeyListenerFactory;
     this.columnValueProviders = ListUtilities.convert(
         columnConfigurations,
@@ -157,4 +160,8 @@ public class ObjectListTableConfiguration<T> extends ObjectTableConfiguration<T>
     return this.accessoryHeaderPanelFactory;
   }
 
+  @Override
+  public IFactory<IObjectTableModel<T>, JComponent, RuntimeException> getAccessoryFooterPanelFactory() {
+    return this.accessoryFooterPanelFactory;
+  }
 }

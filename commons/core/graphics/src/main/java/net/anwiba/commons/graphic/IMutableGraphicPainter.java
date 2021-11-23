@@ -21,10 +21,19 @@
  */
 package net.anwiba.commons.graphic;
 
+import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectModel;
 
 public interface IMutableGraphicPainter<T> extends IGraphicPainter {
 
-  public IObjectModel<T> getModel();
+  IObjectModel<T> getModel();
+
+  default void removeChangeListener(final IChangeableObjectListener painterListener) {
+    getModel().removeChangeListener(painterListener);
+  }
+
+  default void addChangeListener(final IChangeableObjectListener painterListener) {
+    getModel().addChangeListener(painterListener);
+  }
 
 }

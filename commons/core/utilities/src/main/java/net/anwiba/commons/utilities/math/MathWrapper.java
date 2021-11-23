@@ -176,16 +176,10 @@ public class MathWrapper {
   }
 
   public static double toRadians(final double value) {
-    if (fast) {
-      return FastMath.toRadians(value);
-    }
     return Math.toRadians(value);
   }
 
   public static double toDegrees(final double value) {
-    if (fast) {
-      return FastMath.toDegrees(value);
-    }
     return Math.toDegrees(value);
   }
 

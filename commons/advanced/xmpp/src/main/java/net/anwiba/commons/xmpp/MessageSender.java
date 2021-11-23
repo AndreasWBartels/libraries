@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -21,14 +21,6 @@
  */
 package net.anwiba.commons.xmpp;
 
-import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.Logging;
-import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.message.notification.NotificationException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +31,13 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+
+import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.logging.ILogger;
+import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.message.IMessage;
+import net.anwiba.commons.message.Message;
+import net.anwiba.commons.message.notification.NotificationException;
 
 public class MessageSender {
 
@@ -53,11 +52,11 @@ public class MessageSender {
   private final Iterable<String> bodies;
 
   public MessageSender(
-    final ConnectionConfiguration configuration,
-    final String userName,
-    final String password,
-    final List<String> saslAuthenticationTypes,
-    final List<String> bodies) {
+      final ConnectionConfiguration configuration,
+      final String userName,
+      final String password,
+      final List<String> saslAuthenticationTypes,
+      final List<String> bodies) {
     this.configuration = configuration;
     this.userName = userName;
     this.password = password;
@@ -107,14 +106,11 @@ public class MessageSender {
         return message.getThrowable() == null
             ? MessageFormat.format("{0}: {1}", message.getMessageType().name(), message.getText()) //$NON-NLS-1$
             : MessageFormat.format(
-                "{0}: {1} {2}", message.getMessageType().name(), message.getText(), toString(message.getThrowable())); //$NON-NLS-1$
+                "{0}: {1} {2}", //$NON-NLS-1$
+                message.getMessageType().name(),
+                message.getText(),
+                Message.toDetailInfo(message.getThrowable()));
       }
     }
-  }
-
-  private Object toString(final Throwable throwable) {
-    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    throwable.printStackTrace(new PrintStream(outputStream));
-    return outputStream.toString();
   }
 }

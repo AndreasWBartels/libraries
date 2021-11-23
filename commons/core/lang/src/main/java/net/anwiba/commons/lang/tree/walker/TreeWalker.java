@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.lang.tree.walker;
 
+import java.util.Iterator;
+
 import net.anwiba.commons.lang.tree.IItem;
 import net.anwiba.commons.lang.tree.ITreeItem;
 import net.anwiba.commons.lang.tree.iterator.SortedItemIterator;
-
-import java.util.Iterator;
 
 public class TreeWalker<K, V> implements ITreeWalker<K, V> {
 

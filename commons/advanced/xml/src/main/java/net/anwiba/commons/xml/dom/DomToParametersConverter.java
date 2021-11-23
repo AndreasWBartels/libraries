@@ -25,10 +25,10 @@ import java.util.ArrayList;
 
 import org.dom4j.Element;
 
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameter;
-import net.anwiba.commons.utilities.parameter.Parameters;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameter;
+import net.anwiba.commons.lang.parameter.Parameters;
 
 public final class DomToParametersConverter implements IDomToObjectConverter<IParameters> {
 

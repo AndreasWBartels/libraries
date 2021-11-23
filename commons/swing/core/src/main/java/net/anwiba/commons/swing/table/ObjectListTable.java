@@ -85,96 +85,27 @@ public class ObjectListTable<T> extends ObjectTable<T> {
 
   @Override
   public JComponent getComponent() {
-    if (this.configuration.isTextFieldEnable() || !this.configuration.getTextFieldActionConfiguration().isEmpty()) {
-      final StringFieldBuilder builder = new StringFieldBuilder();
-
-      this.configuration.getTextFieldActionConfiguration()
-          .getFactories()
-          .forEach(
-              f -> builder.addActionFactory(
-                  (model, document, enabledDistributor, clearBlock) -> f.create(
-                      getTableModel(),
-                      getSelectionIndexModel(),
-                      getSelectionModel(),
-                      enabledDistributor,
-                      model,
-                      clearBlock)));
-
-      builder.addClearAction(ObjectListTableMessages.clear);
-
-      Optional.of(this.configuration.getTextFieldKeyListenerFactory())
-          .consume(
-              f -> builder.setKeyListenerFactory(new IKeyListenerFactory<String>() {
-
-                @Override
-                public KeyListener create(
-                    final IObjectModel<String> model,
-                    final PlainDocument document,
-                    final IBlock<RuntimeException> clearBlock) {
-                  return f.create(getTableModel(), getSelectionIndexModel(), getSelectionModel(), model, clearBlock);
-                }
-              }));
-      builder.setColumns(40);
-      final IObjectField<String> stringField = builder.build();
-      final IObjectModel<String> model = stringField.getModel();
-
-      if (this.configuration.isFilterable()) {
-        final IObjectModel<IRowFilter> rowFilterModel = getRowFilterModel();
-        final IColumToStringConverter filterToStringConverter = this.configuration.getRowFilterToStringConverter();
-        final IObjectDistributor<IAcceptor<T>> rowFilterDistributor = this.configuration.getRowFilterDistributor();
-        if (filterToStringConverter != null && rowFilterDistributor != null) {
-          @SuppressWarnings("hiding")
-          final IChangeableObjectListener listener = () -> {
-            final String value = model.get();
-            if (StringUtilities.isNullOrTrimmedEmpty(value) && rowFilterDistributor.isEmpty()) {
-              rowFilterModel.set(null);
-            } else if (!StringUtilities.isNullOrTrimmedEmpty(value) && rowFilterDistributor.isEmpty()) {
-              rowFilterModel.set(new ObjectListTableFilter<T>(value, filterToStringConverter));
-            } else if (StringUtilities.isNullOrTrimmedEmpty(value) && !rowFilterDistributor.isEmpty()) {
-              rowFilterModel.set(new ObjectListTableFilter<T>(rowFilterDistributor.get()));
-            } else {
-              rowFilterModel
-                  .set(new ObjectListTableFilter<T>(value, filterToStringConverter, rowFilterDistributor.get()));
-            }
-          };
-          rowFilterDistributor.addChangeListener(listener);
-          model.addChangeListener(listener);
-          listener.objectChanged();
-        } else if (filterToStringConverter != null && rowFilterDistributor == null) {
-          @SuppressWarnings("hiding")
-          final IChangeableObjectListener listener = () -> {
-            final String value = model.get();
-            if (StringUtilities.isNullOrTrimmedEmpty(value)) {
-              rowFilterModel.set(null);
-              return;
-            }
-            rowFilterModel.set(new ObjectListTableFilter<T>(value, filterToStringConverter));
-          };
-          model.addChangeListener(listener);
-          listener.objectChanged();
-        } else if (filterToStringConverter == null && rowFilterDistributor != null) {
-          final IChangeableObjectListener listener = () -> {
-            if (rowFilterDistributor.isEmpty()) {
-              rowFilterModel.set(null);
-              return;
-            }
-            rowFilterModel
-                .set(new ObjectListTableFilter<T>(rowFilterDistributor.get()));
-          };
-          rowFilterDistributor.addChangeListener(listener);
-          listener.objectChanged();
-        }
-      }
+    if (this.configuration.isTextFieldEnable()
+        || !this.configuration.getTextFieldActionConfiguration().isEmpty()
+        || this.configuration.getAccessoryHeaderPanelFactory() != null
+        || this.configuration.getAccessoryFooterPanelFactory() != null) {
+      final IObjectField<String> stringField = createStringField();
       final JPanel contentPane = new JPanel();
       contentPane.setLayout(new BorderLayout());
-      final JPanel headPane = new JPanel();
-      headPane.setLayout(new BorderLayout(0, 0));
-      headPane.add(stringField.getComponent(), BorderLayout.CENTER);
-      if (this.configuration.getAccessoryHeaderPanelFactory() != null) {
-        headPane.add(this.configuration.getAccessoryHeaderPanelFactory().create(getTableModel()), BorderLayout.EAST);
+      if (stringField != null || this.configuration.getAccessoryHeaderPanelFactory() != null) {
+        final JPanel headPane = new JPanel();
+        headPane.setLayout(new BorderLayout(0, 0));
+        Optional.of(stringField).consume(c -> headPane.add(c.getComponent(), BorderLayout.CENTER));
+        if (this.configuration.getAccessoryHeaderPanelFactory() != null) {
+          headPane.add(this.configuration.getAccessoryHeaderPanelFactory().create(getTableModel()), BorderLayout.EAST);
+        }
+        contentPane.add(headPane, BorderLayout.NORTH);
       }
-      contentPane.add(headPane, BorderLayout.NORTH);
       contentPane.add(BorderLayout.CENTER, super.getComponent());
+      if (this.configuration.getAccessoryFooterPanelFactory() != null) {
+        contentPane.add(this.configuration.getAccessoryFooterPanelFactory().create(getTableModel()),
+            BorderLayout.SOUTH);
+      }
       return contentPane;
     }
     final IObjectDistributor<IAcceptor<T>> rowFilterDistributor = this.configuration.getRowFilterDistributor();
@@ -192,5 +123,93 @@ public class ObjectListTable<T> extends ObjectTable<T> {
       listener.objectChanged();
     }
     return super.getComponent();
+  }
+
+  protected IObjectField<String> createStringField() {
+    if (!this.configuration.isTextFieldEnable()
+        && this.configuration.getTextFieldActionConfiguration().isEmpty()) {
+      return null;
+    }
+
+    final StringFieldBuilder builder = new StringFieldBuilder();
+
+    this.configuration.getTextFieldActionConfiguration()
+        .getFactories()
+        .forEach(
+            f -> builder.addActionFactory(
+                (model, document, enabledDistributor, clearBlock) -> f.create(
+                    getTableModel(),
+                    getSelectionIndexModel(),
+                    getSelectionModel(),
+                    enabledDistributor,
+                    model,
+                    clearBlock)));
+
+    builder.addClearAction(ObjectListTableMessages.clear);
+
+    Optional.of(this.configuration.getTextFieldKeyListenerFactory())
+        .consume(
+            f -> builder.setKeyListenerFactory(new IKeyListenerFactory<String>() {
+
+              @Override
+              public KeyListener create(
+                  final IObjectModel<String> model,
+                  final PlainDocument document,
+                  final IBlock<RuntimeException> clearBlock) {
+                return f.create(getTableModel(), getSelectionIndexModel(), getSelectionModel(), model, clearBlock);
+              }
+            }));
+    builder.setColumns(40);
+    final IObjectField<String> stringField = builder.build();
+    final IObjectModel<String> model = stringField.getModel();
+
+    if (this.configuration.isFilterable()) {
+      final IObjectModel<IRowFilter> rowFilterModel = getRowFilterModel();
+      final IColumToStringConverter filterToStringConverter = this.configuration.getRowFilterToStringConverter();
+      final IObjectDistributor<IAcceptor<T>> rowFilterDistributor = this.configuration.getRowFilterDistributor();
+      if (filterToStringConverter != null && rowFilterDistributor != null) {
+        @SuppressWarnings("hiding")
+        final IChangeableObjectListener listener = () -> {
+          final String value = model.get();
+          if (StringUtilities.isNullOrTrimmedEmpty(value) && rowFilterDistributor.isEmpty()) {
+            rowFilterModel.set(null);
+          } else if (!StringUtilities.isNullOrTrimmedEmpty(value) && rowFilterDistributor.isEmpty()) {
+            rowFilterModel.set(new ObjectListTableFilter<T>(value, filterToStringConverter));
+          } else if (StringUtilities.isNullOrTrimmedEmpty(value) && !rowFilterDistributor.isEmpty()) {
+            rowFilterModel.set(new ObjectListTableFilter<T>(rowFilterDistributor.get()));
+          } else {
+            rowFilterModel
+                .set(new ObjectListTableFilter<T>(value, filterToStringConverter, rowFilterDistributor.get()));
+          }
+        };
+        rowFilterDistributor.addChangeListener(listener);
+        model.addChangeListener(listener);
+        listener.objectChanged();
+      } else if (filterToStringConverter != null && rowFilterDistributor == null) {
+        @SuppressWarnings("hiding")
+        final IChangeableObjectListener listener = () -> {
+          final String value = model.get();
+          if (StringUtilities.isNullOrTrimmedEmpty(value)) {
+            rowFilterModel.set(null);
+            return;
+          }
+          rowFilterModel.set(new ObjectListTableFilter<T>(value, filterToStringConverter));
+        };
+        model.addChangeListener(listener);
+        listener.objectChanged();
+      } else if (filterToStringConverter == null && rowFilterDistributor != null) {
+        final IChangeableObjectListener listener = () -> {
+          if (rowFilterDistributor.isEmpty()) {
+            rowFilterModel.set(null);
+            return;
+          }
+          rowFilterModel
+              .set(new ObjectListTableFilter<T>(rowFilterDistributor.get()));
+        };
+        rowFilterDistributor.addChangeListener(listener);
+        listener.objectChanged();
+      }
+    }
+    return stringField;
   }
 }

@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.swing.table;
 
-import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
-import net.anwiba.commons.swing.table.action.ITableActionFactory;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
+import net.anwiba.commons.swing.table.action.ITableActionFactory;
 
 public final class TableActionConfiguration<T> implements ITableActionConfiguration<T> {
 

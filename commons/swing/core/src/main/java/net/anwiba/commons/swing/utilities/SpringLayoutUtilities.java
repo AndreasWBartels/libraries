@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.utilities;
 
-import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
-
 import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.Spring;
 import javax.swing.SpringLayout;
+
+import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 
 /**
  * A 1.4 file that provides utility methods for creating form- or grid-style layouts with SpringLayout. These utilities

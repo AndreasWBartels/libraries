@@ -21,10 +21,46 @@
  */
 package net.anwiba.commons.logging;
 
+import net.anwiba.commons.lang.exception.Throwables;
+
 public interface ILogger {
 
-  void log(ILevel level, IMessageFactory factory);
+  boolean isLoggable(ILevel level);
 
+
+  void doLog(ILevel level, IMessageFactory factory, Throwable throwable);
+
+  default void log(ILevel level, IMessageFactory factory, Throwable throwable) {
+    if (throwable == null) {
+      doLog(level, factory, null);
+      return;
+    }
+
+    doLog(level, () -> {
+      if (Throwables.isApplicable(throwable)) {
+        return String.join("\n", factory.create(), Throwables.toString(throwable));
+      }
+      return factory.create();
+    }, throwable);
+
+  }
+
+  default void log(ILevel level, IMessageFactory factory) {
+    log(level, factory, null);
+  }
+  
+  default void log(ILevel level, String message) {
+    log(level, () -> message, null);
+  }
+
+  default void log(ILevel level, String message, Throwable throwable) {
+    log(level, () -> message, throwable);
+  }
+
+  default void log(ILevel level, Throwable throwable) {
+    log(level, () -> throwable.getMessage(), throwable);
+  }
+  
   default void all(final IMessageFactory factory) {
     log(ILevel.ALL, factory);
   }
@@ -56,8 +92,6 @@ public interface ILogger {
   default void serve(final IMessageFactory factory) {
     log(ILevel.SEVERE, factory);
   }
-
-  void log(ILevel level, String message);
 
   default void all(final String message) {
     log(ILevel.ALL, message);
@@ -91,8 +125,6 @@ public interface ILogger {
     log(ILevel.SEVERE, message);
   }
 
-  void log(ILevel level, String message, Throwable throwable);
-
   default void all(final String message, final Throwable throwable) {
     log(ILevel.ALL, message, throwable);
   }
@@ -124,7 +156,5 @@ public interface ILogger {
   default void serve(final String message, final Throwable throwable) {
     log(ILevel.SEVERE, message, throwable);
   }
-
-  boolean isLoggable(ILevel level);
 
 }

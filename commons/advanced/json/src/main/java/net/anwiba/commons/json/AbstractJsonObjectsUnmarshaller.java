@@ -42,12 +42,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper.Builder;
 
 public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOException>
     extends
     AbstractJsonUnmarshaller<T, List<T>, R, IOException> {
 
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper;
   private final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory;
   private final Class<T> clazz;
   private final Map<String, Object> injectionValues = new HashMap<>();
@@ -70,8 +72,12 @@ public abstract class AbstractJsonObjectsUnmarshaller<T, R, E extends IOExceptio
     this.clazz = clazz;
     this.injectionValues.putAll(injectionValues);
     this.exceptionFactory = exceptionFactory;
-    this.mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-    this.mapper.findAndRegisterModules();
+    final Builder builder = JsonMapper.builder()
+        .findAndAddModules()
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS);
+    problemHandlers.forEach(h -> builder.addHandler(h));
+    this.mapper = builder.build();
   }
 
   @Override

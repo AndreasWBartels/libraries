@@ -29,6 +29,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.border.Border;
 
+import net.anwiba.commons.model.BooleanModel;
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.model.SelectionModel;
 import net.anwiba.commons.swing.ui.IObjectUi;
@@ -45,8 +47,10 @@ public class ObjectListConfigurationBuilder<T> {
   private ISelectionModel<T> selectionModel;
   private TransferHandler transferHandler;
   private boolean isDragEnabled = false;
+  protected boolean isEditable = false;
   private DropMode dropMode = DropMode.USE_SELECTION;
   private T prototype = null;
+  private IBooleanDistributor enabledModel = new BooleanModel(true);
 
   private final ObjectUiCellRendererConfigurationBuilder objectUiCellRendererConfigurationBuilder = new ObjectUiCellRendererConfigurationBuilder();
 
@@ -195,10 +199,25 @@ public class ObjectListConfigurationBuilder<T> {
     return this;
   }
 
+  public ObjectListConfigurationBuilder<T> setEnabledModel(IBooleanDistributor enabledModel) {
+    this.enabledModel = enabledModel;
+    return this;
+  }
+
+  public ObjectListConfigurationBuilder<T> setEditable(boolean isEditable) {
+    this.isEditable = isEditable;
+    return this;
+  }
+
   public IObjectListConfiguration<T> build() {
     final IObjectUiCellRendererConfiguration objectUiCellRendererConfiguration = this.objectUiCellRendererConfigurationBuilder
         .build();
     return new IObjectListConfiguration<T>() {
+      
+      @Override
+      public IBooleanDistributor getEnabledDistributor() {
+        return ObjectListConfigurationBuilder.this.enabledModel;
+      }
 
       @Override
       public int getLayoutOrientation() {
@@ -255,6 +274,11 @@ public class ObjectListConfigurationBuilder<T> {
       @Override
       public T getPrototype() {
         return ObjectListConfigurationBuilder.this.prototype;
+      }
+
+      @Override
+      public boolean isEditable() {
+        return ObjectListConfigurationBuilder.this.isEditable ;
       }
     };
   }

@@ -23,6 +23,8 @@ package net.anwiba.commons.image.imageio;
 
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -35,6 +37,8 @@ import net.anwiba.commons.image.AbstractImageContainer;
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageContainerSettings;
 import net.anwiba.commons.image.IImageMetadata;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
+import net.anwiba.commons.image.imagen.ImagenImageMetadataAdjustor;
 import net.anwiba.commons.image.imagen.RenderedImageContainer;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.image.operation.ImageCropOperation;
@@ -46,6 +50,7 @@ import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -58,92 +63,23 @@ class ImageIoImageContainer extends AbstractImageContainer {
   public ImageIoImageContainer(
       final RenderingHints hints,
       final IImageMetadata metadata,
-      final IImageInputStreamConnector imageInputStream) {
-    this(hints, metadata, imageInputStream, new ObjectList<>());
+      final IImageInputStreamConnector imageInputStream,IImageMetadataAdjustor metadataAdjustor) {
+    this(hints, metadata, imageInputStream, new ObjectList<>(), metadataAdjustor);
   }
 
   private ImageIoImageContainer(
       final RenderingHints hints,
       final IImageMetadata metadata,
       final IImageInputStreamConnector imageInputStream,
-      final IObjectList<IImageOperation> operations) {
-    super(hints, metadata, operations);
+      final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
+    super(hints, metadata, operations, metadataAdjustor);
     this.imageInputStreamConnector = imageInputStream;
   }
 
   @Override
-  public IImageMetadata adjust(final IImageMetadata metadata,
-      final int numberOfComponents,
-      final int numberOfBands,
-      final int colorSpaceType) {
-    ImageIoImageMetadata imageMetadata = (ImageIoImageMetadata) metadata;
-    return new ImageIoImageMetadata(
-        imageMetadata.getIndex(),
-        imageMetadata.getWidth(),
-        imageMetadata.getHeight(),
-        numberOfComponents,
-        numberOfBands,
-        colorSpaceType,
-        imageMetadata.getDataType(),
-        imageMetadata.getTransparency(),
-        imageMetadata.getImageType());
-  }
-
-  @Override
-  protected IImageMetadata adjust(final IImageMetadata metadata, final float width, final float height) {
-    ImageIoImageMetadata imageMetadata = (ImageIoImageMetadata) metadata;
-    return new ImageIoImageMetadata(
-        imageMetadata.getIndex(),
-        width,
-        height,
-        imageMetadata.getNumberOfComponents(),
-        imageMetadata.getNumberOfBands(),
-        imageMetadata.getColorSpaceType(),
-        imageMetadata.getDataType(),
-        imageMetadata.getTransparency(),
-        imageMetadata.getImageType());
-  }
-
-  @Override
-  protected IImageMetadata
-      adjust(final IImageMetadata metadata,
-          final int numberOfComponents,
-          final int numberOfBands,
-          final int colorSpaceType,
-          final int dataType,
-          final int transparency) {
-    ImageIoImageMetadata imageMetadata = (ImageIoImageMetadata) metadata;
-    return new ImageIoImageMetadata(
-        imageMetadata.getIndex(),
-        imageMetadata.getWidth(),
-        imageMetadata.getHeight(),
-        numberOfComponents,
-        numberOfBands,
-        colorSpaceType,
-        dataType,
-        transparency,
-        imageMetadata.getImageType());
-  }
-
-  @Override
-  protected IImageMetadata copy(final IImageMetadata metadata) {
-    ImageIoImageMetadata imageMetadata = (ImageIoImageMetadata) metadata;
-    return new ImageIoImageMetadata(
-        imageMetadata.getIndex(),
-        imageMetadata.getWidth(),
-        imageMetadata.getHeight(),
-        imageMetadata.getNumberOfComponents(),
-        imageMetadata.getNumberOfBands(),
-        imageMetadata.getColorSpaceType(),
-        imageMetadata.getDataType(),
-        imageMetadata.getTransparency(),
-        imageMetadata.getImageType());
-  }
-
-  @Override
   protected IImageContainer
-      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations) {
-    return new ImageIoImageContainer(hints, metadata, this.imageInputStreamConnector, operations);
+      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
+    return new ImageIoImageContainer(hints, metadata, this.imageInputStreamConnector, operations, metadataAdjustor);
   }
 
   @Override
@@ -189,26 +125,30 @@ class ImageIoImageContainer extends AbstractImageContainer {
     final int height = imageReader.getHeight(index);
     final ImageTypeSpecifier imageType =
         Streams.of(IOException.class, imageReader.getImageTypes(index)).first().get();
-    int numColorComponents = imageType.getColorModel().getNumComponents();
-    int numBands = imageType.getNumBands();
+    ColorModel colorModel = imageType.getColorModel();
+    int numColorComponents = colorModel.getNumColorComponents();
+    int numBands = colorModel.getNumComponents();
     final ImageIoImageMetadata metadata = new ImageIoImageMetadata(
         index,
         width,
         height,
         numColorComponents,
         numBands,
-        imageType.getColorModel().getColorSpace().getType(),
-        imageType.getColorModel().getTransferType(),
-        imageType.getColorModel().getTransparency(),
-        imageType);
+        colorModel.getColorSpace().getType(),
+        colorModel.getTransferType(),
+        colorModel.getTransparency(),
+        imageType,
+        colorModel instanceof IndexColorModel);
     return metadata;
   }
 
   @Override
   protected BufferedImage
-      read(final ICanceler canceler,
+      read(final IMessageCollector messageCollector,
+          final ICanceler canceler,
           final RenderingHints hints,
-          final IObjectList<IImageOperation> imageOperations)
+          final IObjectList<IImageOperation> imageOperations,
+          final IImageMetadataAdjustor metadataAdjustor)
           throws CanceledException,
           IOException {
     IImageContainerSettings settings = IImageContainerSettings.getSettings(hints);
@@ -273,7 +213,7 @@ class ImageIoImageContainer extends AbstractImageContainer {
         return image;
       }
       canceler.check();
-      IImageContainer bufferedImageContainer = new RenderedImageContainer(hints, image);
+      IImageContainer bufferedImageContainer = new RenderedImageContainer(hints, image, new ImagenImageMetadataAdjustor());
       try {
         for (final IImageOperation operation : operations) {
           bufferedImageContainer = bufferedImageContainer.operation(operation);
@@ -289,7 +229,7 @@ class ImageIoImageContainer extends AbstractImageContainer {
       settings
           .getImageContainerListener()
           .eventOccurred(exception.getMessage(), exception, MessageType.ERROR);
-      return new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+      return null;
     }
   }
 }

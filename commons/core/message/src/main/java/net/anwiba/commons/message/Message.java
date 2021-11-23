@@ -34,40 +34,26 @@ public class Message implements IMessage {
   private final String description;
   private final MessageType messageType;
   private final Throwable throwable;
-  LocalDateTime timeStamp = LocalDateTime.now(
+  private final Object goal;
+  private final LocalDateTime timeStamp = LocalDateTime.now(
       Optional
           .of(System.getProperty("user.timezone"))
           .convert(z -> TimeZone.getTimeZone(z))
           .getOr(() -> TimeZone.getDefault())
           .toZoneId());
 
-  public Message(
+  Message(
       final String text,
       final String description,
       final Throwable throwable,
-      final MessageType messageType) {
+      final MessageType messageType,
+      final Object goal) {
     Ensure.ensureArgumentNotNull(messageType);
     this.text = text;
     this.description = description;
     this.throwable = throwable;
     this.messageType = messageType;
-  }
-
-  public static IMessage create(final String text, final String description, final MessageType messageType) {
-    return new MessageBuilder().setInfo().setText(text).setDescription(description).setType(messageType).build();
-  }
-
-  public static IMessage create(final String text, final String description) {
-    return new MessageBuilder()
-        .setInfo()
-        .setText(text)
-        .setDescription(description)
-        .setType(MessageType.DEFAULT)
-        .build();
-  }
-
-  public static IMessage create(final String text) {
-    return new MessageBuilder().setInfo().setText(text).setType(MessageType.DEFAULT).build();
+    this.goal = goal;
   }
 
   @Override
@@ -93,5 +79,41 @@ public class Message implements IMessage {
   @Override
   public LocalDateTime getTimeStamp() {
     return this.timeStamp;
+  }
+
+  @Override
+  public Object getGoal() {
+    return this.goal;
+  }
+
+  public static String toDetailInfo(final Throwable throwable) {
+    return MessageBuilder.toDetailInfo(throwable);
+  }
+
+  public static IMessageBuilder builder() {
+    return new MessageBuilder();
+  }
+
+  public static IMessage create(final String text,
+      final String description,
+      final Throwable throwable,
+      final MessageType messageType) {
+    return builder().setText(text)
+        .setDescription(description)
+        .setThrowable(throwable)
+        .setType(messageType)
+        .build();
+  }
+
+  public static IMessage create(final String text, final String description, final MessageType messageType) {
+    return builder().setText(text).setDescription(description).setType(messageType).build();
+  }
+
+  public static IMessage create(final String text, final String description) {
+    return create(text, description, MessageType.DEFAULT);
+  }
+
+  public static IMessage create(final String text) {
+    return builder().setText(text).build();
   }
 }

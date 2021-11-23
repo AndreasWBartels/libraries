@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.swing.statebar;
 
-import net.anwiba.commons.utilities.registry.KeyValueRegistry;
-
 import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.swing.BorderFactory;
+
+import net.anwiba.commons.utilities.registry.KeyValueRegistry;
 
 public class StateBarManager implements IStateBarComponentRegistry {
 

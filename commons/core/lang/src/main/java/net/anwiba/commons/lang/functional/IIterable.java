@@ -22,7 +22,10 @@
 
 package net.anwiba.commons.lang.functional;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import net.anwiba.commons.lang.counter.IntCounter;
 
@@ -39,6 +42,43 @@ public interface IIterable<O, E extends Exception> {
         return iterator(acceptor);
       }
     };
+  }
+
+  default Spliterator<O> spliterator() {
+    IIterator<O, E> iterator = iterator();
+    return Spliterators.spliteratorUnknownSize(new Iterator<O>() {
+
+      O value;
+
+      @Override
+      public boolean hasNext() {
+        if (this.value != null) {
+          return true;
+        }
+        try {
+          if (iterator.hasNext()) {
+            this.value = iterator.next();
+            return true;
+          }
+          return false;
+        } catch (Exception exception) {
+          return false;
+        }
+      }
+
+      @Override
+      public O next() {
+        try {
+          if (hasNext()) {
+            return this.value;
+          } else {
+            throw new NoSuchElementException();
+          }
+        } finally {
+          this.value = null;
+        }
+      }
+    }, 0);
   }
 
   default IIterator<O, E> iterator(final IAcceptor<O> acceptor) {

@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.utilities.color;
 
-import net.anwiba.commons.lang.object.ObjectUtilities;
-
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public class ColorInterval implements IColorInterval {
 

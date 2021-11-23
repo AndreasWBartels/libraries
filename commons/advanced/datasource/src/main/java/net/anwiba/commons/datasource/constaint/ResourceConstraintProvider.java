@@ -24,9 +24,11 @@ package net.anwiba.commons.datasource.constaint;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import net.anwiba.commons.datasource.resource.IResourceDescription;
+import net.anwiba.commons.datasource.resource.ResourceDescription;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.stream.Streams;
@@ -47,8 +49,14 @@ public class ResourceConstraintProvider implements IResourceConstraintProvider {
   public IObjectList<IResourceConstraint> getConstaints(final IResourceDescription description) {
     final Set<IResourceConstraint> constraints = new LinkedHashSet<>();
     constraints.addAll(this.resourceConstraintStorage.read(description).toCollection());
-    Streams.of(this.providers).filter(p -> p.isApplicable(description)).foreach(
-        p -> constraints.addAll(p.getConstaints(description).toCollection()));
+    Streams.of(this.providers)
+        .filter(p -> p.isApplicable(description))
+        .foreach(
+            p -> constraints.addAll(p.getConstaints(description).toCollection()));
+    if (constraints.isEmpty() && !Objects.equals(description.getUrl(),
+        ResourceDescription.of(description.getConnectionDescription()).getUrl())) {
+      return getConstaints(ResourceDescription.of(description.getConnectionDescription()));
+    }
     return new ObjectList<>(constraints);
   }
 

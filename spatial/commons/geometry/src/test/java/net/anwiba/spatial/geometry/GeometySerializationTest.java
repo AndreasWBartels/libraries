@@ -78,7 +78,7 @@ public class GeometySerializationTest {
   private <T extends Serializable> T writeRead(final T object) throws IOException, ClassNotFoundException {
     final byte[] array = write(object);
     return read(array);
-  };
+  }
 
   private <T extends Serializable> byte[] write(final T object) throws IOException {
     try (final ByteArrayOutputStream memory = new ByteArrayOutputStream();
@@ -86,7 +86,7 @@ public class GeometySerializationTest {
       out.writeObject(object);
       return memory.toByteArray();
     }
-  };
+  }
 
   @SuppressWarnings("unchecked")
   private <T extends Serializable> T read(final byte[] array) throws IOException, ClassNotFoundException {
@@ -94,6 +94,6 @@ public class GeometySerializationTest {
         final ObjectInputStream in = new ObjectInputStream(memory);) {
       return (T) in.readObject();
     }
-  };
+  }
 
 }

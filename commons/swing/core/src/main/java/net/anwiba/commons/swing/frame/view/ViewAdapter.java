@@ -21,17 +21,17 @@
  */
 package net.anwiba.commons.swing.frame.view;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.JComponent;
+
 import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.swing.frame.IKeyActionConfiguration;
 import net.anwiba.commons.swing.menu.AbstractMenuItemConfiguration;
 import net.anwiba.commons.swing.menu.AbstractMenuItemDescription;
 import net.anwiba.commons.swing.statebar.StateBarComponentConfiguration;
 import net.anwiba.commons.swing.toolbar.ToolBarItemConfiguration;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.JComponent;
 
 public class ViewAdapter extends AbstractView {
 

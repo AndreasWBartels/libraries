@@ -21,14 +21,15 @@
  */
 package net.anwiba.commons.xml.jaxb;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 
 public class UnmarshallerFactory {
   public Unmarshaller create(final IJaxbContext jaxbContext) throws JAXBException, SAXException {
@@ -38,7 +39,7 @@ public class UnmarshallerFactory {
     final Source[] sources = jaxbContext.getSchemaSources();
     final Schema schema = schemaFactory.newSchema(sources);
     unmarshaller.setSchema(schema);
-    unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+    unmarshaller.setEventHandler(new jakarta.xml.bind.helpers.DefaultValidationEventHandler());
     return unmarshaller;
   }
 

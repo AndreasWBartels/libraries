@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.swing.icon.MutableImageIcon;
-import net.anwiba.commons.swing.icons.GuiIcons;
+import net.anwiba.testing.demo.DemoUtilities;
 
 public class MutableIconDemo {
 
@@ -56,15 +56,11 @@ public class MutableIconDemo {
       }
     });
     show(label, frame -> {
-      try {
-        Thread.sleep(2000);
-        icon.getModel().set(GuiIcons.ADD_ICON.getLargeIcon());
-        Thread.sleep(2000);
-        icon.getModel().set(GuiIcons.CLOSE_ICON.getLargeIcon());
-        Thread.sleep(2000);
-      } catch (final InterruptedException exception) {
-        return;
-      }
+      DemoUtilities.pause();
+      icon.getModel().set(GuiIcons.ADD_ICON.getLargeIcon());
+      DemoUtilities.pause();
+      icon.getModel().set(GuiIcons.CLOSE_ICON.getLargeIcon());
+      DemoUtilities.pause();
     });
   }
 
@@ -89,15 +85,11 @@ public class MutableIconDemo {
       }
     });
     show(button, frame -> {
-      try {
-        Thread.sleep(2000);
-        icon.getModel().set(GuiIcons.ADD_ICON.getLargeIcon());
-        Thread.sleep(2000);
-        icon.getModel().set(GuiIcons.CLOSE_ICON.getLargeIcon());
-        Thread.sleep(2000);
-      } catch (final InterruptedException exception) {
-        return;
-      }
+      DemoUtilities.pause();
+      icon.getModel().set(GuiIcons.ADD_ICON.getLargeIcon());
+      DemoUtilities.pause();
+      icon.getModel().set(GuiIcons.CLOSE_ICON.getLargeIcon());
+      DemoUtilities.pause();
     });
   }
 
@@ -114,15 +106,11 @@ public class MutableIconDemo {
     };
     final JButton button = new JButton(action);
     show(button, frame -> {
-      try {
-        Thread.sleep(2000);
-        action.putValue(Action.SMALL_ICON, GuiIcons.ADD_ICON.getLargeIcon());
-        Thread.sleep(2000);
-        action.putValue(Action.SMALL_ICON, GuiIcons.CLOSE_ICON.getLargeIcon());
-        Thread.sleep(2000);
-      } catch (final InterruptedException exception) {
-        return;
-      }
+      DemoUtilities.pause();
+      action.putValue(Action.SMALL_ICON, GuiIcons.ADD_ICON.getLargeIcon());
+      DemoUtilities.pause();
+      action.putValue(Action.SMALL_ICON, GuiIcons.CLOSE_ICON.getLargeIcon());
+      DemoUtilities.pause();
     });
   }
 }

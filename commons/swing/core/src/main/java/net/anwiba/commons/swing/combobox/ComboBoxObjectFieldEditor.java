@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.combobox;
 
-import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.swing.object.AbstractObjectTextField;
-
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
 import javax.swing.ComboBoxEditor;
+
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.swing.object.AbstractObjectTextField;
 
 public final class ComboBoxObjectFieldEditor<T> implements ComboBoxEditor {
   private final AbstractObjectTextField<T> field;

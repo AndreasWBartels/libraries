@@ -23,9 +23,11 @@ package net.anwiba.commons.image.imagen;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
@@ -56,7 +58,7 @@ import org.eclipse.imagen.operator.LookupDescriptor;
 import org.eclipse.imagen.operator.ScaleDescriptor;
 import org.eclipse.imagen.operator.TranslateDescriptor;
 
-import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.image.ImageUtilities;
 
 public class ImagenImageContainerUtilities {
 
@@ -70,13 +72,36 @@ public class ImagenImageContainerUtilities {
       final float y,
       final float width,
       final float height) {
+    Rectangle imageBounds =
+        new Rectangle(renderedImage.getMinX(),
+            renderedImage.getMinY(),
+            renderedImage.getWidth(),
+            renderedImage.getHeight());
+    final Rectangle cropBounds = new Rectangle2D.Float(x, y, width, height).getBounds();
+    if (cropBounds.isEmpty()) {
+      return null;
+    }
+    if (!imageBounds.contains(cropBounds)) {
+      if (!imageBounds.intersects(cropBounds)) {
+        return null;
+      }
+      Rectangle intersection = imageBounds.intersection(cropBounds);
+      return CropDescriptor
+          .create(
+              renderedImage,
+              toFloat(intersection.x),
+              toFloat(intersection.y),
+              toFloat(intersection.width),
+              toFloat(intersection.height),
+              hints);
+    }
     return CropDescriptor
         .create(
             renderedImage,
-            floor(x),
-            floor(y),
-            ceil(width),
-            ceil(height),
+            toFloat(x),
+            toFloat(y),
+            toFloat(width),
+            toFloat(height),
             hints);
   }
 
@@ -107,7 +132,10 @@ public class ImagenImageContainerUtilities {
   }
 
   public static PlanarImage toInverted(final RenderingHints hints, final RenderedImage source) {
-    return InvertDescriptor.create(source, hints);
+    RenderedImage image = source.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_GRAY
+        ? ImageUtilities.toRGBA(hints, source)
+        : source;
+    return InvertDescriptor.create(image, hints);
   }
 
   public static PlanarImage toGrayScale(final RenderingHints hints, final RenderedImage source) {
@@ -165,12 +193,13 @@ public class ImagenImageContainerUtilities {
       final RenderingHints hints,
       final RenderedImage source,
       final float factor) {
-    if (factor >= 1.0) {
+    if (factor >= 1.0 || factor < 0) {
       return toPlanarImage(source);
     }
+    final ColorModel sourceColorModel = source.getColorModel();
     // http://iihm.imag.fr/Docs/java/jai1_0guide/Color.doc.html
-    if (source.getColorModel() instanceof IndexColorModel) {
-      final IndexColorModel indexColorModel = (IndexColorModel) source.getColorModel();
+    if (sourceColorModel instanceof IndexColorModel) {
+      final IndexColorModel indexColorModel = (IndexColorModel) sourceColorModel;
       final int mapSize = indexColorModel.getMapSize();
       final byte[][] data = new byte[4][mapSize];
       indexColorModel.getReds(data[0]);
@@ -185,65 +214,69 @@ public class ImagenImageContainerUtilities {
       final LookupTableJAI lut = new LookupTableJAI(data);
       return LookupDescriptor.create(source, lut, hints);
     }
-    final int transferType = source.getColorModel().getTransferType();
-    if (transferType == DataBuffer.TYPE_DOUBLE
-        || transferType == DataBuffer.TYPE_FLOAT
-        || transferType == DataBuffer.TYPE_UNDEFINED) {
-      logger.log(ILevel.WARNING, "Unsupported data type: " + transferType);
-      return toPlanarImage(source);
-    }
-    RenderedImage image = source.getColorModel().getColorSpace().getType() == ColorSpace.TYPE_GRAY
-        ? toInverted(hints, source)
-        : source;
-    final ColorModel colorModel = new ComponentColorModel(
-        ColorSpace.getInstance(ColorSpace.CS_sRGB),
-        true,
-        false,
-        Transparency.TRANSLUCENT,
-        DataBuffer.TYPE_BYTE);
-    final ImageLayout imageLayout = new ImageLayout(image);
-    imageLayout.setColorModel(colorModel);
-    imageLayout
-        .setSampleModel(
-            colorModel.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
-    final RenderingHints renderingHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, imageLayout);
-    renderingHints.add(hints);
-    @SuppressWarnings("deprecation")
-    final int expandedNumBands = OpImage
-        .getExpandedNumBands(image.getSampleModel(), image.getColorModel())
-        + 1;
-    double[][] matrix;
-    if (expandedNumBands == 5) {
-      matrix = new double[][] {
-          { 1.0D, 0.0D, 0.0D, 0.0D, 0 },
-          { 0.0D, 1.0D, 0.0D, 0.0D, 0 },
-          { 0.0D, 0.0D, 1.0D, 0.0D, 0 },
-          { 0.0D, 0.0D, 0.0D, factor, 0 },
-      };
-    } else if (expandedNumBands == 4) {
-      matrix = new double[][] {
-          { 1.0D, 0.0D, 0.0D, 0.0D },
-          { 0.0D, 1.0D, 0.0D, 0.0D },
-          { 0.0D, 0.0D, 1.0D, 0.0D },
-          { 1.0D, 1.0D, 1.0D, factor },
-      };
-    } else if (expandedNumBands == 2) {
-      matrix = new double[][] {
-          { 1.0D - factor, 0.0D },
-          { 1.0D - factor, 0.0D },
-          { 1.0D - factor, 0.0D },
-          { factor, 0.0D },
-      };
-    } else {
-      return toPlanarImage(source);
-    }
-    try {
-      ColorModel model = BandCombineDescriptor.create(image, matrix, renderingHints).getColorModel();
-      return BandCombineDescriptor.create(image, matrix, renderingHints);
-    } catch (RuntimeException exception) {
-      logger.log(ILevel.WARNING, exception.getMessage(), exception);
-      return toPlanarImage(source);
-    }
+    return toPlanarImage(ImageUtilities.toOpacity(hints, source, factor));
+//    final int transferType = sourceColorModel.getTransferType();
+//    if (transferType == DataBuffer.TYPE_DOUBLE
+//        || transferType == DataBuffer.TYPE_FLOAT
+//        || transferType == DataBuffer.TYPE_UNDEFINED) {
+//      logger.log(ILevel.WARNING, "Unsupported data type: " + transferType);
+//      return toPlanarImage(source);
+//    }
+//    if (sourceColorModel instanceof MinMaxSingleBandColorModel) {
+//    }
+//    RenderedImage image = sourceColorModel.getColorSpace().getType() == ColorSpace.TYPE_GRAY
+//        || sourceColorModel instanceof DirectColorModel
+//            ? toRGBA(hints, source)
+//            : source;
+//    final ColorModel colorModel = new ComponentColorModel(
+//        ColorSpace.getInstance(ColorSpace.CS_sRGB),
+//        true,
+//        false,
+//        Transparency.TRANSLUCENT,
+//        DataBuffer.TYPE_BYTE);
+//    final ImageLayout imageLayout = new ImageLayout(image);
+//    imageLayout.setColorModel(colorModel);
+//    imageLayout
+//        .setSampleModel(
+//            colorModel.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
+//    final RenderingHints renderingHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, imageLayout);
+//    renderingHints.add(hints);
+//    @SuppressWarnings("deprecation")
+//    final int expandedNumBands = OpImage
+//        .getExpandedNumBands(image.getSampleModel(), image.getColorModel())
+//        + 1;
+//    double[][] matrix;
+//    if (expandedNumBands == 5) {
+//      matrix = new double[][] {
+//          { 1.0D, 0.0D, 0.0D, 0.0D, 0 },
+//          { 0.0D, 1.0D, 0.0D, 0.0D, 0 },
+//          { 0.0D, 0.0D, 1.0D, 0.0D, 0 },
+//          { 0.0D, 0.0D, 0.0D, factor, 0 },
+//      };
+//    } else if (expandedNumBands == 4) {
+//      matrix = new double[][] {
+//          { 1.0D, 0.0D, 0.0D, 0.0D },
+//          { 0.0D, 1.0D, 0.0D, 0.0D },
+//          { 0.0D, 0.0D, 1.0D, 0.0D },
+//          { 1.0D, 1.0D, 1.0D, factor },
+//      };
+//    } else if (expandedNumBands == 2) {
+//      matrix = new double[][] {
+//          { 1.0D - factor, 0.0D },
+//          { 1.0D - factor, 0.0D },
+//          { 1.0D - factor, 0.0D },
+//          { factor, 0.0D },
+//      };
+//    } else {
+//      return toPlanarImage(source);
+//    }
+//    try {
+//      ColorModel model = BandCombineDescriptor.create(image, matrix, renderingHints).getColorModel();
+//      return BandCombineDescriptor.create(image, matrix, renderingHints);
+//    } catch (RuntimeException exception) {
+//      logger.log(ILevel.WARNING, exception.getMessage(), exception);
+//      return toPlanarImage(source);
+//    }
   }
 
   public static PlanarImage toMapped(final RenderingHints hints, final PlanarImage source, final int[] mapping) {
@@ -268,7 +301,7 @@ public class ImagenImageContainerUtilities {
     return true;
   }
 
-  private static PlanarImage toPlanarImage(final RenderedImage image) {
+  public static PlanarImage toPlanarImage(final RenderedImage image) {
     if (image instanceof PlanarImage) {
       return (PlanarImage) image;
     }
@@ -357,8 +390,6 @@ public class ImagenImageContainerUtilities {
   }
 
   public static BufferedImage convertTo256ColorIndexColorModelImage(final BufferedImage image) {
-    // 11.10.2006 (gebhard): Farbreduktion unter Beibehaltung vollständiger Transparenz - Kann eigentlich vereinfacht
-    // werden, wenn keine Transparenz vorliegt
     final PlanarImage colorQuantizedImage = createColorQuantizedImage(
         createWhiteBackgroundedImage(image),
         255);
@@ -413,8 +444,7 @@ public class ImagenImageContainerUtilities {
       final BufferedImage image,
       final int colorCount) {
     RenderedOp op = colorQuantize(image, colorCount);
-    op = expandColorMap(op);
-    return op;
+    return expandColorMap(op);
   }
 
   public static RenderedOp colorQuantize(final RenderedImage image, final int colorCount) {

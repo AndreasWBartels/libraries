@@ -44,5 +44,6 @@ module net.anwiba.commons.lang {
   exports net.anwiba.commons.lang.tree.converter;
   exports net.anwiba.commons.lang.hashable;
   exports net.anwiba.commons.lang.io;
+  exports net.anwiba.commons.lang.parameter;
   requires java.desktop;
 }

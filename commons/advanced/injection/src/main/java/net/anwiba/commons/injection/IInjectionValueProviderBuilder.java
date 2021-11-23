@@ -38,17 +38,25 @@ public interface IInjectionValueProviderBuilder {
 
   <T> IInjectionValueProviderBuilder add(IBinding<T> clazz, IInjectingFactory<T> objectFactory);
 
+  <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder setBySupplier(IBinding<T> clazz,
+      Class<S> supplierClass);
+
+  <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder addBySupplier(IBinding<T> clazz,
+      Class<S> supplierClass);
+
+//  <T, S extends IInjectingFactory<T>> IInjectionValueProviderBuilder setByFactory(IBinding<T> clazz,
+//      Class<S> factoryClass);
+//
+//  <T, S extends IInjectingFactory<T>> IInjectionValueProviderBuilder addByFactory(IBinding<T> clazz,
+//      Class<S> factoryClass);
+
   <T> IInjectionValueProviderBuilder link(IBinding<? extends T> clazz, IBinding<T> link);
 
   <T, S extends T> IInjectionValueProviderBuilder set(Class<T> clazz, S object);
 
   <T, S extends T> IInjectionValueProviderBuilder add(Class<T> clazz, S object);
 
-  <T> IInjectionValueProviderBuilder set(Class<T> clazz);
-
   <T> IInjectionValueProviderBuilder set(Class<T> clazz, Class<? extends T> objectClass);
-
-  <T> IInjectionValueProviderBuilder add(Class<T> clazz);
 
   <T> IInjectionValueProviderBuilder add(Class<T> clazz, Class<? extends T> objectClass);
 
@@ -56,7 +64,17 @@ public interface IInjectionValueProviderBuilder {
 
   <T> IInjectionValueProviderBuilder add(Class<T> clazz, IInjectingFactory<T> objectFactory);
 
+  <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder setBySupplier(Class<T> clazz,
+      Class<S> supplierClass);
+
+  <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder addBySupplier(Class<T> clazz,
+      Class<S> supplierClass);
+
   <T> IInjectionValueProviderBuilder link(Class<? extends T> clazz, Class<T> link);
+
+  <T> IInjectionValueProviderBuilder set(Class<T> clazz);
+
+  <T> IInjectionValueProviderBuilder add(Class<T> clazz);
 
   IInjectionValueProvider build() throws CreationException;
 

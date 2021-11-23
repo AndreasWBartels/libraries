@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.anwiba.commons.lang.optional.Optional;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.Parameter;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.Parameter;
 
 public class UrlBuilder {
 

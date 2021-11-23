@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import net.anwiba.commons.reference.utilities.PathUtilities;
 
@@ -34,21 +35,10 @@ public class PathResourceReference implements IResourceReference {
   private static final long serialVersionUID = 1L;
   private transient Path path;
 
-  private void writeObject(final ObjectOutputStream out) throws IOException {
-    out.defaultWriteObject();
-    out.writeObject(this.path.toUri());
+  PathResourceReference(final Path path) {
+    this.path = Objects.requireNonNull(path);
   }
-
-  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    URI uri = (URI) in.readObject();
-    this.path = PathUtilities.create(uri);
-  }
-
-  public PathResourceReference(final Path path) {
-    this.path = path;
-  }
-
+  
   public Path getPath() {
     return this.path;
   }
@@ -67,7 +57,7 @@ public class PathResourceReference implements IResourceReference {
   public int hashCode() {
     return ((this.path == null)
         ? 0
-        : this.path.toString().toUpperCase().hashCode());
+        : this.path.hashCode());
   }
 
   @Override
@@ -79,7 +69,17 @@ public class PathResourceReference implements IResourceReference {
       return false;
     }
     final PathResourceReference other = (PathResourceReference) obj;
-    return this.path.toString().equals(other.path.toString());
+    return Objects.equals(this.path, other.path);
   }
 
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    out.defaultWriteObject();
+    out.writeObject(this.path.toUri());
+  }
+
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    URI uri = (URI) in.readObject();
+    this.path = PathUtilities.create(uri);
+  }
 }

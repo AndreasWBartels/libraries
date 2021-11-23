@@ -21,10 +21,6 @@
  */
 package net.anwiba.commons.swing.filechooser;
 
-import net.anwiba.commons.swing.preference.IWindowPreferences;
-import net.anwiba.commons.swing.preference.WindowPrefereneceUpdatingListener;
-import net.anwiba.commons.swing.utilities.ContainerUtilities;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -38,6 +34,10 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JRootPane;
 import javax.swing.UIManager;
+
+import net.anwiba.commons.swing.preference.IWindowPreferences;
+import net.anwiba.commons.swing.preference.WindowPrefereneceUpdatingListener;
+import net.anwiba.commons.swing.utilities.ContainerUtilities;
 
 public final class FileChooserDialog extends JFileChooser {
 

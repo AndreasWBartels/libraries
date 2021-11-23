@@ -53,7 +53,7 @@ public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
       createJdbcUrlPatterns(
           Arrays.asList(DEFAULT), //
           Arrays.asList("${protocol}://${host}:${port}/${database}")), //$NON-NLS-1$
-      "org.postgis.Geometry") { //$NON-NLS-1$
+      "net.postgis.jdbc.geometry.Geometry") { //$NON-NLS-1$
   },
   H2("org.h2.Driver", //$NON-NLS-1$
       "jdbc:h2", //$NON-NLS-1$
@@ -62,7 +62,7 @@ public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
       createJdbcUrlPatterns(
           Arrays.asList(TCP, SSL), //
           Arrays.asList("${protocol}:tcp://${host}:${port}/${database}", //$NON-NLS-1$
-              "${protocol}:tcp://${host}:${port}/${database}")), //$NON-NLS-1$
+              "${protocol}:ssl://${host}:${port}/${database}")), //$NON-NLS-1$
       "org.locationtech.jts.geom.Geometry") { //$NON-NLS-1$
   },
   HANA("com.sap.db.jdbc.Driver", //$NON-NLS-1$

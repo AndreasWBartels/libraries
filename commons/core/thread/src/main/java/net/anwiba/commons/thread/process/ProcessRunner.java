@@ -79,7 +79,8 @@ public final class ProcessRunner implements IRunnable {
                 this.monitor,
                 this.canceler));
       }
-      logger.log(ILevel.DEBUG, MessageFormat.format("process {0} started", this.processIdentfier)); //$NON-NLS-1$
+      logger.log(ILevel.DEBUG,
+          MessageFormat.format("process {0} started - {1}", this.processIdentfier, this.process.getDescription())); //$NON-NLS-1$
       this.process.execute(this.monitor, this.canceler, this.processIdentfier);
       logger.log(ILevel.DEBUG, MessageFormat.format("process {0} finished", this.processIdentfier)); //$NON-NLS-1$
     } catch (final CanceledException exception) {
@@ -87,17 +88,17 @@ public final class ProcessRunner implements IRunnable {
       this.processes.cancel(this.processIdentfier);
     } catch (final RuntimeException throwable) {
       this.monitor.addMessage(
-          new Message(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
+          Message.create(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
       logger.log(ILevel.ERROR, "", throwable); //$NON-NLS-1$
       this.processes.cancel(this.processIdentfier);
     } catch (final Exception throwable) {
       this.monitor.addMessage(
-          new Message(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
+          Message.create(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
       logger.log(ILevel.ERROR, "", throwable); //$NON-NLS-1$
       this.processes.cancel(this.processIdentfier);
     } catch (final Throwable throwable) {
       this.monitor.addMessage(
-          new Message(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
+          Message.create(this.process.getDescription(), throwable.getLocalizedMessage(), throwable, MessageType.ERROR));
       logger.log(ILevel.ERROR, "", throwable); //$NON-NLS-1$
       this.processes.cancel(this.processIdentfier);
       throw throwable;

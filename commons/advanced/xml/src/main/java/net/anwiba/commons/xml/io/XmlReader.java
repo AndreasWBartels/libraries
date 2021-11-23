@@ -25,13 +25,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.anwiba.commons.reference.utilities.IoUtilities;
-import net.anwiba.commons.xml.dom.DomConverterException;
-import net.anwiba.commons.xml.dom.IDomToObjectConverter;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
+
+import net.anwiba.commons.reference.utilities.IoUtilities;
+import net.anwiba.commons.xml.dom.DomConverterException;
+import net.anwiba.commons.xml.dom.IDomToObjectConverter;
 
 public class XmlReader<T> implements Closeable {
 

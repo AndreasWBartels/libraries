@@ -45,6 +45,26 @@ public abstract class AbstractContentPane implements IContentPanel {
     return this.messageModel;
   }
 
+  protected void invalid(final IMessage message) {
+    getDataStateModel().set(DataState.INVALIDE);
+    getMessageModel().set(message);
+  }
+
+  protected void valid() {
+    getDataStateModel().set(DataState.VALIDE);
+    getMessageModel().set(null);
+  }
+
+  protected void modified() {
+    getDataStateModel().set(DataState.MODIFIED);
+    getMessageModel().set(null);
+  }
+
+  protected void unknown() {
+    getDataStateModel().set(DataState.UNKNOWN);
+    getMessageModel().set(null);
+  }
+
   @Override
   public boolean apply() {
     return true;

@@ -24,10 +24,10 @@ package net.anwiba.commons.utilities.io.url;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameter;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameter;
 
 public class UrlUtilities {
 

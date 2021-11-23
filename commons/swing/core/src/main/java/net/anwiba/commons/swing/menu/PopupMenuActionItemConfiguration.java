@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.menu;
 
-import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.commons.swing.action.IActionContainerProvider;
-
 import java.awt.Container;
 
 import javax.swing.Action;
 import javax.swing.JMenuItem;
+
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.commons.swing.action.IActionContainerProvider;
 
 public class PopupMenuActionItemConfiguration extends AbstractMenuItemConfiguration<PopupMenuActionItemDescription> {
 

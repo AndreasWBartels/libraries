@@ -155,6 +155,7 @@ public final class LicenseTableFactory {
       IOException {
     final IResultProducer<LicenseListResultResponse> responseProducer = (
         c,
+        url,
         statusCode,
         statusMessage,
         contentType,

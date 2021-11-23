@@ -22,14 +22,15 @@
 package net.anwiba.commons.reference;
 
 import java.net.URL;
+import java.util.Objects;
 
 public class UrlResourceReference implements IResourceReference {
 
   private static final long serialVersionUID = 1L;
   private final URL url;
 
-  public UrlResourceReference(final URL url) {
-    this.url = url;
+  UrlResourceReference(final URL url) {
+    this.url = Objects.requireNonNull(url);;
   }
 
   @Override

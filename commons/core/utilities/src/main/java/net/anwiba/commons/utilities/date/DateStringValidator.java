@@ -21,10 +21,11 @@
  */
 package net.anwiba.commons.utilities.date;
 
+import java.text.SimpleDateFormat;
+
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 import net.anwiba.commons.utilities.validation.IValidator;
-import java.text.SimpleDateFormat;
 
 public final class DateStringValidator implements IValidator<String> {
 

@@ -29,6 +29,8 @@ import java.util.Set;
 
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.IStream;
+import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 import net.anwiba.commons.utilities.collection.SetUtilities;
 
@@ -210,6 +212,13 @@ public class SelectionModel<T> implements ISelectionModel<T> {
   public Iterable<T> getSelectedObjects() {
     synchronized (this.selectedObjects) {
       return IterableUtilities.asList(this.selectedObjects);
+    }
+  }
+
+  @Override
+  public IStream<T, RuntimeException> stream() {
+    synchronized (this.selectedObjects) {
+      return Streams.of(IterableUtilities.asList(this.selectedObjects));
     }
   }
 

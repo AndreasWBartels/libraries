@@ -21,17 +21,17 @@
  */
 package net.anwiba.tools.definition.schema.json.generator.java.bean;
 
+import static net.anwiba.tools.generator.java.bean.configuration.Builders.annotation;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 import net.anwiba.tools.definition.schema.json.gramma.element.JAnnotation;
 import net.anwiba.tools.definition.schema.json.gramma.element.JParameter;
 import net.anwiba.tools.generator.java.bean.configuration.Annotation;
 import net.anwiba.tools.generator.java.bean.configuration.AnnotationBuilder;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static net.anwiba.tools.generator.java.bean.configuration.Builders.*;
 
 public class AnnotationHandler {
 

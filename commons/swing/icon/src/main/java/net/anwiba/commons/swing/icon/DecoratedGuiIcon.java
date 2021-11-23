@@ -22,7 +22,7 @@
 
 package net.anwiba.commons.swing.icon;
 
-import static net.anwiba.commons.swing.icon.GuiIconDecorator.*;
+import static net.anwiba.commons.swing.icon.GuiIconDecorator.decorate;
 
 import javax.swing.ImageIcon;
 

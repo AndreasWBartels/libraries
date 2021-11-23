@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IAssimilator;
+import net.anwiba.commons.lang.functional.ICloseable;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
@@ -39,7 +41,7 @@ import net.anwiba.commons.lang.functional.IIntAssimilator;
 import net.anwiba.commons.lang.functional.ISupplier;
 import net.anwiba.commons.lang.optional.IOptional;
 
-public interface IStream<T, E extends Exception> {
+public interface IStream<T, E extends Exception> extends ICloseable<E> {
 
   IStream<T, E> execute();
 
@@ -69,9 +71,7 @@ public interface IStream<T, E extends Exception> {
 
   void throwIfFailed() throws E;
 
-  Iterable<T> asIterable() throws E;
-
-  Collection<T> asCollection() throws E;
+  <O> Collection<O> asCollection() throws E;
 
   <O> List<O> asList() throws E;
 
@@ -79,7 +79,9 @@ public interface IStream<T, E extends Exception> {
 
   <O> O[] asArray(IntFunction<O[]> function) throws E;
 
-  IObjectList<T> asObjectList() throws E;
+  <O> IObjectList<O> asObjectList() throws E;
+
+  <O> Stream<O> asStream() throws E;
 
   IOptional<T, E> first();
 
@@ -91,8 +93,18 @@ public interface IStream<T, E extends Exception> {
 
   boolean foundAny() throws E;
 
+  boolean foundAny(IAcceptor<T> acceptor) throws E;
+
   boolean isEmpty() throws E;
 
   boolean isSuccessful();
 
+  Stream<T> toStream() throws E;
+
+  Iterable<T> toIterable() throws E;
+
+  @Override
+  default void close() throws E {
+    // nothing to do
+  }
 }

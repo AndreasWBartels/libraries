@@ -44,4 +44,5 @@ public class DoubleModel extends AbstractObjectChangedNotifier {
   public synchronized double getValue() {
     return this.value;
   }
+
 }

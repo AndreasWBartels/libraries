@@ -23,10 +23,12 @@ package net.anwiba.commons.image;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public interface IImageContainer {
@@ -39,7 +41,11 @@ public interface IImageContainer {
     }
   }
 
-  BufferedImage asBufferImage(ICanceler canceler) throws CanceledException;
+  default BufferedImage asBufferImage(final ICanceler canceler) throws CanceledException {
+    return asBufferImage(IMessageCollector.DummyCollector, canceler);
+  }
+
+  BufferedImage asBufferImage(IMessageCollector messageCollector, ICanceler canceler) throws CanceledException;
 
   IImageContainer crop(float x, float y, float width, float height);
 
@@ -88,5 +94,16 @@ public interface IImageContainer {
   default IImageMetadata getMetadata() {
     return null;
   }
+
+  default Number[] getValues(int x, int y) {
+    return getValues(x, y, 1, 1)[0];
+  }
+
+  default Number[][] getValues(int x, int y,int width, int height) {
+    Raster raster = asBufferImage().getData(new Rectangle(x,y,width,height));
+    raster.getDataElements(0,0,width, height, null);
+    return new Number[][] {new Number[] {}};
+  }
+  
 
 }

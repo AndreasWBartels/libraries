@@ -30,12 +30,12 @@ public class EncodingTypeTest {
 
   @Test
   public void code() {
-    final EncodingType[] values = EncodingType.values();
-    for (final EncodingType encodingType : values) {
+    final CharEncoding[] values = CharEncoding.values();
+    for (final CharEncoding encodingType : values) {
       if (encodingType.getCode() == 0x00) {
         continue;
       }
-      assertThat(EncodingType.getByCode(encodingType.getCode()), equalTo(encodingType));
+      assertThat(CharEncoding.getByCode(encodingType.getCode()), equalTo(encodingType));
     }
   }
 

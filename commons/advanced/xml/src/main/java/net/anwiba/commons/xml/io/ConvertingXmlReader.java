@@ -24,10 +24,9 @@ package net.anwiba.commons.xml.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.bind.JAXBElement;
-
+import jakarta.xml.bind.JAXBElement;
 import net.anwiba.commons.lang.object.ObjectPair;
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.utilities.registry.AbstractApplicableRegistry;
 import net.anwiba.commons.utilities.registry.IApplicableRegistry;
 import net.anwiba.commons.version.IVersion;

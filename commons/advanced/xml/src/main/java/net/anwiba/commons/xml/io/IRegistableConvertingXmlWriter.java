@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import net.anwiba.commons.lang.functional.IApplicable;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameters;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameters;
 import net.anwiba.commons.utilities.property.IProperties;
 import net.anwiba.commons.utilities.property.PropertiesBuilder;
 

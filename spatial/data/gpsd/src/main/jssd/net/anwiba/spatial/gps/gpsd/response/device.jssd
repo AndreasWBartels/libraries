@@ -2,7 +2,6 @@
 @JssdPrimitivesEnabled
 {
   @JssdImmutable
-  @JssdNoProperty
   "class": <String> "DEVICE",
   "path": <String> null,
   "activated": <String> null,

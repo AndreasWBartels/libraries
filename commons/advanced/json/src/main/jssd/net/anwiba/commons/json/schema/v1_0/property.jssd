@@ -2,7 +2,6 @@
 @JssdIgnoreUnknownMember
 {
   @JssdImmutable
-  @JssdNoProperty
   "type": <java.lang.String> "property",
   "name": <java.lang.String> null,
   "title": <java.lang.String> null,

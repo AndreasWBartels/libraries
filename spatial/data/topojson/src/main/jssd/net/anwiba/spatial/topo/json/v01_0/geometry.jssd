@@ -2,7 +2,6 @@
 @JssdUnknownMember
 {
   @JssdImmutable
-  @JssdNoProperty
   "type" : <String> "Geometry",
   "id" : <Object> null,
   "properties" : <properties> null

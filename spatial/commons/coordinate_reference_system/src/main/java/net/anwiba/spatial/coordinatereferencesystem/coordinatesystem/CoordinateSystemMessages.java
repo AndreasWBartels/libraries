@@ -26,6 +26,7 @@ import net.anwiba.commons.nls.NLS;
 
 public class CoordinateSystemMessages extends NLS {
 
+  public static String ALBERS_CONIC_EQUAL_AREA;
   public static String TRANSVERSE_MERCATOR_ZONED_GRID_SYSTEM;
   public static String PSEUDO_MERCATOR;
   public static String MERCATOR;

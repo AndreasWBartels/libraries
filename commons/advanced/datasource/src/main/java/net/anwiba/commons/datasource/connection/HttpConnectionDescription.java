@@ -26,12 +26,12 @@ import java.net.URL;
 
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
 import net.anwiba.commons.utilities.io.url.IAuthentication;
 import net.anwiba.commons.utilities.io.url.IUrl;
 import net.anwiba.commons.utilities.io.url.parser.UrlParser;
-import net.anwiba.commons.utilities.parameter.IParameters;
 
 public class HttpConnectionDescription extends AbstractHttpConnectionDescription implements
     IResourceReferenceConnectionDescription {

@@ -125,11 +125,11 @@ public class Conditions {
 
   public static <V, T extends Collection<V>> ICondition<T> containsAll(final Collection<V> values) {
     Ensure.ensureArgumentNotNull(values);
-    return new CollectionContaintsCondition<>(values);
+    return new CollectionContainsCondition<>(values);
   }
 
   public static <V, T extends Collection<V>> ICondition<T> containsNull() {
-    return new CollectionContaintsNullCondition<>();
+    return new CollectionContainsNullCondition<>();
   }
 
   @SuppressWarnings("rawtypes")

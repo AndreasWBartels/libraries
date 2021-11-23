@@ -32,10 +32,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.tools.icons.schema.configuration.Class;
 import net.anwiba.tools.icons.schema.configuration.Folder;

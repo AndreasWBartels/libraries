@@ -22,6 +22,8 @@
 // Copyright (c) 2006 by Andreas W. Bartels 
 package net.anwiba.spatial.geometry.internal;
 
+import java.util.Objects;
+
 import net.anwiba.spatial.coordinate.ICoordinate;
 import net.anwiba.spatial.coordinate.ICoordinateSequence;
 import net.anwiba.spatial.coordinate.IEnvelope;
@@ -92,4 +94,23 @@ public abstract class AbstractGeometry implements IGeometry {
   public final boolean isCollection() {
     return getGeometryType().isCollection();
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(coordinateReferenceSystem, dimension, envelope);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    AbstractGeometry other = (AbstractGeometry) obj;
+    return Objects.equals(this.coordinateReferenceSystem, other.coordinateReferenceSystem)
+        && this.dimension == other.dimension && Objects.equals(this.envelope, other.envelope);
+  }
+
 }

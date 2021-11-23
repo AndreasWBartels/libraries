@@ -22,14 +22,16 @@
 // Copyright (c) 2006 by Andreas W. Bartels 
 package net.anwiba.spatial.geometry.internal;
 
+import static net.anwiba.commons.ensure.Conditions.*;
+import static net.anwiba.commons.ensure.Ensure.*;
+
+import java.util.Objects;
+
 import net.anwiba.spatial.coordinate.ICoordinateSequence;
 import net.anwiba.spatial.coordinate.Orientation;
 import net.anwiba.spatial.coordinatereferencesystem.ICoordinateReferenceSystem;
 import net.anwiba.spatial.geometry.GeometryType;
 import net.anwiba.spatial.geometry.ILinearRing;
-
-import static net.anwiba.commons.ensure.Conditions.*;
-import static net.anwiba.commons.ensure.Ensure.*;
 
 public class LinearRing extends LineString implements ILinearRing {
 
@@ -65,5 +67,25 @@ public class LinearRing extends LineString implements ILinearRing {
   @Override
   public Orientation getOrientation() {
     return this.orientation;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + Objects.hash(orientation);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    LinearRing other = (LinearRing) obj;
+    return this.orientation == other.orientation;
   }
 }

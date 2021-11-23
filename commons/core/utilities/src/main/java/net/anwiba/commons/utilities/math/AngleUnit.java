@@ -23,5 +23,55 @@
 package net.anwiba.commons.utilities.math;
 
 public enum AngleUnit {
-  RADIAN, DEGREE, GON, SEMI_CIRCLE
+
+  RADIAN {
+
+    @Override
+    public double toRadians() {
+      return 1d;
+    }
+
+    @Override
+    public double fromRadians() {
+      return 1d;
+    }
+  }, DEGREE {
+
+    @Override
+    public double toRadians() {
+      return 0.017453292519943295;
+    }
+
+    @Override
+    public double fromRadians() {
+      return 57.29577951308232;
+    }
+  }, GON {
+
+    @Override
+    public double toRadians() {
+      return 0.015707963;
+    }
+
+    @Override
+    public double fromRadians() {
+      return 63.661977237;
+    }
+  }, SEMI_CIRCLE {
+
+    @Override
+    public double toRadians() {
+      return 6.283185307;
+    }
+
+    @Override
+    public double fromRadians() {
+      return 0.318309886;
+    }
+  };
+
+  public abstract double toRadians();
+
+  public abstract double fromRadians();
+
 } 

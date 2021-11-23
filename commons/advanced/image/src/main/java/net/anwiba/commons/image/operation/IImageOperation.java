@@ -21,13 +21,6 @@
  */
 package net.anwiba.commons.image.operation;
 
-import net.anwiba.commons.image.IImageMetadata;
-import net.anwiba.commons.image.IImageMetadataAdjustor;
-
 public interface IImageOperation {
-
-  default IImageMetadata adjust(final IImageMetadata metadata, final IImageMetadataAdjustor metadataAdjustor) {
-    return metadataAdjustor.copy(metadata);
-  }
 
 }

@@ -27,13 +27,14 @@ import java.text.MessageFormat;
 import java.util.Objects;
 
 import net.anwiba.commons.datasource.DataSourceType;
+import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
 import net.anwiba.commons.utilities.io.url.Authentication;
 import net.anwiba.commons.utilities.io.url.IAuthentication;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 @SuppressWarnings("nls")
@@ -52,13 +53,13 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
   private final int hashCode;
 
   public AbstractHttpConnectionDescription(
-    final String host,
-    final int port,
-    final String path,
-    final String userName,
-    final String password,
-    final IParameters parameters,
-    final boolean sslEnabled) {
+      final String host,
+      final int port,
+      final String path,
+      final String userName,
+      final String password,
+      final IParameters parameters,
+      final boolean sslEnabled) {
     super(DataSourceType.SERVICE);
     this.host = host;
     this.port = port;
@@ -100,15 +101,20 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
     return this.parameters;
   }
 
+  @SuppressWarnings("exports")
   @Override
   public IResourceReference getResourceReference() {
-    return new ResourceReferenceFactory().create(getURI());
+    try {
+      return new ResourceReferenceFactory().create(getUrl());
+    } catch (final CreationException exception) {
+      throw new UnreachableCodeReachedException();
+    }
   }
 
   @Override
   public URI getURI() {
     try {
-      return new URI(getUrl());
+      return new URI(getUrlString());
     } catch (final URISyntaxException exception) {
       throw new UnreachableCodeReachedException();
     }
@@ -130,7 +136,7 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
                 ? "/" //$NON-NLS-1$
                 : this.path.startsWith("/") //$NON-NLS-1$
                     ? this.path
-                    : "/" + this.path)); //$NON-NLS-1$
+                : "/" + this.path)); //$NON-NLS-1$
   }
 
   @Override
@@ -149,7 +155,7 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
                 ? "/" //$NON-NLS-1$
                 : this.path.startsWith("/") //$NON-NLS-1$
                     ? this.path
-                    : "/" + this.path), //$NON-NLS-1$
+                : "/" + this.path), //$NON-NLS-1$
             getQueryString());
   }
 
@@ -249,7 +255,7 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
                   ? "/" //$NON-NLS-1$
                   : this.path.startsWith("/") //$NON-NLS-1$
                       ? this.path
-                      : "/" + this.path), //$NON-NLS-1$
+                  : "/" + this.path), //$NON-NLS-1$
               getQueryString() //
           );
     }
@@ -265,7 +271,7 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
                 ? "/" //$NON-NLS-1$
                 : this.path.startsWith("/") //$NON-NLS-1$
                     ? this.path
-                    : "/" + this.path), //$NON-NLS-1$
+                : "/" + this.path), //$NON-NLS-1$
             getQueryString() //
         );
   }

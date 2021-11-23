@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.swing.table;
 
-import net.anwiba.commons.model.IObjectListModel;
-
 import javax.swing.table.TableModel;
+
+import net.anwiba.commons.model.IObjectListModel;
 
 public interface IObjectTableModel<T> extends TableModel, IObjectListModel<T> {
   // nothing to do

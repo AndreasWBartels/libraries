@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.swing.preference;
 
-import net.anwiba.commons.preferences.IPreferences;
-
 import java.awt.Color;
+
+import net.anwiba.commons.preferences.IPreferences;
 
 public class ColorPreference {
 

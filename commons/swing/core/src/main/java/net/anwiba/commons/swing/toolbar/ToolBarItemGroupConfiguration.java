@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.swing.toolbar;
 
-import net.anwiba.commons.utilities.registry.KeyValueRegistry;
-
 import java.io.Serializable;
 import java.util.Comparator;
+
+import net.anwiba.commons.utilities.registry.KeyValueRegistry;
 
 public class ToolBarItemGroupConfiguration {
   public static final class ToolBarItemDescriptionComparator implements

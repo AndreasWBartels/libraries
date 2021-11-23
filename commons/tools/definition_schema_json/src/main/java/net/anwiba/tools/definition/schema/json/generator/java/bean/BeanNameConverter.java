@@ -21,8 +21,9 @@
  */
 package net.anwiba.tools.definition.schema.json.generator.java.bean;
 
+import static net.anwiba.tools.generator.java.bean.JavaConstants.primitives;
+
 import java.text.MessageFormat;
-import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
 
 public class BeanNameConverter {
   private final String packageName;

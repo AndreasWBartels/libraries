@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -24,6 +24,7 @@ package net.anwiba.commons.image.imagen;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
 
 import org.eclipse.imagen.PlanarImage;
@@ -31,31 +32,34 @@ import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.codec.SeekableStream;
 import org.eclipse.imagen.operator.StreamDescriptor;
 
+import net.anwiba.commons.image.AbstractImageContainer;
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageMetadata;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
-class ImagenImageContainer extends AbstractImagenImageContainer {
+class ImagenImageContainer extends AbstractImageContainer {
 
   private final ISeekableStreamConnector seekableStreamConnector;
 
   public ImagenImageContainer(
       final RenderingHints hints,
       final IImageMetadata metadata,
-      final ISeekableStreamConnector seekableStreamConnector) {
-    this(hints, metadata, new ObjectList<IImageOperation>(), seekableStreamConnector);
+      final ISeekableStreamConnector seekableStreamConnector,IImageMetadataAdjustor metadataAdjustor) {
+    this(hints, metadata, new ObjectList<IImageOperation>(), seekableStreamConnector, metadataAdjustor);
   }
 
   public ImagenImageContainer(
       final RenderingHints hints,
       final IImageMetadata metadata,
       final IObjectList<IImageOperation> operations,
-      final ISeekableStreamConnector seekableStreamConnector) {
-    super(metadata, operations, hints);
+      final ISeekableStreamConnector seekableStreamConnector,IImageMetadataAdjustor metadataAdjustor) {
+    super(hints, metadata, operations, metadataAdjustor);
     this.seekableStreamConnector = seekableStreamConnector;
   }
 
@@ -74,9 +78,12 @@ class ImagenImageContainer extends AbstractImagenImageContainer {
           colorModel.getNumComponents(),
           colorModel.getColorSpace().getType(),
           colorModel.getTransferType(),
-          colorModel.getTransparency());
+          colorModel.getTransparency(),
+          colorModel instanceof IndexColorModel);
     } finally {
-      renderedOp.dispose();
+      if (renderedOp != null) {
+        renderedOp.dispose();
+      }
     }
   }
 
@@ -84,24 +91,27 @@ class ImagenImageContainer extends AbstractImagenImageContainer {
   protected IImageContainer adapt(
       final RenderingHints hints,
       final IImageMetadata metadata,
-      final IObjectList<IImageOperation> operations) {
-    return new ImagenImageContainer(hints, metadata, operations, this.seekableStreamConnector);
+      final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
+    return new ImagenImageContainer(hints, metadata, operations, this.seekableStreamConnector, metadataAdjustor);
   }
 
   @Override
   protected BufferedImage read(
+      final IMessageCollector messageCollector,
       final ICanceler canceler,
       final RenderingHints hints,
-      final IObjectList<IImageOperation> imageOperations)
+      final IObjectList<IImageOperation> imageOperations,
+      final IImageMetadataAdjustor metadataAdjustor)
       throws CanceledException,
       IOException {
+    IImageMetadata metadata = read(canceler, hints);
     PlanarImage planarImage = null;
     try (final SeekableStream inputStream = this.seekableStreamConnector.connect()) {
       RenderedOp renderedOp = StreamDescriptor.create(inputStream, null, hints);
-      planarImage = new PlanarImageOperatorFactory()
-          .create(hints, imageOperations)
+      planarImage = new PlanarImageOperatorFactory(metadataAdjustor)
+          .create((ImagenImageMetadata)metadata, imageOperations, hints)
           .execute(canceler, renderedOp);
-      return planarImage.getAsBufferedImage();
+      return planarImage == null ? null : planarImage.getAsBufferedImage();
     } finally {
       if (planarImage != null) {
         planarImage.dispose();

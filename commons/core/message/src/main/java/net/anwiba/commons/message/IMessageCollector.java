@@ -26,15 +26,13 @@ public interface IMessageCollector {
   IMessageCollector DummyCollector = new IMessageCollector() {
 
     @Override
-    public void setNote(final String note) {
-    }
-
-    @Override
     public void addMessage(final IMessage message) {
     }
   };
 
-  public void setNote(String note);
+  default void setNote(String note) {
+    
+  }
 
   public void addMessage(IMessage message);
 

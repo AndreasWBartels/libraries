@@ -28,7 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.swing.dialog.MessageDialogUtilities;
+import net.anwiba.commons.swing.dialog.MessageDialog;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialogUtilities;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
@@ -78,8 +78,8 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
       } catch (final InvocationTargetException exception) {
         final Throwable throwable = exception.getCause();
         logger.log(ILevel.DEBUG, throwable.getMessage(), throwable);
-        MessageDialogUtilities
-            .setTitle(this.title)
+        MessageDialog.launcher()
+            .title(this.title)
             .description(this.errorMessage)
             .text(throwable.getMessage())
             .throwable(throwable)
@@ -87,8 +87,8 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
             .launch(owner);
       } catch (final RuntimeException exception) {
         logger.log(ILevel.DEBUG, exception.getMessage(), exception);
-        MessageDialogUtilities
-            .setTitle(this.title)
+        MessageDialog.launcher()
+            .title(this.title)
             .description(this.errorMessage)
             .text(exception.getMessage())
             .throwable(exception)

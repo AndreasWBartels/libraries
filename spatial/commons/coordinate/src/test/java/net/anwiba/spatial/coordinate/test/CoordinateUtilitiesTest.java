@@ -35,16 +35,26 @@ public class CoordinateUtilitiesTest {
 
   @Test
   public void testCalculateAngle() throws Exception {
-    assertEquals(0, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(0, 10)), 0);
-    assertEquals(Math.PI, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(0, -10)), 0);
-    assertEquals(Math.PI / 2, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(10, 0)), 0);
-    assertEquals(Math.PI / 2 * 3, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(-10, 0)), 0);
-    assertEquals(Math.PI / 4, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(10, 10)), 0);
-    assertEquals(Math.PI / 4 * 3, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(10, -10)), 0);
-    assertEquals(Math.PI / 4 * 5,
-        CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(-10, -10)),
+    assertEquals(0, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(0, 10)).radian(), 0);
+    assertEquals(Math.PI, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(0, -10)).radian(), 0);
+    assertEquals(Math.PI / 2,
+        CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(10, 0)).radian(),
         0);
-    assertEquals(Math.PI / 4 * 7, CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(-10, 10)), 0);
+    assertEquals(Math.PI / 2 * 3,
+        CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(-10, 0)).radian(),
+        0);
+    assertEquals(Math.PI / 4,
+        CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(10, 10)).radian(),
+        0);
+    assertEquals(Math.PI / 4 * 3,
+        CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(10, -10)).radian(),
+        0);
+    assertEquals(Math.PI / 4 * 5,
+        CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(-10, -10)).radian(),
+        0);
+    assertEquals(Math.PI / 4 * 7,
+        CoordinateUtilities.calculateAngle(new Coordinate(0, 0), new Coordinate(-10, 10)).radian(),
+        0);
   }
 
   @Test

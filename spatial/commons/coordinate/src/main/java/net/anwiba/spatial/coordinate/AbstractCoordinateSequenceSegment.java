@@ -21,7 +21,9 @@
  */
 package net.anwiba.spatial.coordinate;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
 
 import net.anwiba.commons.utilities.ArrayUtilities;
 
@@ -33,6 +35,7 @@ public abstract class AbstractCoordinateSequenceSegment implements ICoordinateSe
   private final int measuredIndex;
   private final CoordinateSequenceSegmentType coordinateSequenceSegmentType;
   private final IEnvelope envelope;
+  private int hashcode = - 1;
 
   public AbstractCoordinateSequenceSegment(
       final double ordinates[][],
@@ -225,5 +228,31 @@ public abstract class AbstractCoordinateSequenceSegment implements ICoordinateSe
   @Override
   public boolean isEmpty() {
     return this.ordinates.length == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    if (hashcode==-1) {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + Arrays.deepHashCode(this.ordinates);
+      result = prime * result + Objects.hash(coordinateSequenceSegmentType, envelope, isMeasured, measuredIndex);
+      hashcode = result;
+    }
+    return hashcode;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    AbstractCoordinateSequenceSegment other = (AbstractCoordinateSequenceSegment) obj;
+    return this.coordinateSequenceSegmentType == other.coordinateSequenceSegmentType
+        && Objects.equals(this.envelope, other.envelope) && this.isMeasured == other.isMeasured
+        && this.measuredIndex == other.measuredIndex && Arrays.deepEquals(this.ordinates, other.ordinates);
   }
 }

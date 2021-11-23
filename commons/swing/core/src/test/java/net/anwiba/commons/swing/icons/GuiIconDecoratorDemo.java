@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import net.anwiba.commons.swing.icon.DecorationPosition;
 import net.anwiba.commons.swing.icon.GuiIconDecorator;
 import net.anwiba.commons.swing.icon.GuiIconSize;
-import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.ui.GuiIconDecoration;
 
 public class GuiIconDecoratorDemo {

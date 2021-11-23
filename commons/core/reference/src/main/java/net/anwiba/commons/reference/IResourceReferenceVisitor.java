@@ -33,4 +33,8 @@ public interface IResourceReferenceVisitor<O, E extends Exception> {
 
   public O visitPathResource(PathResourceReference pathResourceReference) throws E;
 
+  default public O visitWrappedReference(IResourceReferenceWrapper resourceReferenceWrapper) throws E {
+    return resourceReferenceWrapper.getWrappedResourceReference().accept(this);
+  }
+
 }

@@ -22,6 +22,7 @@
 package net.anwiba.commons.datasource.constaint;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import net.anwiba.commons.datasource.resource.IResourceDescription;
 import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
@@ -130,10 +131,11 @@ public class ResourceConstraint implements IResourceConstraint {
       final String identifier,
       final String name,
       final String reference,
+      final List<String> attributes, 
       final String source,
       final String usagePolicy,
       final LocalDateTime registered) {
-    return new ResourceConstraint(resource, License.of(identifier, name, reference), source, usagePolicy, registered);
+    return new ResourceConstraint(resource, License.of(identifier, name, reference, attributes), source, usagePolicy, registered);
   }
 
   public static IResourceConstraint of(final IResourceDescription resource, final ILicense license) {
@@ -145,5 +147,13 @@ public class ResourceConstraint implements IResourceConstraint {
       final ILicense license,
       final String maintainer) {
     return new ResourceConstraint(resource, license, maintainer, null, UserDateTimeUtilities.now());
+  }
+
+  public static IResourceConstraint of(
+      final IResourceDescription resource,
+      final ILicense license,
+      final String maintainer,
+      final String usagePolicy) {
+    return new ResourceConstraint(resource, license, maintainer, usagePolicy, UserDateTimeUtilities.now());
   }
 }

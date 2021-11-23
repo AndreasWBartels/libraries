@@ -21,8 +21,8 @@
  */
 package net.anwiba.tools.generator.java.bean.factory;
 
-import static net.anwiba.commons.ensure.Conditions.*;
-import static net.anwiba.commons.ensure.Ensure.*;
+import static net.anwiba.commons.ensure.Conditions.notNull;
+import static net.anwiba.commons.ensure.Ensure.ensureThatArgument;
 
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;

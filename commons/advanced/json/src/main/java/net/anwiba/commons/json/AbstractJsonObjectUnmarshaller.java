@@ -29,19 +29,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper.Builder;
 
 public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException>
     extends
     AbstractJsonUnmarshaller<T, T, R, IOException> {
 
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper;
   private final IJsonObjectMarshallingExceptionFactory<R, E> exceptionFactory;
   private final Class<T> clazz;
   private final Map<String, Object> injectionValues = new HashMap<>();
@@ -64,10 +66,12 @@ public abstract class AbstractJsonObjectUnmarshaller<T, R, E extends IOException
     this.clazz = clazz;
     this.injectionValues.putAll(injectionValues);
     this.exceptionFactory = exceptionFactory;
-    this.mapper.findAndRegisterModules();
-    this.mapper.getFactory().configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
-    this.mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-    problemHandlers.forEach(h -> this.mapper.addHandler(h));
+    final Builder builder = JsonMapper.builder()
+        .findAndAddModules()
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS);
+    problemHandlers.forEach(h -> builder.addHandler(h));
+    this.mapper = builder.build();
   }
 
   @Override

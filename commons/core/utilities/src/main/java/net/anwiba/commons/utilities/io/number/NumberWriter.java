@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.utilities.io.number;
 
-import net.anwiba.commons.utilities.ByteUtilities;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
+
+import net.anwiba.commons.utilities.ByteUtilities;
 
 public class NumberWriter {
 

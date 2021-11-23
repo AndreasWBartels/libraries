@@ -135,4 +135,60 @@ public class PostgresqlUtilities {
       statement.execute(activateVacumAnalyze);
     }
   }
+
+  public static String createStatement(
+      final Connection connection,
+      final String schemaName,
+      final String tableName)
+          throws SQLException {
+    String statementString = "SELECT 'CREATE TABLE ' || pn.nspname || '.' || pc.relname "
+        + "   || E'(\\n' ||\n   string_agg(pa.attname || ' ' || pg_catalog.format_type(pa.atttypid, pa.atttypmod) "
+        + "   || coalesce(' DEFAULT ' "
+        + "               || (\n     SELECT pg_catalog.pg_get_expr(d.adbin, d.adrelid)\n"
+        + "                            FROM pg_catalog.pg_attrdef d\n"
+        + "                           WHERE d.adrelid = pa.attrelid\n"
+        + "                             AND d.adnum = pa.attnum\n"
+        + "                             AND pa.atthasdef\n"
+        + "                 ),\n"
+        + "   '') || ' ' ||\n"
+        + "              CASE pa.attnotnull\n"
+        + "                  WHEN TRUE THEN 'NOT NULL'\n"
+        + "                  ELSE 'NULL'\n"
+        + "              END, E',\\n') ||\n"
+        + "   coalesce((SELECT E',\\n' || string_agg('CONSTRAINT ' || pc1.conname || ' ' || pg_get_constraintdef(pc1.oid), E',\\n' ORDER BY pc1.conindid)\n"
+        + "            FROM pg_constraint pc1\n"
+        + "            WHERE pc1.conrelid = pa.attrelid), '') ||\n"
+        + "   E');'\n"
+        + "FROM pg_catalog.pg_attribute pa\n"
+        + "JOIN pg_catalog.pg_class pc\n"
+        + "    ON pc.oid = pa.attrelid\n"
+        + "    AND pc.relname = ?\n"
+        + "JOIN pg_catalog.pg_namespace pn\n"
+        + "    ON pn.oid = pc.relnamespace\n"
+        + "    AND pn.nspname = ?\n"
+        + "WHERE pa.attnum > 0\n"
+        + "    AND NOT pa.attisdropped\n"
+        + "GROUP BY pn.nspname, pc.relname, pa.attrelid;";
+    logger.log(ILevel.FINE, "Query: Schema " + schemaName + " table " + tableName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    logger.log(ILevel.FINE, "Query: " + statementString); //$NON-NLS-1$
+    try (PreparedStatement statement =
+        connection.prepareStatement(statementString)) {
+      statement.setString(2, schemaName);
+      statement.setString(1, tableName);
+      try {
+        if (!statement.execute()) {
+          return null;
+        }
+      } catch (final Exception exception) {
+        logger.log(ILevel.WARNING, "Query faild: " + statementString, exception); //$NON-NLS-1$
+        return null;
+      }
+      try (ResultSet resultSet = statement.getResultSet()) {
+        if (resultSet.next()) {
+          return resultSet.getString(1);
+        }
+        return null;
+      }
+    }
+  }
 }

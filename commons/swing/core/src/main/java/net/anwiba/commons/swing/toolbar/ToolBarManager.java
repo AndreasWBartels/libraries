@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.swing.toolbar;
 
-import net.anwiba.commons.utilities.registry.KeyValueRegistry;
-
 import java.io.Serializable;
 import java.util.Comparator;
 
 import javax.swing.JToolBar;
+
+import net.anwiba.commons.utilities.registry.KeyValueRegistry;
 
 public class ToolBarManager implements IToolBarComponentRegistry {
 

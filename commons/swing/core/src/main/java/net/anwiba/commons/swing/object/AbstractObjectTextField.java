@@ -59,6 +59,7 @@ import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.utilities.JTextComponentUtilities;
+import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.commons.utilities.validation.IValidationResult;
 import net.anwiba.commons.utilities.validation.IValidator;
 
@@ -114,9 +115,13 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
 
     @Override
     public String getToolTipText() {
+      String toolTipText = super.getToolTipText();
+      if (!StringUtilities.isNullOrTrimmedEmpty(toolTipText) && isTextValid()) {
+        return toolTipText;
+      }
       final IToolTipFactory toolTipFactory = this.configuration.getToolTipFactory();
       if (toolTipFactory == null) {
-        return super.getToolTipText();
+        return toolTipText;
       }
       final String value = getText();
       final int columnWidth = getWidth();
@@ -125,6 +130,13 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
         return toolTipFactory.create(this.validationResult.get(), value);
       }
       return toolTipFactory.create(this.validationResult.get(), null);
+    }
+
+    private boolean isTextValid() {
+      return this.validationResult.optional()
+          .convert(v -> v.isValid())
+          .getOr(() -> Boolean.TRUE)
+          .booleanValue();
     }
   }
 
@@ -176,17 +188,38 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
 
     @Override
     public String getToolTipText() {
+      String toolTipText = super.getToolTipText();
+      if (!StringUtilities.isNullOrTrimmedEmpty(toolTipText) && isTextValid()) {
+        return toolTipText;
+      }
       final IToolTipFactory toolTipFactory = this.configuration.getToolTipFactory();
       if (toolTipFactory == null) {
-        return super.getToolTipText();
+        return toolTipText;
       }
-      final String value = getText();
+      final String value = getPasswordAsString();
+      String string = StringUtilities.repeatString("*", value.length());
       final int columnWidth = getWidth();
-      final double valueWidth = JTextComponentUtilities.getValueWidth(this, value);
+      final double valueWidth = JTextComponentUtilities.getValueWidth(this, string);
       if (valueWidth > columnWidth - 2) {
-        return toolTipFactory.create(this.validationResult.get(), value);
+        return toolTipFactory.create(this.validationResult.get(), string);
       }
       return toolTipFactory.create(this.validationResult.get(), null);
+    }
+
+    private boolean isTextValid() {
+      return this.validationResult.optional()
+          .convert(v -> v.isValid())
+          .getOr(() -> Boolean.TRUE)
+          .booleanValue();
+    }
+
+    private String getPasswordAsString() {
+      try {
+        final Document doc = getDocument();
+        return doc.getText(0, doc.getLength());
+      } catch (BadLocationException e) {
+        return null;
+      }
     }
   }
 
@@ -333,7 +366,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
       @Override
       public void objectChanged() {
         // logger.log(ILevel.DEBUG, "document changed"); //$NON-NLS-1$
-        AbstractObjectTextField.this.controller.modelChanged();
+        valuesController.modelChanged();
       }
     });
     this.textField.addKeyListener(new KeyListener() {

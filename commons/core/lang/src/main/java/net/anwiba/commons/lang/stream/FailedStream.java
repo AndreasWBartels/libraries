@@ -27,11 +27,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IAssimilator;
+import net.anwiba.commons.lang.functional.ICloseable;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
@@ -44,8 +46,10 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
 
   private final Class<E> exceptionClass;
   private final E cause;
+  private final ICloseable<E> closeable;
 
-  FailedStream(final Class<E> exceptionClass, final E cause) {
+  FailedStream(final Class<E> exceptionClass, final E cause, final ICloseable<E> closeable) {
+    this.closeable = closeable;
     this.exceptionClass = Objects.requireNonNull(exceptionClass);
     this.cause = Objects.requireNonNull(cause);
   }
@@ -67,17 +71,17 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
 
   @Override
   public <O> IStream<O, E> convert(final IConverter<T, O, E> funtion) {
-    return new FailedStream<>(this.exceptionClass, this.cause);
+    return stream(this.exceptionClass, this.cause, this.closeable);
   }
 
   @Override
   public <O> IStream<O, E> flat(final IConverter<T, Iterable<O>, E> funtion) {
-    return new FailedStream<>(this.exceptionClass, this.cause);
+    return stream(this.exceptionClass, this.cause, this.closeable);
   }
 
   @Override
   public <O> IStream<O, E> convert(final IAggregator<Integer, T, O, E> aggregator) {
-    return new FailedStream<>(this.exceptionClass, this.cause);
+    return stream(this.exceptionClass, this.cause, this.closeable);
   }
 
   @Override
@@ -85,7 +89,7 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
     try {
       return Streams.of(this.exceptionClass, supplier.supply());
     } catch (final Exception exception) {
-      return stream(this.exceptionClass, exception);
+      return stream(this.exceptionClass, exception, () -> {});
     }
   }
 
@@ -116,7 +120,7 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
 
   @Override
   public <O> IStream<O, E> instanceOf(final Class<O> clazz) {
-    return new FailedStream<>(this.exceptionClass, this.cause);
+    return stream(this.exceptionClass, this.cause, this.closeable);
   }
 
   @Override
@@ -125,12 +129,12 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public Iterable<T> asIterable() throws E {
+  public Iterable<T> toIterable() throws E {
     throw this.cause;
   }
 
   @Override
-  public Collection<T> asCollection() throws E {
+  public <O> Collection<O> asCollection() throws E {
     throw this.cause;
   }
 
@@ -153,7 +157,7 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public IObjectList<T> asObjectList() throws E {
+  public <O> IObjectList<O> asObjectList() throws E {
     throw this.cause;
   }
 
@@ -175,9 +179,10 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   @SuppressWarnings("unchecked")
   private static <T, E extends Exception> IStream<T, E> stream(
       final Class<E> exceptionClass,
-      final Exception exception) {
+      final Exception exception,
+      final ICloseable<E> closeable) {
     if (exceptionClass.isInstance(exception)) {
-      return new FailedStream<>(exceptionClass, (E) exception);
+      return new FailedStream<>(exceptionClass, (E) exception, closeable);
     }
     if (exception instanceof RuntimeException) {
       throw (RuntimeException) exception;
@@ -203,5 +208,20 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   @Override
   public boolean isSuccessful() {
     return false;
+  }
+
+  @Override
+  public boolean foundAny(final IAcceptor<T> acceptor) throws E {
+    throw this.cause;
+  }
+
+  @Override
+  public <O> Stream<O> asStream() throws E {
+    throw this.cause;
+  }
+
+  @Override
+  public Stream<T> toStream() throws E {
+    throw this.cause;
   }
 }

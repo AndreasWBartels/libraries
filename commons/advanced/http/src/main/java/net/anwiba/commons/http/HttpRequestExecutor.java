@@ -22,12 +22,18 @@
 package net.anwiba.commons.http;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.Objects;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.core5.http.HttpResponse;
 
 import net.anwiba.commons.http.apache.HttpContextFactory;
 import net.anwiba.commons.http.apache.RequestToHttpUriRequestConverter;
@@ -39,7 +45,6 @@ import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
-@SuppressWarnings({ "nls" })
 public class HttpRequestExecutor implements IHttpRequestExecutor {
 
   private static ILogger logger = Logging.getLogger(HttpRequestExecutor.class.getName());
@@ -60,9 +65,10 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
     if (this.isClosed) {
       throw new IOException("executor is closed");
     }
+    LocalTime now = LocalTime.now();
     try {
       final HttpUriRequest uriRequest = this.requestToHttpUriRequestConverter.convert(request);
-      logger.log(ILevel.DEBUG, () -> MessageFormat.format("request url: <{0}>", uriRequest.getURI()));
+      logger.log(ILevel.DEBUG, () -> MessageFormat.format("request url: <{0}>", uriRequest.getRequestUri()));
       canceler.check();
       this.client = this.client == null ? this.httpClientFactory.create() : this.client;
       final HttpResponse httpResponse = query(canceler, this.client, request, uriRequest);
@@ -70,16 +76,31 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
         final Response response = new Response(canceler, this.client, uriRequest, httpResponse);
         this.client = null;
         logger.log(ILevel.DEBUG,
-            () -> MessageFormat.format("requested code <{1}> url: <{0}>", response.getUri(), response.getStatusCode()));
+            () -> MessageFormat.format("requested duration: {2} code <{1}> url: <{0}>",
+                response.getUri(),
+                response.getStatusCode(),
+                Duration.between(now, LocalTime.now())));
         return response;
       }
       final Response response = new Response(canceler, () -> {}, uriRequest, httpResponse);
       logger.log(ILevel.DEBUG,
-          () -> MessageFormat.format("requested code <{1}> url: <{0}>", response.getUri(), response.getStatusCode()));
+          () -> MessageFormat.format("requested duration: {2} code <{1}> url: <{0}>",
+              response.getUri(),
+              response.getStatusCode(),
+              Duration.between(now, LocalTime.now())));
       return response;
+    } catch (final IOException exception) {
+      if (exception instanceof InterruptedIOException) {
+        logger.log(ILevel.DEBUG,
+            () -> MessageFormat.format("request canceled after: {1} url: <{0}>",
+                request.getUriString(),
+                Duration.between(now, LocalTime.now())));
+        throw new CanceledException(exception.getMessage(), exception);
+      }
+      throw exception;
     } catch (final IllegalStateException | ConversionException exception) {
       logger.log(ILevel.ALL, exception.getMessage(), exception);
-      throw new IOException(exception.getMessage());
+      throw new IOException(exception.getMessage(), exception);
     }
   }
 
@@ -87,14 +108,14 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
       final ICanceler canceler,
       final CloseableHttpClient httpClient,
       final IRequest request,
-      final HttpUriRequest method)
+      final HttpUriRequest httpUriRequest)
       throws IOException,
       ClientProtocolException {
-    try (IWatcher watcher = canceler.watcherFactory().create(() -> method.abort())) {
+    try (IWatcher watcher = canceler.watcherFactory().create(() -> httpUriRequest.abort())) {
       if (request.getAuthentication() != null) {
-        return httpClient.execute(method, this.httpContextFactory.create(request));
+        return httpClient.execute(httpUriRequest, this.httpContextFactory.create(request));
       }
-      return httpClient.execute(method);
+      return httpClient.execute(httpUriRequest);
     }
   }
 
@@ -104,10 +125,17 @@ public class HttpRequestExecutor implements IHttpRequestExecutor {
       return;
     }
     try {
-      if (this.client == null) {
-        return;
+      if (this.client != null) {
+        this.client.close();
       }
-      this.client.close();
+      IHttpClientConfiguration configuration = this.httpClientFactory.getClientConfiguration();
+      if (Objects.equals(configuration.getMode(), HttpConnectionMode.KEEP_ALIVE)) {
+        final HttpClientConnectionManager manager = configuration.getManager();
+        if (manager instanceof PoolingHttpClientConnectionManager) {
+          return;
+        }
+        manager.close();
+      }
     } finally {
       this.isClosed = true;
       this.httpClientFactory = null;

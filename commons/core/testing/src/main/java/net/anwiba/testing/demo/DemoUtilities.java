@@ -60,7 +60,7 @@ import org.junit.jupiter.api.Assertions;
 
 public class DemoUtilities {
 
-  public static final long DELAY_TIME = 500;
+  public static final Duration DELAY_TIME = Duration.ofMillis(100);
   public static final Duration DEFAULT_TIMEOUT_MILLIS = Duration.ofMillis(30000);
 
   public static final Font DEFAULT_FIXED_WIDTH_FONT = new Font("Monospaced", Font.PLAIN, 11);
@@ -90,10 +90,13 @@ public class DemoUtilities {
           .collect(Collectors.toCollection(ArrayDeque::new))
           .descendingIterator()
           .forEachRemaining(w -> {
-            if (w.isVisible()) {
-              w.setVisible(false);
+            try {
+              if (w.isVisible()) {
+                w.setVisible(false);
+              }
+            } finally {
+              w.dispose();
             }
-            w.dispose();
           });
     }
 
@@ -273,8 +276,12 @@ public class DemoUtilities {
   }
 
   public static void pause() {
+    pause(DELAY_TIME);
+  }
+
+  public static void pause(Duration delay) {
     try {
-      Thread.sleep(DemoUtilities.DELAY_TIME);
+      Thread.sleep(delay.toMillis());
     } catch (InterruptedException exception) {
       Thread.currentThread().isInterrupted();
     }

@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.anwiba.commons.lang.optional.Optional;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.Parameter;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.Parameter;
 
 class QueryBuilder {
 
@@ -46,11 +46,11 @@ class QueryBuilder {
           if (this.builder == null) {
             return null;
           }
-          return Parameter.of(this.builder.toString(), null);
+          return Parameter.of(this.builder.toString(), "");
         }
         case VALUE: {
           if (this.builder == null) {
-            return Parameter.of(this.name, null);
+            return Parameter.of(this.name, "");
           }
           return Parameter.of(this.name, this.builder.toString());
         }

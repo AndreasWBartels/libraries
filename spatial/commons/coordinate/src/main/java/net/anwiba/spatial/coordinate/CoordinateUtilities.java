@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -22,19 +22,21 @@
 // Copyright (c) 2006 by Andreas W. Bartels
 package net.anwiba.spatial.coordinate;
 
-import static net.anwiba.commons.utilities.math.MathWrapper.PI;
 import static net.anwiba.commons.utilities.math.MathWrapper.abs;
-import static net.anwiba.commons.utilities.math.MathWrapper.atan;
-import static net.anwiba.commons.utilities.math.MathWrapper.cos;
 import static net.anwiba.commons.utilities.math.MathWrapper.log10;
 import static net.anwiba.commons.utilities.math.MathWrapper.max;
 import static net.anwiba.commons.utilities.math.MathWrapper.min;
 import static net.anwiba.commons.utilities.math.MathWrapper.pow;
-import static net.anwiba.commons.utilities.math.MathWrapper.sin;
 import static net.anwiba.commons.utilities.math.MathWrapper.sqrt;
 
+import net.anwiba.commons.utilities.math.DirectionAngle;
+import net.anwiba.commons.utilities.math.DirectionOrientation;
+import net.anwiba.spatial.coordinate.calculator.DefaultCoordinateDirectionCalculator;
 import net.anwiba.spatial.coordinate.calculator.DefaultCoordinateDistanceCalculator;
+import net.anwiba.spatial.coordinate.calculator.DefaultFromPolarCoordinateCalculator;
+import net.anwiba.spatial.coordinate.calculator.ICoordinateDirectionCalculator;
 import net.anwiba.spatial.coordinate.calculator.ICoordinateDistanceCalculator;
+import net.anwiba.spatial.coordinate.calculator.IFromPolarCoordinateCalculator;
 import net.anwiba.spatial.coordinate.calculator.RobustDeterminantCalculator;
 import net.anwiba.spatial.coordinate.calculator.SmallPointCalculator;
 
@@ -102,6 +104,9 @@ public class CoordinateUtilities {
   }
 
   final static ICoordinateDistanceCalculator coordinateDistanceCalculator = new DefaultCoordinateDistanceCalculator();
+  final static ICoordinateDirectionCalculator coordinateDirectionCalculator =
+      new DefaultCoordinateDirectionCalculator();
+  final static IFromPolarCoordinateCalculator polarCoordinateCalculator = new DefaultFromPolarCoordinateCalculator();
 
   public static ICoordinate calculateSmallPoint(final ICoordinate c0, final ICoordinate c1, final double s)
       throws CoordinateCalculationException {
@@ -112,7 +117,7 @@ public class CoordinateUtilities {
     }
     final double x1 = c1.getXValue();
     final double y1 = c1.getYValue();
-    final double d = coordinateDistanceCalculator.calculateDistance(x0, y0, x1, y1);
+    final double d = coordinateDistanceCalculator.calculate(x0, y0, x1, y1);
     final double xs = x0 + (x1 - x0) / d * s;
     final double ys = y0 + (y1 - y0) / d * s;
     if (c0.getDimension() > 2 && c1.getDimension() > 2) {
@@ -348,36 +353,21 @@ public class CoordinateUtilities {
 
   public static ICoordinate calculatePolarCoordinate(
       final ICoordinate coordinate,
-      final double angel,
+      final double radian,
       final double distance) {
-    return new Coordinate(
-        (coordinate.getXValue() + distance * sin(angel)),
-        (coordinate.getYValue() + distance * cos(angel)));
+    return polarCoordinateCalculator
+        .calculate(coordinate, distance, DirectionAngle.radian(radian, DirectionOrientation.GEOGRAPHIC_NORTH));
   }
 
-  public static double calculateAngle(final ICoordinate c0, final ICoordinate c1) {
-    final double a = c1.getXValue() - c0.getXValue();
-    final double b = c1.getYValue() - c0.getYValue();
-    if (a == 0) {
-      if (b > 0) {
-        return 0;
-      }
-      return PI;
-    }
-    if (b == 0) {
-      if (a > 0) {
-        return PI / 2;
-      }
-      return PI / 2 * 3;
-    }
-    final double alpha = atan(a / b);
-    if (b < 0) {
-      return PI + alpha;
-    }
-    if (a < 0) {
-      return PI * 2 + alpha;
-    }
-    return alpha;
+  public static ICoordinate calculatePolarCoordinate(
+      final ICoordinate coordinate,
+      final DirectionAngle angle,
+      final double distance) {
+    return polarCoordinateCalculator.calculate(coordinate, distance, angle);
+  }
+
+  public static DirectionAngle calculateAngle(final ICoordinate c0, final ICoordinate c1) {
+    return coordinateDirectionCalculator.calculate(c0, c1);
   }
 
   public static ICoordinate getMinimum(final ICoordinate coordinate, final ICoordinate other) {

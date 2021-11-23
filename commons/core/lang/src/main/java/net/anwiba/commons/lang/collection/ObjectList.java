@@ -40,6 +40,10 @@ public class ObjectList<T> extends AbstractObjectList<T> {
     super(objects);
   }
 
+  public static <T> ObjectListBuilder<T> builder() {
+    return new ObjectListBuilder<>();
+  }
+
   public static <T> IObjectList<T> empty() {
     return new ObjectList<>();
   }

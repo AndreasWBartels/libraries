@@ -21,17 +21,7 @@
  */
 package net.anwiba.commons.image.operation;
 
-import java.awt.color.ColorSpace;
-
-import net.anwiba.commons.image.IImageMetadata;
-import net.anwiba.commons.image.IImageMetadataAdjustor;
-
 public class ImageToGrayScaleOperation implements IImageOperation {
-
-  @Override
-  public IImageMetadata adjust(final IImageMetadata metadata, final IImageMetadataAdjustor metadataAdjustor) {
-    return metadataAdjustor.adjust(metadata, 1, 1, ColorSpace.TYPE_GRAY);
-  }
 
   @Override
   public int hashCode() {

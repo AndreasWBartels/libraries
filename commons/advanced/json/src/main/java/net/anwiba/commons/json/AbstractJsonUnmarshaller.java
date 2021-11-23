@@ -33,18 +33,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper.Builder;
 
 import net.anwiba.commons.lang.io.NoneClosingInputStream;
 
 public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
 
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper;
   private final Class<R> errorResponseClass;
   private final Class<T> clazz;
   private final Map<String, Object> injectionValues = new HashMap<>();
@@ -57,9 +59,11 @@ public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
     this.clazz = clazz;
     this.errorResponseClass = errorResponseClass;
     this.injectionValues.putAll(injectionValues);
-    this.mapper.findAndRegisterModules();
-    this.mapper.getFactory().configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, true);
-    problemHandlers.forEach(h -> this.mapper.addHandler(h));
+    final Builder builder = JsonMapper.builder()
+        .findAndAddModules()
+        .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS);
+    problemHandlers.forEach(h -> builder.addHandler(h));
+    this.mapper = builder.build();
   }
 
   public final O unmarshal(final String body) throws IOException, E {
@@ -107,15 +111,28 @@ public abstract class AbstractJsonUnmarshaller<T, O, R, E extends IOException> {
     }
     try {
       final R response = check(stream, this.errorResponseClass);
+      if (this.errorResponseClass.isInstance(response)) {
+        if (this.errorResponseClass == this.clazz) {
+          return (T) response;
+        }
+        if (!isErrorResponse(response)) {
+          return null;
+        }
+        throw createException(response);
+      }
       if (this.clazz.isInstance(response)) {
         return (T) response;
       }
-      throw createException(response);
+      return null;
     } catch (final JsonParseException e) {
       return null;
     } catch (final JsonMappingException e) {
       return null;
     }
+  }
+
+  protected boolean isErrorResponse(final R response) {
+    return true;
   }
 
   protected abstract E createException(R response);

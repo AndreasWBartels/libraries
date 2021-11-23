@@ -28,7 +28,7 @@ module net.anwiba.commons.xml {
 
   requires dom4j;
   requires java.xml;
-  requires java.xml.bind;
+  requires jakarta.xml.bind;
   requires net.anwiba.commons.lang;
   requires net.anwiba.commons.logging;
   requires net.anwiba.commons.reference;

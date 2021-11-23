@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.swing.utilities;
 
-import net.anwiba.commons.lang.functional.IProcedure;
-
 import javax.swing.SwingUtilities;
+
+import net.anwiba.commons.lang.functional.IProcedure;
 
 public final class EventDispatchThreadUsingProcedureDelegatorFactory<T> {
   public IProcedure<T, RuntimeException> create(final IProcedure<T, RuntimeException> procedure) {

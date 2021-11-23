@@ -22,28 +22,18 @@
 package net.anwiba.commons.swing.dialog;
 
 import java.awt.Component;
-import java.awt.Frame;
 import java.awt.Window;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.Icon;
 
 import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.swing.preference.IWindowPreferences;
 
 public class MessageDialog extends AbstractDialog {
+
   private static final long serialVersionUID = 1L;
 
-  public MessageDialog(
-      final Frame owner,
-      final String title,
-      final IMessage message,
-      final Icon icon,
-      final DialogType dialogType) {
-    this(owner, title, message, icon, dialogType, true);
+  public static MessageDialogLauncher launcher() {
+    return new MessageDialogLauncher();
   }
 
   public MessageDialog(
@@ -52,84 +42,8 @@ public class MessageDialog extends AbstractDialog {
       final IMessage message,
       final Icon icon,
       final DialogType dialogType) {
-    this(owner, title, message, icon, dialogType, true);
+    super(owner, title, message, icon, dialogType, true);
   }
-
-  public MessageDialog(
-      final Window owner,
-      final IWindowPreferences preferences,
-      final String title,
-      final IMessage message,
-      final Icon icon,
-      final DialogType dialogType,
-      final ModalityType modalityType) {
-    super(
-        owner,
-        preferences,
-        title,
-        message,
-        icon,
-        dialogType,
-        Collections.emptyList(),
-        new ObjectModel<>(),
-        modalityType);
-  }
-
-  public MessageDialog(
-      final Window owner,
-      final String title,
-      final IMessage message,
-      final Icon icon,
-      final DialogType dialogType,
-      final boolean modal) {
-    super(owner, title, message, icon, dialogType, modal);
-  }
-
-  public MessageDialog(
-      final Window owner,
-      final IWindowPreferences preferences,
-      final String title,
-      final IMessage message,
-      final Icon icon,
-      final DialogType dialogType,
-      final boolean modal) {
-    super(owner, preferences, title, message, icon, dialogType, Collections.emptyList(), new ObjectModel<>(), modal);
-  }
-
-  public MessageDialog(
-      final Window owner,
-      final IWindowPreferences preferences,
-      final String title,
-      final IMessage message,
-      final Icon icon,
-      final DialogType dialogType,
-      final List<IAdditionalActionFactory> actionFactories,
-      final IObjectModel<DataState> dataStateModel,
-      final boolean modal) {
-    super(owner, preferences, title, message, icon, dialogType, actionFactories, dataStateModel, modal);
-  }
-
-  public MessageDialog(
-      final Window owner,
-      final IWindowPreferences preferences,
-      final String title,
-      final IMessage message,
-      final Icon icon,
-      final DialogType dialogType,
-      final List<IAdditionalActionFactory> actionFactories,
-      final IObjectModel<DataState> dataStateModel,
-      final ModalityType modalityType) {
-    super(owner, preferences, title, message, icon, dialogType, actionFactories, dataStateModel, modalityType);
-  }
-
-//  @Override
-//  protected JPanel createContentPane(final IMessage message) {
-//    final JPanel contentPanel = new JPanel();
-//    contentPanel.setMinimumSize(new Dimension(0, 0));
-//    contentPanel.setMaximumSize(new Dimension(0, 0));
-//    contentPanel.setPreferredSize(new Dimension(0, 0));
-//    return contentPanel;
-//  }
 
   @Override
   protected Component getDetailsComponent() {

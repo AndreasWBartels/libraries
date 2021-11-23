@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.spatial.geo.json.v01_0.Crs;
 import net.anwiba.spatial.geo.json.v01_0.Feature;
-import net.anwiba.spatial.geo.json.v01_0.GeometryCollection;
+import net.anwiba.spatial.geo.json.v01_0.Geometry;
 
 @SuppressWarnings("nls")
 public class GeoJsonV01_0MarshallerTest {
@@ -61,11 +61,11 @@ public class GeoJsonV01_0MarshallerTest {
 
   @Test
   public void geometryCollection() throws IOException, GeoJsonMarshallingException {
-    final GeometryCollection response = this.unmarshallerFactory
-        .create(GeometryCollection.class)
+    final Geometry response = this.unmarshallerFactory
+        .create(Geometry.class)
         .unmarshal(GeoJsonV01_0TestResources.geometryCollection);
     assertThat(response, notNullValue());
-    final String string = marshall(GeometryCollection.class, response);
+    final String string = marshall(Geometry.class, response);
     assertThat(
         StringUtilities.removeWhiteSpaces(string),
         equalTo(

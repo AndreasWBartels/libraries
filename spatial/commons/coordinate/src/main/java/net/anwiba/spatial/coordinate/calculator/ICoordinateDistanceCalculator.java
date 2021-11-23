@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels 
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,10 +25,10 @@ import net.anwiba.spatial.coordinate.ICoordinate;
 
 public interface ICoordinateDistanceCalculator {
 
-  double calculateDistance(double x0, double y0, double x1, double y1);
+  double calculate(double x0, double y0, double x1, double y1);
 
-  default double calculateDistance(final ICoordinate prior, final ICoordinate next) {
-    return calculateDistance(prior.getXValue(), prior.getYValue(), next.getXValue(), next.getYValue());
+  default double calculate(final ICoordinate prior, final ICoordinate next) {
+    return calculate(prior.getXValue(), prior.getYValue(), next.getXValue(), next.getYValue());
   }
 
 }

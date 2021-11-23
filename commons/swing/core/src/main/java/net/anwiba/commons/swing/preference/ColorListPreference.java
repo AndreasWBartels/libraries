@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.swing.preference;
 
-import net.anwiba.commons.preferences.IPreferences;
-
 import java.awt.Color;
 import java.text.MessageFormat;
+
+import net.anwiba.commons.preferences.IPreferences;
 
 public class ColorListPreference {
 

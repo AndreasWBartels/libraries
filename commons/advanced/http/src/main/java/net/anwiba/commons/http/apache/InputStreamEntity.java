@@ -26,13 +26,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.ContentType;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.AbstractHttpEntity;
 
 import net.anwiba.commons.lang.functional.IClosure;
 
 @SuppressWarnings("nls")
 public class InputStreamEntity extends AbstractHttpEntity {
+
+  static final int OUTPUT_BUFFER_SIZE = 4096;
 
   private final IClosure<InputStream, IOException> content;
   private final long length;
@@ -40,13 +42,11 @@ public class InputStreamEntity extends AbstractHttpEntity {
   public InputStreamEntity(
       final IClosure<InputStream, IOException> contentClosure,
       final long length,
-      final ContentType contentType) {
-    super();
+      final ContentType contentType,
+      final String encoding) {
+    super(contentType, encoding);
     this.content = Objects.requireNonNull(contentClosure, "no content");
     this.length = length;
-    if (contentType != null) {
-      setContentType(contentType.toString());
-    }
   }
 
   @Override
@@ -70,7 +70,7 @@ public class InputStreamEntity extends AbstractHttpEntity {
   @Override
   public void writeTo(final OutputStream outstream) throws IOException {
     Objects.requireNonNull(outstream, "no content");
-    try (final InputStream instream = this.content.execute();) {
+    try (final InputStream instream = this.content.execute()) {
       final byte[] buffer = new byte[OUTPUT_BUFFER_SIZE];
       int size;
       if (this.length < 0) {
@@ -94,6 +94,11 @@ public class InputStreamEntity extends AbstractHttpEntity {
   @Override
   public boolean isStreaming() {
     return true;
+  }
+
+  @Override
+  public void close() throws IOException {
+    // nothing to do
   }
 
 }

@@ -1,9 +1,9 @@
 @JssdUnknownMember
 {
-  "place_id" : <String> null,
+  "place_id" : <Object> null,
   "licence" : <String> null,
   "osm_type" : <String> null,
-  "osm_id" : <String> null,
+  "osm_id" : <Object> null,
   "boundingbox" : <String[]> null,
   "lat" : <String> null,
   "lon" : <String> null,

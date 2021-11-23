@@ -24,5 +24,9 @@ package net.anwiba.commons.model;
 import net.anwiba.commons.lang.primitive.IBooleanReceiver;
 
 public interface IBooleanModel extends IBooleanReceiver, IBooleanDistributor {
-  // nothing to do
+
+  default void toggle() {
+    set(!isTrue());
+  }
+
 }

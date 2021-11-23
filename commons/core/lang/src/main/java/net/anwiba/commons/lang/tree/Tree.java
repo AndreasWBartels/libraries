@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.lang.tree;
 
+import java.util.Comparator;
+
 import net.anwiba.commons.lang.collection.IObjectIteratorFactory;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.tree.distance.IObjectDistanceCalculator;
@@ -31,8 +33,6 @@ import net.anwiba.commons.lang.tree.iterator.SortedValueIteratorFactory;
 import net.anwiba.commons.lang.tree.iterator.TreeIterable;
 import net.anwiba.commons.lang.tree.walker.ITreeWalker;
 import net.anwiba.commons.lang.tree.walker.TreeWalker;
-
-import java.util.Comparator;
 
 public class Tree<K, V> implements ITree<K, V> {
 

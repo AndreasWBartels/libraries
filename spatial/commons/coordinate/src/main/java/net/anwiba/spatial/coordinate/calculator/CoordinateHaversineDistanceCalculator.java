@@ -32,7 +32,7 @@ public class CoordinateHaversineDistanceCalculator implements ICoordinateDistanc
   }
 
   @Override
-  public double calculateDistance(
+  public double calculate(
       final double lambda,
       final double phi,
       final double otherLambda,

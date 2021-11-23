@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.eclipse.imagen.media.codec.SeekableStream;
 
+import net.anwiba.commons.image.apache.ApacheImageContainerFactory;
 import net.anwiba.commons.image.awt.BufferedImageContainerFactory;
 import net.anwiba.commons.image.imageio.IImageInputStreamConnector;
 import net.anwiba.commons.image.imageio.ImageIoImageContainerFactory;
@@ -45,6 +46,7 @@ public class ImageContainerFactory implements IImageContainerFactory {
   final ImagenImageContainerFactory imagenImageContainerFactory;
   final ImageIoImageContainerFactory imageIoImageContainerFactory;
   final BufferedImageContainerFactory bufferedImageContainerFactory;
+  private final ApacheImageContainerFactory apacheImageContainerFactory;
 
   public static ImageContainerFactory of(
       final RenderingHints hints,
@@ -52,15 +54,18 @@ public class ImageContainerFactory implements IImageContainerFactory {
     RenderingHints renderingHints = Optional.of(hints).getOr(() -> new RenderingHints(Map.of()));
     return new ImageContainerFactory(
         new BufferedImageContainerFactory(renderingHints),
+        new ApacheImageContainerFactory(renderingHints, resourceReferenceHandler),
         new ImageIoImageContainerFactory(renderingHints, resourceReferenceHandler),
         new ImagenImageContainerFactory(renderingHints, resourceReferenceHandler));
   }
 
   public ImageContainerFactory(
       final BufferedImageContainerFactory bufferedImageContainerFactory,
+      final ApacheImageContainerFactory apacheImageContainerFactory,
       final ImageIoImageContainerFactory imageIoImageContainerFactory,
       final ImagenImageContainerFactory imagenImageContainerFactory) {
     this.bufferedImageContainerFactory = bufferedImageContainerFactory;
+    this.apacheImageContainerFactory = apacheImageContainerFactory;
     this.imageIoImageContainerFactory = imageIoImageContainerFactory;
     this.imagenImageContainerFactory = imagenImageContainerFactory;
   }
@@ -85,9 +90,11 @@ public class ImageContainerFactory implements IImageContainerFactory {
         return new SeekableImageInputStream(seekableStream);
       };
       if (this.imageIoImageContainerFactory.isSupported(imageInputStreamConnector)) {
-        return this.imageIoImageContainerFactory
-            .create(
-                this.imageIoImageContainerFactory.createInputStreamConnector(resourceReference));
+        return this.imageIoImageContainerFactory.create(resourceReference);
+      }
+      seekableStream.seek(0);
+      if (this.apacheImageContainerFactory.isSupported(seekableStream)) {
+        return this.apacheImageContainerFactory.create(resourceReference);
       }
     }
     throw new IOException("Unsupported image format");

@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.datasource.constaint;
 
+import java.util.List;
+
 public interface ILicense {
 
   String getIdentifier();
@@ -28,5 +30,7 @@ public interface ILicense {
   String getName();
 
   String getReference();
+
+  List<String> getAttributes();
 
 }

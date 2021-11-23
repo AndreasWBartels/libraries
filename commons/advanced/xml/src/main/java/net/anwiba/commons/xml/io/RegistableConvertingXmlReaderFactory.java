@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -36,10 +34,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXTransformerFactory;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.IApplicable;
 import net.anwiba.commons.lang.functional.IFunction;
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.xml.jaxb.IJaxbContext;
 import net.anwiba.commons.xml.jaxb.JaxbTransformer;
 
@@ -74,7 +74,10 @@ public class RegistableConvertingXmlReaderFactory {
     try {
       final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
       transformerFactory.setURIResolver(uriResolver);
-      // transformerFactory.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
+// access restriction throws exception if external resource reference is not a "file" or "jar:file" references 
+//      transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "file, jar:file");
+//      transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file, jar:file");
+//      transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "file, jar:file");
       final Templates inputTransformerTemplate = this.templateFactory.create(inputXsltScript, transformerFactory);
       final JaxbTransformer<T> jaxbTransformer = new JaxbTransformer<>(
           transformerFactory,

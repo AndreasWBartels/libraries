@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.swing.configuration;
 
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.IParameters;
 
 public interface IConfiguration {
 

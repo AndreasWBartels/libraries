@@ -32,11 +32,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.reference.utilities.IoUtilities;
 
 @SuppressWarnings("nls")
@@ -92,21 +95,55 @@ public class ResourceReferenceFactoryTest {
   }
 
   @Test
-  @Disabled
-  // TODO delete ignore
   public void relativeFileUrlResource() throws Exception {
     final IResourceReference resourceReference =
-        this.factory.create("file:./src/main/java/net/anwiba/commons/resource/reference/IResourceReference.java");
+        this.factory.create("file:./src/main/java/net/anwiba/commons/reference/IResourceReference.java");
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UriResourceReference.class));
+    assertThat(resourceReference, instanceOf(PathResourceReference.class));
     assertThat(
         ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
         equalTo(
-            new File("./src/main/java/net/anwiba/commons/resource/reference/IResourceReference.java")
+            new File("./src/main/java/net/anwiba/commons/reference/IResourceReference.java")
                 .toURI()
                 .toURL()
                 .toExternalForm()));
     assertConnection(resourceReference);
+  }
+
+  @Test
+  public void ToString() throws CreationException, MalformedURLException, URISyntaxException {
+    assertThat(
+        toString(this.factory.create("file:./src/main/java/net/anwiba/commons/reference/IResourceReference.java")),
+        equalTo("./src/main/java/net/anwiba/commons/reference/IResourceReference.java"));
+    assertThat(
+        toString(this.factory.create(new File("./src/main/java/net/anwiba/commons/reference/IResourceReference.java"))),
+        equalTo("./src/main/java/net/anwiba/commons/reference/IResourceReference.java"));
+    assertThat(
+        toString(
+            this.factory.create(Paths.get("./src/main/java/net/anwiba/commons/reference/IResourceReference.java"))),
+        equalTo("./src/main/java/net/anwiba/commons/reference/IResourceReference.java"));
+    assertThat(
+        toString(this.factory.create("file:///Program Files (x86)/temp/hallo.txt")),
+        equalTo("/Program Files (x86)/temp/hallo.txt"));
+    assertThat(
+        toString(this.factory.create(new URL("file:///Program Files (x86)/temp/hallo.txt"))),
+        equalTo("/Program Files (x86)/temp/hallo.txt"));
+    assertThat(
+        toString(this.factory.create(new URI("file:///Program%20Files%20(x86)/temp/hallo.txt"))),
+        equalTo("/Program Files (x86)/temp/hallo.txt"));
+    assertThat(
+        toString(this.factory.create("http://temp/Program Files (x86)/hallo.txt")),
+        equalTo("http://temp/Program Files (x86)/hallo.txt"));
+    assertThat(
+        toString(this.factory.create(new URL("http://temp/Program Files (x86)/hallo.txt"))),
+        equalTo("http://temp/Program Files (x86)/hallo.txt"));
+    assertThat(
+        toString(this.factory.create(new URI("http://temp/Program%20Files%20(x86)/hallo.txt"))),
+        equalTo("http://temp/Program%20Files%20(x86)/hallo.txt"));
+  }
+
+  protected String toString(final IResourceReference resource) {
+    return ResourceReferenceUtilities.toString(resource);
   }
 
   @Test
@@ -167,12 +204,17 @@ public class ResourceReferenceFactoryTest {
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(PathResourceReference.class));
     assertThat(
-        ResourceReferenceUtilities.toString(resourceReference),
+        toString(resourceReference),
         equalTo("/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat"));
     assertThat(
         ResourceReferenceUtilities.getFile(resourceReference).toString(),
         equalTo(
             new File("/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat")
+                .toString()));
+    assertThat(
+        ResourceReferenceUtilities.getPath(resourceReference).toString(),
+        equalTo(
+            Paths.get("/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat")
                 .toString()));
     assertThat(
         ResourceReferenceUtilities.getUrl(resourceReference).toString(),
@@ -190,12 +232,17 @@ public class ResourceReferenceFactoryTest {
     assertThat(resourceReference, notNullValue());
     assertThat(resourceReference, instanceOf(PathResourceReference.class));
     assertThat(
-        ResourceReferenceUtilities.toString(resourceReference),
+        toString(resourceReference),
         equalTo("/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat"));
     assertThat(
         ResourceReferenceUtilities.getFile(resourceReference).toString(),
         equalTo(
             new File("/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat")
+                .toString()));
+    assertThat(
+        ResourceReferenceUtilities.getPath(resourceReference).toString(),
+        equalTo(
+            Paths.get("/Program Files (x86)/data/./gisdata/Deutschland/Uebersicht-Landesweit/d2500_gk3.icat")
                 .toString()));
     assertThat(
         ResourceReferenceUtilities.getUrl(resourceReference).toString(),

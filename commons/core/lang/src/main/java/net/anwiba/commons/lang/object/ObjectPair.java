@@ -22,6 +22,7 @@
 package net.anwiba.commons.lang.object;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ObjectPair<F, S> implements Serializable {
 
@@ -44,5 +45,22 @@ public class ObjectPair<F, S> implements Serializable {
 
   public static <F, S> ObjectPair<F, S> of(final F firstObject, final S secondObject) {
     return new ObjectPair<F, S>(firstObject, secondObject);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(firstObject, secondObject);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    ObjectPair other = (ObjectPair) obj;
+    return Objects.equals(this.firstObject, other.firstObject) && Objects.equals(this.secondObject, other.secondObject);
   }
 }

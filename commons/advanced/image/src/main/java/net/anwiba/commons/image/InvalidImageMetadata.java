@@ -37,7 +37,7 @@ public final class InvalidImageMetadata implements IImageMetadata {
   }
 
   @Override
-  public int getNumberOfComponents() {
+  public int getNumberOfColorComponents() {
     return 0;
   }
 
@@ -64,5 +64,10 @@ public final class InvalidImageMetadata implements IImageMetadata {
   @Override
   public int getTransparency() {
     return -1;
+  }
+
+  @Override
+  public boolean isIndexed() {
+    return false;
   }
 }

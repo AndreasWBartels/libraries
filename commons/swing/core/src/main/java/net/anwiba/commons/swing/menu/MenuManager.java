@@ -21,13 +21,13 @@
  */
 package net.anwiba.commons.swing.menu;
 
-import net.anwiba.commons.utilities.registry.KeyValueRegistry;
-
 import java.text.MessageFormat;
 import java.util.Comparator;
 
 import javax.swing.Box;
 import javax.swing.JMenuBar;
+
+import net.anwiba.commons.utilities.registry.KeyValueRegistry;
 
 public class MenuManager implements IMenuRegistry {
 

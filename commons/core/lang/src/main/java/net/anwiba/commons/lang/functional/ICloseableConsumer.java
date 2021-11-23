@@ -21,8 +21,28 @@
  */
 package net.anwiba.commons.lang.functional;
 
+import java.util.Objects;
+
 public interface ICloseableConsumer<I, O, E extends Exception> extends ICloseable<E> {
 
   public abstract O consume(I object) throws E;
+
+  default ICloseableConsumer<I, O, E> then(IConsumer<I, E> after) {
+    Objects.requireNonNull(after);
+    return new ICloseableConsumer<I, O, E>() {
+
+      @Override
+      public void close() throws E {
+        ICloseableConsumer.this.close();
+      }
+
+      @Override
+      public O consume(I object) throws E {
+        O result = ICloseableConsumer.this.consume(object);
+        after.consume(object);
+        return result;
+      }
+    };
+}
 
 }

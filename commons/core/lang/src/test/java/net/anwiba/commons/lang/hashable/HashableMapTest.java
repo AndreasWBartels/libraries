@@ -22,6 +22,7 @@
 package net.anwiba.commons.lang.hashable;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
@@ -57,15 +58,15 @@ public class HashableMapTest {
     final MapEntry<HashableIdentifier, Object> otherEntry = new MapEntry<>(new HashableIdentifier(), new Object());
     final HashableMap<HashableIdentifier, Object> map = new HashableMap<>();
     final HashMap<HashableIdentifier, Object> otherMap = new HashMap<>();
-    assertThat(map.equals(otherMap), equalTo(true));
-    assertThat(otherMap.equals(map), equalTo(true));
+    assertThat(map, equalTo(otherMap));
+    assertThat(otherMap, equalTo(map));
     map.put(entry.getKey(), entry.getValue());
     map.put(otherEntry.getKey(), otherEntry.getValue());
     otherMap.put(entry.getKey(), entry.getValue());
-    assertThat(map.equals(otherMap), equalTo(false));
-    assertThat(otherMap.equals(map), equalTo(false));
+    assertThat(map, not(equalTo(otherMap)));
+    assertThat(otherMap, not(equalTo(map)));
     otherMap.put(otherEntry.getKey(), otherEntry.getValue());
-    assertThat(map.equals(otherMap), equalTo(true));
-    assertThat(otherMap.equals(map), equalTo(true));
+    assertThat(map, equalTo(otherMap));
+    assertThat(otherMap, equalTo(map));
   }
 }

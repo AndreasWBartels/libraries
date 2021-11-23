@@ -21,10 +21,6 @@
  */
 package net.anwiba.commons.swing.table.action;
 
-import net.anwiba.commons.swing.table.IObjectTableModel;
-import net.anwiba.commons.swing.table.ISelectionIndexModel;
-import net.anwiba.commons.utilities.collection.IterableUtilities;
-
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +28,10 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+
+import net.anwiba.commons.swing.table.IObjectTableModel;
+import net.anwiba.commons.swing.table.ISelectionIndexModel;
+import net.anwiba.commons.utilities.collection.IterableUtilities;
 
 @SuppressWarnings("serial")
 public final class RemoveTableRowAction<T> extends AbstractAction {

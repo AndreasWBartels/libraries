@@ -25,10 +25,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,11 +40,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.util.concurrent.TimeUnit;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.reference.io.IRandomInputAccess;
+import net.anwiba.commons.reference.io.IRandomOutputAccess;
+import net.anwiba.commons.reference.io.IStreamConnector;
+import net.anwiba.commons.reference.io.RandomFileInputAccess;
+import net.anwiba.commons.reference.io.RandomFileOutputAccess;
+import net.anwiba.commons.reference.utilities.ContentType;
 import net.anwiba.commons.reference.utilities.IoUtilities;
+import net.anwiba.commons.reference.utilities.PathUtilities;
 import net.anwiba.commons.reference.utilities.UriToUrlConverter;
 import net.anwiba.commons.reference.utilities.UrlStreamConnector;
 import net.anwiba.commons.reference.utilities.UrlToUriConverter;
@@ -212,7 +223,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
   }
 
   @Override
-  public boolean exsits(final IResourceReference resourceReference) {
+  public boolean exists(final IResourceReference resourceReference) {
     if (resourceReference == null) {
       return false;
     }
@@ -557,11 +568,16 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       private String getContentType(final Path path) {
-        try {
-          return Files.probeContentType(path);
-        } catch (final IOException exception) {
-          return "application/octet-stream"; //$NON-NLS-1$
-        }
+        return ContentType.getByFileExtension(PathUtilities.getExtension(path))
+            .convert(m -> m.toString())
+            .getOr(() -> {
+              try {
+                String contentType = Files.probeContentType(path);
+                return Optional.of(contentType).getOr(() -> "application/octet-stream");
+              } catch (final IOException exception) {
+                return "application/octet-stream"; //$NON-NLS-1$
+              }
+            });
       }
     };
     return resourceReference.accept(visitor);
@@ -573,48 +589,228 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
   }
 
   @Override
-  public long lastModified(final IResourceReference resourceReference) throws IOException {
-    final IResourceReferenceVisitor<Long, IOException> visitor = new IResourceReferenceVisitor<>() {
+  public FileTime lastModified(final IResourceReference resourceReference) throws IOException {
+    final IResourceReferenceVisitor<FileTime, IOException> visitor = new IResourceReferenceVisitor<>() {
 
       @Override
-      public Long visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
-        return Long.valueOf(fileResourceReference.getFile().lastModified());
+      public FileTime visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
+        return lastModified(fileResourceReference.getFile().toPath());
       }
 
       @Override
-      public Long visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+      public FileTime visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
         try {
           if (isFileSystemResource(urlResourceReference)) {
-            return Long.valueOf(getFile(urlResourceReference).lastModified());
+            return lastModified(getPath(urlResourceReference));
           }
-          return Long.valueOf(-1);
+          return FileTime.from(0, TimeUnit.SECONDS);
         } catch (URISyntaxException e) {
           throw new IOException(e.getMessage(), e);
         }
       }
 
       @Override
-      public Long visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+      public FileTime visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
         try {
           if (isFileSystemResource(uriResourceReference)) {
-            return Long.valueOf(getFile(uriResourceReference).lastModified());
+            return lastModified(getPath(uriResourceReference));
           }
-          return Long.valueOf(-1);
+          return FileTime.from(0, TimeUnit.SECONDS);
         } catch (URISyntaxException e) {
           throw new IOException(e.getMessage(), e);
         }
       }
 
       @Override
-      public Long visitMemoryResource(final MemoryResourceReference memoryResourceReference) throws IOException {
-        return Long.valueOf(memoryResourceReference.getTimeStamp().toInstant().toEpochMilli());
+      public FileTime visitMemoryResource(final MemoryResourceReference memoryResourceReference)
+          throws IOException {
+        return memoryResourceReference.creationTime();
       }
 
       @Override
-      public Long visitPathResource(final PathResourceReference pathResourceReference) throws IOException {
-        return Long.valueOf(Files.getLastModifiedTime(pathResourceReference.getPath()).toMillis());
+      public FileTime visitPathResource(final PathResourceReference pathResourceReference) throws IOException {
+        return lastModified(pathResourceReference.getPath());
+      }
+
+      private FileTime lastModified(final Path path) throws IOException {
+        return Files.getLastModifiedTime(path);
       }
     };
-    return resourceReference.accept(visitor).longValue();
+    return resourceReference.accept(visitor);
+  }
+
+  @Override
+  public FileTime lastAccessed(final IResourceReference resourceReference) throws IOException {
+    final IResourceReferenceVisitor<FileTime, IOException> visitor = new IResourceReferenceVisitor<>() {
+
+      @Override
+      public FileTime visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
+        return visitPathResource(new PathResourceReference(fileResourceReference.getFile().toPath()));
+      }
+
+      @Override
+      public FileTime visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+        try {
+          if (isFileSystemResource(urlResourceReference)) {
+            return visitFileResource(new FileResourceReference(getFile(urlResourceReference)));
+          }
+          return FileTime.from(0, TimeUnit.SECONDS);
+        } catch (URISyntaxException e) {
+          throw new IOException(e.getMessage(), e);
+        }
+      }
+
+      @Override
+      public FileTime visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+        try {
+          if (isFileSystemResource(uriResourceReference)) {
+            return visitFileResource(new FileResourceReference(getFile(uriResourceReference)));
+          }
+          return FileTime.from(0, TimeUnit.SECONDS);
+        } catch (URISyntaxException e) {
+          throw new IOException(e.getMessage(), e);
+        }
+      }
+
+      @Override
+      public FileTime visitMemoryResource(final MemoryResourceReference memoryResourceReference)
+          throws IOException {
+        return memoryResourceReference.creationTime();
+      }
+
+      @Override
+      public FileTime visitPathResource(final PathResourceReference pathResourceReference) throws IOException {
+        return lastAccessed(pathResourceReference.getPath());
+      }
+
+      private FileTime lastAccessed(final Path path) throws IOException {
+        return Files.readAttributes(path, BasicFileAttributes.class).lastAccessTime();
+      }
+    };
+    return resourceReference.accept(visitor);
+  }
+
+  @Override
+  public FileTime created(final IResourceReference resourceReference) throws IOException {
+    final IResourceReferenceVisitor<FileTime, IOException> visitor = new IResourceReferenceVisitor<>() {
+
+      @Override
+      public FileTime visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
+        return visitPathResource(new PathResourceReference(fileResourceReference.getFile().toPath()));
+      }
+
+      @Override
+      public FileTime visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+        try {
+          if (isFileSystemResource(urlResourceReference)) {
+            return visitFileResource(new FileResourceReference(getFile(urlResourceReference)));
+          }
+          return FileTime.from(0, TimeUnit.SECONDS);
+        } catch (URISyntaxException e) {
+          throw new IOException(e.getMessage(), e);
+        }
+      }
+
+      @Override
+      public FileTime visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+        try {
+          if (isFileSystemResource(uriResourceReference)) {
+            return visitFileResource(new FileResourceReference(getFile(uriResourceReference)));
+          }
+          return FileTime.from(0, TimeUnit.SECONDS);
+        } catch (URISyntaxException e) {
+          throw new IOException(e.getMessage(), e);
+        }
+      }
+
+      @Override
+      public FileTime visitMemoryResource(final MemoryResourceReference memoryResourceReference)
+          throws IOException {
+        return memoryResourceReference.creationTime();
+      }
+
+      @Override
+      public FileTime visitPathResource(final PathResourceReference pathResourceReference) throws IOException {
+        return created(pathResourceReference.getPath());
+      }
+
+      private FileTime created(final Path path) throws IOException {
+        return Files.readAttributes(path, BasicFileAttributes.class).creationTime();
+      }
+
+    };
+    return resourceReference.accept(visitor);
+  }
+
+  @Override
+  public IResourceReference toInMemoryReference(final IResourceReference resourceReference) throws IOException {
+    return toInMemoryReference(resourceReference, getContentType(resourceReference), ENCODING);
+  }
+
+  @Override
+  public IResourceReference
+      toInMemoryReference(final IResourceReference resourceReference, final String contentType, final String encoding)
+          throws IOException {
+    final IResourceReferenceVisitor<IResourceReference, IOException> visitor = new IResourceReferenceVisitor<>() {
+
+      @Override
+      public IResourceReference visitFileResource(final FileResourceReference fileResourceReference)
+          throws IOException {
+        return copyTo(fileResourceReference);
+      }
+
+      @Override
+      public IResourceReference visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+        return copyTo(urlResourceReference);
+      }
+
+      @Override
+      public IResourceReference visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+        return copyTo(uriResourceReference);
+      }
+
+      @Override
+      public IResourceReference visitMemoryResource(final MemoryResourceReference memoryResourceReference)
+          throws IOException {
+        return memoryResourceReference;
+      }
+
+      @Override
+      public IResourceReference visitPathResource(final PathResourceReference pathResourceReference)
+          throws IOException {
+        return copyTo(pathResourceReference);
+      }
+
+      private IResourceReference copyTo(final IResourceReference reference) throws IOException {
+        try (InputStream stream = openInputStream(resourceReference)) {
+          return ResourceReferenceHandler.this.factory.create(IoUtilities.toByteArray(stream), contentType, encoding);
+        }
+      }
+
+    };
+    return resourceReference.accept(visitor);
+  }
+
+  @Override
+  public boolean canAccessRandom(final IResourceReference resourceReference) {
+    return isFileSystemResource(resourceReference);
+  }
+
+  @Override
+  public IRandomInputAccess getRandomInputAccess(final IResourceReference resourceReference) throws IOException {
+    try {
+      return new RandomFileInputAccess(new RandomAccessFile(getFile(resourceReference), "r"));
+    } catch (FileNotFoundException | URISyntaxException exception) {
+      throw new IOException(exception.getMessage(), exception);
+    }
+  }
+
+  @Override
+  public IRandomOutputAccess getRandomOutputAccess(final IResourceReference resourceReference) throws IOException {
+    try {
+      return new RandomFileOutputAccess(new RandomAccessFile(getFile(resourceReference), "rw"));
+    } catch (FileNotFoundException | URISyntaxException exception) {
+      throw new IOException(exception.getMessage(), exception);
+    }
   }
 }

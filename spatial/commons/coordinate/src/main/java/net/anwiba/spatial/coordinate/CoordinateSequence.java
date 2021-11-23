@@ -23,11 +23,13 @@
 package net.anwiba.spatial.coordinate;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class CoordinateSequence implements ICoordinateSequence {
 
   private static final long serialVersionUID = 1L;
   private final ICoordinateSequenceSegment segment;
+  private int hashcode = -1;
 
   CoordinateSequence(final ICoordinateSequenceSegment coordinateSequenceSegment) {
     this.segment = coordinateSequenceSegment;
@@ -155,4 +157,25 @@ public class CoordinateSequence implements ICoordinateSequence {
   public boolean isCompouned() {
     return false;
   }
+
+  @Override
+  public int hashCode() {
+    if (hashcode  == -1) {
+      hashcode = Objects.hash(segment);
+    }
+    return hashcode;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    CoordinateSequence other = (CoordinateSequence) obj;
+    return Objects.equals(this.segment, other.segment);
+  }
+
 }

@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.swing.filechooser;
 
+import javax.swing.JFileChooser;
+
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.preferences.UserPreferencesFactory;
-
-import javax.swing.JFileChooser;
 
 public class FileChooserPanelFactory {
 

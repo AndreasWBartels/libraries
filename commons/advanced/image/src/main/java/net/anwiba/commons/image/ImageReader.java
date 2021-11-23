@@ -25,28 +25,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.anwiba.commons.http.IHttpRequestExecutorFactory;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.reference.IResourceReference;
-import net.anwiba.commons.reference.IResourceReferenceHandler;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public final class ImageReader implements IImageReader {
 
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
       .getLogger(ImageReader.class);
-  private final IResourceReferenceHandler handler;
-  private final IHttpRequestExecutorFactory httpRequestExcecutorFactory;
   private final IImageContainerFactory imageContainerFactory;
 
-  public ImageReader(
-      final IImageContainerFactory imageContainerFactory,
-      final IResourceReferenceHandler handler,
-      final IHttpRequestExecutorFactory httpRequestExcecutorFactory) {
+  public ImageReader(final IImageContainerFactory imageContainerFactory) {
     super();
     this.imageContainerFactory = imageContainerFactory;
-    this.handler = handler;
-    this.httpRequestExcecutorFactory = httpRequestExcecutorFactory;
   }
 
   @Override

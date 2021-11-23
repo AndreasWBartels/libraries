@@ -44,4 +44,6 @@ public interface IMessageBuilder {
 
   IMessageBuilder setMessage(IMessage message);
 
+  IMessageBuilder setGoal(Object nature);
+
 }

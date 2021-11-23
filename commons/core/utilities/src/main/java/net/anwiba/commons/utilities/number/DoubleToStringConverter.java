@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.utilities.number;
 
-import net.anwiba.commons.lang.functional.IConverter;
-
 import java.text.DecimalFormat;
+
+import net.anwiba.commons.lang.functional.IConverter;
 
 public final class DoubleToStringConverter implements IConverter<Double, String, RuntimeException> {
 

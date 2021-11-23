@@ -65,10 +65,11 @@ public class ObjectListTableConfigurationBuilder<T> {
   private IKeyListenerFactory<T> keyListenerFactory;
   private IColumToStringConverter columnToStringConverter;
   private int autoRizeMode = -1;
-  private IStringSubstituter toolTipSubstituter = s -> StringUtilities.substitute(s, 8, 120);
+  private IStringSubstituter toolTipSubstituter = s -> StringUtilities.reduce(s, 8, 120);
   private IMouseListenerFactory<T> headerMouseListenerFactory;
   private IObjectDistributor<IAcceptor<T>> rowFilterDistributor;
   private IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryHeaderPanelFactory;
+  private IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryFooterPanelFactory;
 
   public IObjectListTableConfiguration<T> build() {
     final ITableActionConfiguration<T> actionConfiguration = new TableActionConfiguration<>(this.actionFactories);
@@ -88,6 +89,7 @@ public class ObjectListTableConfigurationBuilder<T> {
         actionConfiguration,
         textFieldActionConfiguration,
         this.accessoryHeaderPanelFactory,
+        this.accessoryFooterPanelFactory,
         this.textFieldKeyListenerFactory);
   }
 
@@ -257,6 +259,13 @@ public class ObjectListTableConfigurationBuilder<T> {
       setAccessoryHeaderPanelFactory(
           final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryHeaderPanelFactory) {
     this.accessoryHeaderPanelFactory = accessoryHeaderPanelFactory;
+    return this;
+  }
+
+  public ObjectListTableConfigurationBuilder<T>
+      setAccessoryFooterPanelFactory(
+          final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryFooterPanelFactory) {
+    this.accessoryFooterPanelFactory = accessoryFooterPanelFactory;
     return this;
   }
 }

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Automatic-Module-Name: net.anwiba.eclipse.project.dependencies
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.1.121
+Bundle-Version: 1.1.158
 Bundle-Name: Dependencies
 Bundle-SymbolicName: net.anwiba.eclipse.project.dependencies;singleton:=true
 Bundle-Activator: net.anwiba.eclipse.project.dependency.plugin.DependenciesPlugin

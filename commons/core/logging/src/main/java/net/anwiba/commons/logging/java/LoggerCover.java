@@ -34,31 +34,21 @@ class LoggerCover extends java.util.logging.Logger implements ILogger {
   }
 
   @Override
-  public void log(final Level level, final String message, final Throwable throwable) {
-    super.log(level, message, throwable);
+  public boolean isLoggable(final ILevel level) {
+    return isLoggable(JavaLogging.create(level));
   }
 
   @Override
-  public void log(final ILevel level, final IMessageFactory factory) {
+  public void doLog(ILevel level, IMessageFactory factory, Throwable throwable) {
     if (!isLoggable(level)) {
       return;
     }
-    log(level, factory.create());
+    log(JavaLogging.create(level), factory.create(), throwable);
   }
 
   @Override
-  public void log(final ILevel level, final String message) {
-    log(level, message, null);
-  }
-
-  @Override
-  public void log(final ILevel level, final String message, final Throwable throwable) {
-    super.log(JavaLogging.create(level), message, throwable);
-  }
-
-  @Override
-  public boolean isLoggable(final ILevel level) {
-    return isLoggable(JavaLogging.create(level));
+  public void log(final Level level, final String message, final Throwable throwable) {
+    super.log(level, message, throwable);
   }
 
 }

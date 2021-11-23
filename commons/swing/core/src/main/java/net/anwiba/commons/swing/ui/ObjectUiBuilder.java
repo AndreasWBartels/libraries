@@ -79,4 +79,8 @@ public class ObjectUiBuilder<T> {
       }
     };
   }
+
+  public static <T> ObjectUiBuilder<T>  create() {
+    return new ObjectUiBuilder<T>();
+  }
 }

@@ -45,4 +45,32 @@ public interface IBooleanDistributor extends IBooleanProvider, IObjectChangedNot
     return new OrAggregatedBooleanDistributor(models);
   }
 
+  default IBooleanDistributor not() {
+    final IBooleanDistributor model = this;
+    return new IBooleanDistributor() {
+      
+      List<IChangeableObjectListener> listeners = new ArrayList<>(); 
+      @Override
+      public void removeChangeListeners() {
+        listeners.forEach(model::removeChangeListener);
+      }
+      
+      @Override
+      public void removeChangeListener(IChangeableObjectListener listener) {
+        listeners.remove(listener);
+        model.removeChangeListener(listener);
+      }
+      
+      @Override
+      public void addChangeListener(IChangeableObjectListener listener) {
+        listeners.add(listener);
+        model.addChangeListener(listener);
+      }
+      
+      @Override
+      public boolean isTrue() {
+        return model.notTrue();
+      }
+    };
+  }
 }

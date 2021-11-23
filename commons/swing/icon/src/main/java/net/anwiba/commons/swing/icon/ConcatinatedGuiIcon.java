@@ -22,7 +22,7 @@
 
 package net.anwiba.commons.swing.icon;
 
-import static net.anwiba.commons.swing.icon.GuiIconDecorator.*;
+import static net.anwiba.commons.swing.icon.GuiIconDecorator.add;
 
 import javax.swing.ImageIcon;
 
@@ -68,6 +68,10 @@ public class ConcatinatedGuiIcon implements IGuiIcon {
   @Override
   public boolean isDecorator() {
     return false;
+  }
+
+  public static IGuiIcon of(final IGuiIcon icon, final IGuiIcon... additionalIcons) {
+    return new ConcatinatedGuiIcon(icon, additionalIcons);
   }
 
 }

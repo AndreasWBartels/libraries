@@ -31,9 +31,8 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Objects;
 
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
-
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
@@ -56,16 +55,12 @@ public class ResourceReferenceUtilities {
 
       @Override
       public File visitUrlResource(final UrlResourceReference urlResourceReference) throws URISyntaxException {
-        return new File(urlToUriConverter.convert(urlResourceReference.getUrl()));
+        return convert(Paths.get(urlToUriConverter.convert(urlResourceReference.getUrl())));
       }
 
       @Override
       public File visitUriResource(final UriResourceReference uriResourceReference) {
-        try {
-          return new File(uriResourceReference.getUri());
-        } catch (IllegalArgumentException e) {
-          throw new IllegalArgumentException(uriResourceReference.getUri().toString(), e);
-        }
+        return convert(Paths.get(uriResourceReference.getUri()));
       }
 
       @Override
@@ -79,8 +74,12 @@ public class ResourceReferenceUtilities {
       }
 
       @Override
-      public File visitPathResource(final PathResourceReference pathResourceReference) throws URISyntaxException {
-        return pathResourceReference.getPath().toFile();
+      public File visitPathResource(final PathResourceReference pathResourceReference) {
+        return convert(pathResourceReference.getPath());
+      }
+
+      private File convert(final Path path) {
+        return path.toFile();
       }
     });
   }
@@ -113,7 +112,7 @@ public class ResourceReferenceUtilities {
       }
 
       @Override
-      public Path visitPathResource(final PathResourceReference pathResourceReference) throws URISyntaxException {
+      public Path visitPathResource(final PathResourceReference pathResourceReference) {
         return pathResourceReference.getPath();
       }
     });
@@ -177,7 +176,7 @@ public class ResourceReferenceUtilities {
 
       @Override
       public URI visitFileResource(final FileResourceReference fileResourceReference) {
-        return fileResourceReference.getFile().toURI();
+        return fileResourceReference.getFile().toPath().toAbsolutePath().toUri();
       }
 
       @Override
@@ -187,7 +186,7 @@ public class ResourceReferenceUtilities {
 
       @Override
       public URI visitPathResource(final PathResourceReference pathResourceReference) throws URISyntaxException {
-        return pathResourceReference.getPath().toUri();
+        return pathResourceReference.getPath().toAbsolutePath().toUri();
       }
     });
   }
@@ -310,7 +309,8 @@ public class ResourceReferenceUtilities {
 
       @Override
       public Boolean visitPathResource(final PathResourceReference pathResourceReference) throws RuntimeException {
-        return Boolean.TRUE;
+        return Boolean
+            .valueOf(Objects.equals(pathResourceReference.getPath().getFileSystem().provider().getScheme(), "file"));
       }
     }).booleanValue();
   }
@@ -319,6 +319,7 @@ public class ResourceReferenceUtilities {
     if (resourceReference == null) {
       throw new IllegalArgumentException();
     }
+    final UriToUrlConverter uriToUrlConverter = new UriToUrlConverter();
     return resourceReference.accept(new IResourceReferenceVisitor<String, RuntimeException>() {
 
       @Override
@@ -333,7 +334,11 @@ public class ResourceReferenceUtilities {
 
       @Override
       public String visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
-        return uriResourceReference.getUri().toString();
+        try {
+          return uriToUrlConverter.convert(uriResourceReference.getUri()).toString();
+        } catch (MalformedURLException exception) {
+          return uriResourceReference.getUri().toString();
+        }
       }
 
       @Override

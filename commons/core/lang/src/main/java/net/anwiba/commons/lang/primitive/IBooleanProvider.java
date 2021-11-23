@@ -27,8 +27,12 @@ public interface IBooleanProvider {
 
   boolean isTrue();
 
-  default boolean not() {
+  default boolean notTrue() {
     return !isTrue();
+  }
+
+  static boolean not(IBooleanProvider provider) {
+    return !provider.isTrue();
   }
 
   default <E extends Exception> void isTrue(final IBlock<E> block) throws E {

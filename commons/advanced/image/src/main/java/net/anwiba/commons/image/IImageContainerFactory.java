@@ -28,17 +28,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.anwiba.commons.reference.IResourceReference;
-import net.anwiba.commons.reference.MemoryResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
 import net.anwiba.commons.reference.utilities.IoUtilities;
 
 public interface IImageContainerFactory {
 
+  final ResourceReferenceFactory resourceReferenceFactory = new ResourceReferenceFactory();
+
   IImageContainer create(IResourceReference resourceReference) throws IOException;
 
   default IImageContainer create(final InputStream inputStream) throws IOException {
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-      return create(new MemoryResourceReference(IoUtilities.toByteArray(inputStream), "image", "UTF-8"));
+      return create(resourceReferenceFactory.create(IoUtilities.toByteArray(inputStream), "image", "UTF-8"));
     }
 
   }
@@ -46,7 +47,7 @@ public interface IImageContainerFactory {
   IImageContainer create(final BufferedImage image);
 
   default IImageContainer create(final File randomAccessFile) throws IOException {
-    return create(new ResourceReferenceFactory().create(randomAccessFile));
+    return create(resourceReferenceFactory.create(randomAccessFile));
   }
 
 }

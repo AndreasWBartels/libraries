@@ -32,12 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IAssimilator;
+import net.anwiba.commons.lang.functional.ICloseable;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
@@ -51,24 +54,32 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
 
   private final IIterable<T, E> iterable;
   private final Class<E> exceptionClass;
+  private final ICloseable<E> closeable;
 
-  SequencedStream(final Class<E> exceptionClass, final IIterable<T, E> iterable) {
+//  SequencedStream(final Class<E> exceptionClass, final IIterable<T, E> iterable) {
+//    this(exceptionClass, iterable, () -> {});
+//  }
+
+  SequencedStream(final Class<E> exceptionClass, final IIterable<T, E> iterable, final ICloseable<E> closeable) {
     this.exceptionClass = exceptionClass;
     this.iterable = iterable;
+    this.closeable = closeable;
   }
 
   @Override
   public <O> IStream<O, E> convert(final IConverter<T, O, E> converter) {
     return new SequencedStream<>(
         this.exceptionClass,
-        new IterableConvertingIterable<>(this.iterable, i -> i != null, converter));
+        new IterableConvertingIterable<>(this.iterable, i -> i != null, converter),
+        this.closeable);
   }
 
   @Override
   public <O> IStream<O, E> convert(final IAggregator<Integer, T, O, E> aggegator) {
     return new SequencedStream<>(
         this.exceptionClass,
-        new IterableCountingIterable<>(this.iterable, i -> i != null, aggegator));
+        new IterableCountingIterable<>(this.iterable, i -> i != null, aggegator),
+        this.closeable);
   }
 
   @Override
@@ -80,9 +91,9 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   @Override
   public IStream<T, E> execute() {
     try {
-      return Streams.of(this.exceptionClass, asList());
+      return Streams.of(this.exceptionClass, asList(), this.closeable);
     } catch (final Exception exception) {
-      return stream(this.exceptionClass, exception);
+      return stream(this.exceptionClass, exception, this.closeable);
     }
   }
 
@@ -90,7 +101,8 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   public IStream<T, E> filter(final IAcceptor<T> acceptor) {
     return new SequencedStream<>(
         this.exceptionClass,
-        new IterableFilteringIterable<>(this.iterable, acceptor));
+        new IterableFilteringIterable<>(this.iterable, acceptor),
+        this.closeable);
   }
 
   @Override
@@ -111,9 +123,9 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
         consumer.consume(t);
         visited.add(t);
       });
-      return Streams.of(this.exceptionClass, visited);
+      return Streams.of(this.exceptionClass, visited, this.closeable);
     } catch (final Exception exception) {
-      return stream(this.exceptionClass, exception);
+      return stream(this.exceptionClass, exception, this.closeable);
     }
   }
 
@@ -125,9 +137,9 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
         assimilator.assimilate(i, t);
         visited.add(t);
       });
-      return Streams.of(this.exceptionClass, visited);
+      return Streams.of(this.exceptionClass, visited, this.closeable);
     } catch (final Exception exception) {
-      return stream(this.exceptionClass, exception);
+      return stream(this.exceptionClass, exception, this.closeable);
     }
   }
 
@@ -139,15 +151,19 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
         assimilator.assimilate(i, t);
         visited.add(t);
       });
-      return Streams.of(this.exceptionClass, visited);
+      return Streams.of(this.exceptionClass, visited, this.closeable);
     } catch (final Exception exception) {
-      return stream(this.exceptionClass, exception);
+      return stream(this.exceptionClass, exception, this.closeable);
     }
   }
 
   @Override
   public IStream<T, E> failed(final ISupplier<Iterable<T>, E> supplier) {
-    return this;
+    try {
+      return Streams.of(this.exceptionClass, supplier.supply(), this.closeable);
+    } catch (final Exception exception) {
+      return stream(this.exceptionClass, exception, this.closeable);
+    }
   }
 
   @Override
@@ -174,6 +190,11 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
+  public boolean foundAny(final IAcceptor<T> acceptor) throws E {
+    return first(acceptor).isAccepted();
+  }
+
+  @Override
   public <O> IOptional<O, E> aggregate(final O identity, final IAggregator<O, T, O, E> aggegator) {
     try {
       return Optional.of(this.exceptionClass, this.iterable.aggregate(identity, aggegator));
@@ -183,15 +204,7 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public Iterable<T> asIterable() throws E {
-    return this.iterable.aggregate(new LinkedList<T>(), (l, t) -> {
-      l.add(t);
-      return l;
-    });
-  }
-
-  @Override
-  public Collection<T> asCollection() throws E {
+  public <O> Collection<O> asCollection() throws E {
     return asList();
   }
 
@@ -214,7 +227,7 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public IObjectList<T> asObjectList() throws E {
+  public <O> IObjectList<O> asObjectList() throws E {
     return new ObjectList<>(asList());
   }
 
@@ -239,9 +252,9 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
     try {
       final List<T> list = asList();
       Collections.reverse(list);
-      return Streams.of(this.exceptionClass, list);
+      return Streams.of(this.exceptionClass, list, this.closeable);
     } catch (final Exception exception) {
-      return stream(this.exceptionClass, exception);
+      return stream(this.exceptionClass, exception, this.closeable);
     }
   }
 
@@ -249,15 +262,17 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   public <O> IStream<O, E> flat(final IConverter<T, Iterable<O>, E> converter) {
     return new SequencedStream<>(
         this.exceptionClass,
-        new IterableFlattingIterable<>(this.iterable, i -> i != null, converter));
+        new IterableFlattingIterable<>(this.iterable, i -> i != null, converter),
+        this.closeable);
   }
 
   @SuppressWarnings("unchecked")
   private static <T, E extends Exception> IStream<T, E> stream(
       final Class<E> exceptionClass,
-      final Exception exception) {
+      final Exception exception,
+      final ICloseable<E> closeable) {
     if (exceptionClass.isInstance(exception)) {
-      return new FailedStream<>(exceptionClass, (E) exception);
+      return new FailedStream<>(exceptionClass, (E) exception, closeable);
     }
     if (exception instanceof RuntimeException) {
       throw (RuntimeException) exception;
@@ -292,4 +307,42 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   public boolean isSuccessful() {
     return true;
   }
+
+  @Override
+  public Iterable<T> toIterable() throws E {
+    return this.iterable.aggregate(new LinkedList<T>(), (l, t) -> {
+      l.add(t);
+      return l;
+    });
+  }
+
+  @Override
+  public <O> Stream<O> asStream() throws E {
+    return toStream().map(o -> (O) o);
+  }
+
+  @Override
+  public Stream<T> toStream() throws E {
+    final Stream<T> stream = StreamSupport.stream(this.iterable.spliterator(), false);
+    stream.onClose(() -> {
+      if (this.closeable == null) {
+        return;
+      }
+      try {
+        this.closeable.close();
+      } catch (Exception exception) {
+        throw new RuntimeException(exception.getMessage(), exception);
+      }
+    });
+    return stream;
+  }
+
+  @Override
+  public void close() throws E {
+    if (this.closeable == null) {
+      return;
+    }
+    this.closeable.close();
+  }
+
 }

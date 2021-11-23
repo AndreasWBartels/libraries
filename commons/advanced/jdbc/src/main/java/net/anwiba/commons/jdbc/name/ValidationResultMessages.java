@@ -25,7 +25,7 @@ import net.anwiba.commons.nls.NLS;
 
 public class ValidationResultMessages extends NLS {
 
-  public static String containts_whitespace_character;
+  public static String contains_whitespace_character;
   public static String null_or_empty_string_value;
   public static String UnkownCoordinateReferenceSystemValidator_unkown_srid;
   public static String whitespace_at_character;

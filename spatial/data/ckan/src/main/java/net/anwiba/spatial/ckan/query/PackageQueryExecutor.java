@@ -66,6 +66,7 @@ public class PackageQueryExecutor implements IPackageQueryExecutor {
     try {
       final IResultProducer<PackageSearchResultResponse> responseProducer = (
           c,
+          url,
           statusCode,
           statusMessage,
           contentType,
@@ -124,6 +125,7 @@ public class PackageQueryExecutor implements IPackageQueryExecutor {
     try {
       final IResultProducer<PackageShowResultResponse> responseProducer = (
           c,
+          url,
           statusCode,
           statusMessage,
           contentType,

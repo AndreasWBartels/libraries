@@ -23,10 +23,12 @@ package net.anwiba.commons.swing.exception;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.MessageFormat;
+import java.util.Objects;
 
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.utilities.OperationSystemUtilities;
 
 public class CentralExceptionHandling {
 
@@ -44,6 +46,23 @@ public class CentralExceptionHandling {
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
       @Override
       public void uncaughtException(final Thread t, final Throwable e) {
+        // hack for gtk+ and html tooltip exception https://bugs.openjdk.java.net/browse/JDK-8262085
+//      Caused by: java.lang.IllegalArgumentException: Width and height must be >= 0
+//          at javax.swing.plaf.basic.BasicHTML.getHTMLBaseline(BasicHTML.java:91) ~[?:?]
+//          at javax.swing.plaf.metal.MetalToolTipUI.paint(MetalToolTipUI.java:126) ~[?:?]
+//          at javax.swing.plaf.ComponentUI.update(ComponentUI.java:161) ~[?:?]
+        StackTraceElement[] stackTraceElements = e.getStackTrace();
+        if (OperationSystemUtilities.isLinux() && e instanceof IllegalArgumentException
+            && t.getClass().getName().endsWith("EventDispatchThread")
+            && Objects.equals(e.getMessage(), "Width and height must be >= 0")
+            && stackTraceElements.length > 1
+            && Objects.equals(stackTraceElements[0].getClassName(), "javax.swing.plaf.basic.BasicHTML")
+            && Objects.equals(stackTraceElements[0].getMethodName(), "getHTMLBaseline")) {
+          if (logger.isLoggable(ILevel.FINE)) {
+            handle(new RuntimeException(MessageFormat.format("Uncaught exception on thread [{0}]", t.getName()), e)); //$NON-NLS-1$
+          }
+          return;
+        }
         handle(new RuntimeException(MessageFormat.format("Uncaught exception on thread [{0}]", t.getName()), e)); //$NON-NLS-1$
       }
     });

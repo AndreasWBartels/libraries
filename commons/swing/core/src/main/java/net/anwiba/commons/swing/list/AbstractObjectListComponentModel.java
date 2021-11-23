@@ -60,6 +60,22 @@ public abstract class AbstractObjectListComponentModel<T> extends AbstractListMo
     }
   }
 
+  public void add(final Iterable<T> objects) {
+    if (!objects.iterator().hasNext()) {
+      return;
+    }
+    int rows = 0;
+    synchronized (this) {
+      rows = getSize();
+      for (T object : objects) {
+        this.indexByobjectMap.put(object, Integer.valueOf(getSize()));
+        this.objects.add(object);
+      }
+    }
+    fireIntervalAdded(this, rows, getSize() - 1);
+    fireObjectAdded(objects);
+  }
+
   public void add(@SuppressWarnings({ "unchecked" }) final T... objects) {
 
     if (objects.length == 0) {

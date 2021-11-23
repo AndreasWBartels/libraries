@@ -28,6 +28,11 @@ public interface IAcceptor<T> {
 
   boolean accept(T value);
 
+  static <T> IAcceptor<T> not(IAcceptor<T> acceptor) {
+    Objects.requireNonNull(acceptor);
+    return acceptor.not();
+  }
+
   default IAcceptor<T> not() {
     return (t) -> !accept(t);
   }

@@ -23,7 +23,7 @@ package net.anwiba.commons.utilities.io.url;
 
 import java.util.List;
 
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.IParameters;
 
 public interface IUrl {
 

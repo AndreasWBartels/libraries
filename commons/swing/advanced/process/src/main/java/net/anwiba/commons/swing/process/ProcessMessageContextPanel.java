@@ -25,8 +25,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 import net.anwiba.commons.message.IMessage;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.swing.utilities.SpringLayoutUtilities;
 
 public class ProcessMessageContextPanel extends JPanel {
@@ -48,17 +47,22 @@ public class ProcessMessageContextPanel extends JPanel {
     processField.setColumns(25);
     processField.setEditable(false);
     final IMessage message = context.getMessage();
+    final JTextField timeField = new JTextField(message.getTimeStamp().toString());
+    timeField.setColumns(25);
+    timeField.setEditable(false);
     final JTextField messageField = new JTextField(message.getText());
     messageField.setColumns(25);
     messageField.setEditable(false);
     head.add(new JLabel(ProcessMessages.PROCESS + ":")); //$NON-NLS-1$
     head.add(processField);
+    head.add(new JLabel("Time" + ":")); //$NON-NLS-1$
+    head.add(timeField);
     head.add(new JLabel(ProcessMessages.MESSAGE + ":")); //$NON-NLS-1$
     head.add(messageField);
     head.add(new JLabel(ProcessMessages.DETAIL + ":")); //$NON-NLS-1$
     head.add(new JPanel());
     head.setLayout(new SpringLayout());
-    SpringLayoutUtilities.makeCompactGrid(head, 2, 3, 6, 6, 6, 6);
+    SpringLayoutUtilities.makeCompactGrid(head, 2, 4, 6, 6, 6, 6);
     final JPanel contentPanel = new JPanel();
     contentPanel.setLayout(new BorderLayout());
     contentPanel.add(head, BorderLayout.NORTH);
@@ -72,9 +76,7 @@ public class ProcessMessageContextPanel extends JPanel {
     if (message.getThrowable() != null) {
       final JPanel body = new JPanel(new BorderLayout());
       body.add(createDetailPane(message.getDescription()), BorderLayout.NORTH);
-      final StringWriter stringWriter = new StringWriter();
-      message.getThrowable().printStackTrace(new PrintWriter(stringWriter));
-      body.add(createDetailPane(stringWriter.toString()), BorderLayout.CENTER);
+      body.add(createDetailPane(Message.toDetailInfo(message.getThrowable())), BorderLayout.CENTER);
       return body;
     }
     final JPanel body = new JPanel(new GridLayout(1, 1));

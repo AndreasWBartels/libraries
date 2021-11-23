@@ -35,6 +35,8 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public class StringUtilities {
@@ -448,12 +450,15 @@ public class StringUtilities {
     return counter;
   }
 
-  public static String substitute(final String string, final int maximumNumberOfRows, final int maximumColumnLength) {
+  public static String reduce(final String string, final int maximumNumberOfRows, final int maximumColumnLength) {
     if (string == null) {
       return null;
     }
+    if (string.length() < maximumColumnLength && string.indexOf("\n") < 0) {
+      return string;
+    }
     final StringBuilder builder = new StringBuilder();
-    builder.append("<html>"); //$NON-NLS-1$
+    builder.append("<html><body>"); //$NON-NLS-1$
     final int stringLength = string.length();
     final int maximumLength = Math.min(maximumColumnLength * maximumNumberOfRows, stringLength);
     int endIndex = 0;
@@ -470,7 +475,7 @@ public class StringUtilities {
         if (maximumLength != stringLength) {
           builder.append("..."); //$NON-NLS-1$
         }
-        builder.append("</html>"); //$NON-NLS-1$
+        builder.append("</body></html>"); //$NON-NLS-1$
         return builder.toString();
       }
       builder.append("<br>"); //$NON-NLS-1$
@@ -478,7 +483,7 @@ public class StringUtilities {
     if (maximumLength != stringLength) {
       builder.append("..."); //$NON-NLS-1$
     }
-    builder.append("</html>"); //$NON-NLS-1$
+    builder.append("</body></html>"); //$NON-NLS-1$
     return builder.toString();
   }
 
@@ -486,8 +491,9 @@ public class StringUtilities {
     return new HashSet<>(Arrays.asList(values)).contains(value);
   }
 
-  public static byte[] toBytes(final String str) {
-    // TODO Auto-generated method stub
-    return null;
+  @SuppressWarnings("deprecation")
+  public static String
+      wrap(final String str, final int wrapLength, final String newLineStr, final boolean wrapLongWords) {
+    return WordUtils.wrap(str, wrapLength, newLineStr, wrapLongWords);
   }
 }

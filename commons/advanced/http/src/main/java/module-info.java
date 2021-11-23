@@ -23,12 +23,13 @@ module net.anwiba.commons.http {
   exports net.anwiba.commons.http;
   exports net.anwiba.commons.http.apache;
 
-  requires java.activation;
+  requires jakarta.activation;
+  requires net.anwiba.commons.cache.resource;
   requires net.anwiba.commons.lang;
   requires net.anwiba.commons.logging;
   requires net.anwiba.commons.reference;
   requires net.anwiba.commons.thread;
   requires net.anwiba.commons.utilities;
-  requires org.apache.httpcomponents.httpclient;
-  requires org.apache.httpcomponents.httpcore;
+  requires org.apache.httpcomponents.client5.httpclient5;
+  requires org.apache.httpcomponents.core5.httpcore5;
 }

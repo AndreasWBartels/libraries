@@ -94,6 +94,8 @@ public interface IObjectTableBuilder<T> {
 
   IObjectTableBuilder<T> addDoubleColumn(String title, IFunction<T, Double, RuntimeException> provider, int size);
 
+  IObjectTableBuilder<T> addBooleanColumn(String title, IFunction<T, Boolean, RuntimeException> provider, int size);
+
   IObjectTableBuilder<T> addSortableStringColumn(String title,
       IFunction<T, String, RuntimeException> provider,
       int size);
@@ -148,5 +150,8 @@ public interface IObjectTableBuilder<T> {
 
   IObjectTableBuilder<T> setAccessoryHeaderPanelFactory(
       IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryHeaderPanelFactory);
+
+  IObjectTableBuilder<T> setAccessoryFooterPanelFactory(
+      IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryFooterPanelFactory);
 
 }

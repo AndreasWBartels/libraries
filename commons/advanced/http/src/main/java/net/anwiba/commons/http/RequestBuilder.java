@@ -28,17 +28,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.http.HttpHeaders;
-import org.apache.http.protocol.HTTP;
+import org.apache.hc.core5.http.HeaderElements;
+import org.apache.hc.core5.http.HttpHeaders;
 
+import net.anwiba.commons.cache.resource.ILifeTime;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.IClosure;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.Parameter;
+import net.anwiba.commons.lang.parameter.ParametersBuilder;
 import net.anwiba.commons.utilities.io.url.IUrl;
 import net.anwiba.commons.utilities.io.url.parser.UrlParser;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.Parameter;
-import net.anwiba.commons.utilities.parameter.ParametersBuilder;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class RequestBuilder {
@@ -54,6 +55,7 @@ public class RequestBuilder {
   private String mimeType;
   private String userAgent;
   private IAuthentication authentication;
+  private ILifeTime cacheTime;
 
   public static RequestBuilder get(final String urlString) {
     return new RequestBuilder(urlString).get();
@@ -136,6 +138,11 @@ public class RequestBuilder {
     return this;
   }
 
+  public RequestBuilder cacheTime(ILifeTime cacheTime) {
+    this.cacheTime = cacheTime;
+    return this;
+  }
+
   public IRequest build() throws CreationException {
 //    final String encoded = this.urlString.replace(" ", "%20"); //$NON-NLS-1$//$NON-NLS-2$
     final IUrl uri = new UrlParser().parse(this.urlString);
@@ -146,8 +153,8 @@ public class RequestBuilder {
             m -> this.headerParameters.add(
                 Parameter.of(
                     HttpHeaders.CONNECTION,
-                    HttpConnectionMode.CLOSE.equals(this.httpConnectionMode) ? HTTP.CONN_CLOSE
-                        : HTTP.CONN_KEEP_ALIVE)));
+                    HttpConnectionMode.CLOSE.equals(this.httpConnectionMode) ? HeaderElements.CLOSE
+                        : HeaderElements.KEEP_ALIVE)));
     return new Request(
         this.httpMethodType,
         uri.getScheme().stream().collect(Collectors.joining(":")),
@@ -161,7 +168,8 @@ public class RequestBuilder {
         this.inputStreamClosure,
         this.contentLenght,
         this.encoding,
-        this.mimeType);
+        this.mimeType,
+        this.cacheTime);
   }
 
   public RequestBuilder query(final Iterable<IParameter> parameters) {

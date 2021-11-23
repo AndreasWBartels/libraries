@@ -28,7 +28,7 @@ public class DefaultCoordinateDistanceCalculator implements ICoordinateDistanceC
   }
 
   @Override
-  public double calculateDistance(final double x0, final double y0, final double x1, final double y1) {
+  public double calculate(final double x0, final double y0, final double x1, final double y1) {
     final double dx = Math.abs(x1 - x0);
     final double dy = Math.abs(y1 - y0);
     return Math.sqrt(dx * dx + dy * dy);

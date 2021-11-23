@@ -222,6 +222,33 @@ public class InjectionValueProviderBuilderTest {
   public static class FooC implements IFoos {
   }
 
+  public static class FooD implements IFoos {
+
+    private final IFoo foo;
+
+    public FooD(final IFoo foo) {
+      this.foo = foo;
+    }
+
+    public IFoo getFoo() {
+      return this.foo;
+    }
+  }
+
+  public static class FooSupplyer implements IInjectingSupplier<IFoos> {
+
+    private final IFoo foo;
+
+    public FooSupplyer(final IFoo foo) {
+      this.foo = foo;
+    }
+
+    @Override
+    public IFoos supply() {
+      return new FooD(this.foo);
+    }
+  }
+
   IScope scope = new IScope() {
   };
 
@@ -321,6 +348,18 @@ public class InjectionValueProviderBuilderTest {
     final IMau mau = provider.get(binding(IMau.class));
     assertThat(mau.getName(), equalTo("Text"));
     assertThat(mau.getValue(), equalTo(Integer.valueOf(20)));
+  }
+
+  @Test
+  public void injectSupplier() throws CreationException {
+    final InjectionValueProviderBuilder builder = new InjectionValueProviderBuilder(this.scope);
+    builder.set(IFoo.class, FooB.class);
+    builder.setBySupplier(IFoos.class, FooSupplyer.class);
+    final IInjectionValueProvider provider = builder.build();
+    final IFoos foos = provider.get(binding(IFoos.class));
+    assertThat(foos, notNullValue());
+    assertThat(foos, instanceOf(FooD.class));
+    assertThat(((FooD) foos).getFoo(), notNullValue());
   }
 
   @Test

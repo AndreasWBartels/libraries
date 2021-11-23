@@ -21,13 +21,15 @@
  */
 package net.anwiba.commons.image;
 
-public interface IImageMetadata {
+import java.io.Serializable;
+
+public interface IImageMetadata extends Serializable {
 
   float getWidth();
 
   float getHeight();
 
-  int getNumberOfComponents();
+  int getNumberOfColorComponents();
 
   int getNumberOfBands();
 
@@ -36,5 +38,7 @@ public interface IImageMetadata {
   int getDataType();
 
   int getTransparency();
+
+  boolean isIndexed();
 
 }

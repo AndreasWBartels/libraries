@@ -21,8 +21,9 @@
  */
 package net.anwiba.tools.generator.java.bean.factory;
 
-import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
-import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.*;
+import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_ITERABLE;
+import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_STRING;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.createAddIfNullReturnNullClosure;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;

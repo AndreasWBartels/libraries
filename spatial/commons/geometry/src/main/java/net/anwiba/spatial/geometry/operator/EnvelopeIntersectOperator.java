@@ -22,6 +22,9 @@
 // Copyright (c) 2007 by Andreas W. Bartels 
 package net.anwiba.spatial.geometry.operator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.anwiba.spatial.coordinate.CoordinateCalculationException;
 import net.anwiba.spatial.coordinate.CoordinateSequence;
 import net.anwiba.spatial.coordinate.CoordinateSequenceFactory;
@@ -34,9 +37,6 @@ import net.anwiba.spatial.geometry.IGeometryFactory;
 import net.anwiba.spatial.geometry.IGeometryTypeVisitor;
 import net.anwiba.spatial.geometry.IMultiLineString;
 import net.anwiba.spatial.geometry.utilities.GeometryUtilities;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class EnvelopeIntersectOperator {
 

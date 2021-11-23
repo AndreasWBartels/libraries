@@ -57,7 +57,7 @@ public class DemoProcessMessageContextFactory {
       @Override
       public IMessage getMessage() {
         if (type.equals(MessageType.ERROR)) {
-          return new Message("Test", text, new UnknownError(), type); //$NON-NLS-1$
+          return Message.create("Test", text, new UnknownError(), type); //$NON-NLS-1$
         }
         return Message.create("Test", text, type); //$NON-NLS-1$
       }

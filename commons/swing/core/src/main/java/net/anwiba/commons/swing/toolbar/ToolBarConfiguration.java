@@ -26,7 +26,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -72,7 +71,8 @@ public class ToolBarConfiguration {
 
   private final ToolBarDescription description;
 
-  private final KeyValueRegistry<ToolBarItemGroupDescription, ToolBarItemGroupConfiguration> registry = new KeyValueRegistry<>();
+  private final KeyValueRegistry<ToolBarItemGroupDescription, ToolBarItemGroupConfiguration> registry =
+      new KeyValueRegistry<>();
   final Comparator<ToolBarItemGroupDescription> comparator = new ToolBarItemGroupDescriptionComparator();
 
   public ToolBarConfiguration(final ToolBarDescription description) {
@@ -106,12 +106,14 @@ public class ToolBarConfiguration {
       }
       final ToolBarItemConfiguration[] toolBarItemConfigurations = toolBarGroups[i].getToolBarItemConfigurations();
       if (toolBarGroups[i].getDescription().isToggelGroup()) {
-        final List<Action> actions = new ArrayList<>();
-        final ActionListener listener = new ActionDisabler(actions);
+//        final List<Action> actions = new ArrayList<>();
+//        final ActionListener listener = new ActionDisabler(actions);
         for (final ToolBarItemConfiguration toolBarItemConfiguration : toolBarItemConfigurations) {
-          Optional.of(addToToolBar(toolBar, toolBarItemConfiguration)).consume(
-              button -> button.addActionListener(listener));
-          Optional.of(toolBarItemConfiguration.getAction()).consume(a -> actions.add(a));
+          Optional
+              .of(addToToolBar(toolBar, toolBarItemConfiguration))
+//              .consume(button -> button.addActionListener(listener))
+          ;
+//          Optional.of(toolBarItemConfiguration.getAction()).consume(a -> actions.add(a));
         }
       } else {
         for (final ToolBarItemConfiguration toolBarItemConfiguration : toolBarItemConfigurations) {

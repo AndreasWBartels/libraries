@@ -23,16 +23,18 @@ package net.anwiba.commons.image.awt;
 
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
 
 import net.anwiba.commons.image.AbstractImageContainer;
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageMetadata;
-import net.anwiba.commons.image.IImageOperator;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 class BufferedImageContainer extends AbstractImageContainer {
@@ -45,8 +47,8 @@ class BufferedImageContainer extends AbstractImageContainer {
       final RenderingHints hints,
       final BufferedImageMetadata metadata,
       final BufferedImage image,
-      final IObjectList<IImageOperation> operations) {
-    super(hints, metadata, operations);
+      final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
+    super(hints, metadata, operations, metadataAdjustor);
     this.image = image;
   }
 
@@ -75,14 +77,18 @@ class BufferedImageContainer extends AbstractImageContainer {
         this.image.getColorModel().getNumComponents(),
         this.image.getColorModel().getColorSpace().getType(),
         this.image.getColorModel().getTransferType(),
-        this.image.getColorModel().getTransparency());
+        this.image.getColorModel().getTransparency(),
+    this.image.getColorModel() instanceof IndexColorModel);
   }
 
   @Override
   protected BufferedImage
-      read(final ICanceler canceler,
+      read(
+          final IMessageCollector messageCollector,
+          final ICanceler canceler,
           final RenderingHints hints,
-          final IObjectList<IImageOperation> operations)
+          final IObjectList<IImageOperation> operations,
+          final IImageMetadataAdjustor metadataAdjustor)
           throws CanceledException,
           IOException {
     final long size = (long) getWidth() * (long) getHeight();
@@ -92,76 +98,19 @@ class BufferedImageContainer extends AbstractImageContainer {
       return null;
     }
     canceler.check();
-    final IImageOperator bufferedImageOperator = new BufferedImageOperatorFactory()
+    final IBufferedImageOperator bufferedImageOperator = new BufferedImageOperatorFactory(metadataAdjustor)
         .create(new BufferedImageMetadataFactory().create(this.image), operations, hints);
-    return bufferedImageOperator.execute(this.image);
-  }
-
-  @Override
-  protected IImageMetadata adjust(final IImageMetadata imageMetadata, final float width, final float height) {
-    return new BufferedImageMetadata(
-        width,
-        height,
-        imageMetadata.getNumberOfComponents(),
-        imageMetadata.getNumberOfBands(),
-        imageMetadata.getColorSpaceType(),
-        imageMetadata.getDataType(),
-        imageMetadata.getTransparency());
-  }
-
-  @Override
-  public IImageMetadata adjust(final IImageMetadata imageMetadata,
-      final int numberOfComponents,
-      final int numberOfBands,
-      final int colorSpaceType) {
-    return new BufferedImageMetadata(
-        imageMetadata.getWidth(),
-        imageMetadata.getHeight(),
-        numberOfComponents,
-        numberOfBands,
-        colorSpaceType,
-        imageMetadata.getDataType(),
-        imageMetadata.getTransparency());
-  }
-
-  @Override
-  protected IImageMetadata
-      adjust(final IImageMetadata imageMetadata,
-          final int numberOfComponents,
-          final int numberOfBands,
-          final int colorSpaceType,
-          final int dataType,
-          final int transparency) {
-    return new BufferedImageMetadata(
-        imageMetadata.getWidth(),
-        imageMetadata.getHeight(),
-        numberOfComponents,
-        numberOfBands,
-        colorSpaceType,
-        dataType,
-        transparency);
-  }
-
-  @Override
-  protected IImageMetadata copy(final IImageMetadata imageMetadata) {
-    return new BufferedImageMetadata(
-        imageMetadata.getWidth(),
-        imageMetadata.getHeight(),
-        imageMetadata.getNumberOfComponents(),
-        imageMetadata.getNumberOfBands(),
-        imageMetadata.getColorSpaceType(),
-        imageMetadata.getDataType(),
-        imageMetadata.getTransparency());
+    return bufferedImageOperator.execute(canceler, this.image);
   }
 
   @Override
   protected IImageContainer
-      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations) {
+      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
     BufferedImageMetadata imageMetadata = (BufferedImageMetadata) metadata;
     return new BufferedImageContainer(
         hints,
         imageMetadata,
         this.image,
-        operations);
+        operations, metadataAdjustor);
   }
 }

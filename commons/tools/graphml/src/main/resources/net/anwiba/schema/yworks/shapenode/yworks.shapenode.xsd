@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     targetNamespace="http://www.anwiba.net/tools/graphml/yworks/shapenode"
     xmlns:y="http://www.anwiba.net/tools/graphml/yworks/shapenode"
-    jaxb:version="2.0"
+    xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
     elementFormDefault="qualified"
   >
   <xsd:annotation>

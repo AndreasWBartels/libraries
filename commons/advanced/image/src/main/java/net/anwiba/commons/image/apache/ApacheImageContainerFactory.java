@@ -33,17 +33,26 @@ import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.bytesource.ByteSourceInputStream;
 
 import net.anwiba.commons.image.IImageContainer;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.IResourceReferenceHandler;
 
 public class ApacheImageContainerFactory {
 
+  private final IImageMetadataAdjustor metadataAdjustor = new ApacheImageMetadataAdjustor();
   private final RenderingHints hints;
+  private final ByteSourceConnectorFactory byteSourceConnectorFactory;
 
-  public ApacheImageContainerFactory(final RenderingHints hints) {
+  public ApacheImageContainerFactory(final RenderingHints hints,
+      final IResourceReferenceHandler resourceReferenceHandler) {
+    this.byteSourceConnectorFactory = new ByteSourceConnectorFactory(resourceReferenceHandler);
     this.hints = hints;
   }
 
-  public IImageContainer create(final InputStream inputStream) {
-    return null;
+  public IImageContainer create(final IResourceReference resourceReference) {
+    return new ApacheImageContainer(this.hints,
+        null,
+        this.byteSourceConnectorFactory.create(resourceReference), metadataAdjustor);
   }
 
   public boolean isSupported(final InputStream inputStream) {
@@ -64,5 +73,4 @@ public class ApacheImageContainerFactory {
       return false;
     }
   }
-
 }

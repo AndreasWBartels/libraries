@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.swing.menu;
 
-import net.anwiba.commons.swing.action.IActionContainerProvider;
-
 import java.awt.Container;
 
 import javax.swing.AbstractButton;
 import javax.swing.JPopupMenu;
+
+import net.anwiba.commons.swing.action.IActionContainerProvider;
 
 public final class PopupMenuItemButtomFactory implements IMenuItemTypeVisitor<AbstractButton> {
   private final JPopupMenu menu;

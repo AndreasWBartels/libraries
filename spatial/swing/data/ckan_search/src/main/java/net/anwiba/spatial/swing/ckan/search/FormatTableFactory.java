@@ -286,6 +286,7 @@ public class FormatTableFactory {
       IOException {
     final IResultProducer<StringListResultResponse> responseProducer = (
         c,
+        url,
         statusCode,
         statusMessage,
         contentType,

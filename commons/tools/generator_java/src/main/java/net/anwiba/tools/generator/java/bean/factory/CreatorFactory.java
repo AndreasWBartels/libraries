@@ -21,7 +21,9 @@
  */
 package net.anwiba.tools.generator.java.bean.factory;
 
-import static net.anwiba.tools.generator.java.bean.JavaConstants.*;
+import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_CLASS;
+import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_STRING;
+import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_UTIL_HASHMAP;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

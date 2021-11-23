@@ -22,7 +22,14 @@
 
 package net.anwiba.commons.swing.icon;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.util.function.Function;
+
 import javax.swing.ImageIcon;
+
+import net.anwiba.commons.lang.optional.Optional;
 
 public interface IGuiIcon {
 
@@ -36,4 +43,45 @@ public interface IGuiIcon {
 
   boolean isDecorator();
 
+  default IGuiIcon brighter() {
+    return GuiImageIcon.of(
+        Optional.of(getSmallIcon()).convert(IGuiIcon::brighter).get(),
+        Optional.of(getMediumIcon()).convert(IGuiIcon::brighter).get(), 
+        Optional.of(getLargeIcon()).convert(IGuiIcon::brighter).get());
+  }
+
+  default IGuiIcon darker() {
+    return GuiImageIcon.of(
+        Optional.of(getSmallIcon()).convert(IGuiIcon::darker).get(),
+        Optional.of(getMediumIcon()).convert(IGuiIcon::darker).get(), 
+        Optional.of(getLargeIcon()).convert(IGuiIcon::darker).get());
+  }
+
+  public static ImageIcon darker(ImageIcon imageicon) {
+    return execute(imageicon, c -> c.darker());
+  }
+
+  public static ImageIcon brighter(ImageIcon imageicon) {
+    return execute(imageicon, c -> c.brighter());
+  }
+  
+  private static ImageIcon execute(ImageIcon imageicon, Function<Color, Color> converter) {
+    BufferedImage image = new BufferedImage(imageicon.getIconWidth(), imageicon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+    Graphics graphics = image.getGraphics();
+    try {
+      imageicon.paintIcon(null, graphics, 0, 0);
+      execute(image, converter);
+      return new ImageIcon(image);
+    } finally {
+      graphics.dispose();
+    } 
+  };
+
+  private static void execute(BufferedImage image, Function<Color, Color> converter) {
+    for (int i = 0; i < image.getHeight(); i++) {
+      for (int k = 0; k < image.getWidth(); k++) {
+        image.setRGB(i, k, converter.apply(new Color(image.getRGB(i, k), true)).getRGB());
+      }
+    }
+  };  
 }

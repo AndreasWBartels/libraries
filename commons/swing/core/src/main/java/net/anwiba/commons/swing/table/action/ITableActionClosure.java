@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.swing.table.action;
 
+import java.awt.Component;
+
 import net.anwiba.commons.swing.table.IObjectTableModel;
 import net.anwiba.commons.swing.table.ISelectionIndexModel;
-
-import java.awt.Component;
 
 public interface ITableActionClosure<T> {
 

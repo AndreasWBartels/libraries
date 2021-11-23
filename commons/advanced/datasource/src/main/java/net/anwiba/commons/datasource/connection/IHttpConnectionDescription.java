@@ -21,8 +21,8 @@
  */
 package net.anwiba.commons.datasource.connection;
 
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.utilities.io.url.IAuthentication;
-import net.anwiba.commons.utilities.parameter.IParameters;
 
 public interface IHttpConnectionDescription extends IResourceReferenceConnectionDescription {
 

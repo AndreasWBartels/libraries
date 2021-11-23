@@ -11,7 +11,7 @@
   <parent>
     <groupId>net.anwiba.eclipse</groupId>
     <artifactId>anwiba-eclipse-maven-default</artifactId>
-    <version>1.1.121</version>
+    <version>1.1.158</version>
   </parent>
 
   <scm>
@@ -21,166 +21,31 @@
   </scm>
 
   <dependencies>
+
     <dependency>
       <groupId>net.anwiba.eclipse</groupId>
       <artifactId>net.anwiba.eclipse.commons</artifactId>
-      <version>1.1.121</version>
+      <version>1.1.158</version>
     </dependency>
+
+    <dependency>
+      <groupId>net.anwiba.eclipse</groupId>
+      <artifactId>net.anwiba.eclipse.libraries</artifactId>
+      <version>1.1.158</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-core</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-impl</artifactId>
-                  <version>2.3.2</version>
-                  <type>jar</type>
-                  <destFileName>jaxb-impl-2.3.2.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.sun.xml.bind</groupId>
-                  <artifactId>jaxb-core</artifactId>
-                  <version>2.3.0</version>
-                  <type>jar</type>
-                  <destFileName>jaxb-core-2.3.0.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>javax.xml.bind</groupId>
-                  <artifactId>jaxb-api</artifactId>
-                  <version>2.3.1</version>
-                  <type>jar</type>
-                  <destFileName>jaxb-api-2.3.1.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.sun.activation</groupId>
-                  <artifactId>javax.activation</artifactId>
-                  <version>1.2.0</version>
-                  <type>jar</type>
-                  <destFileName>javax-activation-1.2.0.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-logging</groupId>
-                  <artifactId>commons-logging</artifactId>
-                  <version>1.2</version>
-                  <type>jar</type>
-                  <destFileName>commons-logging-1.2.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.logging.log4j</groupId>
-                  <artifactId>log4j-api</artifactId>
-                  <version>2.14.0</version>
-                  <type>jar</type>
-                  <destFileName>log4j-api-2.14.0.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.logging.log4j</groupId>
-                  <artifactId>log4j-core</artifactId>
-                  <version>2.14.0</version>
-                  <type>jar</type>
-                  <destFileName>log4j-core-2.14.0.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.commons</groupId>
-                  <artifactId>commons-lang3</artifactId>
-                  <version>3.11</version>
-                  <type>jar</type>
-                  <destFileName>commons-lang3-3.11.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-ensure</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-ensure-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-lang</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-lang-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-logging</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-logging-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-message</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-message-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-model</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-model-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-thread</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-thread-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-reference</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-reference-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons</groupId>
-                  <artifactId>anwiba-commons-utilities</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-commons-utilities-1.1.121.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>net.anwiba.commons.tools</groupId>
-                  <artifactId>anwiba-tools-icons</artifactId>
-                  <version>1.1.121</version>
-                  <type>jar</type>
-                  <destFileName>anwiba-tools-icons-1.1.121.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>lib</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>lib</directory>
-              <includes>
-                <include>*.jar</include>
-              </includes>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

@@ -25,7 +25,7 @@ import static net.anwiba.testing.demo.JDialogs.show;
 
 import org.junit.jupiter.api.Test;
 
-import net.anwiba.commons.message.ExceptionMessage;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
 
 public class ExceptionDialogDemo {
@@ -38,9 +38,12 @@ public class ExceptionDialogDemo {
   @Test
   public void demoOwnMessage() {
     show(frame -> new ExceptionDialog(frame,
-        new ExceptionMessage(
-            "NullPointerException", //$NON-NLS-1$
-            "Fehler im Programm, bitte mache Sie eine Fehlermeldung im Bugzilla. Fügen Sie dabei bitte die Details an.", //$NON-NLS-1$
-            new NullPointerException())));
+        Message.builder()
+            .setText("NullPointerException")
+            .setDescription(
+                "Fehler im Programm, bitte mache Sie eine Fehlermeldung im Bugzilla. Fügen Sie dabei bitte die Details an.")
+            .setThrowable(new NullPointerException())
+            .setError()
+            .build()));
   }
 }

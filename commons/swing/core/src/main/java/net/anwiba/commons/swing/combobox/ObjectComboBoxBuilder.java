@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import javax.swing.border.Border;
 
+import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.swing.list.ObjectListConfigurationBuilder;
 import net.anwiba.commons.swing.ui.IObjectUi;
 
@@ -117,9 +118,30 @@ public class ObjectComboBoxBuilder<T> {
     return this;
   }
 
+  public ObjectComboBoxBuilder<T> setEnabledModel(final IBooleanDistributor enabledModel) {
+    this.configurationBuilder.setEnabledModel(enabledModel);
+    return this;
+  }
+
+  public ObjectComboBoxBuilder<T> setEditable(final boolean isEditable) {
+    this.configurationBuilder.setEditable(isEditable);
+    return this;
+  }
+
+  public ObjectComboBoxBuilder<T> setEditableEnabled() {
+    this.configurationBuilder.setEditable(true);
+    return this;
+  }
+
+  public ObjectComboBoxBuilder<T> setEditableDisabled() {
+    this.configurationBuilder.setEditable(false);
+    return this;
+  }
+
   public ObjectComboBox<T> build() {
-    this.model = Optional.ofNullable(this.model).orElseGet(() -> new ObjectComboBoxModel<>(new ArrayList<T>()));
-    this.model.setSelectedItem(this.value);
-    return new ObjectComboBox<>(this.configurationBuilder.build(), this.model);
+    IComboBoxModel model =
+        Optional.ofNullable(this.model).orElseGet(() -> new ObjectComboBoxModel<>(new ArrayList<T>()));
+    model.setSelectedItem(this.value);
+    return new ObjectComboBox<>(this.configurationBuilder.build(), model);
   }
 }

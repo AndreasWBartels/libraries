@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.http;
 
-import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 
 public class HttpClientConnectionManagerProvider implements IHttpClientConnectionManagerProvider {
 

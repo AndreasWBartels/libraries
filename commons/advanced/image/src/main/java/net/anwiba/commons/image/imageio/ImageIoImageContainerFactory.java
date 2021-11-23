@@ -24,6 +24,7 @@ package net.anwiba.commons.image.imageio;
 import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import org.eclipse.imagen.media.codec.ByteArraySeekableStream;
 
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageContainerSettings;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.image.ImageUtilities;
 import net.anwiba.commons.image.awt.BufferedImageContainerFactory;
 import net.anwiba.commons.lang.collection.IObjectList;
@@ -62,6 +64,7 @@ public class ImageIoImageContainerFactory {
 
   private static net.anwiba.commons.logging.ILogger logger =
       net.anwiba.commons.logging.Logging.getLogger(ImageIoImageContainerFactory.class);
+  private final IImageMetadataAdjustor metadataAdjustor = new ImageIoImageMetadataAdjustor();
   private final RenderingHints hints;
   final BufferedImageContainerFactory bufferedImageContainerFactory;
   private final IResourceReferenceHandler resourceReferenceHandler;
@@ -73,7 +76,8 @@ public class ImageIoImageContainerFactory {
     this.bufferedImageContainerFactory = new BufferedImageContainerFactory(hints);
   }
 
-  public IImageContainer create(final IImageInputStreamConnector imageInputStreamConnector) throws IOException {
+  public IImageContainer create(final IResourceReference resourceReference) throws IOException {
+    final IImageInputStreamConnector imageInputStreamConnector = createInputStreamConnector(resourceReference);
     IImageIoImageContainerSettings imageIoSettings = IImageIoImageContainerSettings.getSettings(this.hints);
     IImageContainerSettings settings = IImageContainerSettings.getSettings(this.hints);
     try (ImageInputStream imageInputStream = imageInputStreamConnector.connect()) {
@@ -96,24 +100,24 @@ public class ImageIoImageContainerFactory {
       final ImageTypeSpecifier imageType =
           imageIoSettings.getImageTypeSpecifier(Streams.of(IOException.class, imageTypes).asObjectList());
 
-//      IIOMetadata imageMetadata = imageReader.getImageMetadata(index);
-//      String[] extraMetadataFormatNames =
-//          Optional.of(imageMetadata.getExtraMetadataFormatNames()).getOr(() -> new String[0]);
-//
-//      for (String name : extraMetadataFormatNames) {
-//        IIOMetadataFormat metadataFormat = imageMetadata.getMetadataFormat(name);
-//        Node asTree = imageMetadata.getAsTree(name);
-//        NamedNodeMap attributes = asTree.getAttributes();
-//        attributes.getLength();
-//      }
-//
-//      String[] metadataFormatNames = Optional.of(imageMetadata.getMetadataFormatNames()).getOr(() -> new String[0]);
-//      for (String name : metadataFormatNames) {
-//        IIOMetadataFormat metadataFormat = imageMetadata.getMetadataFormat(name);
-//        Node asTree = imageMetadata.getAsTree(name);
-//        NamedNodeMap attributes = asTree.getAttributes();
-//        attributes.getLength();
-//      }
+      //      IIOMetadata imageMetadata = imageReader.getImageMetadata(index);
+      //      String[] extraMetadataFormatNames =
+      //          Optional.of(imageMetadata.getExtraMetadataFormatNames()).getOr(() -> new String[0]);
+      //
+      //      for (String name : extraMetadataFormatNames) {
+      //        IIOMetadataFormat metadataFormat = imageMetadata.getMetadataFormat(name);
+      //        Node asTree = imageMetadata.getAsTree(name);
+      //        NamedNodeMap attributes = asTree.getAttributes();
+      //        attributes.getLength();
+      //      }
+      //
+      //      String[] metadataFormatNames = Optional.of(imageMetadata.getMetadataFormatNames()).getOr(() -> new String[0]);
+      //      for (String name : metadataFormatNames) {
+      //        IIOMetadataFormat metadataFormat = imageMetadata.getMetadataFormat(name);
+      //        Node asTree = imageMetadata.getAsTree(name);
+      //        NamedNodeMap attributes = asTree.getAttributes();
+      //        attributes.getLength();
+      //      }
 
       final ColorModel colorModel = imageType.getColorModel();
       final ColorSpace colorSpace = colorModel.getColorSpace();
@@ -129,10 +133,11 @@ public class ImageIoImageContainerFactory {
           colorSpaceType,
           colorModel.getTransferType(),
           colorModel.getTransparency(),
-          imageType);
+          imageType,
+          colorModel instanceof IndexColorModel);
       imageReader.setInput(null);
       imageReader.dispose();
-      return new ImageIoImageContainer(this.hints, metadata, imageInputStreamConnector);
+      return new ImageIoImageContainer(this.hints, metadata, imageInputStreamConnector, this.metadataAdjustor);
     } catch (final IOException exception) {
       logger.log(ILevel.WARNING, exception.getMessage());
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);

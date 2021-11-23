@@ -41,7 +41,7 @@ import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.dialog.exception.ExceptionDialog;
-import net.anwiba.commons.swing.icon.GuiIcon;
+import net.anwiba.commons.swing.icon.IGuiIcon;
 import net.anwiba.commons.swing.icons.GuiIcons;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
@@ -49,8 +49,8 @@ public class MessageDialogLauncher {
 
   private final MessageBuilder builder = new MessageBuilder();
   private String title = "Title"; //$NON-NLS-1$
-  GuiIcon icon = GuiIcons.EMPTY_ICON;
-  DialogType dialogType = DialogType.CLOSE;
+  private IGuiIcon icon = GuiIcons.EMPTY_ICON;
+  private DialogType dialogType = DialogType.CLOSE;
 
   private int dialogCloseKeyEvent = KeyEvent.VK_ESCAPE;
 
@@ -64,8 +64,8 @@ public class MessageDialogLauncher {
     return this;
   }
 
-  public MessageDialogLauncher icon(@SuppressWarnings("hiding") final GuiIcon icon) {
-    this.icon = icon;
+  public MessageDialogLauncher icon(@SuppressWarnings("hiding") final IGuiIcon icon) {
+    this.icon = icon == null ? GuiIcons.EMPTY_ICON : icon;
     return this;
   }
 
@@ -161,7 +161,10 @@ public class MessageDialogLauncher {
       final Icon icon,
       final DialogType dialogType) {
     if (message instanceof ExceptionMessage) {
-      return new ExceptionDialog(owner, (ExceptionMessage) message);
+      if (title != null) {
+        return new ExceptionDialog(owner, title, message);
+      }
+      return new ExceptionDialog(owner, message);
     }
     return new MessageDialog(owner, title, message, icon, dialogType);
   }

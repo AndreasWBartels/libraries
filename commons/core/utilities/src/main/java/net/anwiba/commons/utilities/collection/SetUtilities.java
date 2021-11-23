@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.utilities.collection;
 
-import net.anwiba.commons.lang.functional.IAcceptor;
-
 import java.util.Collection;
 import java.util.Set;
+
+import net.anwiba.commons.lang.functional.IAcceptor;
 
 public class SetUtilities {
 

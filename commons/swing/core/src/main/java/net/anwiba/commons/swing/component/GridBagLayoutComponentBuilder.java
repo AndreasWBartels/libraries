@@ -28,7 +28,9 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -56,7 +58,7 @@ public class GridBagLayoutComponentBuilder {
     return this;
   }
 
-  public GridBagLayoutComponentBuilder label(final String text) {
+  public GridBagLayoutComponentBuilder newlineAndLabel(final String text) {
     newline();
     final JLabel label = new JLabel(text + (text.isEmpty() ? "" : ":")); //$NON-NLS-1$ //$NON-NLS-2$
     label.setVerticalTextPosition(JLabel.TOP);
@@ -65,6 +67,14 @@ public class GridBagLayoutComponentBuilder {
     label.setHorizontalAlignment(JLabel.LEFT);
     this.components.add(new GridBagLayoutComponent(label, ++this.column, this.row, 1, 1, UNDEFIND_ANCHOR));
     return this;
+  }
+
+  public GridBagLayoutComponentBuilder label(final String text) {
+    return add(new JLabel(text + (text.isEmpty() ? "" : ":")));
+  }
+
+  public GridBagLayoutComponentBuilder add(final Action action) {
+    return add(new JButton(action));
   }
 
   public GridBagLayoutComponentBuilder add(final JComponent component) {
@@ -79,20 +89,16 @@ public class GridBagLayoutComponentBuilder {
     return this;
   }
 
+  public GridBagLayoutComponentBuilder placeHolder() {
+    add(new JPanel());
+    return this;
+  }
+
   public GridBagLayoutComponentBuilder newline() {
     this.maximunsNumberOfColumns = Math.max(this.maximunsNumberOfColumns, this.column);
     this.column = -1;
     this.row += 1;
     return this;
-  }
-
-  public JComponent build() {
-    final JPanel contentPanel = new JPanel(new GridBagLayout());
-    contentPanel.setBorder(this.border);
-    for (final IGridBagLayoutComponent component : this.components) {
-      contentPanel.add(component.getComponent(), component.getConstraints(this.insets));
-    }
-    return contentPanel;
   }
 
   public GridBagLayoutComponentBuilder emptyLine() {
@@ -107,5 +113,22 @@ public class GridBagLayoutComponentBuilder {
   public GridBagLayoutComponentBuilder setBorder(final Border border) {
     this.border = border;
     return this;
+  }
+
+  public JComponent build() {
+    if (this.components.isEmpty()) {
+      return new JPanel();
+    }
+
+    if (this.components.size() == 1) {
+      return this.components.get(0).getComponent();
+    }
+
+    final JPanel contentPanel = new JPanel(new GridBagLayout());
+    contentPanel.setBorder(this.border);
+    for (final IGridBagLayoutComponent component : this.components) {
+      contentPanel.add(component.getComponent(), component.getConstraints(this.insets));
+    }
+    return contentPanel;
   }
 }

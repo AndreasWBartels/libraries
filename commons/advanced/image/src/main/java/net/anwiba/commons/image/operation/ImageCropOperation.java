@@ -25,8 +25,6 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
-import net.anwiba.commons.image.IImageMetadata;
-import net.anwiba.commons.image.IImageMetadataAdjustor;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
@@ -59,13 +57,6 @@ public class ImageCropOperation implements IImageOperation {
 
   public float getHeight() {
     return this.height;
-  }
-
-  @Override
-  public IImageMetadata adjust(final IImageMetadata metadata, final IImageMetadataAdjustor metadataAdjustor) {
-    float width = adjust(metadata.getWidth(), this.x, this.width);
-    float height = adjust(metadata.getHeight(), this.y, this.height);
-    return metadataAdjustor.adjust(metadata, width, height);
   }
 
   public static IOptional<ImageCropOperation, RuntimeException>
@@ -115,20 +106,6 @@ public class ImageCropOperation implements IImageOperation {
         (float) bounds.getY(),
         (float) bounds.getWidth(),
         (float) bounds.getHeight());
-  }
-
-  private float adjust(final float currentValue, final float offset, final float value) {
-    return offset >= 0
-        ? offset > currentValue
-            ? 0
-            : offset + value <= currentValue
-                ? value
-            : currentValue - offset
-        : offset + value < 0
-            ? 0
-        : offset + value <= currentValue
-            ? offset + value
-        : currentValue;
   }
 
   @Override

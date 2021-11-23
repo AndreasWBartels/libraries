@@ -58,8 +58,10 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
         final String statusText = response.getStatusText();
         final long contentLength = response.getContentLength();
         if (contentLength == 0) {
-          throw new HttpServerException("Http request faild, empty response" + response.getStatusCode() + " " //$NON-NLS-1$//$NON-NLS-2$
-              + response.getStatusText(), statusCode, statusText);
+          throw new HttpServerException("Http request faild, empty response",
+              response.getUri(),
+              statusCode,
+              statusText);
         }
         final String contentType = response.getContentType();
         if (resultProducer.isApplicable(statusCode, contentType)) {
@@ -67,19 +69,23 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
             try (InputStream inputStream = new BufferedInputStream(new NoneClosingInputStream(stream))) {
               try {
                 inputStream.mark(IoUtilities.maximumLimitOfBytes(contentLength));
-                return resultProducer.execute(cancelable, statusCode, statusText, contentType,
+                return resultProducer.execute(cancelable, response.getUri(), statusCode, statusText, contentType,
                     response.getContentEncoding(), inputStream);
               } catch (final IOException exception) {
                 inputStream.reset();
                 throw new HttpRequestException(exception.getMessage(), //
-                    statusCode, statusText, IoUtilities.toByteArray(inputStream), contentType,
+                    response.getUri(),
+                    statusCode, 
+                    statusText, 
+                    IoUtilities.toByteArray(inputStream), 
+                    contentType,
                     response.getContentEncoding(), exception);
               }
             }
           }
         }
         try (InputStream inputStream = response.getInputStream()) {
-          throw errorProducer.execute(cancelable, statusCode, statusText, contentType, response.getContentEncoding(),
+          throw errorProducer.execute(cancelable, response.getUri(), statusCode, statusText, contentType, response.getContentEncoding(),
               inputStream);
         }
       }

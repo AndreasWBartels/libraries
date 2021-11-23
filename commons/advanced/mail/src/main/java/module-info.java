@@ -26,7 +26,7 @@ module net.anwiba.commons.mail {
   requires net.anwiba.commons.crypto;
   requires net.anwiba.commons.xml;
   requires java.xml;
-  requires java.xml.bind;
+  requires jakarta.xml.bind;
   requires jakarta.mail;
   requires net.anwiba.commons.lang;
   requires net.anwiba.commons.utilities;

@@ -23,7 +23,7 @@ package net.anwiba.commons.xml.dom;
 
 import org.dom4j.Element;
 
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.IParameters;
 
 public final class ParametersToDomConverter implements IObjectToDomConverter<IParameters> {
 

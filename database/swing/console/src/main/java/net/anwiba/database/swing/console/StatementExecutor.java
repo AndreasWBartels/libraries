@@ -29,7 +29,6 @@ import java.util.Optional;
 
 import javax.swing.DefaultComboBoxModel;
 
-import net.anwiba.commons.jdbc.DatabaseUtilities;
 import net.anwiba.commons.lang.functional.IWatcher;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.logging.ILevel;
@@ -110,7 +109,7 @@ public class StatementExecutor {
       updateHistoryComboBoyModel(string);
       this.statusModel.set(SqlConsoleMessages.done);
     } catch (final SQLException exception) {
-      logger.log(ILevel.DEBUG, DatabaseUtilities.getCompleteSqlExceptionMessageText(exception), exception);
+      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       this.statusModel.set(exception.getMessage());
     }
   }

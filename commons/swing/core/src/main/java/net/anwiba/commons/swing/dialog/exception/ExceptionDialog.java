@@ -23,13 +23,12 @@ package net.anwiba.commons.swing.dialog.exception;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import net.anwiba.commons.message.ExceptionMessage;
+import net.anwiba.commons.message.IMessage;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.swing.dialog.DialogMessages;
 import net.anwiba.commons.swing.dialog.DialogType;
 import net.anwiba.commons.swing.dialog.MessageDialog;
@@ -38,17 +37,26 @@ import net.anwiba.commons.swing.icons.GuiIcons;
 public class ExceptionDialog extends MessageDialog {
 
   private static final long serialVersionUID = 1L;
-  final ExceptionMessage exceptionMessage;
-  JScrollPane detailsPanel;
+  private final IMessage exceptionMessage;
+  private JScrollPane detailsPanel;
 
   public ExceptionDialog(final Window owner, final Throwable throwable) {
-    this(owner, new ExceptionMessage(throwable.getClass().getSimpleName(), throwable.getLocalizedMessage(), throwable));
+    this(owner,
+        Message.builder()
+            .setText(throwable.getClass().getSimpleName())
+            .setDescription(throwable.getMessage())
+            .setThrowable(throwable)
+            .setError()
+            .build());
   }
 
-  public ExceptionDialog(final Window owner, final ExceptionMessage message) {
-    super(owner, DialogMessages.ERROR, message, GuiIcons.EMPTY_ICON.getLargeIcon(), DialogType.CLOSE_DETIALS);
+  public ExceptionDialog(final Window owner, final IMessage message) {
+    this(owner, DialogMessages.ERROR, message);
+  }
+
+  public ExceptionDialog(final Window owner, final String title, final IMessage message) {
+    super(owner, title, message, GuiIcons.EMPTY_ICON.getLargeIcon(), DialogType.CLOSE_DETIALS);
     this.exceptionMessage = message;
-    // setPreferredSize(new Dimension(300, 120));
   }
 
   @Override
@@ -60,20 +68,9 @@ public class ExceptionDialog extends MessageDialog {
       textArea.setLineWrap(false);
       textArea.setRows(15);
       textArea.setColumns(40);
-      final StringWriter stringWriter = new StringWriter();
-      ExceptionDialog.this.exceptionMessage.getThrowable().printStackTrace(new PrintWriter(stringWriter));
-      textArea.append(stringWriter.getBuffer().toString());
+      textArea.append(Message.toDetailInfo(ExceptionDialog.this.exceptionMessage.getThrowable()));
     }
     return this.detailsPanel;
   }
 
-  public static void show(final Window owner, final ExceptionMessage message) {
-    final ExceptionDialog exceptionDialog = new ExceptionDialog(owner, message);
-    exceptionDialog.setVisible(true);
-  }
-
-  public static void show(final Window owner, final Throwable e) {
-    final ExceptionDialog exceptionDialog = new ExceptionDialog(owner, e);
-    exceptionDialog.setVisible(true);
-  }
 }

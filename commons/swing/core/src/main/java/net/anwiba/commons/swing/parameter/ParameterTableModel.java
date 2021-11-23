@@ -25,11 +25,11 @@ import javax.swing.table.AbstractTableModel;
 
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.object.ObjectUtilities;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameter;
+import net.anwiba.commons.lang.parameter.Parameters;
 import net.anwiba.commons.swing.dialog.DialogMessages;
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameter;
-import net.anwiba.commons.utilities.parameter.Parameters;
 
 public class ParameterTableModel extends AbstractTableModel {
 

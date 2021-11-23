@@ -23,19 +23,21 @@ package net.anwiba.commons.utilities.property;
 
 import java.io.Serializable;
 
-import net.anwiba.commons.utilities.provider.INamedValueProvider;
-
-public interface IProperties extends INamedValueProvider<String, RuntimeException>, Serializable {
+public interface IProperties extends Serializable {
 
   int getNumberOfProperties();
 
   IProperty getProperty(int index);
+  
+  String getValue(String name);
 
   Iterable<IProperty> properties();
 
-  IProperties adapt(int rowIndex, IProperty parameter);
-
   boolean contains(String name);
+  
+  Iterable<String> getNames();
+  
+  IProperties adapt(int rowIndex, IProperty parameter);
 
   String getValueOrDefault(String string, String value);
 

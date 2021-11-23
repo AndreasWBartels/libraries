@@ -2,7 +2,6 @@
 @JssdPrimitivesEnabled
 {
   @JssdImmutable
-  @JssdNoProperty
   "class": <String> "POLL",
   "time": <String> null,
   "active": <int> 0,

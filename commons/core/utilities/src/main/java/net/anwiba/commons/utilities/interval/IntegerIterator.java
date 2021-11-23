@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.utilities.interval;
 
-import net.anwiba.commons.lang.functional.IAcceptor;
-
 import java.util.Iterator;
+
+import net.anwiba.commons.lang.functional.IAcceptor;
 
 public final class IntegerIterator implements Iterator<Integer> {
   private final int maxValue;

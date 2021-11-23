@@ -21,12 +21,12 @@
  */
 package net.anwiba.commons.utilities.date;
 
-import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.utilities.string.StringUtilities;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.utilities.string.StringUtilities;
 
 public final class StringToDateConverter implements IConverter<String, Date, RuntimeException> {
 

@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>spatial-data</artifactId>
-    <version>1.1.121</version>
+    <version>1.1.158</version>
   </parent>
 
   <scm>
@@ -47,25 +47,6 @@
     <plugins>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-source-generated</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${basedir}/src/main/schema</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>net.anwiba.commons.tools</groupId>
         <artifactId>anwiba-tools-definition-schema-json</artifactId>
         <executions>
@@ -78,6 +59,7 @@
             <configuration>
               <pakkage>net.anwiba.spatial.osm.nominatim.schema.v01_0</pakkage>
               <comment>Copyright (c) 2017 by Andreas W. Bartels</comment>
+              <addJSSDFilesToCompileSourceRoot>true</addJSSDFilesToCompileSourceRoot>
             </configuration>
           </execution>
           <execution>
@@ -89,6 +71,7 @@
             <configuration>
               <pakkage>net.anwiba.spatial.osm.overpass.schema.v00_6</pakkage>
               <comment>Copyright (c) 2017 by Andreas W. Bartels</comment>
+              <addJSSDFilesToCompileSourceRoot>true</addJSSDFilesToCompileSourceRoot>
             </configuration>
           </execution>
         </executions>

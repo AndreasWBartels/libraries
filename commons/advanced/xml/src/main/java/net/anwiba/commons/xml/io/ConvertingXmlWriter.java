@@ -26,7 +26,7 @@ import java.io.OutputStream;
 
 import javax.xml.transform.OutputKeys;
 
-import net.anwiba.commons.utilities.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.utilities.property.PropertiesBuilder;
 import net.anwiba.commons.utilities.registry.AbstractApplicableRegistry;
 import net.anwiba.commons.utilities.registry.IApplicableRegistry;

@@ -23,33 +23,32 @@ package net.anwiba.commons.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 
+import net.anwiba.commons.cache.resource.CachingRule;
+import net.anwiba.commons.cache.resource.IResourceCache;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IWatcher;
 import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.IResourceReferenceHandler;
+import net.anwiba.commons.reference.ResourceReferenceFactory;
 import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
-import net.anwiba.commons.utilities.cache.ICache;
 import net.anwiba.commons.utilities.io.url.IUrl;
 import net.anwiba.commons.utilities.io.url.UrlBuilder;
 import net.anwiba.commons.utilities.io.url.parser.UrlParser;
-import net.anwiba.commons.utilities.parameter.IParameters;
 
 public class CachingHttpRequestExecutor implements IHttpRequestExecutor {
 
   private final IHttpRequestExecutor httpRequestExecutor;
-  private final ICache cache;
+  private final IResourceCache cache;
   private final IResourceReferenceHandler resourceReferenceHandler;
 
   public CachingHttpRequestExecutor(
-      final ICache cache,
+      final IResourceCache cache,
       final IResourceReferenceHandler resourceReferenceHandler,
       final IHttpRequestExecutor httpRequestExecutor) {
     this.cache = cache;
@@ -67,18 +66,43 @@ public class CachingHttpRequestExecutor implements IHttpRequestExecutor {
           response.abort();
         })) {
           if (!(response.getStatusCode() >= 200 && response.getStatusCode() < 300)) {
-            return response;
+            return create(url, reference(response), () -> {});
+          }
+          if (!response.cacheControl().isEmpty()) {
+            // https://developer.mozilla.org/de/docs/Web/HTTP/Headers/Cache-Control
+            // https://developer.mozilla.org/de/docs/Web/HTTP/Caching
+            // [private,no-cache,no-store,no-transform,max-age=0]
+            String string = response.cacheControl().get().toString();
+            string.isBlank();
+          } else if (!response.pragma().isEmpty()) {
+            // [private,no-cache,no-store,no-transform,max-age=0]
+            String string = response.pragma().get().toString();
+            string.isBlank();
+          }
+          if (!response.expires().isEmpty()) {
+            String string = response.expires().get();
+            string.isBlank();
           }
           try (InputStream stream = response.getInputStream()) {
+            byte[] byteArray = IoUtilities.toByteArray(stream);
             IResourceReference reference =
-                this.cache
-                    .add(url,
-                        IoUtilities.toByteArray(stream),
+                request.getCacheTime()
+                    .convert(cacheTime -> this.cache.put(
+                        CachingRule.builder()
+                            .preferdLifeTime(cacheTime)
+                            .minimumLifeTime(cacheTime)
+                            .maximumLifeTime(cacheTime)
+                            .build(),
+                        url,
+                        byteArray,
                         response.getContentType(),
-                        response.getContentEncoding());
-            return create(url, reference, () -> {
-              response.abort();
-            });
+                        response.getContentEncoding()))
+                    .getOr(() -> this.cache.put(
+                        url,
+                        byteArray,
+                        response.getContentType(),
+                        response.getContentEncoding()));
+            return create(url, reference, () -> {});
           }
         }
       }
@@ -87,17 +111,22 @@ public class CachingHttpRequestExecutor implements IHttpRequestExecutor {
     }
   }
 
+  private IResourceReference reference(IResponse response) throws IOException {
+    if (response.getContentLength() == 0) {
+      return new ResourceReferenceFactory().create(new byte[] {}, response.getContentType(), response.getContentEncoding());
+    }
+    try (InputStream inputStream = response.getInputStream()) {
+      return new ResourceReferenceFactory().create(IoUtilities.toByteArray(inputStream), response.getContentType(), response.getContentEncoding());
+    }
+  }
+
   private IResponse
       create(final String url, final IResourceReference resourceReference, final IBlock<RuntimeException> abortBlock) {
     return new IResponse() {
 
       @Override
-      public URI getUri() {
-        try {
-          return new URI(url);
-        } catch (URISyntaxException e) {
-          throw new UnreachableCodeReachedException(e);
-        }
+      public String getUri() {
+        return url;
       }
 
       @Override
@@ -142,7 +171,7 @@ public class CachingHttpRequestExecutor implements IHttpRequestExecutor {
 
       @Override
       public void abort() {
-        abortBlock.execute();
+        // nothing todo
       }
     };
   }

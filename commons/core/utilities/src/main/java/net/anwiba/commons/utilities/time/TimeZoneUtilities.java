@@ -32,6 +32,10 @@ public class TimeZoneUtilities {
   private static final int MILLISECONDS_PER_MIN = 60000;
   private static final int MILLISECONDS_PER_HOUR = 3600000;
 
+  public static TimeZone getUniversalTimeZone() {
+    return TimeZone.getTimeZone("UTC");
+  }
+
   public static TimeZone getSystemTimeZone() {
     return TimeZone.getDefault();
   }

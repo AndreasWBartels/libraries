@@ -22,6 +22,7 @@
 package net.anwiba.commons.image.imageio;
 
 import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -69,8 +70,8 @@ public class ImageIoImageMetaDataReader implements IImageMetaDataReader {
       final ImageTypeSpecifier imageType =
           Streams.of(IOException.class, imageReader.getImageTypes(index)).first().get();
       final ColorModel colorModel = imageType.getColorModel();
-      int numColorComponents = colorModel.getNumComponents();
-      int numBands = imageType.getNumBands();
+      int numColorComponents = colorModel.getNumColorComponents();
+      int numBands = colorModel.getNumComponents();
       final ImageMetadata metadata = new ImageMetadata(
           width,
           height,
@@ -78,7 +79,8 @@ public class ImageIoImageMetaDataReader implements IImageMetaDataReader {
           numBands,
           colorModel.getColorSpace().getType(),
           colorModel.getTransferType(),
-          colorModel.getTransparency());
+          colorModel.getTransparency(),
+          colorModel instanceof IndexColorModel);
       return metadata;
     } finally {
       imageReader.setInput(null);

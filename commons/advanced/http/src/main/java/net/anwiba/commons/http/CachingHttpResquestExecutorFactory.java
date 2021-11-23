@@ -21,17 +21,17 @@
  */
 package net.anwiba.commons.http;
 
+import net.anwiba.commons.cache.resource.IResourceCache;
 import net.anwiba.commons.reference.IResourceReferenceHandler;
-import net.anwiba.commons.utilities.cache.ICache;
 
 public class CachingHttpResquestExecutorFactory implements IHttpRequestExecutorFactory {
 
   private final IHttpRequestExecutorFactory httpRequestExecutorFactory;
   private final IResourceReferenceHandler resourceReferenceHandler;
-  private final ICache cache;
+  private final IResourceCache cache;
 
   public CachingHttpResquestExecutorFactory(
-    final ICache cache,
+    final IResourceCache cache,
     final IResourceReferenceHandler resourceReferenceHandler,
     final IHttpRequestExecutorFactory httpRequestExecutorFactory) {
     this.cache = cache;

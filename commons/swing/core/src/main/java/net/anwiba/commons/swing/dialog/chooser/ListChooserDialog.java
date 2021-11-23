@@ -35,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import net.anwiba.commons.lang.exception.CanceledException;
-import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageBuilder;
@@ -205,10 +204,12 @@ public class ListChooserDialog<T> extends AbstractMessageDialog implements IValu
       setOkEnabled(false);
       final Throwable targetException = exception.getTargetException();
       setMessage(
-          new ExceptionMessage(
-              this.chooserPanel.getMessage().getText(),
-              targetException.getLocalizedMessage(),
-              targetException));
+          Message.builder()
+              .setText(this.chooserPanel.getMessage().getText())
+              .setDescription(targetException.getMessage())
+              .setThrowable(targetException)
+              .setError()
+              .build());
       return false;
     }
   }

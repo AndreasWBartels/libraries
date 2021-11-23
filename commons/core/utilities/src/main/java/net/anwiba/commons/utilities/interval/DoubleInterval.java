@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.utilities.interval;
 
-import net.anwiba.commons.lang.object.ObjectUtilities;
-
 import java.io.Serializable;
 import java.util.Arrays;
+
+import net.anwiba.commons.lang.object.ObjectUtilities;
 
 public class DoubleInterval implements Serializable {
 

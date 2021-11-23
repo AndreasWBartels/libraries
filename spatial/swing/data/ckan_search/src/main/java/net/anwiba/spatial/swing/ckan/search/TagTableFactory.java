@@ -301,6 +301,7 @@ public final class TagTableFactory {
     try {
       final IResultProducer<TagListResultResponse> responseProducer = (
           c,
+          url,
           statusCode,
           statusMessage,
           contentType,
@@ -343,6 +344,7 @@ public final class TagTableFactory {
     try {
       final IResultProducer<TagSearchResultResponse> responseProducer = (
           c,
+          url,
           statusCode,
           statusMessage,
           contentType,

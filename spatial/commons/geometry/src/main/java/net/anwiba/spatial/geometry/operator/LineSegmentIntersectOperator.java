@@ -21,17 +21,16 @@
  */
 package net.anwiba.spatial.geometry.operator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
 import net.anwiba.spatial.coordinate.CoordinateSequenceFactory;
 import net.anwiba.spatial.coordinate.CoordinateUtilities;
 import net.anwiba.spatial.coordinate.ICoordinate;
 import net.anwiba.spatial.coordinate.ICoordinateSequence;
 import net.anwiba.spatial.geometry.ILineSegment;
-import net.anwiba.spatial.geometry.utilities.LineSegmentIterable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 
 public class LineSegmentIntersectOperator {
 

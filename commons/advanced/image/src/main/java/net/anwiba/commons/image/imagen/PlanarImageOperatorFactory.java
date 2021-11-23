@@ -26,6 +26,9 @@ import java.awt.RenderingHints;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 
+import net.anwiba.commons.image.IImageMetadata;
+import net.anwiba.commons.image.IImageMetadataAdjustor;
+import net.anwiba.commons.image.awt.BufferedImageOperatorFactory;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.image.operation.ImageCropOperation;
 import net.anwiba.commons.image.operation.ImageInvertOperation;
@@ -38,6 +41,7 @@ import net.anwiba.commons.lang.collection.IMutableObjectList;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.object.ObjectPair;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.thread.cancel.ICanceler;
@@ -56,35 +60,55 @@ class PlanarImageOperatorFactory {
         throws CanceledException {
       return Streams
           .of(CanceledException.class, this.collection)
-          .aggregate(source, (s, o) -> o.execute(canceler, s))
+          .aggregate(source, (s, o) -> {
+            if (canceler.isCanceled()) {
+              return null;
+            }
+            return s == null ? null : o.execute(canceler, s);
+          })
           .get();
     }
   }
 
-  public IPlanarImageOperator create(
-      final RenderingHints hints,
-      final IImageOperation operation) {
+  private IImageMetadataAdjustor metadataAdjustor;
+
+  public PlanarImageOperatorFactory() {
+    this(new ImagenImageMetadataAdjustor());
+  }
+
+  public PlanarImageOperatorFactory(IImageMetadataAdjustor metadataAdjustor) {
+    this.metadataAdjustor = metadataAdjustor;
+  }
+
+  public ObjectPair<IPlanarImageOperator, ImagenImageMetadata> create(
+      final ImagenImageMetadata metadata,
+      final IImageOperation operation,
+      final RenderingHints hints) {
     if (operation instanceof ImageScaleOperation) {
       final ImageScaleOperation o = (ImageScaleOperation) operation;
-      return createImageScaleOperation(hints, o);
+      return ObjectPair.of(createImageScaleOperation(hints, o), adapt(metadata, operation));
     } else if (operation instanceof ImageCropOperation) {
       final ImageCropOperation o = (ImageCropOperation) operation;
-      return createImageCropOperation(hints, o);
+      return ObjectPair.of(createImageCropOperation(hints, o), adapt(metadata, operation));
     } else if (operation instanceof ImageMapBandsOperation) {
       final ImageMapBandsOperation o = (ImageMapBandsOperation) operation;
-      return createImageMapBandsOperation(hints, o);
+      return ObjectPair.of(createImageMapBandsOperation(hints, o), adapt(metadata, operation));
     } else if (operation instanceof ImageOpacityOperation) {
       final ImageOpacityOperation o = (ImageOpacityOperation) operation;
-      return createImageOpacityOperation(hints, o);
+      return ObjectPair.of(createImageOpacityOperation(hints, metadata, o), adapt(metadata, operation));
     } else if (operation instanceof ImageTransparencyColorOperation) {
       final ImageTransparencyColorOperation o = (ImageTransparencyColorOperation) operation;
-      return createImageTransparencyOperation(hints, o);
+      return ObjectPair.of(createImageTransparencyOperation(hints, o), adapt(metadata, operation));
     } else if (operation instanceof ImageInvertOperation) {
-      return createImageInvertOperation(hints);
+      return ObjectPair.of(createImageInvertOperation(metadata, hints), adapt(metadata, operation));
     } else if (operation instanceof ImageToGrayScaleOperation) {
-      return createImageToGrayScaleOperation(hints);
+      return ObjectPair.of(createImageToGrayScaleOperation(hints), adapt(metadata, operation));
     }
-    return (canceler, source) -> source;
+    return ObjectPair.of((canceler, source) -> source, metadata);
+  }
+
+  private ImagenImageMetadata adapt(IImageMetadata metadata, IImageOperation operation) {
+    return (ImagenImageMetadata) metadataAdjustor.adjust(metadata, operation);
   }
 
   private IPlanarImageOperator createImageScaleOperation(
@@ -109,14 +133,16 @@ class PlanarImageOperatorFactory {
       float height = o.getHeight();
       final RenderedOp cropedRenderOp = ImagenImageContainerUtilities
           .crop(hints, source, x, y, width, height);
-      final RenderedOp translatedRenderOp = ImagenImageContainerUtilities
+      if (cropedRenderOp == null || canceler.isCanceled()) {
+        return null;
+      }
+      return ImagenImageContainerUtilities
           .translate(
               hints,
               cropedRenderOp,
               -x,
               -y,
               ImagenImageContainerUtilities.getInterpolation(hints));
-      return translatedRenderOp;
     };
   }
 
@@ -129,9 +155,14 @@ class PlanarImageOperatorFactory {
 
   private IPlanarImageOperator createImageOpacityOperation(
       final RenderingHints hints,
+      final IImageMetadata metadata,
       final ImageOpacityOperation o) {
-    return (canceler, source) -> ImagenImageContainerUtilities
-        .toOpacity(hints, source, o.getFactor());
+    if (metadata.isIndexed()) {
+      return (canceler, source) -> ImagenImageContainerUtilities.toOpacity(hints, source, o.getFactor());
+    }
+    return (canceler, source) -> ImagenImageContainerUtilities.toPlanarImage(
+        BufferedImageOperatorFactory.createImageOpacityOperation(metadata, hints, o)
+            .execute(canceler, source.getAsBufferedImage()));
   }
 
   private IPlanarImageOperator createImageTransparencyOperation(
@@ -142,8 +173,14 @@ class PlanarImageOperatorFactory {
   }
 
   private IPlanarImageOperator createImageInvertOperation(
+      final IImageMetadata metadata,
       final RenderingHints hints) {
-    return (canceler, source) -> ImagenImageContainerUtilities.toInverted(hints, source);
+    if (metadata.isIndexed()) {
+      return (canceler, source) -> ImagenImageContainerUtilities.toInverted(hints, source);
+    }
+    return (canceler, source) -> ImagenImageContainerUtilities.toPlanarImage(
+        BufferedImageOperatorFactory.createImageInvertOperation(metadata, hints)
+            .execute(canceler, source.getAsBufferedImage()));
   }
 
   private IPlanarImageOperator createImageToGrayScaleOperation(final RenderingHints hints) {
@@ -151,9 +188,9 @@ class PlanarImageOperatorFactory {
   }
 
   IPlanarImageOperator create(
-      final RenderingHints hints,
-      final IObjectList<IImageOperation> imageOperations) {
-
+      final ImagenImageMetadata metadata,
+      final IObjectList<IImageOperation> imageOperations,
+      final RenderingHints hints) {
     if (imageOperations.isEmpty()) {
       return new AggregatedPlanarImageOperator(new ObjectList<IPlanarImageOperator>());
     }
@@ -185,11 +222,13 @@ class PlanarImageOperatorFactory {
         .isAccepted()) {
       operations.add(scaleOperation.get());
     }
-
-    final IObjectList<IPlanarImageOperator> collection = operations
-        .stream()
-        .convert(o -> create(hints, o))
-        .asObjectList();
+    final IMutableObjectList<IPlanarImageOperator> collection = new ObjectList<>();
+    ImagenImageMetadata imageMetadata = metadata;
+    for (IImageOperation operation : operations) {
+      ObjectPair<IPlanarImageOperator, ImagenImageMetadata> pair = create(imageMetadata, operation, hints);
+      collection.add(pair.getFirstObject());
+      imageMetadata = pair.getSecondObject();
+    }
     return new AggregatedPlanarImageOperator(collection);
   }
 }

@@ -24,6 +24,7 @@ package net.anwiba.commons.model;
 import java.util.Collection;
 
 import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.stream.IStream;
 
 public interface ISelectionModel<T> {
 
@@ -54,5 +55,7 @@ public interface ISelectionModel<T> {
   Iterable<T> getSelectedObjects();
 
   IOptional<T, RuntimeException> optional();
+
+  IStream<T, RuntimeException> stream();
 
 }

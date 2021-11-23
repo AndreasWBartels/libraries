@@ -93,8 +93,20 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
   }
 
   @Override
+  public <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder setBySupplier(final Class<T> clazz,
+      final Class<S> supplierClass) {
+    return setBySupplier(binding(clazz), supplierClass);
+  }
+
+  @Override
   public <T> IInjectionValueProviderBuilder link(final Class<? extends T> clazz, final Class<T> link) {
     return link(binding(clazz), binding(link));
+  }
+
+  @Override
+  public <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder addBySupplier(final Class<T> clazz,
+      final Class<S> supplierClass) {
+    return addBySupplier(binding(clazz), supplierClass);
   }
 
   @Override
@@ -193,6 +205,15 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
     return this;
   }
 
+  @Override
+  public <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder setBySupplier(final IBinding<T> binding,
+      final Class<S> supplierClass) {
+    checkSingleValue(binding);
+    final IInjektionAnalyserResult analyserResult = this.analyser.analyse(supplierClass);
+    this.results.put(binding, new SingleValueHolder(analyserResult));
+    return this;
+  }
+
   private <T> void checkListResult(final IBinding<T> binding) {
     if (this.links.containsKey(binding)) {
       throw new IllegalArgumentException();
@@ -229,7 +250,22 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
   }
 
   @Override
+  public <T, S extends IInjectingSupplier<T>> IInjectionValueProviderBuilder addBySupplier(final IBinding<T> binding,
+      final Class<S> supplierClass) {
+    checkListResult(binding);
+    final IInjektionAnalyserResult analyserResult = this.analyser.analyse(supplierClass);
+    ((ListValueHolder) this.results.get(binding)).add(analyserResult);
+    return this;
+  }
+
+  @Override
   public <T, S extends T> IInjectionValueProviderBuilder add(final IBinding<T> binding, final S service) {
+    checkServiceListResult(binding);
+    ((ListValueHolder) this.services.get(binding)).add(service);
+    return this;
+  }
+
+  protected <T> void checkServiceListResult(final IBinding<T> binding) {
     if (this.results.containsKey(binding)) {
       final IValueHolder valueHolder = this.results.get(binding);
       if (!(valueHolder instanceof ListValueHolder)) {
@@ -243,8 +279,6 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
     if (!(valueHolder instanceof ListValueHolder)) {
       throw new IllegalArgumentException();
     }
-    ((ListValueHolder) this.services.get(binding)).add(service);
-    return this;
   }
 
   @SuppressWarnings("nls")
@@ -271,7 +305,11 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
               .getValue();
           if (forecaster.isResolveable(result)) {
             final Object object = factory.create(result);
-            this.services.put(binding, new SingleValueHolder(object));
+            if (object instanceof IInjectingSupplier) {
+              this.services.put(binding, new SingleValueHolder(((IInjectingSupplier) object).supply()));
+            } else {
+              this.services.put(binding, new SingleValueHolder(object));
+            }
             this.results.remove(binding);
           }
           continue;
@@ -285,7 +323,11 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
             final IInjektionAnalyserResult result = (IInjektionAnalyserResult) resultObject;
             if (forecaster.isResolveable(result)) {
               final Object object = factory.create(result);
-              ((ListValueHolder) this.services.get(binding)).add(object);
+              if (object instanceof IInjectingSupplier) {
+                ((ListValueHolder) this.services.get(binding)).add(((IInjectingSupplier) object).supply());
+              } else {
+                ((ListValueHolder) this.services.get(binding)).add(object);
+              }
               ((ListValueHolder) valueHolder).remove(result);
               if (((ListValueHolder) valueHolder).isEmty()) {
                 this.results.remove(binding);

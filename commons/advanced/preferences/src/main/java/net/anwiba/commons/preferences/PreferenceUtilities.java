@@ -26,10 +26,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import net.anwiba.commons.utilities.parameter.IParameter;
-import net.anwiba.commons.utilities.parameter.IParameters;
-import net.anwiba.commons.utilities.parameter.Parameter;
-import net.anwiba.commons.utilities.parameter.ParametersBuilder;
+import net.anwiba.commons.lang.parameter.IParameter;
+import net.anwiba.commons.lang.parameter.IParameters;
+import net.anwiba.commons.lang.parameter.Parameter;
+import net.anwiba.commons.lang.parameter.ParametersBuilder;
 
 public class PreferenceUtilities {
 

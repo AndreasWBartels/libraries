@@ -22,6 +22,7 @@
 package net.anwiba.commons.reference;
 
 import java.io.File;
+import java.util.Objects;
 
 public class FileResourceReference implements IResourceReference {
 
@@ -29,8 +30,7 @@ public class FileResourceReference implements IResourceReference {
   private final File file;
 
   public FileResourceReference(final File file) {
-    assert (file != null);
-    this.file = file;
+    this.file = Objects.requireNonNull(file);
   }
 
   @Override

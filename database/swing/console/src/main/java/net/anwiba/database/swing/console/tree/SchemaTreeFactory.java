@@ -47,7 +47,6 @@ import net.anwiba.commons.jdbc.name.IDatabaseTableName;
 import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.functional.IWatcher;
-import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.IBooleanModel;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.swing.tree.LazyFolderTreeNode;
@@ -128,7 +127,7 @@ public final class SchemaTreeFactory {
       this.statusModel.set(SqlConsoleMessages.done);
       return root;
     } catch (final SQLException exception) {
-      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+      logger.debug(exception.getMessage(), exception);
       this.statusModel.set(exception.getMessage());
       return root;
     }
@@ -173,6 +172,7 @@ public final class SchemaTreeFactory {
               }
               return nodes;
             } catch (final Exception exception) {
+              logger.debug(exception.getMessage(), exception);
               return Collections.emptyList();
             }
           }
@@ -200,6 +200,7 @@ public final class SchemaTreeFactory {
               }
               return nodes;
             } catch (final Exception exception) {
+              logger.debug(exception.getMessage(), exception);
               return Collections.emptyList();
             }
           }
@@ -258,6 +259,7 @@ public final class SchemaTreeFactory {
               }
               return names;
             } catch (SQLException exception) {
+              logger.debug(exception.getMessage(), exception);
               return List.of();
             }
           }
@@ -300,6 +302,7 @@ public final class SchemaTreeFactory {
               }
               return nodes;
             } catch (final Exception exception) {
+              logger.debug(exception.getMessage(), exception);
               return Collections.emptyList();
             }
           }
@@ -322,6 +325,7 @@ public final class SchemaTreeFactory {
               }
               return nodes;
             } catch (final Exception exception) {
+              logger.debug(exception.getMessage(), exception);
               return Collections.emptyList();
             }
           }
@@ -344,6 +348,7 @@ public final class SchemaTreeFactory {
               }
               return nodes;
             } catch (final Exception exception) {
+              logger.debug(exception.getMessage(), exception);
               return Collections.emptyList();
             }
           }
@@ -366,6 +371,7 @@ public final class SchemaTreeFactory {
               }
               return nodes;
             } catch (final Exception exception) {
+              logger.debug(exception.getMessage(), exception);
               return Collections.emptyList();
             }
           }
@@ -378,6 +384,7 @@ public final class SchemaTreeFactory {
     try {
       return this.connectionModel.get().getCatalog();
     } catch (final AbstractMethodError | Exception exception) {
+      logger.debug(exception.getMessage(), exception);
       return null;
     }
   }

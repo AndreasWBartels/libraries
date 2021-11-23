@@ -31,8 +31,8 @@ import net.anwiba.spatial.coordinate.ICoordinate;
 import net.anwiba.spatial.geometry.IGeometry;
 import net.anwiba.spatial.geometry.ILineSegment;
 import net.anwiba.spatial.geometry.operator.IEnvelopeConverter;
+import net.anwiba.spatial.geometry.operator.LineSegmentIterable;
 import net.anwiba.spatial.geometry.operator.Rtree;
-import net.anwiba.spatial.geometry.utilities.LineSegmentIterable;
 
 public class LineSegmentExtractor {
 

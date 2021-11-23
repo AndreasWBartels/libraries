@@ -21,12 +21,11 @@
  */
 package net.anwiba.commons.xml.jaxb;
 
-import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.utilities.collection.ListUtilities;
-
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.utilities.collection.ListUtilities;
 
 public class JaxbUtilities {
 

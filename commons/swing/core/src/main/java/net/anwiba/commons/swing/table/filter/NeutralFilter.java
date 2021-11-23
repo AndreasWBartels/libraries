@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.swing.table.filter;
 
+import javax.swing.table.TableModel;
+
 import net.anwiba.commons.swing.table.IRowFilter;
 import net.anwiba.commons.swing.table.IRowMapper;
-
-import javax.swing.table.TableModel;
 
 public class NeutralFilter implements IRowFilter {
 

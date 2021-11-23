@@ -21,10 +21,6 @@
  */
 package net.anwiba.commons.swing.table.listener;
 
-import net.anwiba.commons.model.ISelectionModel;
-import net.anwiba.commons.swing.table.IObjectTableModel;
-import net.anwiba.commons.swing.table.ISortedRowMapper;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +29,10 @@ import java.util.Set;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import net.anwiba.commons.model.ISelectionModel;
+import net.anwiba.commons.swing.table.IObjectTableModel;
+import net.anwiba.commons.swing.table.ISortedRowMapper;
 
 public final class TableSelectionListener<T> implements ListSelectionListener {
 

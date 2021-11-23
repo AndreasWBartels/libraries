@@ -25,11 +25,11 @@ package net.anwiba.spatial.geometry.operator;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anwiba.commons.utilities.collection.IterableUtilities;
-
 import org.khelekore.prtree.MBR;
 import org.khelekore.prtree.MBRConverter;
 import org.khelekore.prtree.PRTree;
+
+import net.anwiba.commons.utilities.collection.IterableUtilities;
 
 public class Rtree<T> {
 

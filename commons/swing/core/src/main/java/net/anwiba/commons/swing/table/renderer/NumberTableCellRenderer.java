@@ -21,8 +21,6 @@
  */
 package net.anwiba.commons.swing.table.renderer;
 
-import net.anwiba.commons.lang.object.ObjectUtilities;
-
 import java.awt.Component;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -30,6 +28,8 @@ import java.text.NumberFormat;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
+
+import net.anwiba.commons.lang.object.ObjectUtilities;
 
 @SuppressWarnings("serial")
 public class NumberTableCellRenderer extends DefaultTableCellRenderer {

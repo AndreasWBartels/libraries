@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
@@ -41,6 +42,7 @@ import net.anwiba.commons.lang.comparable.ComparableComparator;
 import net.anwiba.commons.lang.comparable.NumberComparator;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
+import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.optional.Optional;
@@ -56,7 +58,10 @@ import net.anwiba.commons.swing.table.renderer.DurationTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.LocalDateTimeTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
 import net.anwiba.commons.swing.table.renderer.ObjectTableCellRenderer;
+import net.anwiba.commons.swing.ui.IObjectUi;
+import net.anwiba.commons.swing.ui.IObjectUiCellRendererConfiguration;
 import net.anwiba.commons.swing.ui.ObjectUiBuilder;
+import net.anwiba.commons.swing.ui.ObjectUiListCellRenderer;
 import net.anwiba.commons.swing.ui.ObjectUiTableCellRenderer;
 
 public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
@@ -108,6 +113,35 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
     return this;
   }
 
+  public <O> IObjectTableBuilder<T> addObjectChooseColumn(final String title,
+      final IFunction<T, O, RuntimeException> provider,
+      final IAggregator<T, O, T, RuntimeException> aggregator,
+      final IConverter<T, String, RuntimeException> toString,
+      final List<O> values,
+      final Class<O> clazz,
+      final int size) {
+    IObjectUiCellRendererConfiguration configuration = new ObjectUiCellRendererConfigurationBuilder()
+        .setHorizontalAlignmentLeft()
+        .build();
+    IObjectUi<T> objectUi = new ObjectUiBuilder<T>().text(toString).build();
+    final JComboBox<O> comboBox = new JComboBox<>(new Vector<>(values));
+    comboBox.setRenderer(new ObjectUiListCellRenderer<>(configuration, objectUi));
+    final TableCellEditor editor = new DefaultCellEditor(comboBox);
+
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(
+        title,
+        (IColumnValueProvider<T>) object -> Optional.of(object).convert(o -> provider.execute(o)).get(),
+        configuration,
+        objectUi,
+        (IColumnValueAdaptor<T>) (object, value) -> aggregator.aggregate(object, (O) value),
+        editor,
+        size,
+        clazz,
+        false,
+        null));
+    return this;
+  }
+
   @Override
   public IObjectTableBuilder<T> addEditableStringColumn(final String title,
       final IFunction<T, String, RuntimeException> provider,
@@ -139,12 +173,14 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
     final JComboBox<String> comboBox = new JComboBox<>(values.toArray(String[]::new));
     final DefaultCellEditor cellEditor = new DefaultCellEditor(comboBox);
     cellEditor.setClickCountToStart(2);
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, (IColumnValueProvider<T>) object -> {
-      if (object == null) {
-        return null;
-      }
-      return provider.execute(object);
-    }, //
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(
+        title,
+        (IColumnValueProvider<T>) object -> {
+          if (object == null) {
+            return null;
+          }
+          return provider.execute(object);
+        }, //
         new ObjectTableCellRenderer(),
         (object, value) -> adaptor.aggregate(object, (String) value),
         cellEditor,
@@ -205,7 +241,8 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
     } else {
       throw new IllegalArgumentException("Unsupported component implementation"); //$NON-NLS-1$
     }
-    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title,
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(
+        title,
         (IColumnValueProvider<T>) object -> Optional.of(object).convert(o -> provider.execute(o)).get(),
         new ObjectUiCellRendererConfigurationBuilder().setHorizontalAlignmentRight().build(),
         new ObjectUiBuilder<Integer>().text(v -> v.toString()).build(),
@@ -307,6 +344,19 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
         Image.class,
         false,
         null));
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addBooleanColumn(final String title,
+      final IFunction<T, Boolean, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
+      }
+      return provider.execute(object);
+    }, new BooleanRenderer(), size, Boolean.class, false, null));
     return this;
   }
 
@@ -444,6 +494,13 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   public IObjectTableBuilder<T> setAccessoryHeaderPanelFactory(
       final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryHeaderPanelFactory) {
     this.builder.setAccessoryHeaderPanelFactory(accessoryHeaderPanelFactory);
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> setAccessoryFooterPanelFactory(
+      final IFactory<IObjectTableModel<T>, JComponent, RuntimeException> accessoryFooterPanelFactory) {
+    this.builder.setAccessoryFooterPanelFactory(accessoryFooterPanelFactory);
     return this;
   }
 

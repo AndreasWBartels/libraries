@@ -28,6 +28,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 
 import net.anwiba.commons.lang.functional.IFunction;
+import net.anwiba.commons.lang.parameter.IParameter;
 import net.anwiba.commons.message.Message;
 import net.anwiba.commons.preferences.IPreferences;
 import net.anwiba.commons.preferences.PreferenceUtilities;
@@ -38,7 +39,6 @@ import net.anwiba.commons.swing.dialog.pane.AbstractContentPane;
 import net.anwiba.commons.swing.preferences.editor.IPreferenceNodeEditorFactoryRegistry;
 import net.anwiba.commons.swing.preferences.editor.ParametersEditorFactoryRegistry;
 import net.anwiba.commons.swing.preferences.tree.IPreferenceNode;
-import net.anwiba.commons.utilities.parameter.IParameter;
 
 public final class PreferencesDialogAction extends AbstractAction {
 

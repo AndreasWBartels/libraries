@@ -22,6 +22,7 @@
 package net.anwiba.commons.image.awt;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 
 public class BufferedImageMetadataFactory {
 
@@ -29,11 +30,12 @@ public class BufferedImageMetadataFactory {
     final BufferedImageMetadata metadata = new BufferedImageMetadata(
         image.getWidth(),
         image.getHeight(),
-        image.getColorModel().getNumComponents(),
+        image.getColorModel().getNumColorComponents(),
         image.getColorModel().getNumComponents(),
         image.getColorModel().getColorSpace().getType(),
         image.getColorModel().getTransferType(),
-        image.getColorModel().getTransparency());
+        image.getColorModel().getTransparency(),
+        image.getColorModel() instanceof IndexColorModel);
     return metadata;
   }
 }

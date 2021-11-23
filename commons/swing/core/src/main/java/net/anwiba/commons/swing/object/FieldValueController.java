@@ -53,6 +53,9 @@ public final class FieldValueController<T> {
     public String convert(final PlainDocument plainDocument) throws RuntimeException {
       try {
         final String text = plainDocument.getText(0, plainDocument.getLength());
+        if (characterFilter == null) {
+          return text;
+        }
         final StringBuilder builder = new StringBuilder();
         for (final char character : text.toCharArray()) {
           if (!FieldValueController.this.characterFilter.accept(character)) {
@@ -60,7 +63,7 @@ public final class FieldValueController<T> {
           }
           builder.append(character);
         }
-        return text;
+        return builder.toString();
       } catch (final BadLocationException exception) {
         return ""; //$NON-NLS-1$
       }

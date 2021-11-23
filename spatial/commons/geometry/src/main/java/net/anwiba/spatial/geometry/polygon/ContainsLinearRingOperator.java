@@ -32,8 +32,8 @@ import net.anwiba.spatial.geometry.ILineString;
 import net.anwiba.spatial.geometry.ILinearRing;
 import net.anwiba.spatial.geometry.operator.IEnvelopeConverter;
 import net.anwiba.spatial.geometry.operator.LineIntersector;
+import net.anwiba.spatial.geometry.operator.LineSegmentIterable;
 import net.anwiba.spatial.geometry.operator.Rtree;
-import net.anwiba.spatial.geometry.utilities.LineSegmentIterable;
 
 public class ContainsLinearRingOperator {
 

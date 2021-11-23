@@ -32,6 +32,7 @@ public interface IResultProducer<T> {
 
   T execute(
       ICanceler canceler,
+      String url,
       int statusCode,
       String statusMessage,
       String contentType,

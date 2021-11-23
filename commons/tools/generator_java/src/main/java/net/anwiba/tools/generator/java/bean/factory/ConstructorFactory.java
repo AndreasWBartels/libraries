@@ -21,7 +21,15 @@
  */
 package net.anwiba.tools.generator.java.bean.factory;
 
-import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.*;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.addListParameter;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.addObjectParameter;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.createAddIfNullClearListAndReturnClosure;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.createAddIfNullClearMapAndReturnClosure;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.createAddIfNullReturnClosure;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.createEnsureArgumentNotNullClosure;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.isInstanceOfList;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.isInstanceOfMap;
+import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.setMapParameters;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;

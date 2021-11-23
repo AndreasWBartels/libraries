@@ -21,10 +21,10 @@
  */
 package net.anwiba.commons.thread.progress;
 
+import java.io.Serializable;
+
 import net.anwiba.commons.message.IMessage;
 import net.anwiba.commons.message.IMessageCollector;
-
-import java.io.Serializable;
 
 public interface IProgressMonitor extends IMessageCollector, Serializable {
 

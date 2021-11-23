@@ -23,7 +23,7 @@ package net.anwiba.commons.lang.primitive;
 
 public class BooleanContainer implements IBooleanContainer {
 
-  private boolean value;
+  private volatile boolean value;
 
   public BooleanContainer(final boolean value) {
     this.value = value;

@@ -2,7 +2,6 @@
 @JssdPrimitivesEnabled
 {
   @JssdImmutable
-  @JssdNoProperty
   "class": <String> "DEVICES",
   "devices": <device[]> null,
   "remote": <String> null

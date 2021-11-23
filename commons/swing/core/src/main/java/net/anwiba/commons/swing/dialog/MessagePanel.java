@@ -23,6 +23,7 @@ package net.anwiba.commons.swing.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.Objects;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -39,7 +40,7 @@ import net.anwiba.commons.swing.utilities.GuiUtilities;
 public class MessagePanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
-  PlainDocument messageDocument = new PlainDocument();
+  private final PlainDocument messageDocument = new PlainDocument();
   private final JTextArea messageTextArea = new JTextArea(this.messageDocument);
   private final JLabel messageTitleLabel = new JLabel();
   private final JLabel messageTypeLabel = new JLabel();
@@ -47,7 +48,7 @@ public class MessagePanel extends JPanel {
   private Icon icon = GuiIcons.EMPTY_ICON.getLargeIcon();
 
   public MessagePanel(final IMessage defaultMessage, final Icon icon) {
-    this.defaultMessage = defaultMessage;
+    this.defaultMessage = Objects.requireNonNull(defaultMessage);
     setIcon(icon);
     createView();
     doSetMessage(defaultMessage);

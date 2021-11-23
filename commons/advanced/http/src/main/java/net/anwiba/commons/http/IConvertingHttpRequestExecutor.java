@@ -63,6 +63,7 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
       @Override
       public T execute(
           final ICanceler canceler,
+          final String url,
           final int statusCode,
           final String statusMessage,
           final String contentType,
@@ -70,7 +71,7 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
           final InputStream inputStream)
           throws IOException,
           CanceledException {
-        return resultProducer.execute(canceler, statusCode, statusMessage, contentType, contentEncoding, inputStream);
+        return resultProducer.execute(canceler, url, statusCode, statusMessage, contentType, contentEncoding, inputStream);
       }
 
       @Override

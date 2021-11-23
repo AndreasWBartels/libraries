@@ -26,14 +26,16 @@ import java.time.LocalDateTime;
 
 public interface IMessage extends Serializable {
 
-  public LocalDateTime getTimeStamp();
+  LocalDateTime getTimeStamp();
 
-  public String getText();
+  String getText();
 
-  public String getDescription();
+  String getDescription();
 
-  public MessageType getMessageType();
+  MessageType getMessageType();
 
   Throwable getThrowable();
+
+  Object getGoal();
 
 }

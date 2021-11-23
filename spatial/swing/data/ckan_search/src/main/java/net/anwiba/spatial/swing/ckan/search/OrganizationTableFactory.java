@@ -155,6 +155,7 @@ public class OrganizationTableFactory {
       IOException {
     final IResultProducer<OrganizationListResultResponse> responseProducer = (
         c,
+        url,
         statusCode,
         statusMessage,
         contentType,

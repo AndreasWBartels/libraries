@@ -23,12 +23,11 @@ package net.anwiba.commons.mail;
 
 import java.io.InputStream;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 import org.xml.sax.SAXException;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import net.anwiba.commons.mail.schema.account.Account;
 import net.anwiba.commons.xml.jaxb.JaxbContextBuilder;
 import net.anwiba.commons.xml.jaxb.UnmarshallerFactory;

@@ -21,16 +21,16 @@
  */
 package net.anwiba.commons.swing.filechooser;
 
-import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.preferences.IPreferences;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.model.ObjectModel;
+import net.anwiba.commons.preferences.IPreferences;
 
 public final class MultiFileChooserPanel implements IFileChooserPanel {
   private final JFileChooser fileChooser;

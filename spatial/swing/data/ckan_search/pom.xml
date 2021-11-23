@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <name>spatial swing ckan search</name>
   <description>spatial ckan search swing project</description>
-  <url>${url.net.anwiba}/libraries/spatial/swing/data/swing_ckan_search</url>
+  <url>${url.net.anwiba}/libraries/spatial/swing/data/ckan_search</url>
 
   <artifactId>anwiba-spatial-swing-data-ckan-search</artifactId>
   <packaging>jar</packaging>
@@ -13,13 +13,13 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>spatial-swing-data</artifactId>
-    <version>1.1.121</version>
+    <version>1.1.158</version>
   </parent>
 
   <scm>
     <connection>${scm.url.net.anwiba.base}/libraries.git</connection>
     <developerConnection>${scm.url.net.anwiba.base}/libraries.git</developerConnection>
-    <url>${scm.url.net.anwiba.master}/spatial/swing/data/swing_ckan_search</url>
+    <url>${scm.url.net.anwiba.master}/spatial/swing/data/ckan_search</url>
   </scm>
 
   <dependencies>

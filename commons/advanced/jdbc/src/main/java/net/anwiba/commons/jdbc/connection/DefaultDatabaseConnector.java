@@ -44,7 +44,7 @@ public class DefaultDatabaseConnector implements IRegisterableDatabaseConnector 
       final String url,
       final String userName,
       final String password,
-      boolean isAutoCommitEnabled,
+      final boolean isAutoCommitEnabled,
       final int timeout)
       throws SQLException {
     return connect(url, userName, password, isAutoCommitEnabled, timeout, false);
@@ -75,7 +75,7 @@ public class DefaultDatabaseConnector implements IRegisterableDatabaseConnector 
       final String user,
       final String password,
       final boolean isAutoCommitEnabled,
-      boolean isReadOnly)
+      final boolean isReadOnly)
       throws SQLException {
     final Connection connection = DriverManager.getConnection(url, user, password);
     connection.setAutoCommit(isAutoCommitEnabled);

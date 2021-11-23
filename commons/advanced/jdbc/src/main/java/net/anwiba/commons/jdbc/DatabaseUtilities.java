@@ -40,12 +40,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import net.anwiba.commons.jdbc.connection.IDatabaseConnector;
 import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
@@ -85,10 +83,12 @@ import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.version.IVersion;
+import net.anwiba.commons.version.VersionBuilder;
 
 public class DatabaseUtilities {
 
-  private static ILogger logger = Logging.getLogger(DatabaseUtilities.class.getName());
+  private static ILogger logger = Logging.getLogger(DatabaseUtilities.class);
 
   public static Driver loadDriver(final String driverName) {
     try {
@@ -319,36 +319,6 @@ public class DatabaseUtilities {
     return connection.getMetaData().getDatabaseMinorVersion();
   }
 
-  public static String getCompleteSqlExceptionMessageText(final SQLException exception) {
-    return getCompleteSqlExceptionMessageText(exception, new HashSet<>());
-  }
-
-  private static String getCompleteSqlExceptionMessageText(
-      final Throwable exception,
-      final Set<Throwable> visited) {
-    if (exception == null || visited.contains(exception)) {
-      return "";
-    }
-    visited.add(exception);
-    String message = exception instanceof SQLException ? exception.getMessage() : "";
-    if (exception instanceof SQLException) {
-      final SQLException sqlException = (SQLException) exception;
-      return message
-          + (message.isBlank() ? "" : "\n")
-          + getCompleteSqlExceptionMessageText(sqlException.getNextException(), visited);
-    }
-    if (exception.getCause() != null) {
-      final Throwable cause = exception.getCause();
-      message += (message.isBlank() ? "" : "\n")
-          + getCompleteSqlExceptionMessageText(cause, visited);
-    }
-    for (Throwable throwable : exception.getSuppressed()) {
-      message += (message.isBlank() ? "" : "\n")
-          + getCompleteSqlExceptionMessageText(throwable, visited);
-    }
-    return message;
-  }
-
   public static Map<String, Constraint> readConstraints(
       final Connection connection,
       final String selectStatement,
@@ -529,8 +499,6 @@ public class DatabaseUtilities {
         }
         return resultList;
       }
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
     }
   }
 
@@ -1947,6 +1915,13 @@ public class DatabaseUtilities {
     if (!connection.getAutoCommit() && counter.value() > 0) {
       connection.commit();
     }
+  }
+
+  public static IVersion version(final Connection connection) throws SQLException {
+    DatabaseMetaData metaData = connection.getMetaData();
+    int majorVersion = metaData.getDatabaseMajorVersion();
+    int minorVersion = metaData.getDatabaseMinorVersion();
+    return new VersionBuilder().setMajor(majorVersion).setMinor(minorVersion).build();
   }
 
 }

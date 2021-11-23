@@ -34,6 +34,7 @@ import net.anwiba.commons.swing.dialog.progress.ProgressDialog;
 import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.thread.progress.AbstractProgressTask;
 import net.anwiba.commons.thread.progress.IProgressMonitor;
+import net.anwiba.testing.demo.DemoUtilities;
 
 public class ProgressDialogDemo {
 
@@ -53,11 +54,7 @@ public class ProgressDialogDemo {
               while (i < 5) {
                 canceler.check();
                 progressMonitor.setNote("index " + i); //$NON-NLS-1$
-                try {
-                  Thread.sleep(1000);
-                } catch (final InterruptedException exception) {
-                  return;
-                }
+                DemoUtilities.pause();
                 i++;
               }
             }

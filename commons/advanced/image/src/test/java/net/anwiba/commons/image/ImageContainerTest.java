@@ -83,10 +83,7 @@ public class ImageContainerTest {
       new HttpClientConnector(this.httpRequestExcecutorFactory));
   private final ImageContainerFactory imageContainerFactory =
       ImageContainerFactory.of(null, this.resourceReferenceHandler);
-  private final IImageReader imageReader = new ImageReader(
-      this.imageContainerFactory,
-      this.resourceReferenceHandler,
-      this.httpRequestExcecutorFactory);
+  private final IImageReader imageReader = new ImageReader(this.imageContainerFactory);
   private final ImageWriter imageWriter = new ImageWriter();
 
   @Test
@@ -482,7 +479,6 @@ public class ImageContainerTest {
               (float) (j * 100 - 50 + bounds.getHeight() / 2));
         }
       }
-      graphics.dispose();
     } finally {
       graphics.dispose();
     }
