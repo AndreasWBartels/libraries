@@ -93,7 +93,7 @@
     <org.sonatype.plexus.version>0.0.7</org.sonatype.plexus.version>
 
     <!-- logging -->
-    <org.apache.logging.version>2.14.1</org.apache.logging.version>
+    <org.apache.logging.version>2.15.0</org.apache.logging.version>
     <org.slf4j.version>1.7.30</org.slf4j.version>
 
     <!-- cryptography -->
