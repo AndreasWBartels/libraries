@@ -144,7 +144,7 @@
     <postgresql.version>42.3.1</postgresql.version>
     <net.postgis.version>2021.1.0</net.postgis.version>
 
-    <com.h2database.version>jts-1.8.1-1.4.200</com.h2database.version>
+    <com.h2database.version>2.0.206</com.h2database.version>
     <!-- <com.h2database.version>1.4.199</com.h2database.version> -->
     <!-- <com.h2database.version>1.4.200</com.h2database.version> -->
     <!-- <com.h2database.version>2.0.201-SNAPSHOT</com.h2database.version> -->
