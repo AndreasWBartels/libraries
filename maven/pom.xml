@@ -100,7 +100,7 @@
     <org.bouncycastle.version>1.69</org.bouncycastle.version>
 
     <!-- code generation -->
-    <org.antlr4.version>4.9.2</org.antlr4.version>
+    <org.antlr4.version>4.10.1</org.antlr4.version>
     <com.sun.codemodel.version>2.6</com.sun.codemodel.version>
 
     <!-- software-languages -->
