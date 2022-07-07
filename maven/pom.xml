@@ -152,7 +152,7 @@
     <com.healthmarketscience.jackcess.version>4.0.1</com.healthmarketscience.jackcess.version>
 
     <!-- web -->
-    <org.eclipse.jetty.version>11.0.7</org.eclipse.jetty.version>
+    <org.eclipse.jetty.version>11.0.10</org.eclipse.jetty.version>
     <org.springframework.version>5.3.12</org.springframework.version>
     <org.apache.httpcomponents.core5.version>5.1.2</org.apache.httpcomponents.core5.version>
     <org.apache.httpcomponents.client5.version>5.1.1</org.apache.httpcomponents.client5.version>
