@@ -108,7 +108,7 @@
 
     <!-- json -->
     <!-- version >= 2.12.0 needs jdk 14+ -->
-    <com.fasterxml.jackson.version>2.11.4</com.fasterxml.jackson.version>
+    <com.fasterxml.jackson.version>2.12.6.1</com.fasterxml.jackson.version>
 
     <!-- xml -->
     <javax.xml.stream.version>1.0-2</javax.xml.stream.version>
