@@ -95,9 +95,9 @@ public class ThreadMonitor {
         continue;
       }
       final IMessage message = Message.builder()
-          .setError()
-          .setText("Thread '" + thread.getThreadName() + "' bocked")
-          .setDescription(threadDump)
+          .error()
+          .text("Thread '" + thread.getThreadName() + "' bocked")
+          .description(threadDump)
           .build();
       logger.warning(message.getText());
       logger.debug(message.getDescription());

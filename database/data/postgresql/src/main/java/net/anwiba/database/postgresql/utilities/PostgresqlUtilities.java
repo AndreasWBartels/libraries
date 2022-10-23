@@ -21,17 +21,36 @@
  */
 package net.anwiba.database.postgresql.utilities;
 
+import net.anwiba.commons.jdbc.DatabaseUtilities;
+import net.anwiba.commons.jdbc.constraint.Constraint;
+import net.anwiba.commons.jdbc.constraint.ConstraintType;
+import net.anwiba.commons.jdbc.constraint.ConstraintsUtilities;
+import net.anwiba.commons.jdbc.metadata.ColumnMetaData;
+import net.anwiba.commons.jdbc.metadata.IColumnMetaData;
+import net.anwiba.commons.jdbc.metadata.ITableMetaData;
+import net.anwiba.commons.jdbc.metadata.TableMetaData;
+import net.anwiba.commons.jdbc.name.DatabaseIndexName;
+import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
+import net.anwiba.commons.jdbc.result.IResult;
+import net.anwiba.commons.jdbc.type.TableType;
+import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.logging.ILogger;
+import net.anwiba.commons.logging.Logging;
+import net.anwiba.database.postgresql.PostgresqlTableType;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import net.anwiba.commons.jdbc.name.DatabaseIndexName;
-import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
-import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.Logging;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class PostgresqlUtilities {
 
@@ -140,7 +159,7 @@ public class PostgresqlUtilities {
       final Connection connection,
       final String schemaName,
       final String tableName)
-          throws SQLException {
+      throws SQLException {
     String statementString = "SELECT 'CREATE TABLE ' || pn.nspname || '.' || pc.relname "
         + "   || E'(\\n' ||\n   string_agg(pa.attname || ' ' || pg_catalog.format_type(pa.atttypid, pa.atttypmod) "
         + "   || coalesce(' DEFAULT ' "
@@ -190,5 +209,151 @@ public class PostgresqlUtilities {
         return null;
       }
     }
+  }
+
+  public static List<IColumnMetaData> readColumnMetaData(
+      final Connection connection,
+      final String schemaName,
+      final String tableName,
+      final Map<String, Constraint> constraints)
+      throws SQLException {
+    final List<IColumnMetaData> columnMetaDatas = new ArrayList<>();
+    logger.log(ILevel.FINE, "Query: Schema " + schemaName + " table " + tableName); //$NON-NLS-1$ //$NON-NLS-2$
+    logger.log(ILevel.FINE, "Query: " + PostgresqlUtilitiesStatementStrings.ColumnMetaDataStatement); //$NON-NLS-1$
+    try (PreparedStatement statement = connection
+        .prepareStatement(PostgresqlUtilitiesStatementStrings.ColumnMetaDataStatement)) {
+      statement.setString(1, schemaName);
+      statement.setString(2, tableName);
+      if (statement.execute()) {
+        try (ResultSet resultSet = statement.getResultSet()) {
+          while (resultSet.next()) {
+            final String columnName = resultSet.getString(1);
+            final String typeName = resultSet.getString(2);
+            final int length = resultSet.getInt(3);
+            final int scale = resultSet.getInt(4);
+            final boolean isNullable = resultSet.getString(5).equals("t"); //$NON-NLS-1$
+            final boolean isPrimaryKey = ConstraintsUtilities.isPrimaryKey(constraints, columnName);
+            final boolean isAutoIncrement = resultSet.getString(6).equals("t");
+            final IColumnMetaData metaData = new ColumnMetaData(
+                schemaName,
+                tableName,
+                columnName,
+                typeName,
+                length,
+                scale,
+                isPrimaryKey,
+                isAutoIncrement,
+                isNullable);
+            columnMetaDatas.add(metaData);
+          }
+        }
+      }
+      return columnMetaDatas;
+    }
+  }
+
+  public static Map<String, Constraint> readConstraints(
+      final Connection connection,
+      final String schemaName,
+      final String tableName)
+      throws SQLException {
+    TableType tableType = readTableType(connection, schemaName, tableName);
+    if (Objects.equals(TableType.MATERIALIZED_VIEW, tableType)) {
+      return readConstraintsByMatrializedViewIndexes(connection, schemaName, tableName);
+    }
+    return DatabaseUtilities
+        .readConstraints(
+            connection,
+            PostgresqlUtilitiesStatementStrings.ConstraintTypesStatement,
+            schemaName,
+            tableName);
+  }
+
+  private static Map<String, Constraint>
+      readConstraintsByMatrializedViewIndexes(final Connection connection,
+          final String schemaName,
+          final String tableName) throws SQLException {
+    final Map<String, Constraint> constraints = new HashMap<>();
+    DatabaseUtilities
+        .results(connection,
+            "select t.relname as table_name,\n" +
+                "       i.relname as index_name,\n" +
+                "       a.attname as column_name,\n" +
+                "       ix.indisunique as is_unique\n" +
+                "  from pg_namespace s,\n" +
+                "       pg_class t,\n" +
+                "       pg_class i,\n" +
+                "       pg_index ix,\n" +
+                "       pg_attribute a\n" +
+                " where t.oid = ix.indrelid\n" +
+                "   and i.oid = ix.indexrelid\n" +
+                "   and a.attrelid = t.oid\n" +
+                "   and a.attnum = ANY(ix.indkey)\n" +
+                "   and t.relkind in ('m', 'r')\n" +
+                "   and s.nspname = ?\n" +
+                "   and t.relname = ?\n" +
+                "   and s.oid = t.relnamespace\n" +
+                "order by t.relname, i.relname",
+            DatabaseUtilities.setter(schemaName, tableName),
+            (IConverter<IResult, Void, SQLException>) result -> {
+              if (result.getBoolean(4, false)) {
+                final Constraint constraint = DatabaseUtilities.getConstraint(
+                    constraints,
+                    result.getString(2),
+                    ConstraintType.UNIQUE,
+                    null);
+                constraint.add(result.getString(3));
+              }
+              return null;
+            });
+    return constraints;
+  }
+
+  public static ITableMetaData readTableMetaData(
+      final Connection connection,
+      final String schemaName,
+      final String tableName)
+      throws SQLException {
+    final Map<String, Constraint> constraints = readConstraints(
+        connection,
+        schemaName,
+        tableName);
+    final List<IColumnMetaData> columnMetadata = readColumnMetaData(
+        connection,
+        schemaName,
+        tableName,
+        constraints);
+    return new TableMetaData(columnMetadata, constraints);
+  }
+
+  private static TableType readTableType(
+      final Connection connection,
+      final String schemaName,
+      final String tableName)
+      throws SQLException {
+    return DatabaseUtilities
+        .result(connection,
+            "select case when t.relkind = 'r' then 'BASE TABLE'\n" +
+                "                when t.relkind = 'v' then 'VIEW'\n" +
+                "                when t.relkind = 'm' then 'MATERIALIZED VIEW'\n" +
+                "                else 'UNKNOWN'\n" +
+                "           end as table_type\n" +
+                "      from pg_namespace s,\n" +
+                "           pg_class t\n" +
+                "      where s.nspname = ?\n" +
+                "        and t.relname = ?\n" +
+                "        and s.oid = t.relnamespace",
+            DatabaseUtilities.setter(schemaName, tableName),
+            (IConverter<IOptional<IResult, SQLException>, TableType,
+                SQLException>) optional -> optional.convert(result -> {
+                  return getTableType(result.getString(1));
+                }).getOr(() -> TableType.UNKNOWN));
+  }
+
+  public static TableType getTableType(final String postgresqlTableTypeName) {
+    if (postgresqlTableTypeName == null) {
+      throw new UnreachableCodeReachedException();
+    }
+    return PostgresqlTableType.valueOf(postgresqlTableTypeName.replace(' ', '_')).getTableType();
   }
 }

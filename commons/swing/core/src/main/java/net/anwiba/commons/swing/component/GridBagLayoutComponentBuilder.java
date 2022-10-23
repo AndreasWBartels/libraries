@@ -22,6 +22,7 @@
 
 package net.anwiba.commons.swing.component;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -35,6 +36,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
+
+import net.anwiba.commons.lang.object.IObjectToStringConverter;
+import net.anwiba.commons.model.IBooleanModel;
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.swing.label.LabelUpdater;
 
 public class GridBagLayoutComponentBuilder {
 
@@ -69,12 +75,42 @@ public class GridBagLayoutComponentBuilder {
     return this;
   }
 
+  public <T> GridBagLayoutComponentBuilder label(final IObjectToStringConverter<T> converter,
+      final IObjectModel<T> model) {
+    final IObjectToStringConverter<T> toStringConverter = object -> {
+      String text = converter.toString(object);
+      System.out.println(text);
+      return text + (text.isEmpty() ? "" : ":");
+    };
+    final JLabel label = new JLabel(toStringConverter.toString(model.get()));
+    model.addChangeListener(new LabelUpdater<T>(label, toStringConverter, model));
+    return add(label);
+  }
+
   public GridBagLayoutComponentBuilder label(final String text) {
     return add(new JLabel(text + (text.isEmpty() ? "" : ":")));
   }
 
+  public GridBagLayoutComponentBuilder label(final String text, String tooltipText) {
+    JLabel component = new JLabel(text + (text.isEmpty() ? "" : ":"));
+    component.setToolTipText(tooltipText);
+    return add(component);
+  }
+
   public GridBagLayoutComponentBuilder add(final Action action) {
     return add(new JButton(action));
+  }
+
+  public GridBagLayoutComponentBuilder emptyComponent() {
+    return add(new JPanel());
+  }
+
+  public GridBagLayoutComponentBuilder checkbox(IBooleanModel model, String lable) {
+    return checkbox(model, lable, lable);
+  }
+
+  public GridBagLayoutComponentBuilder checkbox(IBooleanModel model, String lable, String tooltip) {
+    return add(new CheckBox(lable, tooltip, model).getComponent());
   }
 
   public GridBagLayoutComponentBuilder add(final JComponent component) {
@@ -91,6 +127,14 @@ public class GridBagLayoutComponentBuilder {
 
   public GridBagLayoutComponentBuilder placeHolder() {
     add(new JPanel());
+    return this;
+  }
+
+  public GridBagLayoutComponentBuilder placeHolder(int width) {
+    JPanel component = new JPanel();
+    component.setMinimumSize(new Dimension(width, 2));
+    component.setPreferredSize(new Dimension(width, 2));
+    add(component);
     return this;
   }
 
@@ -131,4 +175,5 @@ public class GridBagLayoutComponentBuilder {
     }
     return contentPanel;
   }
+
 }

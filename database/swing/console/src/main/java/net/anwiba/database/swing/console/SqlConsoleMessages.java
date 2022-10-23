@@ -52,6 +52,7 @@ public class SqlConsoleMessages extends NLS {
   public static String triggers;
   public static String views;
   public static String working;
+  public static String columns;
 
   static {
     initialize(SqlConsoleMessages.class, (c, r) -> c.getResourceAsStream(r));

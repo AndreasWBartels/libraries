@@ -24,6 +24,9 @@ package net.anwiba.commons.jdbc.software;
 import java.sql.Driver;
 import java.util.List;
 
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
+
 public interface IDatabaseSoftware {
 
   public static String TCP = "tcp"; //$NON-NLS-1$
@@ -51,5 +54,9 @@ public interface IDatabaseSoftware {
   List<IJdbcPattern> getJdbcUrlPatterns();
 
   String name();
+
+  default IOptional<String, RuntimeException> getDefaultSchema() {
+    return Optional.empty();
+  }
 
 }

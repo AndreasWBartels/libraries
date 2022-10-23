@@ -208,10 +208,10 @@ public final class Response implements IResponse {
   public void close() throws IOException {
     IOException exception = null;
     if (this.response instanceof CloseableHttpResponse) {
-      exception = IoUtilities.close(() -> ((CloseableHttpResponse) this.response).close(), exception);
+      exception = IoUtilities.close(() -> ((CloseableHttpResponse) this.response).close());
     }
-    exception = IoUtilities.close(this.client, exception);
-    IoUtilities.toss(exception);
+    exception = IoUtilities.close(exception, this.client);
+    IoUtilities.throwIfNotNull(exception);
   }
 
   @Override

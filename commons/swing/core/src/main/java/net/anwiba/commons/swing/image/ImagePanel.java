@@ -221,9 +221,6 @@ public class ImagePanel extends JComponent implements Scrollable {
 
   protected void reset() {
     synchronized (this) {
-      if (this.imageContainerModel.get() != null) {
-        this.imageContainerModel.get().dispose();
-      }
       this.imageContainerModel.set(null);
       this.exceptionModel.set(null);
       this.thumbnail = null;

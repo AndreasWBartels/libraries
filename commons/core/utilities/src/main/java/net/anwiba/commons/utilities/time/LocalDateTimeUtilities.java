@@ -88,6 +88,22 @@ public class LocalDateTimeUtilities {
             .toFormatter(Locale.getDefault()));
   }
 
+  public static String toString(final LocalDate date) {
+    return date.format(
+        new DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .append(DateTimeFormatter.ISO_LOCAL_DATE)
+            .toFormatter(Locale.getDefault()));
+  }
+
+  public static String toString(final LocalTime time) {
+    return time.format(
+        new DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .append(DateTimeFormatter.ISO_LOCAL_TIME)
+            .toFormatter(Locale.getDefault()));
+  }
+
   public static LocalDateTime atCoordinatedUniversalTimeZone(final java.sql.Date date) {
     return atCoordinatedUniversalTimeZone(new Date(date.getTime()));
   }
@@ -96,6 +112,7 @@ public class LocalDateTimeUtilities {
     return LocalDateTime.ofInstant(date.toInstant(), ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone());
   }
 
+  // TODO re thing
   public static LocalDateTime
       truncat(final LocalDateTime dateTime, final TemporalAmount duration, final TemporalUnit unit) {
     if (ChronoUnit.SECONDS.getDuration().compareTo(unit.getDuration()) >= 0) {

@@ -21,10 +21,6 @@
  */
 package net.anwiba.commons.swing.action;
 
-import java.awt.Component;
-import java.awt.Window;
-import java.lang.reflect.InvocationTargetException;
-
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.logging.ILevel;
@@ -32,6 +28,10 @@ import net.anwiba.commons.swing.dialog.MessageDialog;
 import net.anwiba.commons.swing.dialog.progress.ProgressDialogUtilities;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
+
+import java.awt.Component;
+import java.awt.Window;
+import java.lang.reflect.InvocationTargetException;
 
 public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O> {
 
@@ -70,7 +70,7 @@ public class ActionProcedurBuilder<I, O> implements IActionProcedurBuilder<I, O>
         final O result = this.task == null
             ? (O) value
             : ProgressDialogUtilities
-                .setTask((progressMonitor, canceler) -> this.task.excecute(progressMonitor, canceler, value))
+                .setTask((progressMonitor, canceler) -> this.task.execute(progressMonitor, canceler, value))
                 .setTitle(this.title)
                 .setDescription(this.description)
                 .launch(owner);

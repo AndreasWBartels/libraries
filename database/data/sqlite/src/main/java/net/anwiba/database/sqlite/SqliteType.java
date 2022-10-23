@@ -26,140 +26,140 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.anwiba.commons.jdbc.metadata.IDataBaseType;
+import net.anwiba.commons.jdbc.metadata.IDatabaseType;
 
-public enum SqliteType implements IDataBaseType {
+public enum SqliteType implements IDatabaseType {
 
   INT2(Types.SMALLINT) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitShort();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitShort();
     }
   },
   MEDIUMINT(Types.SMALLINT) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitShort();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitShort();
     }
   },
   INT4(Types.INTEGER) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitInteger();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitInteger();
     }
   },
   INT8(Types.BIGINT) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitLong();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitLong();
     }
   },
   INTEGER(Types.BIGINT) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitLong();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitLong();
     }
   },
   BIGINT(Types.BIGINT) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitLong();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitLong();
     }
   },
   FLOAT4(Types.NUMERIC) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitFloat();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitFloat();
     }
   },
   FLOAT8(Types.DOUBLE) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitDouble();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitDouble();
     }
   },
   DOUBLE_PRECISION(Types.DOUBLE) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitDouble();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitDouble();
     }
   },
   DECIMAL(Types.DECIMAL) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitDouble();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitDouble();
     }
   },
   NUMERIC(Types.NUMERIC) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitDouble();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitDouble();
     }
   },
   MONEY(Types.DOUBLE) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BPCHAR(Types.CHAR) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TEXT(Types.VARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitVarchar();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitVarchar();
     }
   },
   NAME(Types.VARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BYTEA(Types.VARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BOOL(Types.BIT) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitBoolean();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitBoolean();
     }
   },
   TIME(Types.TIME) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TIMESTAMP(Types.TIMESTAMP) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TIMETZ(Types.TIME) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TIMESTAMPTZ(Types.TIMESTAMP) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   UNKNOWN(Integer.MAX_VALUE) {
     @Override
-    public <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnknown();
+    public <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnknown();
     }
   };
 
@@ -171,6 +171,11 @@ public enum SqliteType implements IDataBaseType {
     this.names.addAll(Arrays.asList(names));
   }
 
+  @Override
+  public String getName() {
+    return names.isEmpty() ? name() : names.iterator().next();
+  }
+  
   public static SqliteType getByName(final String name) {
     final String normalized = name.trim().replace(' ', '_').toUpperCase();
     for (final SqliteType type : SqliteType.values()) {
@@ -195,5 +200,5 @@ public enum SqliteType implements IDataBaseType {
     return this.code;
   }
 
-  public abstract <T, E extends Exception> void accept(final ISqliteTypeVisitor<T, E> visitor) throws E;
+  public abstract <T, E extends Exception> T accept(final ISqliteTypeVisitor<T, E> visitor) throws E;
 }

@@ -10,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>commons-core</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -41,8 +41,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>jakarta.activation</artifactId>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
     </dependency>
 
     <dependency>

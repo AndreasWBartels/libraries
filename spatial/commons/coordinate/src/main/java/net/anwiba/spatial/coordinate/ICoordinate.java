@@ -54,4 +54,8 @@ public interface ICoordinate extends Comparable<ICoordinate>, Serializable {
 
   public ICoordinate subtract(ICoordinate coordinate);
 
+  public ICoordinate withMeasured(double value);
+
+  public ICoordinate withAltitude(double value);
+
 }

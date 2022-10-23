@@ -21,60 +21,144 @@
  */
 package net.anwiba.commons.jdbc.database;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
+import net.anwiba.commons.jdbc.metadata.Property;
+import net.anwiba.commons.jdbc.name.IDatabaseColumnName;
 import net.anwiba.commons.jdbc.name.IDatabaseConstraintName;
 import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
+import net.anwiba.commons.jdbc.name.IDatabaseSchemaName;
 import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
 import net.anwiba.commons.jdbc.name.IDatabaseTableName;
 import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
+import net.anwiba.commons.jdbc.name.IDatabaseViewName;
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.commons.utilities.time.TimeZoneUtilities;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.TimeZone;
 
 public interface IDatabaseFacade {
 
-  List<String> getSchemaNames(Connection connection, String catalog) throws SQLException;
+  List<IDatabaseSchemaName> getSchemaNames(ICanceler canceler, Connection connection, String catalogName)
+      throws SQLException,
+      CanceledException;
 
-  boolean supportsTables();
+  default boolean isInformationSchema(final IDatabaseSchemaName name) {
+    return false;
+  }
 
-  List<IDatabaseTableName> getTables(Connection connection, String schema) throws SQLException;
+  List<IDatabaseTableName> getTables(ICanceler canceler, Connection connection, IDatabaseSchemaName name)
+      throws SQLException,
+      CanceledException;
 
-  ResultSet getTableMetadata(Connection connection, IDatabaseTableName schema) throws SQLException;
+  // table, view, synonym
+  ResultSet getTableMetadata(ICanceler canceler, Connection connection, IDatabaseTableName name) throws SQLException,
+      CanceledException;
 
   boolean isTable(IDatabaseTableName table);
 
   Iterable<INamedTableFilter> getTableFilters();
 
-  boolean supportsSequences();
-
-  String getTableStatement(final Connection connection, final IDatabaseTableName tableName)
-      throws SQLException;
-
   boolean supportsTableStatement();
 
-  List<IDatabaseSequenceName> getSequences(Connection connection, String schema) throws SQLException;
+  String getTableStatement(ICanceler canceler, final Connection connection, final IDatabaseTableName name)
+      throws SQLException,
+      CanceledException;
 
-  ResultSet getSequenceMetadata(Connection connection, IDatabaseSequenceName schema) throws SQLException;
+  List<IDatabaseColumnName> getTableColumns(ICanceler canceler, Connection connection, IDatabaseTableName name)
+      throws SQLException,
+      CanceledException;
+
+  // table, view, synonym
+  ResultSet getTableColumnMetadata(ICanceler canceler, Connection connection, IDatabaseColumnName name)
+      throws SQLException,
+      CanceledException;
+
+  List<IDatabaseViewName> getViews(ICanceler canceler, Connection connection, IDatabaseSchemaName name)
+      throws SQLException,
+      CanceledException;
+
+  boolean isView(IDatabaseTableName name);
+
+  List<IDatabaseColumnName> getViewColumns(ICanceler canceler, Connection connection, IDatabaseViewName name)
+      throws SQLException,
+      CanceledException;
+
+  boolean supportsSequences();
+
+  List<IDatabaseSequenceName> getSequences(ICanceler canceler, Connection connection, IDatabaseSchemaName name)
+      throws SQLException,
+      CanceledException;
+
+  ResultSet getSequenceMetadata(ICanceler canceler, Connection connection, IDatabaseSequenceName name)
+      throws SQLException,
+      CanceledException;
 
   boolean supportsTrigger();
 
-  List<IDatabaseTriggerName> getTriggers(Connection connection, IDatabaseTableName tableName) throws SQLException;
+  List<IDatabaseTriggerName> getTriggers(ICanceler canceler, Connection connection, IDatabaseTableName name)
+      throws SQLException,
+      CanceledException;
 
-  ResultSet getTriggerMetadata(Connection connection, IDatabaseTriggerName schema) throws SQLException;
+  ResultSet getTriggerMetadata(ICanceler canceler, Connection connection, IDatabaseTriggerName name)
+      throws SQLException,
+      CanceledException;
 
-  String getTriggerStatement(Connection connection, IDatabaseTriggerName schema) throws SQLException;
+  String getTriggerStatement(ICanceler canceler, Connection connection, IDatabaseTriggerName name) throws SQLException,
+      CanceledException;
 
-  boolean supportsIndicies();
+  List<IDatabaseIndexName> getIndicies(ICanceler canceler, Connection connection, IDatabaseTableName name)
+      throws SQLException,
+      CanceledException;
 
-  List<IDatabaseIndexName> getIndicies(Connection connection, IDatabaseTableName tableName) throws SQLException;
-
-  ResultSet getIndexMetadata(Connection connection, IDatabaseIndexName schema) throws SQLException;
+  ResultSet getIndexMetadata(ICanceler canceler, Connection connection, IDatabaseIndexName name) throws SQLException,
+      CanceledException;
 
   boolean supportsConstaints();
 
-  List<IDatabaseConstraintName> getConstraints(Connection connection, IDatabaseTableName tableName) throws SQLException;
+  List<IDatabaseConstraintName> getConstraints(ICanceler canceler, Connection connection, IDatabaseTableName name)
+      throws SQLException,
+      CanceledException;
 
-  ResultSet getConstraintMetadata(Connection connection, IDatabaseConstraintName schema) throws SQLException;
+  ResultSet getConstraintMetadata(ICanceler canceler,
+      Connection connection,
+      IDatabaseTableName table,
+      IDatabaseConstraintName name)
+      throws SQLException,
+      CanceledException;
 
+  String quoted(IDatabaseTableName name);
+
+  String quoted(String name);
+
+  default TimeZone getTimeZone(final ICanceler canceler, final Connection connection) throws SQLException {
+    return TimeZoneUtilities.getUniversalTimeZone();
+  }
+
+  List<Property> getClientProperties(ICanceler canceler,
+      Connection connection)
+      throws CanceledException,
+      SQLException;
+
+  List<Property> getDatabaseProperties(ICanceler canceler,
+      Connection connection)
+      throws CanceledException,
+      SQLException;
+
+  List<Property> getCapabilities(ICanceler canceler, Connection connection) throws CanceledException,
+      SQLException;
+
+  ResultSet getDataTypes(ICanceler canceler, Connection connection) throws CanceledException, SQLException;
+
+  DatabaseMetaData getMetaData(Connection connection) throws SQLException;
+
+  ResultSet getColumnPrivileges(Connection connection,
+      IDatabaseTableName name,
+      String column) throws SQLException;
+
+  ResultSet getTablePrivileges(Connection connection, IDatabaseTableName tableName) throws SQLException;
 }

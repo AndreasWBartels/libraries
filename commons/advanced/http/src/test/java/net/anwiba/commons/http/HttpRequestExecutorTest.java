@@ -22,6 +22,16 @@
 
 package net.anwiba.commons.http;
 
+import net.anwiba.commons.http.testing.ConnectionValuesValidator;
+import net.anwiba.commons.http.testing.HttpServerBuilder;
+import net.anwiba.commons.http.testing.IRequestRecorder;
+import net.anwiba.commons.http.testing.RequestCountValidator;
+import net.anwiba.commons.http.testing.RequestProcessorBuilder;
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.logging.LoggingUtilities;
+import net.anwiba.commons.thread.cancel.Canceler;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Set;
@@ -33,15 +43,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import net.anwiba.commons.http.testing.ConnectionValuesValidator;
-import net.anwiba.commons.http.testing.HttpServerBuilder;
-import net.anwiba.commons.http.testing.IRequestRecorder;
-import net.anwiba.commons.http.testing.RequestCountValidator;
-import net.anwiba.commons.http.testing.RequestProcessorBuilder;
-import net.anwiba.commons.lang.exception.CanceledException;
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.thread.cancel.Canceler;
-
 public class HttpRequestExecutorTest {
 
   static final ConnectionValuesValidator connectionValueValidator = new ConnectionValuesValidator();
@@ -51,6 +52,13 @@ public class HttpRequestExecutorTest {
 
   @BeforeAll
   public static void startServer() throws Exception {
+    LoggingUtilities.initialize("debug", "org.apache.hc.client5.http.protocol"
+    //         , "org.apache.hc.client5.http"
+        , "org.apache.hc.client5.http.headers"
+    //        , "org.apache.hc.client5.http.impl.classic"
+    //        , "org.apache.hc.client5.http.impl.io"
+    //        , "org.apache.hc.client5.http.ssl"
+    );
     final IRequestRecorder recorder = request -> {
       requestCountValidator.add(request);
       connectionValueValidator.add(request);
@@ -116,7 +124,7 @@ public class HttpRequestExecutorTest {
         .useAlwaysANewConnection()
         .build()
         .create()) {
-      excecute(executor, "http://anwiba.net/new", 1);
+      execute(executor, "http://anwiba.net/new", 1);
     }
     requestCountValidator.assertEquals(1);
     connectionValueValidator.assertEquals(Set.of("close"));
@@ -179,10 +187,10 @@ public class HttpRequestExecutorTest {
   private void execute(final IHttpRequestExecutor executor, final String path) throws CanceledException,
       IOException,
       CreationException {
-    excecute(executor, "http://localhost:8081" + path, 10);
+    execute(executor, "http://localhost:8081" + path, 10);
   }
 
-  protected void excecute(final IHttpRequestExecutor executor, final String url, final int numberOfRequests)
+  protected void execute(final IHttpRequestExecutor executor, final String url, final int numberOfRequests)
       throws IOException,
       CanceledException,
       CreationException {

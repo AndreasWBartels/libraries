@@ -22,21 +22,27 @@
 package net.anwiba.commons.jdbc.connection;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Objects;
+
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.Streams;
+import net.anwiba.commons.utilities.property.IProperties;
+import net.anwiba.commons.utilities.property.Properties;
 
 public class DefaultDatabaseConnector implements IRegisterableDatabaseConnector {
-
-  private static final int TIMEOUT = 10;
 
   @Override
   public synchronized Connection connectReadOnly(
       final String url,
       final String userName,
       final String password,
-      final int timeout)
+      final int timeout,
+      final IProperties properties)
       throws SQLException {
-    return connect(url, userName, password, false, timeout, true);
+    return connect(url, userName, password, false, timeout, true, properties);
   }
 
   @Override
@@ -45,9 +51,10 @@ public class DefaultDatabaseConnector implements IRegisterableDatabaseConnector 
       final String userName,
       final String password,
       final boolean isAutoCommitEnabled,
-      final int timeout)
+      final int timeout,
+      final IProperties properties)
       throws SQLException {
-    return connect(url, userName, password, isAutoCommitEnabled, timeout, false);
+    return connect(url, userName, password, isAutoCommitEnabled, timeout, false, properties);
   }
 
   public synchronized Connection connect(
@@ -58,42 +65,65 @@ public class DefaultDatabaseConnector implements IRegisterableDatabaseConnector 
       final int timeout,
       final boolean isReadOnly)
       throws SQLException {
+    return connect(url, userName, password, isAutoCommitEnabled, timeout, isReadOnly, Properties.empty());
+  }
+
+  public synchronized Connection connect(
+      final String url,
+      final String userName,
+      final String password,
+      final boolean isAutoCommitEnabled,
+      final int timeout,
+      final boolean isReadOnly,
+      final IProperties properties)
+      throws SQLException {
     if (timeout == -1) {
-      return createConnection(url, userName, password, isAutoCommitEnabled, isReadOnly);
+      return createConnection(url, userName, password, isAutoCommitEnabled, isReadOnly, properties);
     }
     final int loginTimeout = DriverManager.getLoginTimeout();
     try {
       DriverManager.setLoginTimeout(timeout);
-      return createConnection(url, userName, password, isAutoCommitEnabled, isReadOnly);
+      return createConnection(url, userName, password, isAutoCommitEnabled, isReadOnly, properties);
     } finally {
       DriverManager.setLoginTimeout(loginTimeout);
     }
   }
 
-  private Connection createConnection(
+  public static Connection createConnection(
       final String url,
       final String user,
       final String password,
       final boolean isAutoCommitEnabled,
-      final boolean isReadOnly)
+      final boolean isReadOnly,
+      final IProperties properties)
       throws SQLException {
-    final Connection connection = DriverManager.getConnection(url, user, password);
+    Driver driver = DriverManager.getDriver(url);
+    if (driver == null) {
+      throw new SQLException(ConnectionUtilities.nullHash() + " connection create failed, unsupporterd url");
+    }
+    final Connection connection =
+        driver.connect(url, getProperties(user, password, isReadOnly, properties));
     connection.setAutoCommit(isAutoCommitEnabled);
     connection.setReadOnly(isReadOnly);
     return connection;
   }
 
-  @Override
-  public boolean isApplicable(final String context) {
-    return true;
+  public static java.util.Properties getProperties(
+      final String userName,
+      final String password,
+      final boolean isReadOnly,
+      final IProperties properties) {
+    java.util.Properties settings = new java.util.Properties();
+    Optional.of(userName).consume(value -> settings.put("user", value));
+    Optional.of(password).consume(value -> settings.put("password", value));
+    Streams.of(properties.properties())
+        .filter(property -> Objects.nonNull(property.getValue()))
+        .forEach(property -> settings.put(property.getName(), property.getValue()));
+    return settings;
   }
 
   @Override
-  public boolean isConnectable(final String url, final String userName, final String password) {
-    try (Connection connection = connectReadOnly(url, userName, password, TIMEOUT)) {
-      return true;
-    } catch (final SQLException exception) {
-      return false;
-    }
+  public boolean isApplicable(final String context) {
+    return true;
   }
 }

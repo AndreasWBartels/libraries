@@ -21,28 +21,29 @@
  */
 package net.anwiba.commons.jdbc.software;
 
+import java.util.List;
 import java.util.Vector;
 
 public class DatabaseSoftwareUtilities {
 
-  public static ServiceDatabaseSoftware[] getGisSupportingTypes() {
+  public static List<ServiceDatabaseSoftware> getGisSupportingTypes() {
     final Vector<ServiceDatabaseSoftware> dbTypeValues = new Vector<>();
     for (final ServiceDatabaseSoftware serviceDatabaseSoftware : ServiceDatabaseSoftware.values()) {
       if (serviceDatabaseSoftware.isApplicable() && serviceDatabaseSoftware.isGisSupportApplicable()) {
         dbTypeValues.add(serviceDatabaseSoftware);
       }
     }
-    return dbTypeValues.toArray(new ServiceDatabaseSoftware[dbTypeValues.size()]);
+    return dbTypeValues;
   }
 
-  public static ServiceDatabaseSoftware[] getApplicableTypes() {
+  public static List<ServiceDatabaseSoftware> getApplicableTypes() {
     final Vector<ServiceDatabaseSoftware> dbTypeValues = new Vector<>();
     for (final ServiceDatabaseSoftware serviceDatabaseSoftware : ServiceDatabaseSoftware.values()) {
       if (serviceDatabaseSoftware.isApplicable() && serviceDatabaseSoftware.isGisSupportApplicable()) {
         dbTypeValues.add(serviceDatabaseSoftware);
       }
     }
-    return dbTypeValues.toArray(new ServiceDatabaseSoftware[dbTypeValues.size()]);
+    return dbTypeValues;
   }
 
 }

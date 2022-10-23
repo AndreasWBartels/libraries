@@ -72,13 +72,10 @@ public class DatabaseConstraintName implements IDatabaseConstraintName {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof IDatabaseTriggerName)) {
-      return false;
-    }
-    final IDatabaseTriggerName other = (IDatabaseTriggerName) obj;
-    return ObjectUtilities.equals(this.catalogName, other.getCatalogName()) //
+    return obj instanceof IDatabaseConstraintName other
+        && ObjectUtilities.equals(this.catalogName, other.getCatalogName()) //
         && ObjectUtilities.equals(this.schemaName, other.getSchemaName()) //
-        && ObjectUtilities.equals(this.constraintName, other.getTriggerName());
+        && ObjectUtilities.equals(this.constraintName, other.getConstraintName());
   }
 
   @Override

@@ -25,11 +25,13 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
+import java.util.List;
 
 import net.anwiba.commons.image.AbstractImageContainer;
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageMetadata;
 import net.anwiba.commons.image.IImageMetadataAdjustor;
+import net.anwiba.commons.image.ImageUtilities;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.exception.CanceledException;
@@ -47,7 +49,8 @@ class BufferedImageContainer extends AbstractImageContainer {
       final RenderingHints hints,
       final BufferedImageMetadata metadata,
       final BufferedImage image,
-      final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor) {
     super(hints, metadata, operations, metadataAdjustor);
     this.image = image;
   }
@@ -63,13 +66,9 @@ class BufferedImageContainer extends AbstractImageContainer {
   }
 
   @Override
-  public void dispose() {
-    // nothing to do
-  }
-
-  @Override
-  protected IImageMetadata read(final ICanceler canceler, final RenderingHints hints) throws CanceledException,
-      IOException {
+  protected IImageMetadata read(final ICanceler canceler, final RenderingHints hints) 
+      throws CanceledException, IOException {
+    boolean isIndexed = this.image.getColorModel() instanceof IndexColorModel;
     return new BufferedImageMetadata(
         this.image.getWidth(),
         this.image.getHeight(),
@@ -78,19 +77,18 @@ class BufferedImageContainer extends AbstractImageContainer {
         this.image.getColorModel().getColorSpace().getType(),
         this.image.getColorModel().getTransferType(),
         this.image.getColorModel().getTransparency(),
-    this.image.getColorModel() instanceof IndexColorModel);
+        isIndexed,
+        isIndexed ? ImageUtilities.getColors((IndexColorModel)this.image.getColorModel()) : List.of());
   }
 
   @Override
-  protected BufferedImage
-      read(
+  protected BufferedImage read(
           final IMessageCollector messageCollector,
           final ICanceler canceler,
           final RenderingHints hints,
           final IObjectList<IImageOperation> operations,
           final IImageMetadataAdjustor metadataAdjustor)
-          throws CanceledException,
-          IOException {
+          throws CanceledException, IOException {
     final long size = (long) getWidth() * (long) getHeight();
     if (size >= Integer.MAX_VALUE) {
       logger
@@ -105,12 +103,16 @@ class BufferedImageContainer extends AbstractImageContainer {
 
   @Override
   protected IImageContainer
-      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
-    BufferedImageMetadata imageMetadata = (BufferedImageMetadata) metadata;
+      adapt(final RenderingHints hints,
+          final IImageMetadata metadata,
+          final IObjectList<IImageOperation> operations,
+          final IImageMetadataAdjustor metadataAdjustor) {
+    final BufferedImageMetadata imageMetadata = (BufferedImageMetadata) metadata;
     return new BufferedImageContainer(
         hints,
         imageMetadata,
         this.image,
-        operations, metadataAdjustor);
+        operations,
+        metadataAdjustor);
   }
 }

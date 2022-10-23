@@ -21,16 +21,16 @@
  */
 package net.anwiba.tools.definition.schema.json.generator.java.ant;
 
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-
-import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
 
 public class JsonBeanGeneratorTask extends Task {
 
@@ -110,7 +110,7 @@ public class JsonBeanGeneratorTask extends Task {
               getProject().log(message, throwable, Project.MSG_ERR);
             }
           });
-      excecutor.excecute(this.destination);
+      excecutor.execute(this.destination);
     } catch (final Throwable exception) {
       exception.printStackTrace();
       throw new BuildException(exception);

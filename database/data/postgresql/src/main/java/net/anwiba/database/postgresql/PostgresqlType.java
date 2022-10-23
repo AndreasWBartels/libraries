@@ -23,98 +23,98 @@ package net.anwiba.database.postgresql;
 
 import java.sql.Types;
 
-import net.anwiba.commons.jdbc.metadata.IDataBaseType;
+import net.anwiba.commons.jdbc.metadata.IDatabaseType;
 
-public enum PostgresqlType implements IDataBaseType {
+public enum PostgresqlType implements IDatabaseType {
 
   OID(Types.INTEGER) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   INT2(Types.SMALLINT) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitShort();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitShort();
     }
   },
   INT4(Types.INTEGER) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitInteger();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitInteger();
     }
   },
   INT8(Types.BIGINT) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitLong();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitLong();
     }
   },
   FLOAT4(Types.NUMERIC) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitFloat();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitFloat();
     }
   },
   FLOAT8(Types.DOUBLE) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitDouble();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitDouble();
     }
   },
   MONEY(Types.DOUBLE) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BPCHAR(Types.CHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TEXT(Types.VARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitVarchar();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitVarchar();
     }
   },
   NAME(Types.VARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BYTEA(Types.VARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BOOL(Types.BIT) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitBoolean();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitBoolean();
     }
   },
   TIMETZ(Types.TIME) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TIMESTAMPTZ(Types.TIMESTAMP) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   UNKNOWN(Integer.MAX_VALUE) {
     @Override
-    public <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnknown();
+    public <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnknown();
     }
   };
 
@@ -122,6 +122,11 @@ public enum PostgresqlType implements IDataBaseType {
 
   private PostgresqlType(final int code) {
     this.code = code;
+  }
+
+  @Override
+  public String getName() {
+    return name();
   }
 
   public static PostgresqlType getByName(final String name) {
@@ -147,5 +152,5 @@ public enum PostgresqlType implements IDataBaseType {
     return this.code;
   }
 
-  public abstract <T, E extends Exception> void accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E;
+  public abstract <T, E extends Exception> T accept(final IPostgresqlTypeVisitor<T, E> visitor) throws E;
 }

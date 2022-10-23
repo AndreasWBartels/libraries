@@ -28,6 +28,15 @@ import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_STRIN
 import static net.anwiba.tools.generator.java.bean.JavaConstants.primitiveClasses;
 import static net.anwiba.tools.generator.java.bean.JavaConstants.primitives;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.utilities.ArrayUtilities;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.Parameter;
+import net.anwiba.tools.generator.java.bean.configuration.Type;
+import net.anwiba.tools.generator.java.bean.value.IValueTypeVisitor;
+
 import java.util.List;
 
 import com.sun.codemodel.ClassType;
@@ -44,19 +53,16 @@ import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JPrimitiveType;
 import com.sun.codemodel.JType;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.utilities.ArrayUtilities;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.Parameter;
-import net.anwiba.tools.generator.java.bean.configuration.Type;
-import net.anwiba.tools.generator.java.bean.value.IValueTypeVisitor;
-
 public class AbstractSourceFactory {
 
   private final JCodeModel codeModel;
+  private final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+      CreationException> annotationClassfactory;
 
-  public AbstractSourceFactory(final JCodeModel codeModel) {
+  public AbstractSourceFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    this.annotationClassfactory = annotationClassfactory;
     ensureThatArgument(codeModel, notNull());
     this.codeModel = codeModel;
   }
@@ -83,14 +89,7 @@ public class AbstractSourceFactory {
 
   @SuppressWarnings("unchecked")
   Class<? extends java.lang.annotation.Annotation> getAnnotationClass(final String name) throws CreationException {
-    try {
-      return (Class<? extends java.lang.annotation.Annotation>) this.codeModel.getClass()
-          .getClassLoader()
-          .loadClass(
-              name);
-    } catch (final ClassNotFoundException exception) {
-      throw new CreationException(exception.getMessage(), exception);
-    }
+    return this.annotationClassfactory.create(name);
   }
 
   protected void annotate(final JAnnotatable annotatable, final Annotation annotation) throws CreationException {

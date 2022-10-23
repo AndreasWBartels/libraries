@@ -28,12 +28,13 @@ import javax.swing.SwingUtilities;
 
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.message.MessageBuilder;
+import net.anwiba.commons.message.IMessageBuilder;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.thread.progress.IProgressTask;
 
 public class ProgressDialogLauncher<O, E extends Exception> {
 
-  private final MessageBuilder builder = new MessageBuilder();
+  private final IMessageBuilder builder = Message.builder();
   private final IProgressTask<O, E> task;
   private String titel = null;
 
@@ -47,12 +48,12 @@ public class ProgressDialogLauncher<O, E extends Exception> {
   }
 
   public ProgressDialogLauncher<O, E> setText(final String text) {
-    this.builder.setText(text);
+    this.builder.text(text);
     return this;
   }
 
   public ProgressDialogLauncher<O, E> setDescription(final String description) {
-    this.builder.setDescription(description);
+    this.builder.description(description);
     return this;
   }
 

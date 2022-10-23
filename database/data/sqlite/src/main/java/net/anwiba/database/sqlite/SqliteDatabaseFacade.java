@@ -22,6 +22,7 @@
 package net.anwiba.database.sqlite;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,41 +30,55 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.sqlite.jdbc3.JDBC3DatabaseMetaData;
+import org.sqlite.jdbc4.JDBC4DatabaseMetaData;
+
 import net.anwiba.commons.jdbc.DatabaseUtilities;
 import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
+import net.anwiba.commons.jdbc.connection.WrappedResultSet;
+import net.anwiba.commons.jdbc.connection.WrappedStatement;
 import net.anwiba.commons.jdbc.database.DatabaseFacade;
 import net.anwiba.commons.jdbc.database.INamedTableFilter;
-import net.anwiba.commons.jdbc.database.IRegistrableDatabaseFacade;
+import net.anwiba.commons.jdbc.database.IRegisterableDatabaseFacade;
 import net.anwiba.commons.jdbc.name.DatabaseIndexName;
 import net.anwiba.commons.jdbc.name.DatabaseSequenceName;
 import net.anwiba.commons.jdbc.name.DatabaseTriggerName;
+import net.anwiba.commons.jdbc.name.IDatabaseColumnName;
 import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
+import net.anwiba.commons.jdbc.name.IDatabaseSchemaName;
 import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
 import net.anwiba.commons.jdbc.name.IDatabaseTableName;
 import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
 import net.anwiba.commons.jdbc.result.IResult;
 import net.anwiba.commons.jdbc.software.FileDatabaseSoftware;
+import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
-public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrableDatabaseFacade {
+public class SqliteDatabaseFacade extends DatabaseFacade implements IRegisterableDatabaseFacade {
 
   public SqliteDatabaseFacade() {
   }
 
-  @SuppressWarnings("nls")
   @Override
   public boolean isTable(final IDatabaseTableName table) {
-    if (isSpatialMetaData(table) || isSpatialIndex(table) || Objects.equals(table.getTableName(), "sqlite_sequence")) {
+    if (isSpatialMetaData(table)
+        || isSpatialIndex(table)
+        || Objects.equals(table.getTableName(), "sqlite_sequence")
+        || table.getTableName().startsWith("sqlite_autoindex")) {
       return false;
     }
     return super.isTable(table);
   }
 
   @Override
-  public String getTableStatement(final Connection connection, final IDatabaseTableName tableName) throws SQLException {
+  public String getTableStatement(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName) throws SQLException {
     return DatabaseUtilities.result(
+        canceler,
         connection,
         "SELECT sql FROM sqlite_master WHERE type = 'table' and name = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -79,7 +94,6 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
     return true;
   }
 
-  @SuppressWarnings("nls")
   private boolean isSpatialMetaData(final IDatabaseTableName table) {
     return table.getTableName().startsWith("virts_")
         || table.getTableName().startsWith("vector_")
@@ -92,7 +106,6 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
         || Objects.equals(table.getTableName(), "spatialite_history");
   }
 
-  @SuppressWarnings("nls")
   private boolean isSpatialIndex(final IDatabaseTableName table) {
     return table.getTableName().startsWith("idx_") || table.getTableName().startsWith("rtree_");
   }
@@ -101,7 +114,6 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
   public Iterable<INamedTableFilter> getTableFilters() {
     return Arrays.asList(new INamedTableFilter() {
 
-      @SuppressWarnings("nls")
       @Override
       public String getName() {
         return "SpatialMetadata";
@@ -113,7 +125,6 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
       }
     }, new INamedTableFilter() {
 
-      @SuppressWarnings("nls")
       @Override
       public String getName() {
         return "SpatialIndex";
@@ -127,9 +138,12 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public List<IDatabaseIndexName> getIndicies(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseIndexName> getIndicies(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
         "SELECT null, name FROM sqlite_master WHERE type = 'index' and tbl_name = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -141,23 +155,23 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public ResultSet getIndexMetadata(final Connection connection, final IDatabaseIndexName name) throws SQLException {
-    final ResultSet resultSet = DatabaseUtilities.resultSet(
+  public ResultSet getIndexMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseIndexName name) throws SQLException {
+    return DatabaseUtilities.resultSet(
+        canceler,
         connection,
-        "PRAGMA index_xinfo('" + name.getIndexName() + "')", //$NON-NLS-1$ //$NON-NLS-2$
+        "PRAGMA index_xinfo('" + name.getIndexName() + "')",
         (IProcedure<PreparedStatement, SQLException>) value -> {});
-    return resultSet;
   }
 
   @Override
-  public boolean supportsIndicies() {
-    return true;
-  }
-
-  @Override
-  public List<IDatabaseTriggerName> getTriggers(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseTriggerName> getTriggers(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
         "SELECT null, name FROM sqlite_master WHERE type = 'trigger' and tbl_name = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -169,9 +183,12 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public String getTriggerStatement(final Connection connection, final IDatabaseTriggerName triggerName)
+  public String getTriggerStatement(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTriggerName triggerName)
       throws SQLException {
     return DatabaseUtilities.result(
+        canceler,
         connection,
         "SELECT sql FROM sqlite_master WHERE type = 'trigger' and name = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -188,9 +205,12 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public List<IDatabaseSequenceName> getSequences(final Connection connection, final String schema)
+  public List<IDatabaseSequenceName> getSequences(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseSchemaName schema)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
         "SELECT null, name FROM sqlite_sequence", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {},
@@ -200,9 +220,12 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public ResultSet getSequenceMetadata(final Connection connection, final IDatabaseSequenceName sequence)
+  public ResultSet getSequenceMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseSequenceName sequence)
       throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
         "SELECT * FROM sqlite_sequence WHERE name = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -220,4 +243,38 @@ public class SqliteDatabaseFacade extends DatabaseFacade implements IRegistrable
     return Objects.equals(FileDatabaseSoftware.SQLITE.getDriverName(), context.getDriverName());
   }
 
+  @Override
+  public ResultSet getDataTypes(final ICanceler canceler, final Connection connection) throws CanceledException,
+      SQLException {
+    return DatabaseUtilities.wrapWithUnclosableStatement(connection.getMetaData().getTypeInfo());
+  }
+
+  @Override
+  public ResultSet getTableMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName name)
+      throws CanceledException,
+      SQLException {
+    return DatabaseUtilities.wrapWithUnclosableStatement(connection
+        .getMetaData()
+        .getColumns(name.getCatalogName(),
+            name.getSchemaName(),
+            name.getTableName(),
+            null));
+  }
+
+  @Override
+  public ResultSet getTableColumnMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseColumnName name)
+      throws CanceledException,
+      SQLException {
+    IDatabaseTableName tableName = name.getDatabaseTable();
+    return DatabaseUtilities.wrapWithUnclosableStatement(connection.getMetaData()
+        .getColumns(tableName.getCatalogName(),
+            tableName.getSchemaName(),
+            tableName.getTableName(),
+            name.getColumnName()));
+  }
 }
+

@@ -74,8 +74,6 @@ public interface IInjectionValueProviderBuilder {
 
   <T> IInjectionValueProviderBuilder set(Class<T> clazz);
 
-  <T> IInjectionValueProviderBuilder add(Class<T> clazz);
-
   IInjectionValueProvider build() throws CreationException;
 
 }

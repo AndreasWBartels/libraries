@@ -183,6 +183,11 @@ public class DialogConfigurationBuilder {
     return this;
   }
 
+  public DialogConfigurationBuilder setCancleApplyOkButtonDialog() {
+    setDialogType(DialogType.CANCEL_APPLY_OK);
+    return this;
+  }
+
   public DialogConfigurationBuilder enableCloseOnEscape() {
     setDialogCloseKeyEvent(KeyEvent.VK_ESCAPE);
     return this;

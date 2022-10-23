@@ -103,5 +103,6 @@ public interface IFileExtensions {
   public static final String XHTML = "xhtml";
   public static final String QPJ = "qpj";
   public static final String BDF = "bdf";
+  public static final String JOB = "job";
 
 }

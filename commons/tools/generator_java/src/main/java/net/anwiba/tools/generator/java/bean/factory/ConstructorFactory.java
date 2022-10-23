@@ -31,14 +31,16 @@ import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilitie
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.isInstanceOfMap;
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.setMapParameters;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Bean;
+import net.anwiba.tools.generator.java.bean.configuration.Member;
+
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-
-import net.anwiba.tools.generator.java.bean.configuration.Bean;
-import net.anwiba.tools.generator.java.bean.configuration.Member;
 
 public class ConstructorFactory extends AbstractSourceFactory {
 
@@ -47,9 +49,11 @@ public class ConstructorFactory extends AbstractSourceFactory {
 
   public ConstructorFactory(
       final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory,
       final EnsurePredicateFactory ensurePredicateFactory,
       final boolean isNoneNullableValuesOnlyEnabled) {
-    super(codeModel);
+    super(codeModel, annotationClassfactory);
     this.ensurePredicateFactory = ensurePredicateFactory;
     this.isNoneNullableValuesOnlyEnabled = isNoneNullableValuesOnlyEnabled;
   }

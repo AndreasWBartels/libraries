@@ -23,13 +23,18 @@ package net.anwiba.commons.http;
 
 public interface IHttpRequestExecutorFactoryBuilder {
 
+  HttpRequestExecutorFactoryBuilder setUserAgent(String userAgent);
+  
+  IHttpRequestExecutorFactoryBuilder setProxy(String scheme, String hostname, int port);
+
+  IHttpRequestExecutorFactoryBuilder
+      setProxy(String scheme, String hostname, int port, String username, String password);
+
   IHttpRequestExecutorFactoryBuilder useAlwaysTheSameConnection();
 
   IHttpRequestExecutorFactoryBuilder useAlwaysANewConnection();
 
   IHttpRequestExecutorFactoryBuilder usePoolingConnection();
-
-  IHttpRequestExecutorFactoryBuilder setProxy(String scheme, String hostname, int port);
 
   IHttpRequestExecutorFactory build();
 

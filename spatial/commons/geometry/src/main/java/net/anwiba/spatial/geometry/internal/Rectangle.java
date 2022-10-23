@@ -39,4 +39,8 @@ public class Rectangle extends Polygon implements IRectangle {
         Orientation.POSITIVE));
   }
 
+  public String toString() {
+    return getClass().getSimpleName() + getCoordinateSequence().toString();
+  }
+
 }

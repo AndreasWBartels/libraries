@@ -23,24 +23,22 @@ package net.anwiba.database.postgresql;
 
 public interface IPostgresqlTypeVisitor<T, E extends Exception> {
 
-  public void visitUnknown() throws E;
+  public T visitUnknown() throws E;
 
-  public void visitUnsupportedType() throws E;
+  public T visitUnsupportedType() throws E;
 
-  public void visitShort() throws E;
+  public T visitShort() throws E;
 
-  public void visitInteger() throws E;
+  public T visitInteger() throws E;
 
-  public void visitLong() throws E;
+  public T visitLong() throws E;
 
-  public void visitFloat() throws E;
+  public T visitFloat() throws E;
 
-  public void visitDouble() throws E;
+  public T visitDouble() throws E;
 
-  public void visitVarchar() throws E;
+  public T visitVarchar() throws E;
 
-  public void visitBoolean() throws E;
-
-  public T result();
+  public T visitBoolean() throws E;
 
 }

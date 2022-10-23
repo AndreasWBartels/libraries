@@ -41,6 +41,10 @@ public class MessageDialogUtilities {
     return show(owner, title, message, DialogType.CLOSE);
   }
 
+  public static final IDialogResult show(final Component owner, final String text) {
+    return show(owner, "info", Message.create(text), DialogType.CLOSE);
+  }
+
   public static IDialogResult show(
       final Component owner,
       final String title,

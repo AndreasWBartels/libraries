@@ -27,8 +27,9 @@ import java.util.List;
 import net.anwiba.spatial.coordinate.CoordinateUtilities;
 import net.anwiba.spatial.coordinate.ICoordinate;
 import net.anwiba.spatial.coordinate.IEnvelope;
+import net.anwiba.spatial.coordinate.ILineSegment;
+import net.anwiba.spatial.coordinate.LineSegmentIterable;
 import net.anwiba.spatial.geometry.IGeometry;
-import net.anwiba.spatial.geometry.ILineSegment;
 import net.anwiba.spatial.geometry.ILineString;
 
 public class LineStringInteractOperator {

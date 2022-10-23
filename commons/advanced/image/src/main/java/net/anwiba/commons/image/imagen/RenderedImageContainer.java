@@ -21,13 +21,17 @@
  */
 package net.anwiba.commons.image.imagen;
 
+import java.awt.Dimension;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.util.List;
 
+import org.eclipse.imagen.Histogram;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedImageAdapter;
 
@@ -35,10 +39,12 @@ import net.anwiba.commons.image.AbstractImageContainer;
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageMetadata;
 import net.anwiba.commons.image.IImageMetadataAdjustor;
+import net.anwiba.commons.image.ImageUtilities;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -46,14 +52,17 @@ public class RenderedImageContainer extends AbstractImageContainer {
 
   private final RenderedImage renderedImage;
 
-  public RenderedImageContainer(final RenderingHints hints, final RenderedImage renderedImage,IImageMetadataAdjustor metadataAdjustor) {
+  public RenderedImageContainer(final RenderingHints hints,
+      final RenderedImage renderedImage,
+      final IImageMetadataAdjustor metadataAdjustor) {
     this(null, renderedImage, new ObjectList<IImageOperation>(), hints, metadataAdjustor);
   }
 
   public RenderedImageContainer(final IImageMetadata metadata,
       final RenderedImage renderedImage,
       final IObjectList<IImageOperation> operations,
-      final RenderingHints hints,IImageMetadataAdjustor metadataAdjustor) {
+      final RenderingHints hints,
+      final IImageMetadataAdjustor metadataAdjustor) {
     super(hints, metadata, operations, metadataAdjustor);
     this.renderedImage = renderedImage;
   }
@@ -62,6 +71,7 @@ public class RenderedImageContainer extends AbstractImageContainer {
   protected IImageMetadata read(final ICanceler canceler, final RenderingHints hints) throws CanceledException,
       IOException {
     final ColorModel colorModel = this.renderedImage.getColorModel();
+    boolean isIndexed = colorModel instanceof IndexColorModel;
     return new ImagenImageMetadata(this.renderedImage.getWidth(),
         this.renderedImage.getHeight(),
         colorModel.getNumColorComponents(),
@@ -69,7 +79,10 @@ public class RenderedImageContainer extends AbstractImageContainer {
         colorModel.getColorSpace().getType(),
         colorModel.getTransferType(),
         colorModel.getTransparency(),
-        colorModel instanceof IndexColorModel);
+        isIndexed,
+        isIndexed
+            ? ImageUtilities.getColors((IndexColorModel) colorModel)
+            : List.of());
   }
 
   @Override
@@ -81,17 +94,75 @@ public class RenderedImageContainer extends AbstractImageContainer {
           final IImageMetadataAdjustor metadataAdjustor)
           throws CanceledException,
           IOException {
+    return read(messageCollector,
+        canceler,
+        hints,
+        operations,
+        metadataAdjustor,
+        image -> image.getAsBufferedImage());
+  }
+
+  @Override
+  protected Number[][] read(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor,
+      final int x,
+      final int y,
+      final int width,
+      final int height)
+      throws CanceledException,
+      IOException {
+    final Raster raster = read(messageCollector,
+        canceler,
+        hints,
+        operations,
+        metadataAdjustor,
+        image -> ImageUtilities
+            .getIntersection(new Dimension(image.getWidth(), image.getHeight()), x, y, width, height)
+            .convert(intersection -> image.getData(intersection))
+            .getOr(() -> null));
+    if (raster == null) {
+      return null;
+    }
+    return ImageUtilities.getValues(raster);
+  }
+
+  private <O> O read(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor,
+      final IConverter<PlanarImage, O, IOException> converter)
+      throws CanceledException,
+      IOException {
+    if (operations.isEmpty()) {
+      return converter.convert(new RenderedImageAdapter(this.renderedImage));
+    }
     IImageMetadata metadata = read(canceler, hints);
     final PlanarImage planarImage = new PlanarImageOperatorFactory(metadataAdjustor)
-        .create((ImagenImageMetadata)metadata, operations, hints)
+        .create((ImagenImageMetadata) metadata, operations, hints)
         .execute(canceler, new RenderedImageAdapter(this.renderedImage));
-    return planarImage == null ? null : planarImage.getAsBufferedImage();
+    return planarImage == null ? null : converter.convert(planarImage);
   }
 
   @Override
   protected IImageContainer
-      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
-    return new RenderedImageContainer(metadata, this.renderedImage, operations, hints,metadataAdjustor);
+      adapt(final RenderingHints hints,
+          final IImageMetadata metadata,
+          final IObjectList<IImageOperation> operations,
+          final IImageMetadataAdjustor metadataAdjustor) {
+    return new RenderedImageContainer(metadata, this.renderedImage, operations, hints, metadataAdjustor);
   }
 
+
+  @Override
+  protected Histogram readHistogram(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor) throws CanceledException, IOException {
+    return ImagenImageContainerUtilities.getHistogram(renderedImage, hints);
+  }
 }

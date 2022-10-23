@@ -21,14 +21,6 @@
  */
 package net.anwiba.commons.lang.stream;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.IntFunction;
-import java.util.stream.Stream;
-
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
@@ -41,6 +33,16 @@ import net.anwiba.commons.lang.functional.IIntAssimilator;
 import net.anwiba.commons.lang.functional.ISupplier;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 public class FailedStream<T, E extends Exception> implements IStream<T, E> {
 
@@ -55,17 +57,17 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public IStream<T, E> execute() {
-    return this;
-  }
-
-  @Override
   public IStream<T, E> distinct() {
     return this;
   }
 
   @Override
   public IStream<T, E> filter(final IAcceptor<T> funtion) {
+    return this;
+  }
+
+  @Override
+  public IStream<T, E> sort(final Comparator<T> comparator) {
     return this;
   }
 
@@ -104,6 +106,11 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
+  public IStream<T, E> foreachAsOptional(final IConsumer<IOptional<T, E>, E> consumer) {
+    return this;
+  }
+
+  @Override
   public IStream<T, E> foreach(final IAssimilator<Integer, T, E> assimilator) {
     return this;
   }
@@ -136,6 +143,21 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   @Override
   public <O> Collection<O> asCollection() throws E {
     throw this.cause;
+  }
+
+  @Override
+  public <O> Iterable<O> asIterable() throws E {
+    throw this.cause;
+  }
+
+  @Override
+  public <O> Iterator<O> asIterator() throws E {
+    throw this.cause;
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    throw new IllegalStateException(this.cause);
   }
 
   @Override
@@ -196,7 +218,7 @@ public class FailedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public void throwIfFailed() throws E {
+  public IStream<T, E> throwIfFailed() throws E {
     throw this.cause;
   }
 

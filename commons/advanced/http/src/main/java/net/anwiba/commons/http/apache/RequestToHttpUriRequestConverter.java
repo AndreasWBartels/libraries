@@ -22,12 +22,16 @@
 package net.anwiba.commons.http.apache;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.utils.ByteArrayBuilder;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HeaderElements;
 import org.apache.hc.core5.http.HttpEntity;
@@ -35,14 +39,15 @@ import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpMessage;
 
 import net.anwiba.commons.http.HttpConnectionMode;
+import net.anwiba.commons.http.IAuthentication;
 import net.anwiba.commons.http.IRequest;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.parameter.IParameter;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.UrlBuilder;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.builder.UrlBuilder;
+import net.anwiba.commons.reference.url.parser.UrlParser;
 
 public final class RequestToHttpUriRequestConverter {
 
@@ -55,22 +60,21 @@ public final class RequestToHttpUriRequestConverter {
   @SuppressWarnings("nls")
   public HttpUriRequest convert(final IRequest request) throws ConversionException {
     try {
-      UrlBuilder urlBuilder = new UrlBuilder(new UrlParser().parse(request.getUriString()));
+      IUrl parsedUrl = new UrlParser().parse(request.getUriString());
+      UrlBuilder urlBuilder = new UrlBuilder(parsedUrl);
       request.getParameters().forEach(urlBuilder::addQueryParameter);
       IUrl url = urlBuilder.build();
       switch (request.getMethodType()) {
         case POST: {
           HttpPost post = new HttpPost(url.encoded());
-          addToHeader(request.getProperties().parameters(), post);
-          Optional.ofNullable(request.getUserAgent()).ifPresent(value -> post.addHeader("User-Agent", value));
+          addToHeader(request.getAuthentication(), request.getProperties().parameters(), post);
           final HttpEntity entity = createEntity(request);
           post.setEntity(entity);
           return post;
         }
         case GET: {
           HttpGet get = new HttpGet(url.encoded());
-          addToHeader(request.getProperties().parameters(), get);
-          Optional.ofNullable(request.getUserAgent()).ifPresent(value -> get.addHeader("User-Agent", value));
+          addToHeader(request.getAuthentication(), request.getProperties().parameters(), get);
           return get;
         }
       }
@@ -80,7 +84,9 @@ public final class RequestToHttpUriRequestConverter {
     throw new UnreachableCodeReachedException();
   }
 
-  private void addToHeader(final Iterable<IParameter> parameters, final HttpMessage requestBuilder) {
+  private void addToHeader(final IAuthentication authentication,
+      final Iterable<IParameter> parameters,
+      final HttpMessage requestBuilder) {
     for (final IParameter parameter : parameters) {
       if (Objects.equals(HttpHeaders.CONNECTION, parameter.getName())
           && HttpConnectionMode.CLOSE.equals(this.httpConnectionMode)) {
@@ -91,12 +97,22 @@ public final class RequestToHttpUriRequestConverter {
     if (HttpConnectionMode.CLOSE.equals(this.httpConnectionMode)) {
       requestBuilder.addHeader(HttpHeaders.CONNECTION, HeaderElements.CLOSE);
     }
+    Optional.ofNullable(authentication)
+        .filter(a -> a.isForces())
+        .ifPresent(a -> requestBuilder.addHeader(HttpHeaders.AUTHORIZATION, toBasicSchema(authentication)));
+  }
+
+  private String toBasicSchema(IAuthentication authentication) {
+    ByteArrayBuilder buffer = new ByteArrayBuilder(64).charset(StandardCharsets.US_ASCII);
+    buffer.append(authentication.getUsername()).append(":").append(authentication.getPassword());
+    final byte[] encodedCreds = Base64.getEncoder().encode(buffer.toByteArray());
+    return StandardAuthScheme.BASIC + " " + new String(encodedCreds, 0, encodedCreds.length, StandardCharsets.US_ASCII);
   }
 
   private HttpEntity createEntity(final IRequest request) {
-    final String encoding = request.getEncoding();
-    final Charset charset = encoding == null ? null : Charset.forName(encoding);
-    final ContentType contentType = ContentType.create(request.getMimeType(), charset);
-    return new InputStreamEntity(request.getContent(), request.getContentLength(), contentType, encoding);
+    final String charsetName = request.getContentCharset();
+    final Charset charset = charsetName == null ? null : Charset.forName(charsetName);
+    final ContentType contentType = ContentType.create(request.getContentMimeType(), charset);
+    return new InputStreamEntity(request.getContent(), request.getContentLength(), contentType, charsetName);
   }
 }

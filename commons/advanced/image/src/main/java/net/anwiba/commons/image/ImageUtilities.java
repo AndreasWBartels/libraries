@@ -22,15 +22,26 @@
 
 package net.anwiba.commons.image;
 
+import net.anwiba.commons.image.codec.IImageCodecVisitor;
+import net.anwiba.commons.image.codec.ImageCodec;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.Streams;
+import net.anwiba.commons.reference.utilities.FileUtilities;
+
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,6 +49,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -46,10 +58,6 @@ import javax.swing.ImageIcon;
 import org.apache.commons.imaging.ImageInfo;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
-
-import net.anwiba.commons.image.codec.IImageCodecVisitor;
-import net.anwiba.commons.image.codec.ImageCodec;
-import net.anwiba.commons.reference.utilities.FileUtilities;
 
 public class ImageUtilities {
 
@@ -220,7 +228,7 @@ public class ImageUtilities {
         && colorModel.getColorSpace().isCS_sRGB();
   }
 
-  public static String getMimeType(byte[] bytes, String name) {
+  public static String getMimeType(final byte[] bytes, final String name) {
     if (bytes != null) {
       try {
         ImageInfo info = Imaging.getImageInfo(bytes);
@@ -235,7 +243,7 @@ public class ImageUtilities {
     return "image/" + extension;
   }
 
-  public static String convertToBase64(byte[] bytes, String mimeType) {
+  public static String convertToBase64(final byte[] bytes, final String mimeType) {
     if (bytes == null) {
       return MISSING_IMAGE_DATA;
     }
@@ -243,7 +251,7 @@ public class ImageUtilities {
     return "data:" + mimeType + ";base64," + base64Image;
   }
 
-  public static String convertToBase64(BufferedImage image, String imageCodec) {
+  public static String convertToBase64(final BufferedImage image, final String imageCodec) {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     try (OutputStream b64 = Base64.getEncoder().wrap(os)) {
       ImageIO.write(image, imageCodec, b64);
@@ -258,7 +266,7 @@ public class ImageUtilities {
     }
   }
 
-  public static Dimension getImageSize(byte[] bytes, String name) {
+  public static Dimension getImageSize(final byte[] bytes, final String name) {
     if (bytes == null) {
       return DEFAULT_IMAGE_SIZE;
     }
@@ -270,7 +278,7 @@ public class ImageUtilities {
     }
   }
 
-  public static ImageIcon toImageIcon(Icon icon) {
+  public static ImageIcon toImageIcon(final Icon icon) {
     if (icon instanceof ImageIcon) {
       return (ImageIcon) icon;
     } else {
@@ -283,5 +291,110 @@ public class ImageUtilities {
         graphics.dispose();
       }
     }
+  }
+
+  public static IOptional<Rectangle, IOException> getIntersection(
+      final IImageMetadata metadata,
+      final int x,
+      final int y,
+      final int width,
+      final int height) {
+    final Dimension size = new Dimension(Math.round(metadata.getWidth()), Math.round(metadata.getHeight()));
+    return getIntersection(size, x, y, width, height);
+  }
+
+  public static IOptional<Rectangle, IOException> getIntersection(final Dimension size,
+      final int x,
+      final int y,
+      final int width,
+      final int height) {
+    final Rectangle imageRectangle = new Rectangle(0, 0, size.width, size.height);
+    final Rectangle rectangle = new Rectangle(x, y, width, height);
+    if (imageRectangle.intersects(rectangle)) {
+      return Optional.of(IOException.class, imageRectangle.intersection(rectangle));
+    }
+    return Optional.empty(IOException.class);
+  }
+
+  public static Number[][] getValues(final Raster raster) {
+
+    int x = raster.getMinX();
+    int y = raster.getMinY();
+
+    int width = raster.getWidth();
+    int height = raster.getHeight();
+
+    final Number[][] values = new Number[width * height][raster.getSampleModel().getNumBands()];
+    switch (raster.getSampleModel().getDataType()) {
+      case DataBuffer.TYPE_BYTE -> convertFromInt(x, y, width, height, raster, values);
+      case DataBuffer.TYPE_INT -> convertFromInt(x, y, width, height, raster, values);
+      case DataBuffer.TYPE_SHORT -> convertFromInt(x, y, width, height, raster, values);
+      case DataBuffer.TYPE_USHORT -> convertFromInt(x, y, width, height, raster, values);
+      case DataBuffer.TYPE_FLOAT -> convertFromDouble(x, y, width, height, raster, values);
+      case DataBuffer.TYPE_DOUBLE -> convertFromDouble(x, y, width, height, raster, values);
+      case DataBuffer.TYPE_UNDEFINED -> convertFromDouble(x, y, width, height, raster, values);
+      default -> convertFromDouble(x, y, width, height, raster, values);
+    }
+    return values;
+  }
+
+  private static void convertFromInt(final int x,
+      final int y,
+      final int width,
+      final int height,
+      final Raster raster,
+      final Number[][] values) {
+    int[] pixel = new int[raster.getSampleModel().getNumBands()];
+    int n = 0;
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+        raster.getPixel(x + i, y + j, pixel);
+        values[n++] = convert(pixel);
+      }
+    }
+  }
+
+  private static void convertFromDouble(final int x,
+      final int y,
+      final int width,
+      final int height,
+      final Raster raster,
+      final Number[][] values) {
+    double[] pixel = new double[raster.getSampleModel().getNumBands()];
+    int n = 0;
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+        raster.getPixel(x + i, y + j, pixel);
+        values[n++] = convert(pixel);
+      }
+    }
+  }
+
+  private static Number[] convert(final Object pixel) {
+    if (pixel instanceof int[] array) {
+      Number[] values = new Number[array.length];
+      for (int i = 0; i < array.length; i++) {
+        values[i] = Integer.valueOf(array[i]);
+      }
+      return values;
+    }
+    if (pixel instanceof double[] array) {
+      Number[] values = new Number[array.length];
+      for (int i = 0; i < array.length; i++) {
+        values[i] = Double.valueOf(array[i]);
+      }
+      return values;
+    }
+    throw new IllegalArgumentException();
+  }
+
+  public static List<Color> getColors(final IndexColorModel colorModel) {
+    if (colorModel == null || colorModel.getMapSize() == 0) {
+      return List.of();
+    }
+    int[] colors = new int[colorModel.getMapSize()];
+    boolean hasAlpha = colorModel.hasAlpha();
+    colorModel.getRGBs(colors);
+    return Streams.of(colors).convert(i -> new Color(i, hasAlpha)).asList();
   }
 }

@@ -23,11 +23,11 @@ package net.anwiba.commons.swing.object.demo;
 
 import static net.anwiba.testing.demo.JFrames.show;
 
+import net.anwiba.commons.swing.object.numeric.LongField;
+
 import javax.swing.JPanel;
 
 import org.junit.jupiter.api.Test;
-
-import net.anwiba.commons.swing.object.LongField;
 
 public class LongFieldDemo extends AbstractObjectFieldDemo {
 

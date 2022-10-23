@@ -28,6 +28,7 @@ import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -54,11 +55,12 @@ import net.anwiba.commons.reference.IResourceReferenceHandler;
 import net.anwiba.commons.reference.IResourceReferenceVisitor;
 import net.anwiba.commons.reference.MemoryResourceReference;
 import net.anwiba.commons.reference.PathResourceReference;
-import net.anwiba.commons.reference.UriResourceReference;
-import net.anwiba.commons.reference.UrlResourceReference;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.UrlBuilder;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.reference.URIResourceReference;
+import net.anwiba.commons.reference.URLResourceReference;
+import net.anwiba.commons.reference.UniformResourceLocatorReference;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.builder.UrlBuilder;
+import net.anwiba.commons.reference.url.parser.UrlParser;
 
 public class ImageIoImageContainerFactory {
 
@@ -124,6 +126,7 @@ public class ImageIoImageContainerFactory {
       int numColorComponents = colorSpace.getNumComponents();
       int numBands = imageType.getNumBands();
       final int colorSpaceType = colorSpace.getType();
+      boolean isIndexed = colorModel instanceof IndexColorModel;
       final ImageIoImageMetadata metadata = new ImageIoImageMetadata(
           index,
           width,
@@ -134,7 +137,10 @@ public class ImageIoImageContainerFactory {
           colorModel.getTransferType(),
           colorModel.getTransparency(),
           imageType,
-          colorModel instanceof IndexColorModel);
+          isIndexed,
+          isIndexed
+          ? ImageUtilities.getColors((IndexColorModel) colorModel)
+          : List.of());
       imageReader.setInput(null);
       imageReader.dispose();
       return new ImageIoImageContainer(this.hints, metadata, imageInputStreamConnector, this.metadataAdjustor);
@@ -172,13 +178,18 @@ public class ImageIoImageContainerFactory {
       return resourceReference.accept(new IResourceReferenceVisitor<ImageInputStream, IOException>() {
 
         @Override
+        public ImageInputStream visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws IOException  {
+          throw new UnsupportedOperationException();
+        }
+
+        @Override
         public ImageInputStream visitFileResource(final FileResourceReference fileResourceReference)
             throws IOException {
           return new FileImageInputStream(fileResourceReference.getFile());
         }
 
         @Override
-        public ImageInputStream visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+        public ImageInputStream visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
           if (ImageIoImageContainerFactory.this.resourceReferenceHandler.isFileSystemResource(resourceReference)) {
             return openAsFileIfPossible(resourceReference);
           }
@@ -188,7 +199,7 @@ public class ImageIoImageContainerFactory {
         }
 
         @Override
-        public ImageInputStream visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+        public ImageInputStream visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
           if (ImageIoImageContainerFactory.this.resourceReferenceHandler.isFileSystemResource(resourceReference)) {
             return openAsFileIfPossible(resourceReference);
           }

@@ -22,15 +22,15 @@
 // Copyright (c) 2006 by Andreas W. Bartels
 package net.anwiba.spatial.coordinate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.lang.visitor.EnumSwitches;
 import net.anwiba.commons.utilities.ArrayUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class Envelope implements IEnvelope {
 
@@ -212,9 +212,8 @@ public class Envelope implements IEnvelope {
     if (this.minimum.touch(this.maximum)) {
       return CoordinateUtilities.isInterior(c0, c1, this.minimum);
     }
-    final Iterable<ICoordinate> coordinates = getCoordinateSequence().getCoordinates();
     ICoordinate prior = null;
-    for (final ICoordinate next : coordinates) {
+    for (final ICoordinate next : getCoordinateSequence().getCoordinates()) {
       if (prior == null) {
         prior = next;
         continue;
@@ -339,5 +338,19 @@ public class Envelope implements IEnvelope {
     final double[] min = max(this.minimum.getValues(), other.getMinimum().getValues(), length);
     final double[] max = min(this.maximum.getValues(), other.getMaximum().getValues(), length);
     return new Envelope(min, max, this.isMeasured && other.isMeasured());
+  }
+
+  @Override
+  public IEnvelope withMeasured(final double from, final double to) {
+    return new Envelope(this.minimum.withMeasured(from).getValues(),
+        this.maximum.withMeasured(to).getValues(),
+        true);
+  }
+
+  @Override
+  public IEnvelope withAltitude(final double from, final double to) {
+    return new Envelope(this.minimum.withAltitude(from).getValues(),
+        this.maximum.withAltitude(to).getValues(),
+        this.isMeasured);
   }
 }

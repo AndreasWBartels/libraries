@@ -22,14 +22,14 @@
 
 package net.anwiba.commons.lang.optional;
 
-import java.util.Objects;
-
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFunction;
 import net.anwiba.commons.lang.functional.ISupplier;
+
+import java.util.Objects;
 
 public class Optional<T, E extends Exception> {
 
@@ -187,8 +187,8 @@ public class Optional<T, E extends Exception> {
     }
 
     @Override
-    public void throwIfFaild() throws E {
-      // nothing to do
+    public IOptional<T, E> throwIfFaild() throws E {
+      return this;
     }
   }
 
@@ -272,7 +272,9 @@ public class Optional<T, E extends Exception> {
 
     @Override
     public <X extends Exception> T getOrThrow(final ISupplier<X, E> supplier) throws X, E {
-      throw this.cause;
+      X supply = supplier.supply();
+      supply.addSuppressed(this.cause);
+      throw supply;
     }
 
     @Override
@@ -316,7 +318,7 @@ public class Optional<T, E extends Exception> {
     }
 
     @Override
-    public void throwIfFaild() throws E {
+    public IOptional<T, E> throwIfFaild() throws E {
       throw this.cause;
     }
   }
@@ -457,8 +459,8 @@ public class Optional<T, E extends Exception> {
     }
 
     @Override
-    public void throwIfFaild() throws E {
-      // nothing to do
+    public IOptional<T, E> throwIfFaild() throws E {
+      return this;
     }
   }
 

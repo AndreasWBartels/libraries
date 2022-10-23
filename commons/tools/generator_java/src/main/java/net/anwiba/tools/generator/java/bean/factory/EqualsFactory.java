@@ -21,6 +21,10 @@
  */
 package net.anwiba.tools.generator.java.bean.factory;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Bean;
+
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -33,15 +37,15 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
 
-import net.anwiba.tools.generator.java.bean.configuration.Bean;
-
 @SuppressWarnings("nls")
 public class EqualsFactory extends AbstractSourceFactory {
 
   private final JCodeModel codeModel;
 
-  public EqualsFactory(final JCodeModel codeModel) {
-    super(codeModel);
+  public EqualsFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    super(codeModel, annotationClassfactory);
     this.codeModel = codeModel;
   }
 

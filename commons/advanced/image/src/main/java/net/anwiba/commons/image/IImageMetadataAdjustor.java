@@ -30,7 +30,7 @@ import net.anwiba.commons.image.operation.ImageMapBandsOperation;
 import net.anwiba.commons.image.operation.ImageOpacityOperation;
 import net.anwiba.commons.image.operation.ImageScaleOperation;
 import net.anwiba.commons.image.operation.ImageToGrayScaleOperation;
-import net.anwiba.commons.message.MessageBuilder;
+import net.anwiba.commons.message.Message;
 
 public interface IImageMetadataAdjustor {
 
@@ -94,10 +94,10 @@ public interface IImageMetadataAdjustor {
       return metadata;
     }
     if (metadata.getWidth() <= 0) {
-      return new InvalidImageMetadata(new MessageBuilder().setText("width <= 0").setError().build());
+      return new InvalidImageMetadata(Message.error("width <= 0").build());
     }
     if (metadata.getHeight() <= 0) {
-      return new InvalidImageMetadata(new MessageBuilder().setText("height <= 0").setError().build());
+      return new InvalidImageMetadata(Message.error("height <= 0").build());
     }
     return doAdjust(metadata, width, height);
   }
@@ -111,13 +111,13 @@ public interface IImageMetadataAdjustor {
       return metadata;
     }
     if (metadata.getNumberOfBands() <= 0) {
-      return new InvalidImageMetadata(new MessageBuilder().setText("number of bands <= 0").setError().build());
+      return new InvalidImageMetadata(Message.error("number of bands <= 0").build());
     }
     if (metadata.getNumberOfColorComponents() <= 0) {
-      return new InvalidImageMetadata(new MessageBuilder().setText("number of components <= 0").setError().build());
+      return new InvalidImageMetadata(Message.error("number of components <= 0").build());
     }
     if (metadata.getColorSpaceType() < 0 || metadata.getColorSpaceType() > 25) {
-      return new InvalidImageMetadata(new MessageBuilder().setText("number of components <= 0").setError().build());
+      return new InvalidImageMetadata(Message.error("number of components <= 0").build());
     }
 
     return doAdjust(metadata, numberOfComponents, numberOfBands, colorSpaceType);

@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -11,7 +10,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>commons-advanced</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
 
   <scm>
@@ -52,30 +51,34 @@
       <groupId>org.apache.httpcomponents.client5</groupId>
       <artifactId>httpclient5</artifactId>
     </dependency>
-
-<!--     <dependency> -->
-<!--       <groupId>org.apache.httpcomponents.client5</groupId> -->
-<!--       <artifactId>httpclient5-fluent</artifactId> -->
-<!--     </dependency> -->
+    <!--     <dependency> -->
+    <!--       <groupId>org.apache.httpcomponents.client5</groupId> -->
+    <!--       <artifactId>httpclient5-fluent</artifactId> -->
+    <!--     </dependency> -->
 
     <dependency>
       <groupId>org.apache.httpcomponents.core5</groupId>
       <artifactId>httpcore5</artifactId>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.apache.httpcomponents.core5</groupId> -->
-<!--       <artifactId>httpcore5-h2</artifactId> -->
-<!--     </dependency> -->
+    <!--     <dependency> -->
+    <!--       <groupId>org.apache.httpcomponents.core5</groupId> -->
+    <!--       <artifactId>httpcore5-h2</artifactId> -->
+    <!--     </dependency> -->
 
     <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>jakarta.activation</artifactId>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
     </dependency>
 
     <dependency>
       <groupId>net.anwiba.commons</groupId>
       <artifactId>anwiba-commons-http-testing</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
       <scope>test</scope>
     </dependency>
 

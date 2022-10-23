@@ -37,9 +37,8 @@ public final class Request implements IRequest {
   private final IParameters parameters;
   private final IClosure<InputStream, IOException> inputStreamClosure;
   private final long contentLength;
-  private final String encoding;
+  private final String charsetName;
   private final String mimeType;
-  private final String userAgent;
   private final IParameters properties;
   private final IAuthentication authentication;
   private final String host;
@@ -56,10 +55,9 @@ public final class Request implements IRequest {
       final String urlString,
       final IParameters parameters,
       final IParameters properties,
-      final String userAgent,
       final IClosure<InputStream, IOException> inputStreamClosure,
       final long contentLength,
-      final String encoding,
+      final String charsetName,
       final String mimeType,
       final ILifeTime cacheTime) {
     super();
@@ -71,10 +69,9 @@ public final class Request implements IRequest {
     this.authentication = authentication;
     this.parameters = parameters;
     this.properties = properties;
-    this.userAgent = userAgent;
     this.inputStreamClosure = inputStreamClosure;
     this.contentLength = contentLength;
-    this.encoding = encoding;
+    this.charsetName = charsetName;
     this.mimeType = mimeType;
     this.cacheTime = cacheTime;
   }
@@ -105,23 +102,18 @@ public final class Request implements IRequest {
   }
 
   @Override
-  public String getUserAgent() {
-    return this.userAgent;
-  }
-
-  @Override
   public IClosure<InputStream, IOException> getContent() {
     return this.inputStreamClosure;
   }
 
   @Override
-  public String getMimeType() {
+  public String getContentMimeType() {
     return this.mimeType;
   }
 
   @Override
-  public String getEncoding() {
-    return this.encoding;
+  public String getContentCharset() {
+    return this.charsetName;
   }
 
   @Override

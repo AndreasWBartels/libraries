@@ -23,7 +23,7 @@ package net.anwiba.commons.model;
 
 public class IntegerModel extends AbstractObjectChangedNotifier {
 
-  private int value;
+  private volatile int value;
 
   public IntegerModel() {
     this(0);
@@ -33,7 +33,7 @@ public class IntegerModel extends AbstractObjectChangedNotifier {
     this.value = value;
   }
 
-  public void setValue(final int value) {
+  public void set(final int value) {
     synchronized (this) {
       if (this.value == value) {
         return;
@@ -43,7 +43,7 @@ public class IntegerModel extends AbstractObjectChangedNotifier {
     fireObjectChanged();
   }
 
-  public int getValue() {
+  public int get() {
     synchronized (this) {
       return this.value;
     }

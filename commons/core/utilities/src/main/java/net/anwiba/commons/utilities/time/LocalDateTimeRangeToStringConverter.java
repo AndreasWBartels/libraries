@@ -21,10 +21,9 @@
  */
 package net.anwiba.commons.utilities.time;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import net.anwiba.commons.lang.functional.IConverter;
+
+import java.time.format.DateTimeFormatter;
 
 public final class LocalDateTimeRangeToStringConverter implements
     IConverter<ILocalDateTimeRange, String, RuntimeException> {
@@ -39,13 +38,6 @@ public final class LocalDateTimeRangeToStringConverter implements
   public String convert(final ILocalDateTimeRange value) {
     if (value == null) {
       return null;
-    }
-    if (value instanceof RelativeLocalDateTimeRange) {
-      RelativeLocalDateTimeRange timeRange = (RelativeLocalDateTimeRange) value;
-      LocalDateTime from =
-          LocalDateTimeUtilities.truncat(timeRange.getFrom(), timeRange.getDuration(), timeRange.getUnit());
-      LocalDateTime until = from.plus(timeRange.getDuration());
-      return this.formatter.format(from) + " - " + this.formatter.format(until);
     }
     return this.formatter.format(value.getFrom()) + " - " + this.formatter.format(value.getUntil());
   }

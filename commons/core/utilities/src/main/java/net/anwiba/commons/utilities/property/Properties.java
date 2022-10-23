@@ -21,56 +21,42 @@
  */
 package net.anwiba.commons.utilities.property;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.anwiba.commons.lang.stream.Streams;
+
 public final class Properties implements IProperties {
 
-  private static final long serialVersionUID = 655956184779585973L;
-  private final List<String> names = new ArrayList<>();
-  private final List<IProperty> properties = new ArrayList<>();
-  private final Map<String, IProperty> map = new HashMap<>();
+  private final Map<String, IProperty> map = new LinkedHashMap<>();
+
+  public static IProperties empty() {
+    return builder().build();
+  }
 
   public static PropertiesBuilder builder() {
     return new PropertiesBuilder();
   }
 
+  public static PropertiesBuilder builder(IProperties properties) {
+    return new PropertiesBuilder(properties);
+  }
+
   public Properties(final List<IProperty> properties) {
-    for (final IProperty property : properties) {
-      this.names.add(property.getName());
-      this.map.put(property.getName(), property);
-    }
-    this.names.forEach(name -> this.properties.add(this.map.get(name)));
-  }
-
-  @Override
-  public int getNumberOfProperties() {
-    return this.properties.size();
-  }
-
-  @Override
-  public IProperty getProperty(final int index) {
-    return this.properties.get(index);
-  }
-
-  @Override
-  public IProperties adapt(final int index, final IProperty property) {
-    final IProperty[] array = this.properties.toArray(new IProperty[this.properties.size()]);
-    array[index] = property;
-    return new Properties(Arrays.asList(array));
+    Streams.of(properties)
+        .filter(property -> property.getName() != null)
+        .foreach(property -> this.map.put(property.getName(), property));
   }
 
   @Override
   public Iterable<IProperty> properties() {
-    return this.properties;
+    return this.map.values();
   }
 
   @Override
   public Iterable<String> getNames() {
-    return this.names;
+    return this.map.keySet();
   }
 
   @Override
@@ -90,9 +76,7 @@ public final class Properties implements IProperties {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((this.properties == null)
-        ? 0
-        : this.properties.hashCode());
+    result = prime * result + this.map.hashCode();
     return result;
   }
 
@@ -108,11 +92,7 @@ public final class Properties implements IProperties {
       return false;
     }
     final Properties other = (Properties) obj;
-    if (this.properties == null) {
-      if (other.properties != null) {
-        return false;
-      }
-    } else if (!this.properties.equals(other.properties)) {
+    if (!this.map.equals(other.map)) {
       return false;
     }
     return true;
@@ -124,6 +104,11 @@ public final class Properties implements IProperties {
       return defaultValue;
     }
     return this.map.get(name).getValue();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return map.isEmpty();
   }
 
 }

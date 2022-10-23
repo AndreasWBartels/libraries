@@ -32,6 +32,12 @@ public final class ParametersBuilder {
     return new ParametersBuilder();
   }
 
+  public static ParametersBuilder of(IParameters parameters) {
+    ParametersBuilder builder = new ParametersBuilder();
+    parameters.parameters().forEach(builder::add);
+    return builder;
+  }
+
   public ParametersBuilder() {
   }
 

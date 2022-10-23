@@ -45,6 +45,8 @@ import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
 import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.api.LoggerComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.RootLoggerComponentBuilder;
 import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 import org.apache.logging.log4j.core.config.xml.XmlConfiguration;
 
@@ -109,7 +111,7 @@ public class LoggingUtilities {
   }
 
   public static void initialize(final String level, final String... namespaces) {
-    Configurator.initialize(createDefaultConfiguration(level, Set.of(CONSOLE, FILE), namespaces));
+    Configurator.initialize(createDefaultConfiguration(level.toUpperCase(), Set.of(CONSOLE, FILE), namespaces));
   }
 
   public static void read(final String loggingConfigurationFileName) {
@@ -152,26 +154,38 @@ public class LoggingUtilities {
   }
 
   private static BuiltConfiguration createDefaultConfiguration(
-      final String level,
+      final String levelName,
       final Set<String> appenders,
       final String... namespaces) {
 
     ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory
         .newConfigurationBuilder();
 
-    builder.setConfigurationName("Default builder");
-    builder.setStatusLevel(org.apache.logging.log4j.Level.ERROR);
-
-    builder.add(builder.newLogger("net.anwiba", org.apache.logging.log4j.Level.getLevel(level)));
-    for (final String namespace : namespaces) {
-      builder.add(builder.newLogger(namespace, org.apache.logging.log4j.Level.getLevel(level)));
-    }
-
     if (appenders.contains(CONSOLE)) {
       builder.add(builder.newAppender(CONSOLE, ConsoleAppender.PLUGIN_NAME)
           .add(builder.newLayout("PatternLayout")
-              .addAttribute("pattern", "%d{ISO8601} %-5p [%t] %-25.25c - %m%n")));
+//              .addAttribute("pattern", "%d{ISO8601} %-5p [%t] %-40.40c - %m%n")));
+      .addAttribute("pattern", "%m%n")));
     }
+
+    builder.setConfigurationName("Default builder");
+    builder.setStatusLevel(org.apache.logging.log4j.Level.ERROR);
+
+    RootLoggerComponentBuilder rootLogger = builder.newRootLogger(org.apache.logging.log4j.Level.ERROR);
+    rootLogger.add(builder.newAppenderRef(CONSOLE));
+    builder.add(rootLogger);
+
+    org.apache.logging.log4j.Level level = org.apache.logging.log4j.Level.getLevel(levelName);
+    builder.add(builder.newLogger("net.anwiba", level));
+    for (final String namespace : namespaces) {
+      LoggerComponentBuilder logger = builder
+          .newLogger(namespace, level)
+//          .add(builder.newAppenderRef(CONSOLE))
+//          .addAttribute("additivity", false)
+          ;
+      builder.add(logger);
+    }
+
 //    if (appenders.contains(FILE)) {
 //      builder.add(builder
 //          .newAppender("rolling", "RollingFile")

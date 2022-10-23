@@ -27,6 +27,10 @@ public class Property implements IProperty {
   private final String name;
   private final String value;
 
+  public static IProperty of(final String name, final String value) {
+    return new Property(name, value);
+  }
+
   public Property(final String name, final String value) {
     this.name = name;
     this.value = value;

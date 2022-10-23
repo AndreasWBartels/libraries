@@ -35,8 +35,8 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
       IApplicableResultProducer<T> resultProducer,
       IApplicableHttpResponseExceptionFactory... exceptionFactories)
       throws CanceledException,
-      HttpServerException,
       HttpRequestException,
+      HttpResponseException,
       IOException;
 
   <T> T execute(
@@ -45,8 +45,8 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
       IApplicableResultProducer<T> resultProducer,
       IResultProducer<IOException> errorProducer)
       throws CanceledException,
-      HttpServerException,
       HttpRequestException,
+      HttpResponseException,
       IOException;
 
   default <T> T execute(
@@ -55,8 +55,8 @@ public interface IConvertingHttpRequestExecutor extends AutoCloseable {
       final IResultProducer<T> resultProducer,
       final IResultProducer<IOException> errorProducer)
       throws CanceledException,
-      HttpServerException,
       HttpRequestException,
+      HttpResponseException,
       IOException {
     return execute(cancelable, request, new IApplicableResultProducer<T>() {
 

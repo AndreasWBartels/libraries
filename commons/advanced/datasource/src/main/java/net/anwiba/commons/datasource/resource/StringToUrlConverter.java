@@ -25,8 +25,8 @@ package net.anwiba.commons.datasource.resource;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.parser.UrlParser;
 
 public class StringToUrlConverter implements IConverter<String, IUrl, ConversionException> {
 

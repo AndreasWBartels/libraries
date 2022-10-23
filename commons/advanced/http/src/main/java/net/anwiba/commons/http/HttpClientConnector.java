@@ -21,12 +21,6 @@
  */
 package net.anwiba.commons.http;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.IAcceptor;
@@ -37,9 +31,15 @@ import net.anwiba.commons.reference.io.IStreamConnector;
 import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+
 public final class HttpClientConnector implements IStreamConnector<URI> {
 
-  private static ILogger logger = Logging.getLogger(HttpClientConnector.class.getName());
+  private final static ILogger logger = Logging.getLogger(HttpClientConnector.class.getName());
   private final IHttpRequestExecutorFactory httpRequestExcecutorFactory;
 
   public HttpClientConnector(final IHttpRequestExecutorFactory httpRequestExcecutorFactory) {
@@ -50,7 +50,6 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
     return this.httpRequestExcecutorFactory.create();
   }
 
-  @SuppressWarnings("nls")
   @Override
   public boolean exist(final URI uri) {
     try (final IResponse response = response(uri);) {
@@ -78,7 +77,7 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
       response = requestExecutor().execute(ICanceler.DummyCanceler, request);
       return response;
     } catch (CreationException exception) {
-      IOException closeException = IoUtilities.close(response, null);
+      IOException closeException = IoUtilities.close(response);
       final IOException wrappingException = new IOException(exception.getMessage(), exception);
       if (closeException != null) {
         wrappingException.addSuppressed(wrappingException);
@@ -111,7 +110,7 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
     return openInputStream(uri, s -> true);
   }
 
-  @SuppressWarnings({ "nls", "resource" })
+  @SuppressWarnings({ "resource" })
   @Override
   public InputStream openInputStream(final URI uri, final IAcceptor<String> contentTypeAcceptor) throws IOException {
     try {
@@ -153,10 +152,10 @@ public final class HttpClientConnector implements IStreamConnector<URI> {
         if (logger.isLoggable(ILevel.DEBUG)) {
           final String body = response.getBody();
           logger.log(ILevel.DEBUG, body);
-          throw HttpRequestException
+          throw HttpResponseException
               .create(statusCode + " - " + response.getStatusText(), response, body.getBytes());
         }
-        throw HttpRequestException.create(statusCode + " - " + response.getStatusText(), response);
+        throw HttpResponseException.create(statusCode + " - " + response.getStatusText(), response);
       } finally {
         response.close();
       }

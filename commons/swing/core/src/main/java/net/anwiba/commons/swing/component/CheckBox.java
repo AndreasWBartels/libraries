@@ -36,6 +36,7 @@ public class CheckBox implements IComponentProvider {
   private final IBooleanModel model;
   private JCheckBox checkBox;
   private final String label;
+  private final String tooltip;
 
   public CheckBox() {
     this(new BooleanModel(false));
@@ -46,7 +47,12 @@ public class CheckBox implements IComponentProvider {
   }
 
   public CheckBox(final String label, final IBooleanModel model) {
+    this(label, label, model);
+  }
+
+  public CheckBox(final String label, final String tooltip, final IBooleanModel model) {
     this.label = label;
+    this.tooltip = tooltip;
     this.model = model;
     this.model.addChangeListener(new IChangeableObjectListener() {
 
@@ -74,6 +80,7 @@ public class CheckBox implements IComponentProvider {
 
   private void initView() {
     this.checkBox = new JCheckBox(this.label);
+    this.checkBox.setToolTipText(this.tooltip);
     this.checkBox.getModel().addItemListener(new ItemListener() {
 
       @Override

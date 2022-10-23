@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Factory {
 
     private final String type = "Factory";
-    private final static HashMap<java.lang.String, Class> _classes = new HashMap<java.lang.String, Class>();
+    private final static HashMap<java.lang.String, Class> _classes = new HashMap<>();
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public static Factory create(

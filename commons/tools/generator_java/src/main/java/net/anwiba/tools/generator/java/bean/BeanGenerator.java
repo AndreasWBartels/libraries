@@ -21,6 +21,14 @@
  */
 package net.anwiba.tools.generator.java.bean;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Bean;
+import net.anwiba.tools.generator.java.bean.factory.BeanBuilderFactory;
+import net.anwiba.tools.generator.java.bean.factory.BeanFactory;
+import net.anwiba.tools.generator.java.bean.factory.EnsurePredicateFactory;
+import net.anwiba.tools.generator.java.bean.writer.SourceCodeWriter;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,25 +38,26 @@ import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.writer.FileCodeWriter;
 import com.sun.codemodel.writer.SingleStreamCodeWriter;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.tools.generator.java.bean.configuration.Bean;
-import net.anwiba.tools.generator.java.bean.factory.BeanBuilderFactory;
-import net.anwiba.tools.generator.java.bean.factory.BeanFactory;
-import net.anwiba.tools.generator.java.bean.factory.EnsurePredicateFactory;
-import net.anwiba.tools.generator.java.bean.writer.SourceCodeWriter;
-
 public class BeanGenerator {
 
-  final JCodeModel codeModel = new JCodeModel();
-  final EnsurePredicateFactory ensurePredicateFactory = new EnsurePredicateFactory(this.codeModel);
-  final BeanFactory beanFactory = new BeanFactory(this.codeModel, this.ensurePredicateFactory);
-  final BeanBuilderFactory beanBuilderFactory = new BeanBuilderFactory(this.codeModel, this.ensurePredicateFactory);
+  final private JCodeModel codeModel = new JCodeModel();
+  final private EnsurePredicateFactory ensurePredicateFactory;
+  final private BeanFactory beanFactory;
+  final private BeanBuilderFactory beanBuilderFactory;
 
   public class ClosableSourceCodeWriter extends SourceCodeWriter implements AutoCloseable {
 
     public ClosableSourceCodeWriter(final File target, final String comment) throws IOException {
       super(target, comment);
     }
+  }
+
+  public BeanGenerator(final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+      CreationException> annotationClassfactory) {
+    this.ensurePredicateFactory = new EnsurePredicateFactory(this.codeModel, annotationClassfactory);
+    this.beanFactory = new BeanFactory(this.codeModel, annotationClassfactory, this.ensurePredicateFactory);
+    this.beanBuilderFactory =
+        new BeanBuilderFactory(this.codeModel, annotationClassfactory, this.ensurePredicateFactory);
   }
 
   public void generate(final OutputStream ouputStream) throws IOException {

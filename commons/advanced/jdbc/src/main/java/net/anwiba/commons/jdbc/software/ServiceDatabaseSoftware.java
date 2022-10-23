@@ -21,19 +21,22 @@
  */
 package net.anwiba.commons.jdbc.software;
 
+import net.anwiba.commons.jdbc.connection.ConnectionUtilities;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
+
 import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.anwiba.commons.jdbc.DatabaseUtilities;
+import java.util.function.Predicate;
 
 public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
 
-  ORACLE("oracle.jdbc.OracleDriver", //$NON-NLS-1$
-      "jdbc:oracle:thin", //$NON-NLS-1$
+  ORACLE("oracle.jdbc.OracleDriver",
+      "jdbc:oracle:thin",
       1521, //
       SID, //
       createJdbcUrlPatterns(
@@ -41,38 +44,75 @@ public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
               SID, //
               SERVICE), //
           Arrays.asList(
-              "${protocol}:@${host}:${port}:${database}", //$NON-NLS-1$
-              "${protocol}:@//${host}:${port}/${database}" //$NON-NLS-1$
-          )),
-      "oracle.spatial.geometry.JGeometry") { //$NON-NLS-1$
+              "${protocol}:@${host}:${port}:${database}",
+              "${protocol}:@//${host}:${port}/${database}")),
+      d -> exists("oracle.spatial.geometry.JGeometry")) {
+
+    @Override
+    public IOptional<String, RuntimeException> getDefaultSchema() {
+      return Optional.of("${connection}");
+    }
   },
-  POSTGRES("org.postgresql.Driver", //$NON-NLS-1$
-      "jdbc:postgresql", //$NON-NLS-1$
+  POSTGRES("org.postgresql.Driver",
+      "jdbc:postgresql",
       5432, //
       DEFAULT, //
       createJdbcUrlPatterns(
           Arrays.asList(DEFAULT), //
-          Arrays.asList("${protocol}://${host}:${port}/${database}")), //$NON-NLS-1$
-      "net.postgis.jdbc.geometry.Geometry") { //$NON-NLS-1$
+          Arrays.asList("${protocol}://${host}:${port}/${database}")),
+      d -> exists("net.postgis.jdbc.geometry.Geometry")) {
+
+    @Override
+    public IOptional<String, RuntimeException> getDefaultSchema() {
+      return Optional.of("public");
+    }
   },
-  H2("org.h2.Driver", //$NON-NLS-1$
-      "jdbc:h2", //$NON-NLS-1$
+  H2("org.h2.Driver", // isn't supported jet
+      "jdbc:h2",
       0,
       TCP, //
       createJdbcUrlPatterns(
           Arrays.asList(TCP, SSL), //
-          Arrays.asList("${protocol}:tcp://${host}:${port}/${database}", //$NON-NLS-1$
-              "${protocol}:ssl://${host}:${port}/${database}")), //$NON-NLS-1$
-      "org.locationtech.jts.geom.Geometry") { //$NON-NLS-1$
+          Arrays.asList("${protocol}:tcp://${host}:${port}/${database}",
+              "${protocol}:ssl://${host}:${port}/${database}")),
+      d -> true) {
   },
-  HANA("com.sap.db.jdbc.Driver", //$NON-NLS-1$
-      "jdbc:sap", //$NON-NLS-1$
+  HANA("com.sap.db.jdbc.Driver", // isn't really tested
+      "jdbc:sap",
       30015, //
       DEFAULT, //
       createJdbcUrlPatterns(
           Arrays.asList(DEFAULT), //
-          Arrays.asList("${protocol}://${host}:${port}")), //$NON-NLS-1$
-      "java.lang.Object") { //$NON-NLS-1$
+          //          Arrays.asList("${protocol}://${host}:${port}")),
+          Arrays.asList("${protocol}://${host}:${port}/?databaseName=${database}")),
+      d -> true) {
+  },
+  MARIADB("org.mariadb.jdbc.Driver",
+      "jdbc:mariadb",
+      3306, //
+      DEFAULT, //
+      createJdbcUrlPatterns(
+          Arrays.asList(DEFAULT), //
+          Arrays.asList("${protocol}://${host}:${port}/${database}")),
+      d -> true) {
+  },
+  MSSQL("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+      "jdbc:sqlserver",
+      1433, //
+      DEFAULT, //
+      createJdbcUrlPatterns(
+          Arrays.asList(DEFAULT), //
+          Arrays.asList("${protocol}://${host}:${port};databaseName=${database}")),
+      d -> true) {
+  },
+  MYSQL("com.mysql.cj.jdbc.Driver",
+      "jdbc:mysql",
+      3306, //
+      DEFAULT, //
+      createJdbcUrlPatterns(
+          Arrays.asList(DEFAULT), //
+          Arrays.asList("${protocol}://${host}:${port}/${database}")),
+      d -> true) {
   };
 
   static Map<String, IJdbcPattern> createJdbcUrlPatterns(final List<String> names, final List<String> patterns) {
@@ -85,12 +125,13 @@ public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
 
   transient private Driver driver;
 
-  private final Map<String, IJdbcPattern> jdbcUrlPatterns = new HashMap<>();
+  private final String driverName;
   private final String protocol;
   private final int port;
-  private final String geometryClassName;
-  private final String driverName;
   private final String defaultJdbcUrlPatternName;
+  private final Map<String, IJdbcPattern> jdbcUrlPatterns = new HashMap<>();
+
+  private Predicate<ServiceDatabaseSoftware> isGisSupportApplicablePredicate;
 
   private ServiceDatabaseSoftware(
       final String driverName,
@@ -98,20 +139,20 @@ public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
       final int port,
       final String defaultJdbcUrlPatternName,
       final Map<String, IJdbcPattern> jdbcUrlPatterns,
-      final String geometryClassName) {
+      final Predicate<ServiceDatabaseSoftware> isGisSupportApplicablePredicate) {
     this.driverName = driverName;
     this.defaultJdbcUrlPatternName = defaultJdbcUrlPatternName;
+    this.isGisSupportApplicablePredicate = isGisSupportApplicablePredicate;
     this.jdbcUrlPatterns.putAll(jdbcUrlPatterns);
-    this.driver = DatabaseUtilities.loadDriver(driverName);
+    this.driver = ConnectionUtilities.loadDriver(driverName);
     this.protocol = protocol;
     this.port = port;
-    this.geometryClassName = geometryClassName;
   }
 
   @Override
   public Driver getDriver() {
     if (this.driver == null) {
-      final Driver _driver = DatabaseUtilities.loadDriver(this.driverName);
+      final Driver _driver = ConnectionUtilities.loadDriver(this.driverName);
       this.driver = _driver;
     }
     return this.driver;
@@ -139,8 +180,12 @@ public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
 
   @Override
   public boolean isGisSupportApplicable() {
+    return this.isGisSupportApplicablePredicate.test(this);
+  }
+
+  private static boolean exists(final String className) {
     try {
-      Class.forName(this.geometryClassName);
+      Class.forName(className);
       return true;
     } catch (final ClassNotFoundException exception) {
       return false;
@@ -173,5 +218,18 @@ public enum ServiceDatabaseSoftware implements IDatabaseSoftware {
   @Override
   public List<IJdbcPattern> getJdbcUrlPatterns() {
     return new ArrayList<>(this.jdbcUrlPatterns.values());
+  }
+
+  public static ServiceDatabaseSoftware getByName(final String name) {
+    if (name == null) {
+      return null;
+    }
+    final ServiceDatabaseSoftware[] values = values();
+    for (final ServiceDatabaseSoftware serviceDatabaseSoftware : values) {
+      if (name.equalsIgnoreCase(serviceDatabaseSoftware.name())) {
+        return serviceDatabaseSoftware;
+      }
+    }
+    return null;
   }
 }

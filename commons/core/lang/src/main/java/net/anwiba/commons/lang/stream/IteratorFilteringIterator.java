@@ -26,12 +26,14 @@ import java.util.NoSuchElementException;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IIterator;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public final class IteratorFilteringIterator<T, E extends Exception> implements IIterator<T, E> {
 
   private final IIterator<T, E> iterator;
   private final IAcceptor<T> acceptor;
-  private T item = null;
+  private IOptional<T, RuntimeException> item = null;
 
   public IteratorFilteringIterator(final IIterator<T, E> input, final IAcceptor<T> acceptor) {
     this.iterator = input;
@@ -40,10 +42,13 @@ public final class IteratorFilteringIterator<T, E extends Exception> implements 
 
   @Override
   public boolean hasNext() throws E {
+    if (this.item != null) {
+      return true;
+    }
     while (this.iterator.hasNext()) {
       final T i = this.iterator.next();
       if (this.acceptor.accept(i) && i != null) {
-        this.item = i;
+        this.item = Optional.of(i);
         return true;
       }
     }
@@ -53,8 +58,8 @@ public final class IteratorFilteringIterator<T, E extends Exception> implements 
   @Override
   public T next() throws E {
     try {
-      if (this.item != null || hasNext()) {
-        return this.item;
+      if (hasNext()) {
+        return this.item.get();
       }
       throw new NoSuchElementException();
     } finally {

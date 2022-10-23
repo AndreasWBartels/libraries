@@ -22,10 +22,10 @@
 // Copyright (c) 2006 by Andreas W. Bartels
 package net.anwiba.spatial.coordinate;
 
-import java.util.Arrays;
-
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.utilities.ArrayUtilities;
+
+import java.util.Arrays;
 
 public class Coordinate implements ICoordinate {
 
@@ -60,7 +60,7 @@ public class Coordinate implements ICoordinate {
     if (isMeasured) {
       this.measuredIndex = this.values.length - 1;
     } else {
-      this.measuredIndex = 0;
+      this.measuredIndex = -1;
     }
     this.isMeasured = isMeasured;
   }
@@ -208,7 +208,23 @@ public class Coordinate implements ICoordinate {
 
   @Override
   public String toString() {
-    return "Coordinate[" + Arrays.toString(getValues()) + "," + isMeasured() + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    return "Coordinate[" + Arrays.toString(getValues()) + "," + isMeasured() + "]";
+  }
+
+  @Override
+  public ICoordinate withMeasured(final double value) {
+    if (getDimension() == 2) {
+      return new Coordinate(new double[] { getXValue(), getYValue(), value }, true);
+    }
+    return new Coordinate(new double[] { getXValue(), getYValue(), getZValue(), value }, true);
+  }
+
+  @Override
+  public ICoordinate withAltitude(final double value) {
+    if (isMeasured()) {
+      return new Coordinate(new double[] { getXValue(), getYValue(), value, getMeasuredValue() }, true);
+    }
+    return new Coordinate(new double[] { getXValue(), getYValue(), value }, false);
   }
 
 }

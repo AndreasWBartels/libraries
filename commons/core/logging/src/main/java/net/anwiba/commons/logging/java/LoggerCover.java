@@ -25,7 +25,8 @@ import java.util.logging.Level;
 
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.IMessageFactory;
+import net.anwiba.commons.logging.LogMessage;
+import net.anwiba.commons.logging.ILogMessageFactory;
 
 class LoggerCover extends java.util.logging.Logger implements ILogger {
 
@@ -39,11 +40,12 @@ class LoggerCover extends java.util.logging.Logger implements ILogger {
   }
 
   @Override
-  public void doLog(ILevel level, IMessageFactory factory, Throwable throwable) {
+  public void doLog(ILevel level, ILogMessageFactory factory) {
     if (!isLoggable(level)) {
       return;
     }
-    log(JavaLogging.create(level), factory.create(), throwable);
+    LogMessage logMessage = factory.create(level);
+    log(JavaLogging.create(level), logMessage.message(), logMessage.throwable());
   }
 
   @Override

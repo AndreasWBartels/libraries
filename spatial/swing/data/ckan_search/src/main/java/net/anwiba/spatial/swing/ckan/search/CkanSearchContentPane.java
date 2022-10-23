@@ -47,7 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import net.anwiba.commons.datasource.connection.IHttpConnectionDescription;
-import net.anwiba.commons.http.HttpRequestException;
+import net.anwiba.commons.http.HttpResponseException;
 import net.anwiba.commons.http.IObjectRequestExecutorBuilderFactory;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.object.IObjectReceiver;
@@ -56,7 +56,7 @@ import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.lang.primitive.IBooleanProvider;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.message.MessageBuilder;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IBooleanModel;
@@ -550,9 +550,9 @@ public final class CkanSearchContentPane extends AbstractContentPane {
         MessageFormat
             .format(
                 Messages.i0_to_i1_of_i2,
-                (offsetModel.getValue() + 1),
-                (offsetModel.getValue() + this.datasets.size()),
-                resultCountModel.getValue()));
+                (offsetModel.get() + 1),
+                (offsetModel.get() + this.datasets.size()),
+                resultCountModel.get()));
     datasetLabelsPanel.add(resultsLable);
 
     final IntegerModel selectedIndexModel = new IntegerModel();
@@ -601,14 +601,14 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       public void objectsChanged(final Iterable<Dataset> oldObjects, final Iterable<Dataset> newObjects) {
         CkanSearchContentPane.this.dataSetResultsConsumer.consume(newObjects);
         if (newObjects.iterator().hasNext()) {
-          if (selectedIndexModel.getValue() != -1) {
+          if (selectedIndexModel.get() != -1) {
             final List<Dataset> values = IterableUtilities.asList(newObjects);
-            if ((values.size() - 1) > selectedIndexModel.getValue()) {
-              datasetTable.getSelectionModel().setSelectedObject(values.get(selectedIndexModel.getValue()));
+            if ((values.size() - 1) > selectedIndexModel.get()) {
+              datasetTable.getSelectionModel().setSelectedObject(values.get(selectedIndexModel.get()));
             } else {
               datasetTable.getSelectionModel().setSelectedObject(values.get(values.size() - 1));
             }
-            selectedIndexModel.setValue(-1);
+            selectedIndexModel.set(-1);
             return;
           }
           final Dataset dataSet = newObjects.iterator().next();
@@ -703,7 +703,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
           @Override
           public void keyTyped(final KeyEvent e) {
             if (e.getKeyChar() == '\n') {
-              if (offsetModel.getValue() == 0) {
+              if (offsetModel.get() == 0) {
                 query(
                     contentPanel,
                     CkanSearchContentPane.this.description,
@@ -723,7 +723,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                     toDateModel);
                 return;
               }
-              offsetModel.setValue(0);
+              offsetModel.set(0);
             }
           }
         })
@@ -731,7 +731,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             (model, document, enabledDistributor, clearBlock) -> new ConfigurableActionBuilder()
                 .setIcon(net.anwiba.commons.swing.icons.GuiIcons.ADVANCED_SEARCH_ICON)
                 .setProcedure(component -> {
-                  if (offsetModel.getValue() == 0) {
+                  if (offsetModel.get() == 0) {
                     query(
                         contentPanel,
                         this.description,
@@ -751,7 +751,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                         toDateModel);
                     return;
                   }
-                  offsetModel.setValue(0);
+                  offsetModel.set(0);
                 })
                 .build())
         .addActionFactory((model, document, enabledDistributor, clearBlock) -> {
@@ -763,7 +763,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
               .setTooltip(Messages.clear_query)
               .setProcedure(value -> {
                 clearBlock.execute();
-                if (offsetModel.getValue() == 0) {
+                if (offsetModel.get() == 0) {
                   query(
                       contentPanel,
                       this.description,
@@ -783,7 +783,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                       toDateModel);
                   return;
                 }
-                offsetModel.setValue(0);
+                offsetModel.set(0);
               })
               .build();
         })
@@ -795,7 +795,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
         .addChangeListener(
             () -> If
                 .isTrue(this.useEnvelopDistributor.isTrue())
-                .excecute(() -> this.envelopeModel.set(this.envelopeDistributor.get())));
+                .execute(() -> this.envelopeModel.set(this.envelopeDistributor.get())));
 
     final ObjectModel<IGuiIcon> envelopeLinkIconModel = new ObjectModel<>();
 
@@ -898,7 +898,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                                 .setDocumentModality()
                                 .setCancleOkButtonDialog()
                                 .enableCloseOnEscape()
-                                .setMessage(new MessageBuilder().setText("From").build())
+                                .setMessage(Message.text("From").build())
                                 .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
                                 .setTitle("From")
                                 .setPreferences(this.preferences.node("date"))
@@ -924,7 +924,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                                 .setDocumentModality()
                                 .setCancleOkButtonDialog()
                                 .enableCloseOnEscape()
-                                .setMessage(new MessageBuilder().setText("Until").build())
+                                .setMessage(Message.text("Until").build())
                                 .setIcon(net.anwiba.commons.swing.icons.GuiIcons.DATE_ICON)
                                 .setTitle("Until")
                                 .setPreferences(this.preferences.node("date"))
@@ -1003,7 +1003,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                       } finally {
                         this.isQueryEnabledModel.set(true);
                       }
-                      if (offsetModel.getValue() == 0) {
+                      if (offsetModel.get() == 0) {
                         query(
                             contentPanel,
                             this.description,
@@ -1023,7 +1023,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                             toDateModel);
                         return;
                       }
-                      offsetModel.setValue(0);
+                      offsetModel.set(0);
                     })
                     .build()));
 
@@ -1075,9 +1075,9 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                     MessageFormat
                         .format(
                             Messages.i0_to_i1_of_i2,
-                            (offsetModel.getValue() + 1),
-                            (offsetModel.getValue() + this.datasets.size()),
-                            resultCountModel.getValue())));
+                            (offsetModel.get() + 1),
+                            (offsetModel.get() + this.datasets.size()),
+                            resultCountModel.get())));
 
     resultCountModel
         .addChangeListener(
@@ -1086,9 +1086,9 @@ public final class CkanSearchContentPane extends AbstractContentPane {
                     MessageFormat
                         .format(
                             Messages.i0_to_i1_of_i2,
-                            (offsetModel.getValue() + 1),
-                            (offsetModel.getValue() + this.datasets.size()),
-                            resultCountModel.getValue())));
+                            (offsetModel.get() + 1),
+                            (offsetModel.get() + this.datasets.size()),
+                            resultCountModel.get())));
 
     ((FilterableObjectTableModel<String>) formatsTable.getTableModel())
         .getObjectTableModel()
@@ -1268,7 +1268,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       if (!this.isQueryEnabledModel.isTrue()) {
         return;
       }
-      if (offsetModel.getValue() == 0) {
+      if (offsetModel.get() == 0) {
         query(
             contentPanel,
             this.description,
@@ -1288,7 +1288,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             toDateModel);
         return;
       }
-      offsetModel.setValue(0);
+      offsetModel.set(0);
     };
 
     fromDateModel.addChangeListener(queryExecutingListener);
@@ -1299,7 +1299,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       if (!this.isQueryEnabledModel.isTrue()) {
         return;
       }
-      if (offsetModel.getValue() == 0) {
+      if (offsetModel.get() == 0) {
         query(
             contentPanel,
             this.description,
@@ -1319,7 +1319,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
             toDateModel);
         return;
       }
-      offsetModel.setValue(0);
+      offsetModel.set(0);
     });
 
     dataSetSelectionModel.addSelectionListener(event -> {
@@ -1461,7 +1461,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
       final IObjectModel<Event> eventModel,
       final IObjectModel<LocalDateTime> fromDateModel,
       final IObjectModel<LocalDateTime> toDateModel) {
-    final int offset = offsetModel.getValue();
+    final int offset = offsetModel.get();
     try {
       final IPackageSearchCondition condition = new PackageSearchConditionBuilder()
           .setQuery(queryModel.get())
@@ -1482,17 +1482,15 @@ public final class CkanSearchContentPane extends AbstractContentPane {
           (progressMonitor, canceler) -> this.packageQueryExecutor.query(canceler, connectionDescription, condition))
               .launch(parentCompoment);
       this.packageQueryConditionModel.set(condition);
-      resultCountModel.setValue(result.getCount());
+      resultCountModel.set(result.getCount());
       datasetTableModel.set(result.getResults());
-    } catch (final HttpRequestException exception) {
+    } catch (final HttpResponseException exception) {
       logger.log(ILevel.DEBUG, Messages.format_query_faild, exception);
       new ConfigurableDialogLauncher() //
           .setTitle(Messages.formats)
           .setMessage(
-              new MessageBuilder()
-                  .setText(Messages.format_query_faild)
-                  .setDescription(exception.getStatusCode() + " " + exception.getStatusText()) //$NON-NLS-1$
-                  .setError()
+              Message.error(Messages.format_query_faild)
+                  .description(exception.getStatusCode() + " " + exception.getStatusText()) //$NON-NLS-1$
                   .build())
           .setContentPaneFactory((o, p, d) -> new TextContentPane(d, exception.getContentAsString()))
           .setCloseButtonDialog()
@@ -1534,7 +1532,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
         if (!CkanSearchContentPane.this.isQueryEnabledModel.isTrue()) {
           return;
         }
-        if (offsetModel.getValue() == 0) {
+        if (offsetModel.get() == 0) {
           query(
               contentPanel,
               connectionDescription,
@@ -1554,7 +1552,7 @@ public final class CkanSearchContentPane extends AbstractContentPane {
               toDateModel);
           return;
         }
-        offsetModel.setValue(0);
+        offsetModel.set(0);
       }
 
       @Override

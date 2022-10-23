@@ -31,6 +31,12 @@ import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilitie
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.isInstanceOfMap;
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.withoutGenerics;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.Type;
+
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -38,17 +44,14 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.lang.optional.IOptional;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.Type;
-
 public class MemberFactory extends AbstractSourceFactory {
 
   private final JCodeModel codeModel;
 
-  public MemberFactory(final JCodeModel codeModel) {
-    super(codeModel);
+  public MemberFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    super(codeModel, annotationClassfactory);
     this.codeModel = codeModel;
   }
 

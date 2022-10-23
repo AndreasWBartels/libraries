@@ -32,4 +32,6 @@ public class PostgresqlUtilitiesStatementStrings extends AbstractStatementString
   public static String IsIndexedStatement;
   public static String IndexNameStatement;
 
+  public static String ColumnMetaDataStatement;
+  public static String ConstraintTypesStatement;
 }

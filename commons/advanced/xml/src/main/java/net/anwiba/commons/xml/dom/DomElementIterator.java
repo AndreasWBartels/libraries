@@ -86,21 +86,20 @@ public class DomElementIterator<T> implements IClosableIoIterator<T> {
     if (this.isClosed) {
       return;
     }
-    this.isClosed = true;
-    this.object = null;
-    IOException ioException = IoUtilities.close(() -> {
-      if (this.eventReader != null) {
-        try {
-          this.eventReader.close();
-        } catch (XMLStreamException exception) {
-          throw new IOException(exception.getMessage(), exception);
+    try {
+      IOException ioException = IoUtilities.close(() -> {
+        if (this.eventReader != null) {
+          try {
+            this.eventReader.close();
+          } catch (XMLStreamException exception) {
+            throw new IOException(exception.getMessage(), exception);
+          }
         }
-      }
-    }, null);
-    ioException = IoUtilities.close(this.inputStream, ioException);
-    ioException = IoUtilities.close(this.connector, ioException);
-    if (ioException != null) {
-      throw ioException;
+      }, this.inputStream, this.connector);
+      IoUtilities.throwIfNotNull(ioException);
+    } finally {
+      this.isClosed = true;
+      this.object = null;
     }
   }
 

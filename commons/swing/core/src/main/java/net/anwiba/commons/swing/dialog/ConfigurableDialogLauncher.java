@@ -59,6 +59,10 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
   private final List<IProcedure<ConfigurableDialog, RuntimeException>> beforeShowExecutables = new ArrayList<>();
   private boolean isProgressDialogEnabled = false;
 
+  public static ConfigurableDialogLauncher launcher() {
+    return new ConfigurableDialogLauncher();
+  }
+
   public ConfigurableDialogLauncher setDialogIcon(final GuiIcon icon) {
     this.dialogConfigurationBuilder.setDialogIcon(icon);
     return this;
@@ -76,6 +80,11 @@ public class ConfigurableDialogLauncher implements IDialogLauncher {
 
   public ConfigurableDialogLauncher setCancleOkButtonDialog() {
     this.dialogConfigurationBuilder.setCancleOkButtonDialog();
+    return this;
+  }
+
+  public ConfigurableDialogLauncher setCancleApplyOkButtonDialog() {
+    this.dialogConfigurationBuilder.setCancleApplyOkButtonDialog();
     return this;
   }
 

@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.message;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 
@@ -98,22 +99,64 @@ public class Message implements IMessage {
       final String description,
       final Throwable throwable,
       final MessageType messageType) {
-    return builder().setText(text)
-        .setDescription(description)
-        .setThrowable(throwable)
-        .setType(messageType)
+    return builder().text(text)
+        .description(description)
+        .throwable(throwable)
+        .type(messageType)
         .build();
   }
 
   public static IMessage create(final String text, final String description, final MessageType messageType) {
-    return builder().setText(text).setDescription(description).setType(messageType).build();
+    return builder().text(text).description(description).type(messageType).build();
   }
 
   public static IMessage create(final String text, final String description) {
-    return create(text, description, MessageType.DEFAULT);
+    return text(text).description(description).build();
   }
 
   public static IMessage create(final String text) {
-    return builder().setText(text).build();
+    return text(text).build();
+  }
+
+  public static IMessageBuilder warning(String text) {
+    return builder().warning().text(text);
+  }
+
+  public static IMessageBuilder warning(Throwable throwable) {
+    return warning(throwable.getMessage()).throwable(throwable);
+  }
+
+
+  public static IMessageBuilder warning(String text, Object... objects) {
+    return warning(MessageFormat.format(text, objects));
+  }
+
+  public static IMessageBuilder info(String text) {
+    return builder().warning().text(text);
+  }
+
+
+  public static IMessageBuilder info(String text, Object... objects) {
+    return info(MessageFormat.format(text, objects));
+  }
+
+  public static IMessageBuilder error(String text) {
+    return builder().error().text(text);
+  }
+
+  public static IMessageBuilder error(String text, Object... objects) {
+    return error(MessageFormat.format(text, objects));
+  }
+
+  public static IMessageBuilder error(Throwable throwable) {
+    return error(throwable.getMessage()).throwable(throwable);
+  }
+
+  public static IMessageBuilder text(String text) {
+    return builder().text(text);
+  }
+
+  public static IMessageBuilder text(String text, Object... objects) {
+    return text(MessageFormat.format(text, objects));
   }
 }

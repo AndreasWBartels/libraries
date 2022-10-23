@@ -40,10 +40,11 @@ import net.anwiba.commons.reference.IResourceReferenceVisitor;
 import net.anwiba.commons.reference.MemoryResourceReference;
 import net.anwiba.commons.reference.PathResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
-import net.anwiba.commons.reference.UriResourceReference;
-import net.anwiba.commons.reference.UrlResourceReference;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
-import net.anwiba.commons.utilities.io.url.IUrl;
+import net.anwiba.commons.reference.URIResourceReference;
+import net.anwiba.commons.reference.URLResourceReference;
+import net.anwiba.commons.reference.UniformResourceLocatorReference;
+import net.anwiba.commons.reference.url.IAuthentication;
+import net.anwiba.commons.reference.url.IUrl;
 
 @SuppressWarnings("nls")
 public class ResourceDescription implements IResourceDescription {
@@ -60,13 +61,18 @@ public class ResourceDescription implements IResourceDescription {
         resourceReference.accept(new IResourceReferenceVisitor<IConnectionDescription, CreationException>() {
 
           @Override
+          public IConnectionDescription visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException  {
+            throw new UnsupportedOperationException();
+          }
+
+          @Override
           public IConnectionDescription visitFileResource(final FileResourceReference fileResourceReference)
               throws RuntimeException {
             return new FileConnectionDescription(fileResourceReference);
           }
 
           @Override
-          public IConnectionDescription visitUrlResource(final UrlResourceReference urlResourceReference)
+          public IConnectionDescription visitURLResource(final URLResourceReference urlResourceReference)
               throws CreationException {
             final URL inUrl = urlResourceReference.getUrl();
             if ("file".equals(inUrl.getProtocol())) {
@@ -98,7 +104,7 @@ public class ResourceDescription implements IResourceDescription {
           }
 
           @Override
-          public IConnectionDescription visitUriResource(final UriResourceReference uriResourceReference)
+          public IConnectionDescription visitURIResource(final URIResourceReference uriResourceReference)
               throws RuntimeException,
               CreationException {
             final URI uri = uriResourceReference.getUri();

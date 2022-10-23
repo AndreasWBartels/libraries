@@ -26,7 +26,10 @@ import net.anwiba.commons.utilities.provider.IContextValueProvider;
 public class SytemPropertiesStringResolver extends AbstractStringResolver {
 
   public SytemPropertiesStringResolver(final IStringAppender errorHandler) {
-    super(errorHandler, SYSTEM_PATTERN, new IContextValueProvider<String, String, RuntimeException>() {
+    super(errorHandler, 
+        value -> value,
+        SYSTEM_PATTERN, 
+        new IContextValueProvider<String, String, RuntimeException>() {
 
       @Override
       public String getValue(final String name) throws RuntimeException {

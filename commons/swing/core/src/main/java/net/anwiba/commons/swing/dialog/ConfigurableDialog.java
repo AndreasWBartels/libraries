@@ -61,8 +61,11 @@ public class ConfigurableDialog extends AbstractDialog {
         configuration.getModalExclusionType());
     setIconImage(configuration.getImage());
     this.dataStateModel = getDataStateModel();
-    this.contentPane =
-        configuration.getContentPaneBuilder().setDataStateModel(this.dataStateModel).setOwner(this).build();
+    this.contentPane = configuration
+        .getContentPaneBuilder()
+        .setDataStateModel(this.dataStateModel)
+        .setOwner(this)
+        .build();
     setContentPane(this.contentPane.getComponent());
     Optional
         .of(configuration.getDataState())

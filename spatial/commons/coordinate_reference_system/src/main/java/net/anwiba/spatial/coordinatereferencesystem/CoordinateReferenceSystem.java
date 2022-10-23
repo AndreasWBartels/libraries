@@ -8,18 +8,18 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-// Copyright (c) 2006 by Andreas W. Bartels 
+// Copyright (c) 2006 by Andreas W. Bartels
 package net.anwiba.spatial.coordinatereferencesystem;
 
 import net.anwiba.commons.ensure.Ensure;
@@ -35,7 +35,9 @@ public class CoordinateReferenceSystem implements ICoordinateReferenceSystem {
   private final int srid;
   private final ICoordinateSystem coordinateSystem;
 
-  public CoordinateReferenceSystem(final Authority authority, final int srid, final ICoordinateSystem coordinateSystem) {
+  public CoordinateReferenceSystem(final Authority authority,
+      final int srid,
+      final ICoordinateSystem coordinateSystem) {
     Ensure.ensureArgumentNotNull(authority);
     Ensure.ensureArgumentIsInside(srid, -1, Integer.MAX_VALUE);
     Ensure.ensureArgumentNotNull(coordinateSystem);
@@ -55,10 +57,15 @@ public class CoordinateReferenceSystem implements ICoordinateReferenceSystem {
   }
 
   @Override
-  public CoordinateReferenceSystem adapt(ToWgs84 towgs84) {
-    return new CoordinateReferenceSystem(authority, srid, coordinateSystem.adapt(towgs84));
+  public CoordinateReferenceSystem adapt(final ToWgs84 towgs84) {
+    return new CoordinateReferenceSystem(this.authority, this.srid, this.coordinateSystem.adapt(towgs84));
   }
-  
+
+  @Override
+  public ICoordinateReferenceSystem adapt(final int srid) {
+    return new CoordinateReferenceSystem(this.authority, srid, this.coordinateSystem);
+  }
+
   @Override
   public ICoordinateSystem getCoordinateSystem() {
     return this.coordinateSystem;
@@ -71,10 +78,9 @@ public class CoordinateReferenceSystem implements ICoordinateReferenceSystem {
 
   @Override
   public boolean equals(final Object obj) {
-    if (!(obj instanceof ICoordinateReferenceSystem)) {
+    if (!(obj instanceof ICoordinateReferenceSystem other)) {
       return super.equals(obj);
     }
-    final ICoordinateReferenceSystem other = (ICoordinateReferenceSystem) obj;
     return ObjectUtilities.equals(this.coordinateSystem, other.getCoordinateSystem());
   }
 }

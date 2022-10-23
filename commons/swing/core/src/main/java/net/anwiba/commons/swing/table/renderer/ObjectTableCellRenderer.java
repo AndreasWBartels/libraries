@@ -21,18 +21,22 @@
  */
 package net.anwiba.commons.swing.table.renderer;
 
+import net.anwiba.commons.swing.ui.DateUi;
+import net.anwiba.commons.utilities.math.Angle;
+import net.anwiba.commons.utilities.math.AngleFormat;
+import net.anwiba.commons.utilities.time.LocalDateTimeUtilities;
+import net.anwiba.commons.utilities.time.ZonedDateTimeUtilities;
+
 import java.awt.Component;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
-
-import net.anwiba.commons.swing.ui.DateUi;
-import net.anwiba.commons.utilities.math.Angle;
-import net.anwiba.commons.utilities.math.AngleFormat;
-import net.anwiba.commons.utilities.time.LocalDateTimeUtilities;
 
 public class ObjectTableCellRenderer extends DefaultTableCellRenderer {
   private static final long serialVersionUID = 1L;
@@ -48,14 +52,31 @@ public class ObjectTableCellRenderer extends DefaultTableCellRenderer {
       final int row,
       final int column) {
     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-    if (value instanceof LocalDateTime) {
-      final LocalDateTime time = (LocalDateTime) value;
+
+    if (value instanceof ZonedDateTime dateTime) {
+      setText(ZonedDateTimeUtilities.toString(dateTime));
+      setHorizontalAlignment(SwingConstants.RIGHT);
+      return this;
+    }
+
+    if (value instanceof LocalDateTime dateTime) {
+      setText(LocalDateTimeUtilities.toString(dateTime));
+      setHorizontalAlignment(SwingConstants.RIGHT);
+      return this;
+    }
+    if (value instanceof LocalDate date) {
+      setText(LocalDateTimeUtilities.toString(date));
+      setHorizontalAlignment(SwingConstants.RIGHT);
+      return this;
+    }
+    if (value instanceof LocalTime time) {
       setText(LocalDateTimeUtilities.toString(time));
       setHorizontalAlignment(SwingConstants.RIGHT);
       return this;
     }
-    if (value instanceof Date) {
-      setText(this.dateUi.getText((Date) value));
+
+    if (value instanceof Date date) {
+      setText(this.dateUi.getText(date));
       setHorizontalAlignment(SwingConstants.RIGHT);
       return this;
     }

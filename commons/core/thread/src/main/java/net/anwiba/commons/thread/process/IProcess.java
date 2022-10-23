@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.thread.process;
 
-import java.util.concurrent.TimeUnit;
-
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
+
+import java.util.concurrent.TimeUnit;
 
 public interface IProcess {
 
@@ -45,5 +45,9 @@ public interface IProcess {
 
   default boolean isPeriodic() {
     return false;
+  }
+
+  static ProcessBuilder builder() {
+    return new ProcessBuilder();
   }
 }

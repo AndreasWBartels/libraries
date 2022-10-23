@@ -36,8 +36,9 @@ public class Logging {
     }
 
     @Override
-    public void doLog(ILevel level, IMessageFactory message, Throwable throwable) {
-      // nothing to do
+    public void doLog(ILevel level, ILogMessageFactory factory) {
+      // TODO Auto-generated method stub
+      
     }
   };
 

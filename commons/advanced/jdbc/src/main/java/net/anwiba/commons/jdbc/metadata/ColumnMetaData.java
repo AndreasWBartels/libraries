@@ -25,21 +25,23 @@ public class ColumnMetaData implements IColumnMetaData {
 
   private final String name;
   private final String typeName;
-  private final int length;
+  private final long length;
   private final int scale;
   private final boolean isKey;
   private final boolean isNullable;
   private final String schemaName;
   private final String tableName;
+  private boolean isAutoIncrement;
 
   public ColumnMetaData(
       final String schemaName,
       final String tableName,
       final String columnName,
       final String typeName,
-      final int length,
+      final long length,
       final int scale,
       final boolean isKey,
+      final boolean isAutoIncrement,
       final boolean isNullable) {
     this.schemaName = schemaName;
     this.tableName = tableName;
@@ -48,11 +50,12 @@ public class ColumnMetaData implements IColumnMetaData {
     this.length = length;
     this.scale = scale;
     this.isKey = isKey;
+    this.isAutoIncrement = isAutoIncrement;
     this.isNullable = isNullable;
   }
 
   @Override
-  public int getLength() {
+  public long getLength() {
     return this.length;
   }
 
@@ -76,6 +79,11 @@ public class ColumnMetaData implements IColumnMetaData {
     return this.isKey;
   }
 
+  @Override
+  public boolean isAutoIncrement() {
+    return this.isAutoIncrement;
+  }
+  
   @Override
   public boolean isNullable() {
     return this.isNullable;

@@ -23,14 +23,14 @@ package net.anwiba.commons.thread.queue;
 
 public interface IQueueNameConstans {
 
-  public static final String CONTENT_MANAGMENT_QUEUE = "CONTENT_MANAGMENT_QUEUE"; //$NON-NLS-1$
-  public static final String CONTENT_IO_QUEUE = "CONTENT_IO_QUEUE"; //$NON-NLS-1$
-  public static final String METADATA_IO_QUEUE = "METADATA_IO_QUEUE"; //$NON-NLS-1$
-  public static final String MAP_VIEW_RENDRER = "MAP_VIEW_RENDRER"; //$NON-NLS-1$
-  public static final String SCRIPTING_QUEUE = "SCRIPTING_QUEUE"; //$NON-NLS-1$
-  public static final String CANCEL_QUEUE = "CANCEL_QUEUE"; //$NON-NLS-1$
-  public static final String CACHE_WRITER_QUEUE = "CACHE_WRITER_QUEUE"; //$NON-NLS-1$
-  public static final String AUDIT_LOGGING_QUEUE = "AUDIT_LOGGING_QUEUE"; //$NON-NLS-1$
-  public static final String CONTENT_TIMER_QUEUE = "CONTENT_RELOAD_QUEUE"; //$NON-NLS-1$
+  public static final String CONTENT_MANAGMENT_QUEUE = "CONTENT_MANAGMENT";
+  public static final String CONTENT_IO_QUEUE = "CONTENT_IO";
+  public static final String METADATA_IO_QUEUE = "METADATA_IO";
+  public static final String MAP_VIEW_RENDRER_QUEUE = "MAP_RENDRER";
+  public static final String SCRIPTING_QUEUE = "SCRIPTING";
+  public static final String CANCEL_QUEUE = "CANCEL";
+  public static final String CACHE_WRITER_QUEUE = "CACHE_WRITER";
+  public static final String AUDIT_LOGGING_QUEUE = "AUDIT_LOGGING";
+  public static final String CONTENT_TIMER_QUEUE = "CONTENT_RELOAD";
 
 }

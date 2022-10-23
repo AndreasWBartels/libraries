@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -109,10 +109,7 @@ public class ContentPaneFactoryBuilder {
                 for (IObjectField<?> field : objectFields) {
                   IValidationResult validationResult = field.getValidationResultDistributor().get();
                   if (!validationResult.isValid()) {
-                    getMessageModel().set(Message
-                        .builder()
-                        .setText(validationResult.getMessage())
-                        .setError()
+                    getMessageModel().set(Message.error(validationResult.getMessage())
                         .build());
                     getDataStateModel().set(DataState.INVALIDE);
                     return;

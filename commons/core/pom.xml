@@ -11,13 +11,13 @@
   <packaging>pom</packaging>
 
   <properties>
-    <revision>1.1.158</revision>
+    <revision>1.2.50</revision>
   </properties>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>commons</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -39,8 +39,8 @@
     <module>reference</module>
     <module>reflection</module>
     <module>resource</module>
-    <module>thread</module>
     <module>testing</module>
+    <module>thread</module>
     <module>utilities</module>
     <module>version</module>
   </modules>

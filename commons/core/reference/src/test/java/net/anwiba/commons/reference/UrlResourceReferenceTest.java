@@ -36,7 +36,7 @@ public class UrlResourceReferenceTest {
 
   @Test
   public void samePathUrlResourcesAreEqual() throws Exception {
-    assertEquals(new UrlResourceReference(createTestUrl()), new UrlResourceReference(createTestUrl()));
+    assertEquals(new URLResourceReference(createTestUrl()), new URLResourceReference(createTestUrl()));
   }
 
 }

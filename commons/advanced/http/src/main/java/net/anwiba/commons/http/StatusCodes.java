@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -83,7 +83,8 @@ public enum StatusCodes {
 
   Multiple_Choice(300, "Multiple Choice"),
   MOVED_PERMANENTLY(301, "Moved Permanently"),
-  FOUND(302, "Found"),
+  MOVED_TEMPORARY(302, "Moved Temporary"),
+//  FOUND(302, "Found"),
   SEE_OTHER(303, "See Other"),
   NOT_MODIFIED(304, "Not Modified"),
   USE_PROXY(305, "Use Proxy"),
@@ -148,7 +149,11 @@ public enum StatusCodes {
   }
 
   public static boolean isRedirection(int code) {
-    return 300 <= code && code < 400;
+    return code == MOVED_PERMANENTLY.code
+        || code == MOVED_TEMPORARY.code
+        || code == SEE_OTHER.code
+        || code == PERMANENT_REDIRECT.code
+        || code == TEMPORARY_REDIRECT.code;
   }
 
   public static boolean isClientError(int code) {

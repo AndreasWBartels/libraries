@@ -452,4 +452,20 @@ public class CoordinateUtilities {
     }
     return result;
   }
+
+  public static ICoordinateSequence calculateCircle(ICoordinate coordinate, double radius) {
+    double angleOffset = 0;
+
+    final int coordinateCount = 32;
+    Coordinate[] coordinates = new Coordinate[coordinateCount+1];
+    for (int i = 0; i < coordinateCount; i++) {
+      double angle = (((double) i / (double) coordinateCount) * Math.PI * 2.0) + angleOffset;
+      double dx = Math.sin(angle) * radius;
+      double dy = Math.cos(angle) * radius;
+      coordinates[i] = new Coordinate(coordinate.getXValue() + dx, coordinate.getYValue() + dy);
+    }
+    coordinates[coordinateCount] = coordinates[0];
+    return new CoordinateSequenceFactory().create(coordinates);
+  }
+
 }

@@ -21,10 +21,6 @@
  */
 package net.anwiba.commons.xml.io;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import jakarta.xml.bind.JAXBElement;
 import net.anwiba.commons.lang.object.ObjectPair;
 import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.utilities.registry.AbstractApplicableRegistry;
@@ -32,12 +28,18 @@ import net.anwiba.commons.utilities.registry.IApplicableRegistry;
 import net.anwiba.commons.version.IVersion;
 import net.anwiba.commons.xml.extractor.XmlStreamStartElementNameAndVersionExtractor;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import jakarta.xml.bind.JAXBElement;
+
 public class ConvertingXmlReader implements IConvertingXmlReader {
 
-  IApplicableRegistry<IXmlConverterContext, IRegistableConvertingXmlReader<IXmlConverterContext, ?>> registry = new AbstractApplicableRegistry<IXmlConverterContext, IRegistableConvertingXmlReader<IXmlConverterContext, ?>>(
-      null) {
-    // nothing to do
-  };
+  IApplicableRegistry<IXmlConverterContext, IRegistableConvertingXmlReader<IXmlConverterContext, ?>> registry =
+      new AbstractApplicableRegistry<IXmlConverterContext, IRegistableConvertingXmlReader<IXmlConverterContext, ?>>(
+          null) {
+        // nothing to do
+      };
 
   @SuppressWarnings("unchecked")
   public void add(final IRegistableConvertingXmlReader<IXmlConverterContext, ?> persister) {
@@ -54,10 +56,12 @@ public class ConvertingXmlReader implements IConvertingXmlReader {
     final IVersion version = result.getSecondObject();
     final IXmlConverterContext context = new XmlConverterContext(name, version, clazz);
 
-    final IRegistableConvertingXmlReader<IXmlConverterContext, O> converter = (IRegistableConvertingXmlReader<IXmlConverterContext, O>) this.registry
-        .get(context);
+    final IRegistableConvertingXmlReader<IXmlConverterContext, O> converter =
+        (IRegistableConvertingXmlReader<IXmlConverterContext, O>) this.registry
+            .get(context);
     if (converter == null) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Unsupported content root tag: '" + name + "' version: '" + version
+          + "' for class: '" + clazz.getName() + "'");
     }
     final Object object = converter.read(inputStream, parameters);
     if (object instanceof JAXBElement) {

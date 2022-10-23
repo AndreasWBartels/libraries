@@ -53,6 +53,10 @@ public interface IDatabaseTypeVisitor<T, E extends Exception> {
 
   public T visitTimeStamp() throws E;
 
+  public T visitTimeStampWithTimeZone() throws E;
+
   public T visitTime() throws E;
+
+  public T visitTimeWithTimeZone() throws E;
 
 }

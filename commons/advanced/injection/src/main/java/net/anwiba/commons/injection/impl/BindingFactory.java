@@ -21,19 +21,15 @@
  */
 package net.anwiba.commons.injection.impl;
 
-import java.util.Optional;
-
 import net.anwiba.commons.injection.IBinding;
 import net.anwiba.commons.injection.IBindingFactory;
-import net.anwiba.commons.injection.binding.ClassBinding;
-import net.anwiba.commons.injection.binding.NamedClassBinding;
+import net.anwiba.commons.injection.binding.Bindings;
 
 public class BindingFactory implements IBindingFactory {
 
   @Override
   public <T> IBinding<T> create(final Class<T> clazz, final String name) {
-    return Optional.ofNullable(name).map(n -> (IBinding<T>) new NamedClassBinding<>(clazz, n)).orElseGet(
-        () -> new ClassBinding<>(clazz));
+    return Bindings.of(clazz, name);
   }
 
 }

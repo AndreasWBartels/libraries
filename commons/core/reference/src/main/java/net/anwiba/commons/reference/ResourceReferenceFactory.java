@@ -66,7 +66,7 @@ public class ResourceReferenceFactory implements IResourceReferenceFactory {
     if (url == null) {
       throw new IllegalArgumentException();
     }
-    final UrlResourceReference urlResourceReference = new UrlResourceReference(url);
+    final URLResourceReference urlResourceReference = new URLResourceReference(url);
     if (ResourceReferenceUtilities.isFileSystemResource(urlResourceReference)) {
       try {
         Path path = ResourceReferenceUtilities.getPath(urlResourceReference);
@@ -83,7 +83,7 @@ public class ResourceReferenceFactory implements IResourceReferenceFactory {
     if (uri == null) {
       throw new IllegalArgumentException();
     }
-    final UriResourceReference uriResourceReference = new UriResourceReference(uri);
+    final URIResourceReference uriResourceReference = new URIResourceReference(uri);
     if (ResourceReferenceUtilities.isFileSystemResource(uriResourceReference)) {
       try {
         Path path = ResourceReferenceUtilities.getPath(uriResourceReference);
@@ -110,7 +110,7 @@ public class ResourceReferenceFactory implements IResourceReferenceFactory {
     }
     try {
       if (UriUtilities.isHttpUrl(pathString)) {
-        return new UrlResourceReference(new URL(pathString));
+        return new URLResourceReference(new URL(pathString));
       }
       if (pathString.length() > 5 && pathString.substring(0, 5).equalsIgnoreCase("data:")) {
         final Pattern pattern = Pattern
@@ -132,7 +132,7 @@ public class ResourceReferenceFactory implements IResourceReferenceFactory {
       if (UriUtilities.isFileUrl(pathString)) {
         final URL url = new URL(pathString);
         if (url.getHost() != null && url.getHost().trim().length() > 0) {
-          return new UrlResourceReference(url);
+          return new URLResourceReference(url);
         }
         final String filePath = url.getFile();
         // if (FileUtilities.isAbsoluteWindowsFilePath(filePath)) {

@@ -181,7 +181,7 @@ public class ResourceReferenceFactoryTest {
   public void httpUrlResource() throws Exception {
     final IResourceReference resourceReference = this.factory.create("http://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UrlResourceReference.class));
+    assertThat(resourceReference, instanceOf(URLResourceReference.class));
     assertThat(
         ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
         equalTo(new URL("http://temp/hallo.txt").toExternalForm()));
@@ -191,7 +191,7 @@ public class ResourceReferenceFactoryTest {
   public void httpsUrlResource() throws Exception {
     final IResourceReference resourceReference = this.factory.create("https://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UrlResourceReference.class));
+    assertThat(resourceReference, instanceOf(URLResourceReference.class));
     assertThat(
         ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
         equalTo(new URL("https://temp/hallo.txt").toExternalForm()));
@@ -261,7 +261,7 @@ public class ResourceReferenceFactoryTest {
   public void fileUrlResource() throws Exception {
     final IResourceReference resourceReference = this.factory.create("file://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UrlResourceReference.class));
+    assertThat(resourceReference, instanceOf(URLResourceReference.class));
     assertThat(
         ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
         equalTo(new URL("file://temp/hallo.txt").toExternalForm()));
@@ -271,7 +271,7 @@ public class ResourceReferenceFactoryTest {
   public void UrlCaseSensitiveResource() throws Exception {
     final IResourceReference resourceReference = this.factory.create("HTTP://temp/hallo.txt");
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UrlResourceReference.class));
+    assertThat(resourceReference, instanceOf(URLResourceReference.class));
     assertThat(
         ResourceReferenceUtilities.getUrl(resourceReference).toExternalForm(),
         equalTo(new URL("HTTP://temp/hallo.txt").toExternalForm()));

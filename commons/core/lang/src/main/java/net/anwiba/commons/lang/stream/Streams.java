@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IClosableIterator;
 import net.anwiba.commons.lang.functional.ICloseable;
 import net.anwiba.commons.lang.functional.IIterable;
@@ -130,6 +131,13 @@ public class Streams {
     return of(RuntimeException.class, new JavaUtilIterableFilteringIterable<>(input, i -> i != null));
   }
 
+  public static <T> IStream<T, RuntimeException> of(final Iterable<T> input, final IAcceptor<T> acceptor) {
+    if (input == null) {
+      return of(RuntimeException.class, Collections.emptyList());
+    }
+    return of(RuntimeException.class, new JavaUtilIterableFilteringIterable<>(input, acceptor));
+  }
+
   public static <T> IStream<T, RuntimeException> of(final IClosableIterator<T, RuntimeException> input) {
     if (input == null) {
       return of(RuntimeException.class, Collections.emptyList());
@@ -165,6 +173,17 @@ public class Streams {
     return of(RuntimeException.class, Arrays.stream(input).boxed().collect(Collectors.toList()));
   }
 
+  public static IStream<Double, RuntimeException> of(final float[] input) {
+    if (input == null) {
+      return of(RuntimeException.class, Collections.emptyList());
+    }
+    double[] values = new double[input.length];
+    for (int i = 0; i < input.length; i++) {
+      values[i] = input[i];
+    }
+    return of(values);
+  }
+
   public static <T, E extends Exception> IStream<T, E> of(final Class<E> exceptionClass, final IIterable<T, E> input) {
     if (input == null) {
       return of(exceptionClass, Collections.emptyList());
@@ -172,7 +191,8 @@ public class Streams {
     return of(exceptionClass, new IterableFilteringIterable<>(input, i -> i != null), () -> {});
   }
 
-  public static <T,E extends Exception> IStream<T, E> of(final Class<E> exceptionClass, final IClosableIterator<T, E> input) {
+  public static <T, E extends Exception> IStream<T, E> of(final Class<E> exceptionClass,
+      final IClosableIterator<T, E> input) {
     if (input == null) {
       return of(exceptionClass, Collections.emptyList());
     }
@@ -186,7 +206,9 @@ public class Streams {
     return of(exceptionClass, Arrays.asList(input));
   }
 
-  public static <T, E extends Exception> IStream<T, E> of(final Class<E> exceptionClass, final IIterable<T, E> input, ICloseable<E> closeable) {
+  public static <T, E extends Exception> IStream<T, E> of(final Class<E> exceptionClass,
+      final IIterable<T, E> input,
+      final ICloseable<E> closeable) {
     if (input == null) {
       return of(exceptionClass, Collections.emptyList(), closeable);
     }
@@ -197,14 +219,20 @@ public class Streams {
     if (input == null) {
       return of(exceptionClass, Collections.emptyList(), () -> {});
     }
-    return new SequencedStream<>(exceptionClass, new JavaUtilIterableFilteringIterable<>(input, i -> i != null), () -> {});
+    return new SequencedStream<>(exceptionClass,
+        new JavaUtilIterableFilteringIterable<>(input, i -> i != null),
+        () -> {});
   }
 
-  public static <T, E extends Exception> IStream<T, E> of(final Class<E> exceptionClass, final Iterable<T> input, ICloseable<E> closeable) {
+  public static <T, E extends Exception> IStream<T, E> of(final Class<E> exceptionClass,
+      final Iterable<T> input,
+      final ICloseable<E> closeable) {
     if (input == null) {
       return of(exceptionClass, Collections.emptyList(), closeable);
     }
-    return new SequencedStream<>(exceptionClass, new JavaUtilIterableFilteringIterable<>(input, i -> i != null), closeable);
+    return new SequencedStream<>(exceptionClass,
+        new JavaUtilIterableFilteringIterable<>(input, i -> i != null),
+        closeable);
   }
 
   public static <T, E extends Exception> IStream<T, E> of(final Class<E> exceptionClass, final Iterator<T> iterator) {

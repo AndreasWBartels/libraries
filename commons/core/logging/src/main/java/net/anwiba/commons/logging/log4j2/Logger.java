@@ -28,7 +28,8 @@ import org.apache.logging.log4j.util.MessageSupplier;
 
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.IMessageFactory;
+import net.anwiba.commons.logging.LogMessage;
+import net.anwiba.commons.logging.ILogMessageFactory;
 
 public class Logger implements ILogger {
 
@@ -39,7 +40,7 @@ public class Logger implements ILogger {
   }
 
   @Override
-  public void doLog(ILevel level, IMessageFactory message, Throwable throwable) {
+  public void doLog(ILevel level, ILogMessageFactory message) {
     if (!isLoggable(level)) {
       return;
     }
@@ -49,9 +50,14 @@ public class Logger implements ILogger {
       public Message get() {
         return new Message() {
           
+          LogMessage logMessage = null;
+
           @Override
           public Throwable getThrowable() {
-            return throwable;
+            if (logMessage == null) {
+              logMessage = message.create(level);
+            }
+            return logMessage.throwable();
           }
           
           @Override
@@ -61,7 +67,10 @@ public class Logger implements ILogger {
           
           @Override
           public String getFormattedMessage() {
-            return message.create();
+            if (logMessage == null) {
+              logMessage = message.create(level);
+            }
+            return logMessage.message();
           }
           
           @Override

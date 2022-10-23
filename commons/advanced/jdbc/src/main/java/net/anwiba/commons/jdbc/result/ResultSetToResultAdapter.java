@@ -29,16 +29,46 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import net.anwiba.commons.jdbc.metadata.IDatabaseType;
+import net.anwiba.commons.lang.object.IObjectContainer;
+import net.anwiba.commons.lang.object.ObjectContainer;
 
 public class ResultSetToResultAdapter implements IResult {
 
-  private final ResultSet resultSet;
+  private static final class DatabaseType implements IDatabaseType {
+    private final String columnTypeName;
+    private final int columnType;
 
-  public ResultSetToResultAdapter(final ResultSet resultSet) {
+    private DatabaseType(final String columnTypeName, final int columnType) {
+      this.columnTypeName = columnTypeName;
+      this.columnType = columnType;
+    }
+
+    @Override
+    public String getName() {
+      return this.columnTypeName;
+    }
+
+    @Override
+    public int getCode() {
+      return this.columnType;
+    }
+  }
+
+  private final ResultSet resultSet;
+  private final IResultSetValuesConverter converter;
+
+  public ResultSetToResultAdapter(
+      final ResultSet resultSet,
+      final IResultSetValuesConverter converter) {
     this.resultSet = resultSet;
+    this.converter = converter;
   }
 
   @Override
@@ -214,12 +244,15 @@ public class ResultSetToResultAdapter implements IResult {
 
   @Override
   public Object getObject(final int columnIndex) throws SQLException {
-    return this.resultSet.getObject(columnIndex);
+    return this.converter.convert(this.resultSet.getStatement().getConnection(),
+        columnIndex,
+        this.resultSet.getObject(columnIndex),
+        () -> getDatabaseType(columnIndex));
   }
 
   @Override
   public Object getObject(final String columnName) throws SQLException {
-    return this.resultSet.getObject(columnName);
+    return getObject(indexOf(columnName));
   }
 
   @Override
@@ -234,12 +267,12 @@ public class ResultSetToResultAdapter implements IResult {
 
   @Override
   public int getNumberOfValues() throws SQLException {
-    return this.resultSet.getMetaData().getColumnCount();
+    return getResultMetaData().getColumnCount();
   }
 
   @Override
   public List<String> getColumnNames() throws SQLException {
-    final ResultSetMetaData metaData = this.resultSet.getMetaData();
+    final ResultSetMetaData metaData = getResultMetaData();
     LinkedList<String> names = new LinkedList<>();
     final int columnCount = metaData.getColumnCount();
     for (int i = 0; i < columnCount; i++) {
@@ -248,9 +281,34 @@ public class ResultSetToResultAdapter implements IResult {
     return names;
   }
 
+  private final Map<Integer, IDatabaseType> databaseTypes = new HashMap<>();
+  private final IObjectContainer<ResultSetMetaData> resultSetMetaData = new ObjectContainer<>();
+
+  private ResultSetMetaData getResultMetaData() throws SQLException {
+    if (this.resultSetMetaData.isEmpty()) {
+      this.resultSetMetaData.set(this.resultSet.getMetaData());
+    }
+    return this.resultSetMetaData.get();
+  }
+
+  private IDatabaseType getDatabaseType(final int columnIndex) {
+    Integer key = Integer.valueOf(columnIndex);
+    if (!this.databaseTypes.containsKey(key)) {
+      try {
+        final ResultSetMetaData metaData = getResultMetaData();
+        int columnType = metaData.getColumnType(columnIndex);
+        String columnTypeName = metaData.getColumnTypeName(columnIndex);
+        this.databaseTypes.put(key, new DatabaseType(columnTypeName, columnType));
+      } catch (SQLException exception) {
+        this.databaseTypes.put(key, null);
+      }
+    }
+    return this.databaseTypes.get(key);
+  }
+
   @Override
   public boolean hasColumn(final String columnName) throws SQLException {
-    final ResultSetMetaData metaData = this.resultSet.getMetaData();
+    final ResultSetMetaData metaData = getResultMetaData();
     final int columnCount = metaData.getColumnCount();
     for (int i = 0; i < columnCount; i++) {
       if (Objects.equals(metaData.getColumnName(i + 1), columnName)) {
@@ -258,6 +316,17 @@ public class ResultSetToResultAdapter implements IResult {
       }
     }
     return false;
+  }
+
+  public int indexOf(final String columnName) throws SQLException {
+    final ResultSetMetaData metaData = getResultMetaData();
+    final int columnCount = metaData.getColumnCount();
+    for (int i = 0; i < columnCount; i++) {
+      if (Objects.equals(metaData.getColumnName(i + 1), columnName)) {
+        return i + 1;
+      }
+    }
+    throw new SQLException("Missing column name " + columnName);
   }
 
 }

@@ -21,6 +21,11 @@
  */
 package net.anwiba.tools.definition.schema.json.generator.java.maven;
 
+import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.commons.reference.utilities.FileUtilities;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
+import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -37,11 +42,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
-
-import net.anwiba.commons.ensure.Ensure;
-import net.anwiba.commons.reference.utilities.FileUtilities;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.IOutput;
-import net.anwiba.tools.definition.schema.json.generator.java.bean.JsonBeanGeneratorExecutor;
 
 @Mojo(
     name = "generate",
@@ -183,7 +183,7 @@ public class JsonBeanGeneratorMojo extends AbstractMojo {
                 getLog().error(message, throwable);
               }
             });
-        excecutor.excecute(this.outputDirectory);
+        excecutor.execute(this.outputDirectory);
         this.buildContext.refresh(this.outputDirectory);
       } catch (final Exception e) {
         throw new MojoExecutionException("Internal exception", e); //$NON-NLS-1$

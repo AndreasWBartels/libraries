@@ -23,7 +23,7 @@ package net.anwiba.commons.model;
 
 public class BooleanModel extends AbstractObjectChangedNotifier implements IBooleanModel {
 
-  private boolean value;
+  private volatile boolean value;
   private final Object mutex = new Object();
 
   public BooleanModel(final boolean value) {

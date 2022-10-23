@@ -29,12 +29,12 @@ import net.anwiba.commons.lang.functional.IApplicable;
 import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.lang.parameter.Parameters;
 import net.anwiba.commons.utilities.property.IProperties;
-import net.anwiba.commons.utilities.property.PropertiesBuilder;
+import net.anwiba.commons.utilities.property.Properties;
 
 public interface IRegistableConvertingXmlWriter<C, T> extends IApplicable<C> {
 
   default void write(final T object, final OutputStream outputStream) throws IOException {
-    write(object, Parameters.empty(), outputStream, new PropertiesBuilder().build());
+    write(object, Parameters.empty(), outputStream, Properties.empty());
   }
 
   void write(T object, IParameters parameter, OutputStream outputStream, IProperties outputProperties)

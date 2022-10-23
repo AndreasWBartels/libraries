@@ -21,6 +21,29 @@
  */
 package net.anwiba.database.oracle;
 
+import net.anwiba.commons.jdbc.DatabaseUtilities;
+import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
+import net.anwiba.commons.jdbc.database.DatabaseFacade;
+import net.anwiba.commons.jdbc.database.IRegisterableDatabaseFacade;
+import net.anwiba.commons.jdbc.name.DatabaseConstraintName;
+import net.anwiba.commons.jdbc.name.DatabaseIndexName;
+import net.anwiba.commons.jdbc.name.DatabaseSequenceName;
+import net.anwiba.commons.jdbc.name.DatabaseTriggerName;
+import net.anwiba.commons.jdbc.name.IDatabaseConstraintName;
+import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
+import net.anwiba.commons.jdbc.name.IDatabaseSchemaName;
+import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
+import net.anwiba.commons.jdbc.name.IDatabaseTableName;
+import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
+import net.anwiba.commons.jdbc.result.IResult;
+import net.anwiba.commons.jdbc.software.ServiceDatabaseSoftware;
+import net.anwiba.commons.lang.functional.IConverter;
+import net.anwiba.commons.lang.functional.IProcedure;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.reference.utilities.IoUtilities;
+import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.commons.utilities.time.TimeZoneUtilities;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -31,37 +54,43 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TimeZone;
 
-import net.anwiba.commons.jdbc.DatabaseUtilities;
-import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
-import net.anwiba.commons.jdbc.database.DatabaseFacade;
-import net.anwiba.commons.jdbc.database.IRegistrableDatabaseFacade;
-import net.anwiba.commons.jdbc.name.DatabaseConstraintName;
-import net.anwiba.commons.jdbc.name.DatabaseIndexName;
-import net.anwiba.commons.jdbc.name.DatabaseSequenceName;
-import net.anwiba.commons.jdbc.name.DatabaseTriggerName;
-import net.anwiba.commons.jdbc.name.IDatabaseConstraintName;
-import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
-import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
-import net.anwiba.commons.jdbc.name.IDatabaseTableName;
-import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
-import net.anwiba.commons.jdbc.result.IResult;
-import net.anwiba.commons.jdbc.software.ServiceDatabaseSoftware;
-import net.anwiba.commons.lang.functional.IConverter;
-import net.anwiba.commons.lang.functional.IProcedure;
-import net.anwiba.commons.lang.optional.IOptional;
-import net.anwiba.commons.reference.utilities.IoUtilities;
-
-public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrableDatabaseFacade {
+public class OracleDatabaseFacade extends DatabaseFacade implements IRegisterableDatabaseFacade {
 
   public OracleDatabaseFacade() {
   }
 
-//  select dbms_metadata.get_ddl( 'TABLE', 'EMP', 'SCOTT' ) from dual
+  @Override
+  public TimeZone getTimeZone(final ICanceler canceler, final Connection connection) throws SQLException {
+    return DatabaseUtilities.result(
+        canceler,
+        connection,
+        """
+                SELECT DBTIMEZONE
+                  FROM dual
+            """,
+        (IConverter<IOptional<IResult, SQLException>, TimeZone, SQLException>) optional -> optional
+            .convert(v -> TimeZoneUtilities.get(v.getString(1)))
+            .get());
+  }
+
+  //  select dbms_metadata.get_ddl( 'TABLE', 'EMP', 'SCOTT' ) from dual
 
   @Override
-  public String getTableStatement(final Connection connection, final IDatabaseTableName tableName) throws SQLException {
+  public boolean isInformationSchema(final IDatabaseSchemaName schemaName) {
+    return schemaName != null
+        && schemaName.getSchemaName() != null
+        && Set.of("SYS", "SYSTEM", "MDSYS", "XDB").contains(schemaName.getSchemaName());
+  }
+
+  @Override
+  public String getTableStatement(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName) throws SQLException {
     return DatabaseUtilities.result(
+        canceler,
         connection,
         "select dbms_metadata.get_ddl( 'TABLE', ?, ? ) from dual", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -87,9 +116,12 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public List<IDatabaseConstraintName> getConstraints(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseConstraintName> getConstraints(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
         "SELECT OWNER, CONSTRAINT_NAME FROM SYS.ALL_CONSTRAINTS WHERE OWNER = ? AND TABLE_NAME = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -102,9 +134,14 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public ResultSet getConstraintMetadata(final Connection connection, final IDatabaseConstraintName name)
+  public ResultSet getConstraintMetadata(
+      final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName table,
+      final IDatabaseConstraintName name)
       throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
         // "SELECT OWNER, CONSTRAINT_NAME, CONSTRAINT_TYPE, TABLE_NAME, R_OWNER, R_CONSTRAINT_NAME, DELETE_RULE, STATUS,
         // DEFERRABLE, DEFERRED, VALIDATED, GENERATED, BAD, RELY, LAST_CHANGE, INDEX_OWNER, INDEX_NAME, INVALID,
@@ -122,9 +159,12 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public List<IDatabaseIndexName> getIndicies(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseIndexName> getIndicies(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
         "SELECT OWNER, INDEX_NAME FROM SYS.ALL_INDEXES WHERE TABLE_OWNER = ? AND TABLE_NAME = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -136,26 +176,12 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
             value.getString(2)));
   }
 
-  // @Override
-  // public List<IDatabaseIndexName> getIndicies(final Connection connection, final String schema) throws SQLException {
-  // return DatabaseUtilities.results(
-  // connection,
-  // "SELECT OWNER, INDEX_NAME FROM SYS.ALL_INDEXES WHERE TABLE_OWNER = ?", //$NON-NLS-1$
-  // (IProcedure<PreparedStatement, SQLException>) value -> {
-  // value.setObject(1, schema);
-  // },
-  // new IFunction<IResult, IDatabaseIndexName, SQLException>() {
-  //
-  // @Override
-  // public IDatabaseIndexName execute(final IResult value) throws SQLException {
-  // return new DatabaseIndexName(value.getString(1), value.getString(2));
-  // }
-  // });
-  // }
-
   @Override
-  public ResultSet getIndexMetadata(final Connection connection, final IDatabaseIndexName name) throws SQLException {
+  public ResultSet getIndexMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseIndexName name) throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
         "SELECT * FROM SYS.ALL_INDEXES WHERE OWNER = ? AND INDEX_NAME = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -165,14 +191,12 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public boolean supportsIndicies() {
-    return true;
-  }
-
-  @Override
-  public List<IDatabaseTriggerName> getTriggers(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseTriggerName> getTriggers(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
         "SELECT OWNER, TRIGGER_NAME FROM SYS.ALL_TRIGGERS WHERE TABLE_OWNER = ? AND TABLE_NAME = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -185,9 +209,12 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public ResultSet getTriggerMetadata(final Connection connection, final IDatabaseTriggerName name)
+  public ResultSet getTriggerMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTriggerName name)
       throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
         "SELECT OWNER, TRIGGER_NAME, TRIGGER_TYPE, TRIGGERING_EVENT, TABLE_OWNER, BASE_OBJECT_TYPE, TABLE_NAME, COLUMN_NAME, REFERENCING_NAMES, WHEN_CLAUSE, STATUS, DESCRIPTION, ACTION_TYPE, TRIGGER_BODY FROM SYS.ALL_TRIGGERS WHERE OWNER = ? AND TRIGGER_NAME = ?", //$NON-NLS-1$
         // "SELECT OWNER, TRIGGER_NAME, TRIGGER_TYPE, TRIGGERING_EVENT, TABLE_OWNER, BASE_OBJECT_TYPE, TABLE_NAME,
@@ -200,8 +227,11 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public String getTriggerStatement(final Connection connection, final IDatabaseTriggerName name) throws SQLException {
+  public String getTriggerStatement(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTriggerName name) throws SQLException {
     return DatabaseUtilities.result(
+        canceler,
         connection,
         "SELECT TRIGGER_BODY, DESCRIPTION FROM SYS.ALL_TRIGGERS WHERE OWNER = ? AND TRIGGER_NAME = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
@@ -212,7 +242,6 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
           final String body;
           try (InputStream stream = v.getAsciiStream(1)) {
             body = IoUtilities.toString(stream, "UTF-8"); //$NON-NLS-1$
-
           } catch (final IOException exception) {
             throw new SQLException(exception);
           }
@@ -227,21 +256,27 @@ public class OracleDatabaseFacade extends DatabaseFacade implements IRegistrable
   }
 
   @Override
-  public List<IDatabaseSequenceName> getSequences(final Connection connection, final String schema)
+  public List<IDatabaseSequenceName> getSequences(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseSchemaName schema)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
         "SELECT SEQUENCE_OWNER, SEQUENCE_NAME FROM SYS.ALL_SEQUENCES WHERE SEQUENCE_OWNER = ?", //$NON-NLS-1$
-        (IProcedure<PreparedStatement, SQLException>) value -> value.setObject(1, schema),
+        (IProcedure<PreparedStatement, SQLException>) value -> value.setObject(1, schema.getSchemaName()),
         (IConverter<IResult, IDatabaseSequenceName, SQLException>) value -> new DatabaseSequenceName(
             value.getString(1),
             value.getString(2)));
   }
 
   @Override
-  public ResultSet getSequenceMetadata(final Connection connection, final IDatabaseSequenceName sequence)
+  public ResultSet getSequenceMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseSequenceName sequence)
       throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
         "SELECT * FROM SYS.ALL_SEQUENCES WHERE SEQUENCE_OWNER = ? AND SEQUENCE_NAME = ?", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {

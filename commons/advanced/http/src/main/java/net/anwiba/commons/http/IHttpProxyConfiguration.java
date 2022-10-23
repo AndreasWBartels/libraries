@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,6 +21,9 @@
  */
 package net.anwiba.commons.http;
 
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
+
 public interface IHttpProxyConfiguration {
 
   String getHost();
@@ -29,6 +32,10 @@ public interface IHttpProxyConfiguration {
 
   default String getScheme() {
     return "http";
+  }
+
+  default IOptional<IAuthentication, RuntimeException> getAuthentication() {
+    return Optional.empty();
   }
 
 }

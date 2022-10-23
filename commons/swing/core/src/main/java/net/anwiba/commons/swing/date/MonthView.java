@@ -52,7 +52,7 @@ import net.anwiba.commons.swing.date.event.DateSelectionListener;
 import net.anwiba.commons.swing.date.event.MonthChangedEvent;
 import net.anwiba.commons.swing.date.event.MonthChangedListener;
 import net.anwiba.commons.swing.object.IObjectField;
-import net.anwiba.commons.swing.object.IntegerFieldBuilder;
+import net.anwiba.commons.swing.object.numeric.IntegerFieldBuilder;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class MonthView extends JPanel {

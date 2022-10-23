@@ -42,7 +42,7 @@ public class TreeModel<T extends ITreeNode<?>> implements ITreeModel<T> {
     if (parent == null) {
       throw new IllegalArgumentException("parent is null"); //$NON-NLS-1$
     }
-    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
+    if (parent instanceof ReloadableFolderTreeNode reloadable && !reloadable.isInitialized()) {
       return 0;
     }
     return ((T) parent).getChildCount();
@@ -74,7 +74,7 @@ public class TreeModel<T extends ITreeNode<?>> implements ITreeModel<T> {
     if (!(child instanceof ITreeNode)) {
       throw new IllegalArgumentException("unsupported instance"); //$NON-NLS-1$
     }
-    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
+    if (parent instanceof ReloadableFolderTreeNode reloadable && !reloadable.isInitialized()) {
       throw new IllegalStateException();
     }
     return ((ITreeNode) parent).getIndex((ITreeNode) child);
@@ -123,7 +123,7 @@ public class TreeModel<T extends ITreeNode<?>> implements ITreeModel<T> {
     if (parent == null) {
       throw new IllegalArgumentException("parent is null"); //$NON-NLS-1$
     }
-    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
+    if (parent instanceof ReloadableFolderTreeNode reloadable && !reloadable.isInitialized()) {
       throw new IllegalStateException();
     }
     return (T) ((T) parent).getChildAt(index);

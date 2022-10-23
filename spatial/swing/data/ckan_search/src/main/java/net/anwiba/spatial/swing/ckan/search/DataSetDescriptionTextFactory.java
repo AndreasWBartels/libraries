@@ -21,8 +21,6 @@
  */
 package net.anwiba.spatial.swing.ckan.search;
 
-import java.util.Objects;
-
 import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.utilities.string.StringUtilities;
@@ -32,6 +30,8 @@ import net.anwiba.spatial.ckan.json.schema.v1_0.Publisher;
 import net.anwiba.spatial.ckan.json.types.DateString;
 import net.anwiba.spatial.ckan.utilities.CkanUtilities;
 import net.anwiba.spatial.swing.ckan.search.message.Messages;
+
+import java.util.Objects;
 
 public final class DataSetDescriptionTextFactory {
 
@@ -44,11 +44,11 @@ public final class DataSetDescriptionTextFactory {
       text.append("<b>" + Messages.location + ": </b>"); //$NON-NLS-1$ //$NON-NLS-2$
       text.append(e.getValue());
     });
-    If.isTrue(!StringUtilities.isNullOrTrimmedEmpty(CkanUtilities.toString(dataset.getDescription()))).excecute(() -> {
+    If.isTrue(!StringUtilities.isNullOrTrimmedEmpty(CkanUtilities.toString(dataset.getDescription()))).execute(() -> {
       final String trimedString = CkanUtilities.toString(dataset.getDescription()).trim();
       text.append(trimedString);
     });
-    If.isTrue(!StringUtilities.isNullOrTrimmedEmpty(dataset.getNotes())).excecute(() -> {
+    If.isTrue(!StringUtilities.isNullOrTrimmedEmpty(dataset.getNotes())).execute(() -> {
       final String trimedNotes = dataset.getNotes().trim();
       if (text.length() == 0) {
         text.append(dataset.getNotes());

@@ -33,6 +33,12 @@ import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilitie
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.isInstanceOfMap;
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.setMapParameters;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IAcceptor;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+
 import java.util.List;
 
 import com.sun.codemodel.JCodeModel;
@@ -45,18 +51,16 @@ import com.sun.codemodel.JMod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.lang.functional.IAcceptor;
-import net.anwiba.commons.lang.optional.IOptional;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-
 public class SetterFactory extends AbstractSourceFactory {
 
   private final EnsurePredicateFactory ensurePredicateFactory;
   private final JCodeModel codeModel;
 
-  public SetterFactory(final JCodeModel codeModel, final EnsurePredicateFactory ensurePredicateFactory) {
-    super(codeModel);
+  public SetterFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory,
+      final EnsurePredicateFactory ensurePredicateFactory) {
+    super(codeModel, annotationClassfactory);
     this.codeModel = codeModel;
     this.ensurePredicateFactory = ensurePredicateFactory;
   }

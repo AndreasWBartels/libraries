@@ -21,6 +21,12 @@
  */
 package net.anwiba.tools.definition.schema.json.generator.java.bean;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.reference.utilities.FileUtilities;
+import net.anwiba.commons.reference.utilities.IoUtilities;
+import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.tools.definition.schema.json.gramma.parser.JssdParserException;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -28,12 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.reference.utilities.FileUtilities;
-import net.anwiba.commons.reference.utilities.IoUtilities;
-import net.anwiba.commons.utilities.string.StringUtilities;
-import net.anwiba.tools.definition.schema.json.gramma.parser.JssdParserException;
 
 @SuppressWarnings("nls")
 public class JsonBeanGeneratorExecutor {
@@ -57,7 +57,7 @@ public class JsonBeanGeneratorExecutor {
     this.comment = comment;
   }
 
-  public void excecute(final File target) throws IOException {
+  public void execute(final File target) throws IOException {
     final JsonBeanGenerator generator = new JsonBeanGenerator(this.pakkage, this.comment, false);
     final String path = this.pakkage.replace('.', File.separatorChar);
     final File packageFolder = new File(this.source, path);
@@ -111,6 +111,6 @@ public class JsonBeanGeneratorExecutor {
       this.output.error("Error writing target to: " + target + ", because: " + exception.getMessage(), exception);
       throwables.add(exception);
     }
-    IoUtilities.throwException(throwables);
+    IoUtilities.throwIfNotEmpty(throwables);
   }
 }

@@ -8,12 +8,12 @@
 
   <groupId>net.anwiba.commons.swing.icons</groupId>
   <artifactId>org.gnome.gnome-icons</artifactId>
-  <version>3.12.0-1.1.158</version>
+  <version>3.12.0-1.2.50</version>
  
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>commons-swing-icons</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
 
   <scm>

@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -35,7 +35,7 @@ import net.anwiba.commons.message.MessageType;
 
 public class CommentedResult<O> {
 
-  private static IMessage DEFAULT_SUCCESS_MESSAGE = Message.builder().setText("OK").setInfo().build();
+  private static IMessage DEFAULT_SUCCESS_MESSAGE = Message.info("OK").build();
 
   private O value;
   private IMessage message;
@@ -50,88 +50,67 @@ public class CommentedResult<O> {
 
   public static <O> CommentedResult<O> success(O value, String comment) {
     return new CommentedResult<>(value,
-        Message.builder()
-        .setText(comment)
-        .setInfo()
+        Message.info(comment)
         .build());
   }
   
   public static <O> CommentedResult<O> success(O value, String comment, String description) {
     return new CommentedResult<>(value,
-        Message.builder()
-        .setText(comment)
-        .setDescription(description)
-        .setInfo()
+        Message.info(comment)
+        .description(description)
         .build());
   }
 
   public static <O> CommentedResult<O> unsatisfied(String comment) {
     return new CommentedResult<>(null,
-        Message.builder()
-        .setText(comment)
-        .setWarning()
+        Message.warning(comment)
         .build());
   }
 
   public static <O> CommentedResult<O> unsatisfied(O value, String comment) {
     return new CommentedResult<>(value,
-        Message.builder()
-            .setText(comment)
-            .setWarning()
+        Message.warning(comment)
             .build());
   }
 
   public static <O> CommentedResult<O> unsatisfied(O value, String comment, String description) {
     return new CommentedResult<>(value,
-        Message.builder()
-            .setText(comment)
-            .setDescription(description)
-            .setWarning()
+        Message.warning(comment)
+            .description(description)
             .build());
   }
 
   public static <O> CommentedResult<O> failure(Throwable throwable) {
     return new CommentedResult<>(null,
-        Message.builder()
-            .setText(throwable.getMessage())
-            .setThrowable(throwable)
-            .setError()
+        Message.error(throwable)
             .build());
   }
 
   public static <O> CommentedResult<O> failure(String comment, Throwable throwable) {
     return new CommentedResult<>(null,
-        Message.builder()
-            .setText(comment)
-            .setThrowable(throwable)
-            .setError()
+        Message.error(comment)
+            .throwable(throwable)
             .build());
   }
 
   public static <O> CommentedResult<O> failure(String comment, String description, Throwable throwable) {
     return new CommentedResult<>(null,
-        Message.builder()
-            .setText(comment)
-            .setDescription(description)
-            .setThrowable(throwable)
-            .setError()
+        Message.error(comment)
+            .description(description)
+            .throwable(throwable)
             .build());
   }
 
   public static <O> CommentedResult<O> failure(String comment, String description) {
     return new CommentedResult<>(null,
-        Message.builder()
-            .setText(comment)
-            .setDescription(description)
-            .setError()
+        Message.error(comment)
+            .description(description)
             .build());
   }
 
   public static <O> CommentedResult<O> failure(String comment) {
     return new CommentedResult<>(null,
-        Message.builder()
-            .setText(comment)
-            .setError()
+        Message.error(comment)
             .build());
   }
 

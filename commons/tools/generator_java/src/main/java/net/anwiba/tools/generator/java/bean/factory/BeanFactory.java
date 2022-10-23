@@ -23,6 +23,17 @@ package net.anwiba.tools.generator.java.bean.factory;
 
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.isInstanceOfMap;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.Argument;
+import net.anwiba.tools.generator.java.bean.configuration.Bean;
+import net.anwiba.tools.generator.java.bean.configuration.Builders;
+import net.anwiba.tools.generator.java.bean.configuration.Getter;
+import net.anwiba.tools.generator.java.bean.configuration.Member;
+import net.anwiba.tools.generator.java.bean.configuration.NamedValueProvider;
+import net.anwiba.tools.generator.java.bean.configuration.Setter;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,16 +50,6 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JVar;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.Argument;
-import net.anwiba.tools.generator.java.bean.configuration.Bean;
-import net.anwiba.tools.generator.java.bean.configuration.Builders;
-import net.anwiba.tools.generator.java.bean.configuration.Getter;
-import net.anwiba.tools.generator.java.bean.configuration.Member;
-import net.anwiba.tools.generator.java.bean.configuration.NamedValueProvider;
-import net.anwiba.tools.generator.java.bean.configuration.Setter;
-
 public class BeanFactory extends AbstractSourceFactory {
 
   private final ConstructorFactory constructorFactory;
@@ -59,15 +60,18 @@ public class BeanFactory extends AbstractSourceFactory {
   private final NamedValueProviderFactory namedValueProviderFactory;
   private final EqualsFactory equalsFactory;
 
-  public BeanFactory(final JCodeModel codeModel, final EnsurePredicateFactory ensurePredicateFactory) {
-    super(codeModel);
-    this.constructorFactory = new ConstructorFactory(codeModel, ensurePredicateFactory, false);
-    this.memberFactory = new MemberFactory(codeModel);
-    this.setterFactory = new SetterFactory(codeModel, ensurePredicateFactory);
-    this.getterFactory = new GetterFactory(codeModel);
-    this.namedValueProviderFactory = new NamedValueProviderFactory(codeModel);
-    this.creatorFactory = new CreatorFactory(codeModel);
-    this.equalsFactory = new EqualsFactory(codeModel);
+  public BeanFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory,
+      final EnsurePredicateFactory ensurePredicateFactory) {
+    super(codeModel, annotationClassfactory);
+    this.constructorFactory = new ConstructorFactory(codeModel, annotationClassfactory, ensurePredicateFactory, false);
+    this.memberFactory = new MemberFactory(codeModel, annotationClassfactory);
+    this.setterFactory = new SetterFactory(codeModel, annotationClassfactory, ensurePredicateFactory);
+    this.getterFactory = new GetterFactory(codeModel, annotationClassfactory);
+    this.namedValueProviderFactory = new NamedValueProviderFactory(codeModel, annotationClassfactory);
+    this.creatorFactory = new CreatorFactory(codeModel, annotationClassfactory);
+    this.equalsFactory = new EqualsFactory(codeModel, annotationClassfactory);
   }
 
   public void create(final Bean configuration) throws CreationException {

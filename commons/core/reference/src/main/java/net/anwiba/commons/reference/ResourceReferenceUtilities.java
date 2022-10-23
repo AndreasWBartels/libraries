@@ -54,12 +54,17 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<File, URISyntaxException>() {
 
       @Override
-      public File visitUrlResource(final UrlResourceReference urlResourceReference) throws URISyntaxException {
+      public File visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws URISyntaxException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public File visitURLResource(final URLResourceReference urlResourceReference) throws URISyntaxException {
         return convert(Paths.get(urlToUriConverter.convert(urlResourceReference.getUrl())));
       }
 
       @Override
-      public File visitUriResource(final UriResourceReference uriResourceReference) {
+      public File visitURIResource(final URIResourceReference uriResourceReference) {
         return convert(Paths.get(uriResourceReference.getUri()));
       }
 
@@ -92,12 +97,17 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<Path, URISyntaxException>() {
 
       @Override
-      public Path visitUrlResource(final UrlResourceReference urlResourceReference) throws URISyntaxException {
+      public Path visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws URISyntaxException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public Path visitURLResource(final URLResourceReference urlResourceReference) throws URISyntaxException {
         return Paths.get(urlToUriConverter.convert(urlResourceReference.getUrl()));
       }
 
       @Override
-      public Path visitUriResource(final UriResourceReference uriResourceReference) {
+      public Path visitURIResource(final URIResourceReference uriResourceReference) {
         return Paths.get(uriResourceReference.getUri());
       }
 
@@ -126,12 +136,17 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<URL, MalformedURLException>() {
 
       @Override
-      public URL visitUrlResource(final UrlResourceReference urlResourceReference) {
+      public URL visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws MalformedURLException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public URL visitURLResource(final URLResourceReference urlResourceReference) {
         return urlResourceReference.getUrl();
       }
 
       @Override
-      public URL visitUriResource(final UriResourceReference uriResourceReference) throws MalformedURLException {
+      public URL visitURIResource(final URIResourceReference uriResourceReference) throws MalformedURLException {
         return uriToUrlConverter.convert(uriResourceReference.getUri());
       }
 
@@ -165,12 +180,17 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<URI, URISyntaxException>() {
 
       @Override
-      public URI visitUrlResource(final UrlResourceReference urlResourceReference) throws URISyntaxException {
+      public URI visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws URISyntaxException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public URI visitURLResource(final URLResourceReference urlResourceReference) throws URISyntaxException {
         return urlToUriConverter.convert(urlResourceReference.getUrl());
       }
 
       @Override
-      public URI visitUriResource(final UriResourceReference uriResourceReference) {
+      public URI visitURIResource(final URIResourceReference uriResourceReference) {
         return uriResourceReference.getUri();
       }
 
@@ -198,12 +218,17 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<String, RuntimeException>() {
 
       @Override
+      public String visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public String visitFileResource(final FileResourceReference fileResourceReference) throws RuntimeException {
         return FileUtilities.getExtension(fileResourceReference.getFile());
       }
 
       @Override
-      public String visitUrlResource(final UrlResourceReference urlResourceReference) throws RuntimeException {
+      public String visitURLResource(final URLResourceReference urlResourceReference) throws RuntimeException {
         final String path = urlResourceReference.getUrl().getPath();
         if (path == null) {
           return null;
@@ -212,7 +237,7 @@ public class ResourceReferenceUtilities {
       }
 
       @Override
-      public String visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
+      public String visitURIResource(final URIResourceReference uriResourceReference) throws RuntimeException {
         final String path = uriResourceReference.getUri().getPath();
         if (path == null) {
           return null;
@@ -248,12 +273,17 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<Boolean, RuntimeException>() {
 
       @Override
-      public Boolean visitUrlResource(final UrlResourceReference urlResourceReference) {
+      public Boolean visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException {
         return Boolean.FALSE;
       }
 
       @Override
-      public Boolean visitUriResource(final UriResourceReference uriResourceReference) {
+      public Boolean visitURLResource(final URLResourceReference urlResourceReference) {
+        return Boolean.FALSE;
+      }
+
+      @Override
+      public Boolean visitURIResource(final URIResourceReference uriResourceReference) {
         return Boolean.FALSE;
       }
 
@@ -282,12 +312,17 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<Boolean, RuntimeException>() {
 
       @Override
-      public Boolean visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
+      public Boolean visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException {
+        return Boolean.FALSE;
+      }
+
+      @Override
+      public Boolean visitURIResource(final URIResourceReference uriResourceReference) throws RuntimeException {
         return Boolean.valueOf(UriUtilities.isFileUri(uriResourceReference.getUri()));
       }
 
       @Override
-      public Boolean visitUrlResource(final UrlResourceReference urlResourceReference) {
+      public Boolean visitURLResource(final URLResourceReference urlResourceReference) {
         try {
           final URI uri = urlToUriConverter.convert(urlResourceReference.getUrl());
           return Boolean.valueOf(UriUtilities.isFileUri(uri));
@@ -323,17 +358,22 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<String, RuntimeException>() {
 
       @Override
+      public String visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public String visitFileResource(final FileResourceReference fileResourceReference) throws RuntimeException {
         return fileResourceReference.getFile().toString();
       }
 
       @Override
-      public String visitUrlResource(final UrlResourceReference urlResourceReference) throws RuntimeException {
+      public String visitURLResource(final URLResourceReference urlResourceReference) throws RuntimeException {
         return urlResourceReference.getUrl().toString();
       }
 
       @Override
-      public String visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
+      public String visitURIResource(final URIResourceReference uriResourceReference) throws RuntimeException {
         try {
           return uriToUrlConverter.convert(uriResourceReference.getUri()).toString();
         } catch (MalformedURLException exception) {
@@ -360,18 +400,23 @@ public class ResourceReferenceUtilities {
     return resourceReference.accept(new IResourceReferenceVisitor<String, RuntimeException>() {
 
       @Override
+      public String visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public String visitFileResource(final FileResourceReference fileResourceReference) throws RuntimeException {
         return fileResourceReference.getFile().getName();
       }
 
       @Override
-      public String visitUrlResource(final UrlResourceReference urlResourceReference) throws RuntimeException {
+      public String visitURLResource(final URLResourceReference urlResourceReference) throws RuntimeException {
         URL url = urlResourceReference.getUrl();
         return new File(url.getPath()).getName();
       }
 
       @Override
-      public String visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
+      public String visitURIResource(final URIResourceReference uriResourceReference) throws RuntimeException {
         try {
           URL url = uriResourceReference.getUri().toURL();
           return new File(url.getPath()).getName();

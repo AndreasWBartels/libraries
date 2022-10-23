@@ -183,4 +183,12 @@ public class MathWrapper {
     return Math.toDegrees(value);
   }
 
+  public static double floor(final double value) {
+    if (fast) {
+      return FastMath.floor(value);
+    }
+    return Math.floor(value);
+  }
+
 }
+

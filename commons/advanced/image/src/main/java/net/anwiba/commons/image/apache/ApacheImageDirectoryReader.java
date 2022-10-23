@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -128,23 +128,33 @@ public class ApacheImageDirectoryReader {
   private IImageDirectoryItem convert(final ImageMetadataItem item) {
     if (item instanceof TiffMetadataItem) {
       TiffMetadataItem tiffMetadataItem = (TiffMetadataItem) item;
-      String name = tiffMetadataItem.getKeyword();
-      String text = tiffMetadataItem.getText();
-      int tag = tiffMetadataItem.getTiffField().getTag();
       return new IImageDirectoryItem() {
+
+        private int tag = -1;
+        private String name = null;
+        private String text = null;
 
         @Override
         public int getTag() {
+          if (tag == -1) {
+            tag = tiffMetadataItem.getTiffField().getTag();
+          }
           return tag;
         }
 
         @Override
         public String getName() {
+          if (name == null) {
+            name = tiffMetadataItem.getKeyword();
+          }
           return name;
         }
 
         @Override
         public String getValue() {
+          if (text == null) {
+            text = tiffMetadataItem.getText();
+          }
           return text;
         }
       };

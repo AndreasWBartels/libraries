@@ -24,13 +24,16 @@ package net.anwiba.commons.lang.parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.Streams;
 
 public final class Parameters implements IParameters {
 
@@ -53,11 +56,16 @@ public final class Parameters implements IParameters {
   }
 
   Parameters(final List<IParameter> parameters) {
-    this.parameters.addAll(parameters);
+    final Set<String> names = new LinkedHashSet<>();
     for (final IParameter parameter : parameters) {
-      this.names.add(parameter.getName());
+      names.add(parameter.getName());
       this.map.put(parameter.getName(), parameter);
     }
+    this.names.addAll(names);
+    Streams.of(names)
+        .convert(name -> map.get(name))
+        .notNull()
+        .foreach(parameter -> this.parameters.add(parameter));
   }
 
   @Override
@@ -158,5 +166,9 @@ public final class Parameters implements IParameters {
 
   public static ParametersBuilder builder() {
     return ParametersBuilder.of();
+  }
+
+  public static ParametersBuilder builder(IParameters parameters) {
+    return ParametersBuilder.of(parameters);
   }
 }

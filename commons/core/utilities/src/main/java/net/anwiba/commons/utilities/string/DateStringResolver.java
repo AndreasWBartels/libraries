@@ -32,17 +32,20 @@ public class DateStringResolver extends AbstractStringResolver {
 
   public DateStringResolver(
       final IStringAppender stringAppender) {
-    super(stringAppender, DATE_PATTERN, new IContextValueProvider<String, String, RuntimeException>() {
+    super(stringAppender,
+        value -> value,
+        DATE_PATTERN,
+        new IContextValueProvider<String, String, RuntimeException>() {
 
-      @Override
-      public String getValue(final String name) throws RuntimeException {
-        try {
-          return UserDateTimeUtilities.now().format(DateTimeFormatter.ofPattern(name));
-        } catch (DateTimeException exception) {
-          return name;
-        }
-      }
-    });
+          @Override
+          public String getValue(final String name) throws RuntimeException {
+            try {
+              return UserDateTimeUtilities.now().format(DateTimeFormatter.ofPattern(name));
+            } catch (DateTimeException exception) {
+              return name;
+            }
+          }
+        });
   }
 
 }

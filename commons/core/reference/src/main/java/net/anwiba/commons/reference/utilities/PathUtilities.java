@@ -26,10 +26,18 @@ import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import net.anwiba.commons.lang.optional.Optional;
 
@@ -109,5 +117,60 @@ public class PathUtilities {
 
   public static Path create(final URI uri) throws IOException {
     return getFileSystem(uri).provider().getPath(uri);
+  }
+
+  public static Path create(final List<String> path) {
+    return create(path.toArray(String[]::new));
+  }
+
+  public static Path create(final String[] path) {
+    if (path == null) {
+      return null;
+    }
+    if (path.length == 0) {
+      return Paths.get("");
+    }
+    if (path.length == 1) {
+      return Paths.get(path[0]);
+    }
+    String[] subpath = new String[path.length-1];
+    System.arraycopy(path, 1, subpath, 0, path.length-1);
+    return Paths.get(path[0], subpath);
+  }
+
+  public static List<Path> collectFolders(final Path folder, final Predicate<Path> predicate) throws IOException {
+    List<Path> folders = new LinkedList<>();
+    Files.walkFileTree(folder, new SimpleFileVisitor<>() {
+
+      public FileVisitResult postVisitDirectory(final Path dir, final IOException exc)
+          throws IOException {
+        if (predicate.test(dir)) {
+          folders.add(dir);
+        }
+        return FileVisitResult.CONTINUE;
+      };
+    });
+    return folders;
+  }
+
+  public static void deleteIfExits(final Path folder) throws IOException {
+    if (!Files.exists(folder)) {
+      return;
+    }
+    Files.walkFileTree(folder, new SimpleFileVisitor<>() {
+
+      public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+        FileVisitResult result = super.visitFile(file, attrs);
+        Files.deleteIfExists(file);
+        return result;
+      };
+
+      public FileVisitResult postVisitDirectory(final Path dir, final IOException exc)
+          throws IOException {
+        FileVisitResult result = super.postVisitDirectory(dir, exc);
+        Files.deleteIfExists(dir);
+        return result;
+      };
+    });
   }
 }

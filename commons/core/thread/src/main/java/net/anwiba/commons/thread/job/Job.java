@@ -34,9 +34,9 @@ public class Job implements IJob {
   }
 
   @Override
-  public void excecute(final IMessageCollector monitor, final ICanceler canceler)
+  public void execute(final IMessageCollector monitor, final ICanceler canceler)
       throws ExcecutionFaildException,
-        CanceledException {
+      CanceledException {
     for (final IDescribedTask tasks : this.configuration.getSubTasks()) {
       if (canceler.isCanceled()) {
         return;

@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -79,8 +79,8 @@ public enum DirectionOrientation {
   }
 
   public static Angle between(final DirectionAngle direction, final DirectionAngle other) {
-    final double mathDirectionAngle = direction.getOrientation().toMath(direction.getAngle().nonNegativ()).radian();
-    final double mathOtherAngle = other.getOrientation().toMath(other.getAngle().nonNegativ()).radian();
+    final double mathDirectionAngle = direction.getOrientation().toMath(direction.getAngle().moduloPositive()).radian();
+    final double mathOtherAngle = other.getOrientation().toMath(other.getAngle().moduloPositive()).radian();
 
     if (mathDirectionAngle < mathDirectionAngle) {
       return Angle.radian(mathDirectionAngle - mathOtherAngle);

@@ -6,7 +6,7 @@
   <parent>
     <groupId>net.anwiba.spatial</groupId>
     <artifactId>spatial</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
 
   <modules>
@@ -32,112 +32,7 @@
       </dependency>
       <dependency>
         <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-feature</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-layer</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-feature-layer</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-raster</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-entity</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
         <artifactId>anwiba-spatial-geometry</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-coordinatetransformer</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-data-arcgis-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-persistence-layer</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-persistence-coordinatereferencesystem</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-persistence-feature</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-persistence-raster</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-tile-cache</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-data-geopackage</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-persistence-grid</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-grid</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-database-layer</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-map</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-renderer-map</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-style</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-persistence-style</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>net.anwiba.spatial</groupId>
-        <artifactId>anwiba-spatial-geometry-style</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

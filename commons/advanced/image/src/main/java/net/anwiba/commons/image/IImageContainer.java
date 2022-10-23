@@ -25,9 +25,11 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 
+import net.anwiba.commons.image.histogram.Histogram;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
+import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -55,7 +57,7 @@ public interface IImageContainer {
 
   default IImageContainer scale(final double widthFactor, final double heightFactor) {
     return scale(Double.valueOf(widthFactor).floatValue(), Double.valueOf(heightFactor).floatValue());
-  };
+  }
 
   IImageContainer scaleTo(int width, int height);
 
@@ -75,8 +77,6 @@ public interface IImageContainer {
 
   IImageContainer toGrayScale();
 
-  void dispose();
-
   int getWidth();
 
   int getHeight();
@@ -95,15 +95,71 @@ public interface IImageContainer {
     return null;
   }
 
-  default Number[] getValues(int x, int y) {
-    return getValues(x, y, 1, 1)[0];
+  default Number[] getValues(final int x, final int y) {
+    try {
+      return getValues(ICanceler.DummyCanceler, x, y);
+    } catch (CanceledException exception) {
+      throw new UnreachableCodeReachedException(exception);
+    }
   }
 
-  default Number[][] getValues(int x, int y,int width, int height) {
-    Raster raster = asBufferImage().getData(new Rectangle(x,y,width,height));
-    raster.getDataElements(0,0,width, height, null);
-    return new Number[][] {new Number[] {}};
+  default Number[] getValues(final ICanceler canceler, final int x, final int y) throws CanceledException {
+    return getValues(IMessageCollector.DummyCollector, canceler, x, y);
   }
+
+  default Number[]
+      getValues(final IMessageCollector messageCollector, final ICanceler canceler, final int x, final int y)
+          throws CanceledException {
+    return Optional.of(getValues(messageCollector, canceler, x, y, 1, 1))
+        .accept(values -> values.length > 0)
+        .convert(values -> values[0])
+        .get();
+  }
+
+  default Number[][] getValues(
+      final int x,
+      final int y,
+      final int width,
+      final int height) {
+    try {
+      return getValues(ICanceler.DummyCanceler, x, y, width, height);
+    } catch (CanceledException exception) {
+      throw new UnreachableCodeReachedException(exception);
+    }
+  }
+
+  default Number[][] getValues(
+      final ICanceler canceler,
+      final int x,
+      final int y,
+      final int width,
+      final int height) throws CanceledException {
+    return getValues(IMessageCollector.DummyCollector, canceler, x, y, width, height);
+  }
+
+  default Number[][] getValues(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final int x,
+      final int y,
+      final int width,
+      final int height) throws CanceledException {
+    final BufferedImage bufferImage = asBufferImage(messageCollector, canceler);
+    final Raster raster = bufferImage.getData(new Rectangle(x, y, width, height));
+    if (raster == null) {
+      return null;
+    }
+    return ImageUtilities.getValues(raster);
+  }
+
+  default Histogram getHistogram() {
+    try {
+      return getHistogram(IMessageCollector.DummyCollector, ICanceler.DummyCanceler);
+    } catch (CanceledException exception) {
+      throw new UnreachableCodeReachedException(exception);
+    }
+  }
+
+  Histogram getHistogram(final IMessageCollector messageCollector,
+      final ICanceler canceler) throws CanceledException;
   
-
 }

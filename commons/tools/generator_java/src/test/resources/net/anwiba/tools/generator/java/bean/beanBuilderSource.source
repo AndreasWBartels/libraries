@@ -8,7 +8,7 @@ import java.util.Map;
 public class Bean {
 
     private String type = "Bean";
-    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> properties = new LinkedHashMap<>();
 
     public Bean(final Map<String, Object> properties) {
         this.properties.putAll(properties);
@@ -43,7 +43,7 @@ import java.util.Map;
 
 public class BeanBuilder {
 
-    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> properties = new LinkedHashMap<>();
 
     public BeanBuilder() {
     }

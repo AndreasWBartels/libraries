@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -37,7 +38,6 @@ import javax.swing.JPanel;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.message.Message;
-import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
@@ -97,9 +97,7 @@ public class ComboBoxChooserDialog<T> extends AbstractMessageDialog implements I
     public void objectChanged() {
       if (!ComboBoxChooserDialog.this.validStateModel.get().isValid()) {
         setMessage(
-            new MessageBuilder()
-                .setText(ComboBoxChooserDialog.this.validStateModel.get().getMessage())
-                .setError()
+            Message.error(ComboBoxChooserDialog.this.validStateModel.get().getMessage())
                 .build());
         setTryEnabled(false);
         setOkEnabled(false);
@@ -136,7 +134,8 @@ public class ComboBoxChooserDialog<T> extends AbstractMessageDialog implements I
     builder.setObjectUi(new ChooserPanelConfigurationUi<T>(GuiIconSize.SMALL));
     builder.setSingleSelectionMode();
     builder.setBorder(BorderFactory.createEmptyBorder(4, 0, 2, 0));
-    final List<IChooserPanelConfiguration<T>> optionPanelConfigurations = configuration.getOptionPanelConfigurations();
+    final List<IChooserPanelConfiguration<T>> optionPanelConfigurations =
+        new ArrayList<>(configuration.getOptionPanelConfigurations());
     optionPanelConfigurations.sort(new Comparator<IChooserPanelConfiguration<T>>() {
 
       @Override
@@ -214,11 +213,9 @@ public class ComboBoxChooserDialog<T> extends AbstractMessageDialog implements I
     } catch (final InvocationTargetException exception) {
       setOkEnabled(false);
       final Throwable targetException = exception.getTargetException();
-      setMessage(Message.builder()
-          .setText(this.chooserPanel.getMessage().getText())
-          .setDescription(targetException.getMessage())
-          .setThrowable(targetException)
-          .setError()
+      setMessage(Message.error(this.chooserPanel.getMessage().getText())
+          .description(targetException.getMessage())
+          .throwable(targetException)
           .build());
       return false;
     }

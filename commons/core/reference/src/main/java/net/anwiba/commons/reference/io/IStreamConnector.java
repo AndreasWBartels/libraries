@@ -24,7 +24,6 @@ package net.anwiba.commons.reference.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 
 import net.anwiba.commons.lang.functional.IAcceptor;
 
@@ -36,14 +35,18 @@ public interface IStreamConnector<T> {
 
   boolean canWrite(T uri);
 
-  InputStream openInputStream(URI uri, IAcceptor<String> contentTypeAcceptor) throws IOException;
+  InputStream openInputStream(T uri, IAcceptor<String> contentTypeAcceptor) throws IOException;
 
   InputStream openInputStream(T uri) throws IOException;
 
   OutputStream openOutputStream(T uri) throws IOException;
 
-  long getContentLength(URI uri) throws IOException;
+  long getContentLength(T uri) throws IOException;
 
-  String getContentType(URI uri) throws IOException;
+  String getContentType(T uri) throws IOException;
 
+  default boolean isApplicable(T uri) {
+    return true;
+  }
+  
 }

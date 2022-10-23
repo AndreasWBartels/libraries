@@ -21,6 +21,8 @@
  */
 package net.anwiba.commons.jdbc.name;
 
+import net.anwiba.commons.lang.object.ObjectUtilities;
+
 public class DatabaseColumnName implements IDatabaseColumnName {
 
   private final IDatabaseTableName table;
@@ -34,6 +36,10 @@ public class DatabaseColumnName implements IDatabaseColumnName {
 
   public DatabaseColumnName(final String schemaName, final String tableName, final String columnName) {
     this(new DatabaseTableName(schemaName, tableName), columnName);
+  }
+
+  public DatabaseColumnName(final String catalogName,final String schemaName, final String tableName, final String columnName) {
+    this(new DatabaseTableName(catalogName, schemaName, tableName), columnName);
   }
 
   @Override
@@ -64,5 +70,22 @@ public class DatabaseColumnName implements IDatabaseColumnName {
   @Override
   public String getSchemaName() {
     return this.table.getSchemaName();
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = prime + ((this.table == null) ? 0 : this.table.hashCode());
+    return prime * result + ((this.columnName == null) ? 0 : this.columnName.hashCode());
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    return obj instanceof IDatabaseColumnName other
+        && ObjectUtilities.equals(this.table, other.getDatabaseTable()) //
+        && ObjectUtilities.equals(this.columnName, other.getColumnName());
   }
 }

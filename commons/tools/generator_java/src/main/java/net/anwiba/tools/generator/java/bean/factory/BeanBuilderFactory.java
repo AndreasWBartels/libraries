@@ -21,6 +21,12 @@
  */
 package net.anwiba.tools.generator.java.bean.factory;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Bean;
+import net.anwiba.tools.generator.java.bean.configuration.Member;
+import net.anwiba.tools.generator.java.bean.configuration.Setter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -35,11 +41,6 @@ import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.tools.generator.java.bean.configuration.Bean;
-import net.anwiba.tools.generator.java.bean.configuration.Member;
-import net.anwiba.tools.generator.java.bean.configuration.Setter;
-
 public class BeanBuilderFactory extends AbstractSourceFactory {
 
   private final SetterFactory setterFactory;
@@ -47,12 +48,15 @@ public class BeanBuilderFactory extends AbstractSourceFactory {
   private final BuildMethodFactory buildMethodFactory;
   private final ConstructorFactory constructorFactory;
 
-  public BeanBuilderFactory(final JCodeModel codeModel, final EnsurePredicateFactory ensurePredicateFactory) {
-    super(codeModel);
-    this.setterFactory = new SetterFactory(codeModel, ensurePredicateFactory);
-    this.memberFactory = new MemberFactory(codeModel);
-    this.buildMethodFactory = new BuildMethodFactory(codeModel);
-    this.constructorFactory = new ConstructorFactory(codeModel, ensurePredicateFactory, true);
+  public BeanBuilderFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory,
+      final EnsurePredicateFactory ensurePredicateFactory) {
+    super(codeModel, annotationClassfactory);
+    this.setterFactory = new SetterFactory(codeModel, annotationClassfactory, ensurePredicateFactory);
+    this.memberFactory = new MemberFactory(codeModel, annotationClassfactory);
+    this.buildMethodFactory = new BuildMethodFactory(codeModel, annotationClassfactory);
+    this.constructorFactory = new ConstructorFactory(codeModel, annotationClassfactory, ensurePredicateFactory, true);
   }
 
   public void create(final Bean configuration) throws CreationException {

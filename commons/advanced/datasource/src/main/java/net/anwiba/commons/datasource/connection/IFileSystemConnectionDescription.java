@@ -24,7 +24,7 @@ package net.anwiba.commons.datasource.connection;
 import java.net.URI;
 import java.nio.file.Path;
 
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.IAuthentication;
 
 public interface IFileSystemConnectionDescription extends IResourceReferenceConnectionDescription {
 

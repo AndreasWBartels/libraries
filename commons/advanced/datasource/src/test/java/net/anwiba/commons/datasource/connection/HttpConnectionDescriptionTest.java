@@ -27,8 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.optional.Optional;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.parser.UrlParser;
 
 @SuppressWarnings("nls")
 public class HttpConnectionDescriptionTest {

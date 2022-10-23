@@ -29,4 +29,5 @@ module net.anwiba.database.postgresql {
   requires net.anwiba.commons.logging;
   requires net.anwiba.commons.nls;
   requires net.anwiba.commons.utilities;
+  requires net.anwiba.commons.thread;
 }

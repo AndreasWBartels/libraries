@@ -25,42 +25,63 @@ import net.anwiba.commons.lang.exception.Throwables;
 
 public interface ILogger {
 
-  boolean isLoggable(ILevel level);
-
-
-  void doLog(ILevel level, IMessageFactory factory, Throwable throwable);
-
-  default void log(ILevel level, IMessageFactory factory, Throwable throwable) {
-    if (throwable == null) {
-      doLog(level, factory, null);
-      return;
+  public final static class Builder {
+    
+    public Builder message( ) {
+      return this;
     }
-
-    doLog(level, () -> {
-      if (Throwables.isApplicable(throwable)) {
-        return String.join("\n", factory.create(), Throwables.toString(throwable));
-      }
-      return factory.create();
-    }, throwable);
-
-  }
-
-  default void log(ILevel level, IMessageFactory factory) {
-    log(level, factory, null);
+    
+    public void commit() {
+      
+    }
   }
   
-  default void log(ILevel level, String message) {
+  boolean isLoggable(ILevel level);
+
+  void doLog(final ILevel level, ILogMessageFactory factory);
+
+  default void log(final ILevel level, final IMessageFactory factory, final Throwable throwable) {
+//    if (throwable == null) {
+//      doLog(level, factory, null);
+//      return;
+//    }
+
+    doLog(level, l -> {
+      String extendedMessage = throwable == null 
+          ? null
+          : Throwables.getExtendedMessage(throwable);
+      if (extendedMessage == null) {
+        return LogMessage.of(factory.create(), throwable);
+      }
+      return LogMessage.of(String.join("\n", extendedMessage), throwable);
+    });
+  }
+
+//  default void log(final ILogMessageFactory factory) {
+////    if (throwable == null) {
+////      doLog(level, factory, null);
+////      return;
+////    }
+//    
+//    doLog(factory);
+//  }
+
+  default void log(final ILevel level, final IMessageFactory factory) {
+    log(level, factory, null);
+  }
+
+  default void log(final ILevel level, final String message) {
     log(level, () -> message, null);
   }
 
-  default void log(ILevel level, String message, Throwable throwable) {
+  default void log(final ILevel level, final String message, final Throwable throwable) {
     log(level, () -> message, throwable);
   }
 
-  default void log(ILevel level, Throwable throwable) {
+  default void log(final ILevel level, final Throwable throwable) {
     log(level, () -> throwable.getMessage(), throwable);
   }
-  
+
   default void all(final IMessageFactory factory) {
     log(ILevel.ALL, factory);
   }
@@ -73,6 +94,10 @@ public interface ILogger {
     log(ILevel.DEBUG, factory);
   }
 
+  default void debug(final IMessageFactory factory, final Throwable throwable) {
+    log(ILevel.DEBUG, factory, throwable);
+  }
+
   default void info(final IMessageFactory factory) {
     log(ILevel.INFO, factory);
   }
@@ -81,12 +106,24 @@ public interface ILogger {
     log(ILevel.WARNING, factory);
   }
 
+  default void warning(final IMessageFactory factory, final Throwable throwable) {
+    log(ILevel.WARNING, factory, throwable);
+  }
+
   default void error(final IMessageFactory factory) {
     log(ILevel.ERROR, factory);
   }
 
+  default void error(final IMessageFactory factory, final Throwable throwable) {
+    log(ILevel.ERROR, factory, throwable);
+  }
+
   default void fatal(final IMessageFactory factory) {
     log(ILevel.FATAL, factory);
+  }
+
+  default void fatal(final IMessageFactory factory, final Throwable throwable) {
+    log(ILevel.FATAL, factory, throwable);
   }
 
   default void serve(final IMessageFactory factory) {

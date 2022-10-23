@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 import org.junit.jupiter.api.Test;
 
 import net.anwiba.commons.swing.object.IObjectField;
-import net.anwiba.commons.swing.object.ShortField;
+import net.anwiba.commons.swing.object.numeric.ShortField;
 
 public class ShortFieldDemo extends AbstractObjectFieldDemo {
 

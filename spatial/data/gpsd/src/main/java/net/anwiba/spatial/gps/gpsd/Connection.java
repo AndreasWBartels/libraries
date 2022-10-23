@@ -122,20 +122,8 @@ public class Connection implements AutoCloseable {
 
   @Override
   public void close() throws IOException {
-    IOException ioException = null;
-    if (this.out != null) {
-      ioException = IoUtilities.close(this.out, ioException);
-    }
-    if (this.in != null) {
-      ioException = IoUtilities.close(this.in, ioException);
-    }
-    if (this.socket != null) {
-      ioException = IoUtilities.close(this.socket, ioException);
-    }
-    if (ioException == null) {
-      return;
-    }
-    throw ioException;
+    IOException ioException = IoUtilities.close(this.out, this.in, this.socket);
+    IoUtilities.throwIfNotNull(ioException);
   }
 
 }

@@ -26,6 +26,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.EventQueue;
+import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import net.anwiba.commons.logging.ILevel;
@@ -171,5 +173,33 @@ public class GuiUtilities extends ContainerUtilities {
       }
     }
     return enabledComps;
+  }
+
+  public static JComponent decorate(
+      final LayoutManager layout,
+      final JComponent component) {
+    return decorate(new JPanel(layout), component);
+  }
+
+  public static JComponent decorate(
+      final JComponent container,
+      final JComponent component) {
+    container.add(component);
+    return container;
+  }
+
+  public static JComponent decorate(
+      final LayoutManager layout,
+      final Object constaint,
+      final JComponent component) {
+    return decorate(new JPanel(layout), constaint, component);
+  }
+
+  public static JComponent decorate(
+      final JComponent container,
+      final Object constaint,
+      final JComponent component) {
+    container.add(component, constaint);
+    return container;
   }
 }

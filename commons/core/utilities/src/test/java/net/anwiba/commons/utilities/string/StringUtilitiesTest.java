@@ -119,4 +119,11 @@ public class StringUtilitiesTest {
     assertThat(StringUtilities.removeWhiteSpaces("VA\\n\"L\n\fU\"E"), equalTo("VA\\n\"L\n\fU\"E"));
     assertThat(StringUtilities.removeWhiteSpaces("VA\"L   U\"\n E"), equalTo("VA\"L   U\" E"));
   }
+  
+  @Test
+  public void containsWhitespaces() {
+    assertTrue(StringUtilities.containsWhitespaces("VA\"L   U\"\n E"));
+    assertFalse(StringUtilities.containsWhitespaces("VA\"LU\"E"));
+  }
+  
 }

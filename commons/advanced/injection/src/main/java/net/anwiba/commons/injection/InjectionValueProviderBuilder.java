@@ -115,14 +115,6 @@ public class InjectionValueProviderBuilder implements IInjectionValueProviderBui
   }
 
   @Override
-  public <T> IInjectionValueProviderBuilder add(final Class<T> clazz) {
-    if (clazz.isInterface()) {
-      throw new IllegalArgumentException();
-    }
-    return add(clazz, clazz);
-  }
-
-  @Override
   public <T> IInjectionValueProviderBuilder add(final Class<T> clazz, final Class<? extends T> serviceClass) {
     return add(binding(clazz), serviceClass);
   }

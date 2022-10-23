@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import net.anwiba.commons.lang.functional.ConversionException;
-import net.anwiba.commons.utilities.io.url.IUrl;
+import net.anwiba.commons.reference.url.IUrl;
 
 @SuppressWarnings({ "unused", "nls" })
 public class StringToUrlConverterTest {

@@ -25,12 +25,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import net.anwiba.commons.lang.stream.Streams;
 
 public final class Properties implements IProperties {
 
-  private static final long serialVersionUID = 655956184779585973L;
   private final List<String> names = new ArrayList<>();
   private final List<IProperty> properties = new ArrayList<>();
   private final Map<String, IProperty> map = new HashMap<>();
@@ -44,11 +47,16 @@ public final class Properties implements IProperties {
   }
 
   public Properties(final List<IProperty> properties) {
+    final Set<String> names = new LinkedHashSet<>();
     for (final IProperty property : properties) {
-      this.names.add(property.getName());
+      names.add(property.getName());
       this.map.put(property.getName(), property);
     }
-    this.names.forEach(name -> this.properties.add(this.map.get(name)));
+    this.names.addAll(names);
+    Streams.of(names)
+        .convert(name -> map.get(name))
+        .notNull()
+        .foreach(property -> this.properties.add(property));
   }
 
   @Override

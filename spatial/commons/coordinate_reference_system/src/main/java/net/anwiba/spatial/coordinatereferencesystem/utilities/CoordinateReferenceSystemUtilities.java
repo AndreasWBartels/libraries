@@ -22,8 +22,6 @@
 // Copyright (c) 2007 by Andreas W. Bartels
 package net.anwiba.spatial.coordinatereferencesystem.utilities;
 
-import java.util.Objects;
-
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.spatial.coordinate.IEnvelope;
 import net.anwiba.spatial.coordinatereferencesystem.Authority;
@@ -52,6 +50,8 @@ import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.VerticalCoo
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.VerticalDatum;
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.unit.Unit;
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.utilities.CoordinateSystemUtilities;
+
+import java.util.Objects;
 
 public class CoordinateReferenceSystemUtilities {
 
@@ -184,9 +184,9 @@ public class CoordinateReferenceSystemUtilities {
     final IEnvelope envelope = area.getEnvelope();
     buffer.append(envelope.getMinimum().getXValue());
     buffer.append(", "); //$NON-NLS-1$
-    buffer.append(envelope.getMaximum().getXValue());
-    buffer.append(", "); //$NON-NLS-1$
     buffer.append(envelope.getMinimum().getYValue());
+    buffer.append(", "); //$NON-NLS-1$
+    buffer.append(envelope.getMaximum().getXValue());
     buffer.append(", "); //$NON-NLS-1$
     buffer.append(envelope.getMaximum().getYValue());
     final Authority authority = area.getAuthority();

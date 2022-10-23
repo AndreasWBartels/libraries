@@ -32,7 +32,7 @@ import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.LoggingUtilities;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.swing.object.DoubleIntervalField;
+import net.anwiba.commons.swing.object.numeric.DoubleIntervalField;
 import net.anwiba.commons.utilities.interval.DoubleInterval;
 import net.anwiba.commons.utilities.number.DoubleToStringConverter;
 import net.anwiba.commons.utilities.validation.IValidationResult;

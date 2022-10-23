@@ -43,14 +43,14 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
   public <T> T execute(final ICanceler cancelable, final IRequest request,
       final IApplicableResultProducer<T> resultProducer,
       final IApplicableHttpResponseExceptionFactory... exceptionFactories)
-      throws CanceledException, HttpServerException, HttpRequestException, IOException {
+      throws CanceledException, HttpRequestException, HttpResponseException, IOException {
     return execute(cancelable, request, resultProducer, new ExceptionProducer(exceptionFactories));
   }
 
   @Override
   public <T> T execute(final ICanceler cancelable, final IRequest request,
       final IApplicableResultProducer<T> resultProducer, final IResultProducer<IOException> errorProducer)
-      throws CanceledException, HttpServerException, HttpRequestException, IOException {
+      throws CanceledException, HttpRequestException, HttpResponseException, IOException {
 
     try {
       try (final IResponse response = this.httpRequestExecutor.execute(cancelable, request)) {
@@ -58,7 +58,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
         final String statusText = response.getStatusText();
         final long contentLength = response.getContentLength();
         if (contentLength == 0) {
-          throw new HttpServerException("Http request faild, empty response",
+          throw new HttpRequestException("Http request faild, empty response",
               response.getUri(),
               statusCode,
               statusText);
@@ -73,7 +73,7 @@ public class ConvertingHttpRequestExecutor implements IConvertingHttpRequestExec
                     response.getContentEncoding(), inputStream);
               } catch (final IOException exception) {
                 inputStream.reset();
-                throw new HttpRequestException(exception.getMessage(), //
+                throw new HttpResponseException(exception.getMessage(), //
                     response.getUri(),
                     statusCode, 
                     statusText, 

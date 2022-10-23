@@ -51,7 +51,7 @@ import net.anwiba.commons.lang.collection.IObjectIterable;
 import net.anwiba.commons.lang.object.ObjectPair;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.message.MessageBuilder;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IChangeableListListener;
@@ -171,7 +171,7 @@ public class DatasetTableFactory {
                   .enableCloseOnEscape()
                   .setTitle("Datasets")
                   .setMessage(
-                      new MessageBuilder().setText("Sort order").setDescription("Please, set sort order").build())
+                      Message.text("Sort order").description("Please, set sort order").build())
                   .setContentPaneFactory(new IContentPaneFactory() {
 
                     @Override
@@ -377,76 +377,76 @@ public class DatasetTableFactory {
 
       builder.addActionFactory((tableModel, selectionIndexModel, selectionModel, sortStateModel) -> {
         final BooleanModel enabledModel = new BooleanModel(false);
-        tableModel.addTableModelListener(e -> enabledModel.set(offsetModel.getValue() > 0));
+        tableModel.addTableModelListener(e -> enabledModel.set(offsetModel.get() > 0));
         return new ConfigurableActionBuilder()
             .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.GO_FIRST)
             .setEnabledDistributor(enabledModel)
             .setProcedure(component -> {
               if (selectionIndexModel.isEmpty()) {
-                selectedIndexModel.setValue(-1);
+                selectedIndexModel.set(-1);
               } else {
-                selectedIndexModel.setValue(selectionIndexModel.getMinimum());
+                selectedIndexModel.set(selectionIndexModel.getMinimum());
               }
-              offsetModel.setValue(0);
+              offsetModel.set(0);
             })
             .build();
       }).addActionFactory((tableModel, selectionIndexModel, selectionModel, sortStateModel) -> {
         final BooleanModel enabledModel = new BooleanModel(false);
-        tableModel.addTableModelListener(e -> enabledModel.set(offsetModel.getValue() > 0));
+        tableModel.addTableModelListener(e -> enabledModel.set(offsetModel.get() > 0));
         return new ConfigurableActionBuilder()
             .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.GO_PREVIOUS)
             .setEnabledDistributor(enabledModel)
             .setProcedure(component -> {
               if (selectionIndexModel.isEmpty()) {
-                selectedIndexModel.setValue(-1);
+                selectedIndexModel.set(-1);
               } else {
-                selectedIndexModel.setValue(selectionIndexModel.getMinimum());
+                selectedIndexModel.set(selectionIndexModel.getMinimum());
               }
               offsetModel
-                  .setValue(
-                      offsetModel.getValue() > this.numberOfResultRows
-                          ? offsetModel.getValue() - this.numberOfResultRows
+                  .set(
+                      offsetModel.get() > this.numberOfResultRows
+                          ? offsetModel.get() - this.numberOfResultRows
                           : 0);
             })
             .build();
       }).addActionFactory((tableModel, selectionIndexModel, selectionModel, sortStateModel) -> {
         final BooleanModel enabledModel =
-            new BooleanModel(offsetModel.getValue() + tableModel.size() < resultCountModel.getValue());
+            new BooleanModel(offsetModel.get() + tableModel.size() < resultCountModel.get());
         tableModel
             .addTableModelListener(
-                e -> enabledModel.set(offsetModel.getValue() + tableModel.size() < resultCountModel.getValue()));
+                e -> enabledModel.set(offsetModel.get() + tableModel.size() < resultCountModel.get()));
         return new ConfigurableActionBuilder()
             .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.GO_NEXT)
             .setEnabledDistributor(enabledModel)
             .setProcedure(component -> {
               if (selectionIndexModel.isEmpty()) {
-                selectedIndexModel.setValue(-1);
+                selectedIndexModel.set(-1);
               } else {
-                selectedIndexModel.setValue(selectionIndexModel.getMinimum());
+                selectedIndexModel.set(selectionIndexModel.getMinimum());
               }
               offsetModel
-                  .setValue(
-                      offsetModel.getValue() + this.numberOfResultRows > resultCountModel.getValue()
-                          ? resultCountModel.getValue() - this.numberOfResultRows
-                          : offsetModel.getValue() + this.numberOfResultRows);
+                  .set(
+                      offsetModel.get() + this.numberOfResultRows > resultCountModel.get()
+                          ? resultCountModel.get() - this.numberOfResultRows
+                          : offsetModel.get() + this.numberOfResultRows);
             })
             .build();
       }).addActionFactory((tableModel, selectionIndexModel, selectionModel, sortStateModel) -> {
         final BooleanModel enabledModel =
-            new BooleanModel(offsetModel.getValue() + tableModel.size() < resultCountModel.getValue());
+            new BooleanModel(offsetModel.get() + tableModel.size() < resultCountModel.get());
         tableModel
             .addTableModelListener(
-                e -> enabledModel.set(offsetModel.getValue() + tableModel.size() < resultCountModel.getValue()));
+                e -> enabledModel.set(offsetModel.get() + tableModel.size() < resultCountModel.get()));
         return new ConfigurableActionBuilder()
             .setIcon(net.anwiba.commons.swing.icons.gnome.contrast.high.ContrastHightIcons.GO_LAST)
             .setEnabledDistributor(enabledModel)
             .setProcedure(component -> {
               if (selectionIndexModel.isEmpty()) {
-                selectedIndexModel.setValue(-1);
+                selectedIndexModel.set(-1);
               } else {
-                selectedIndexModel.setValue(selectionIndexModel.getMinimum());
+                selectedIndexModel.set(selectionIndexModel.getMinimum());
               }
-              offsetModel.setValue(resultCountModel.getValue() - this.numberOfResultRows);
+              offsetModel.set(resultCountModel.get() - this.numberOfResultRows);
             })
             .build();
       });
@@ -515,33 +515,33 @@ public class DatasetTableFactory {
               case KeyEvent.VK_PAGE_UP: {
                 event.consume();
                 if (tableModel.isEmpty()) {
-                  selectedIndexModel.setValue(-1);
+                  selectedIndexModel.set(-1);
                 } else {
-                  selectedIndexModel.setValue(tableModel.size() - 1);
+                  selectedIndexModel.set(tableModel.size() - 1);
                 }
                 offsetModel
-                    .setValue(
-                        offsetModel.getValue() > DatasetTableFactory.this.numberOfResultRows
-                            ? offsetModel.getValue() - DatasetTableFactory.this.numberOfResultRows
+                    .set(
+                        offsetModel.get() > DatasetTableFactory.this.numberOfResultRows
+                            ? offsetModel.get() - DatasetTableFactory.this.numberOfResultRows
                             : 0);
                 return;
               }
               case KeyEvent.VK_PAGE_DOWN: {
                 event.consume();
-                if (!(offsetModel.getValue() + tableModel.size() < resultCountModel.getValue())) {
+                if (!(offsetModel.get() + tableModel.size() < resultCountModel.get())) {
                   return;
                 }
                 if (tableModel.isEmpty()) {
-                  selectedIndexModel.setValue(-1);
+                  selectedIndexModel.set(-1);
                 } else {
-                  selectedIndexModel.setValue(0);
+                  selectedIndexModel.set(0);
                 }
                 offsetModel
-                    .setValue(
-                        offsetModel.getValue() + DatasetTableFactory.this.numberOfResultRows > resultCountModel
-                            .getValue()
-                                ? resultCountModel.getValue() - DatasetTableFactory.this.numberOfResultRows
-                                : offsetModel.getValue() + DatasetTableFactory.this.numberOfResultRows);
+                    .set(
+                        offsetModel.get() + DatasetTableFactory.this.numberOfResultRows > resultCountModel
+                            .get()
+                                ? resultCountModel.get() - DatasetTableFactory.this.numberOfResultRows
+                                : offsetModel.get() + DatasetTableFactory.this.numberOfResultRows);
                 return;
               }
             }

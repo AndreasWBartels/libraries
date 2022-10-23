@@ -21,7 +21,9 @@
  */
 package net.anwiba.commons.image;
 
+import java.awt.Color;
 import java.io.Serializable;
+import java.util.List;
 
 public interface IImageMetadata extends Serializable {
 
@@ -40,5 +42,9 @@ public interface IImageMetadata extends Serializable {
   int getTransparency();
 
   boolean isIndexed();
+  
+  default List<Color> getColors() {
+    return List.of();
+  }
 
 }

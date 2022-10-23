@@ -40,6 +40,7 @@ import net.anwiba.commons.annotation.Injection;
 import net.anwiba.commons.annotation.Nullable;
 import net.anwiba.commons.injection.IBinding;
 import net.anwiba.commons.injection.IInjectingFactory;
+import net.anwiba.commons.injection.binding.Bindings;
 import net.anwiba.commons.injection.binding.ClassBinding;
 import net.anwiba.commons.injection.binding.NamedClassBinding;
 
@@ -139,8 +140,7 @@ public class ValueInjectionAnalyser implements IValueInjectionAnalyser {
   }
 
   private <T> IBinding<T> binding(final Class<T> clazz, final String name) {
-    return Optional.ofNullable(name).map(n -> (IBinding<T>) new NamedClassBinding<>(clazz, n)).orElseGet(
-        () -> new ClassBinding<>(clazz));
+    return Bindings.of(clazz, name);
   }
 
   @SuppressWarnings({ "rawtypes" })

@@ -42,6 +42,7 @@ import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.action.ConfigurableActionBuilder;
 import net.anwiba.commons.swing.icons.GuiIcons;
+import net.anwiba.commons.swing.object.temporal.DefaultObjectFieldConfiguration;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.commons.utilities.validation.AggregatingStringValidator;

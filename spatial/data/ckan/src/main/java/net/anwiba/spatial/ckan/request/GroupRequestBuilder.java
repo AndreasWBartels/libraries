@@ -79,8 +79,8 @@ public class GroupRequestBuilder {
 
     public IRequest build() throws CreationException {
       final RequestBuilder builder = RequestBuilder.get(CkanUtilities.getBaseUrl(this.url, "group_list")); //$NON-NLS-1$
-      If.isTrue(this.limit > 0).excecute(() -> builder.query("limit", String.valueOf(this.limit))); //$NON-NLS-1$
-      If.isTrue(this.allFields).excecute(() -> builder.query("all_fields", "True")); //$NON-NLS-1$ //$NON-NLS-2$
+      If.isTrue(this.limit > 0).execute(() -> builder.query("limit", String.valueOf(this.limit))); //$NON-NLS-1$
+      If.isTrue(this.allFields).execute(() -> builder.query("all_fields", "True")); //$NON-NLS-1$ //$NON-NLS-2$
       Optional.of(this.key).convert(k -> builder.header("X-CKAN-API-Key", k)); //$NON-NLS-1$
       Optional.of(this.authentication).consume(a -> builder.authentication(a.getUsername(), a.getPassword()));
       return builder.build();

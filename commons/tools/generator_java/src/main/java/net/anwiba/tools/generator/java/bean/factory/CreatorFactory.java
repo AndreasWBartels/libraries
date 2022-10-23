@@ -25,6 +25,13 @@ import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_CLASS
 import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_STRING;
 import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_UTIL_HASHMAP;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Argument;
+import net.anwiba.tools.generator.java.bean.configuration.Bean;
+import net.anwiba.tools.generator.java.bean.configuration.Creator;
+import net.anwiba.tools.generator.java.bean.configuration.Member;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
@@ -48,12 +55,6 @@ import com.sun.codemodel.JMod;
 import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JVar;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.tools.generator.java.bean.configuration.Argument;
-import net.anwiba.tools.generator.java.bean.configuration.Bean;
-import net.anwiba.tools.generator.java.bean.configuration.Creator;
-import net.anwiba.tools.generator.java.bean.configuration.Member;
-
 @SuppressWarnings("nls")
 public class CreatorFactory extends AbstractSourceFactory {
 
@@ -64,9 +65,11 @@ public class CreatorFactory extends AbstractSourceFactory {
     stringTypes.add(java.lang.String.class.getSimpleName());
   }
 
-  public CreatorFactory(final JCodeModel codeModel) {
-    super(codeModel);
-    this.memberFactory = new MemberFactory(codeModel);
+  public CreatorFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    super(codeModel, annotationClassfactory);
+    this.memberFactory = new MemberFactory(codeModel, annotationClassfactory);
   }
 
   public void creator(
@@ -93,7 +96,7 @@ public class CreatorFactory extends AbstractSourceFactory {
         bean,
         _classByNames(JAVA_UTIL_HASHMAP, JAVA_LANG_STRING, JAVA_LANG_CLASS),
         "_classes",
-        new String[]{ JAVA_LANG_STRING, JAVA_LANG_CLASS });
+        new String[] { JAVA_LANG_STRING, JAVA_LANG_CLASS });
     createTypeCreateMethod(configuration, creator, bean);
     createCreateBeanMethod(bean);
     createCreateClassMethod(bean, classes);
@@ -128,19 +131,21 @@ public class CreatorFactory extends AbstractSourceFactory {
 
     method.body()._if(isNullOrTrimmedEmpty(type))._then()._return(JExpr._new(bean));
 
-    final JVar clazz = method.body().decl(
-        _classByNames(java.lang.Class.class.getName(), MessageFormat.format("? extends {0}", bean.name())), //$NON-NLS-1$
-        "clazz",
-        _createClass(type));
+    final JVar clazz = method.body()
+        .decl(
+            _classByNames(java.lang.Class.class.getName(), MessageFormat.format("? extends {0}", bean.name())), //$NON-NLS-1$
+            "clazz",
+            _createClass(type));
     JBlock block = method.body()._if(clazz.ne(JExpr._null()))._then();
     block._return(_createBean(clazz));
     method.body().assign(clazz, _createClass(lowerCase(type)));
     block = method.body()._if(clazz.ne(JExpr._null()))._then();
     block._return(_createBean(clazz));
-    final JVar className = method.body().decl(
-        _String(),
-        "className", //$NON-NLS-1$
-        format("{0}{1}", type, JExpr.lit(bean.name())));
+    final JVar className = method.body()
+        .decl(
+            _String(),
+            "className", //$NON-NLS-1$
+            format("{0}{1}", type, JExpr.lit(bean.name())));
     method.body().assign(clazz, _createClass(className));
     block = method.body()._if(clazz.ne(JExpr._null()))._then();
     block._return(_createBean(clazz));
@@ -218,8 +223,11 @@ public class CreatorFactory extends AbstractSourceFactory {
     final JMethod method = bean.method(JMod.SYNCHRONIZED | JMod.PRIVATE | JMod.STATIC, returnClazz, "_createClass");
     final JVar type = method.param(java.lang.String.class, "type");
 
-    method.body()._if(classes.invoke("containsKey").arg(type))._then()._return(
-        JExpr.cast(returnClazz, classes.invoke("get").arg(type)));
+    method.body()
+        ._if(classes.invoke("containsKey").arg(type))
+        ._then()
+        ._return(
+            JExpr.cast(returnClazz, classes.invoke("get").arg(type)));
 
     final JTryBlock _try = method.body()._try();
     final JBlock body = _try.body();
@@ -252,8 +260,11 @@ public class CreatorFactory extends AbstractSourceFactory {
     final JVar value = method.param(java.lang.String.class, "value");
     final JBlock body = method.body();
     body._if(value.eq(JExpr._null()).cor(value.invoke("trim").invoke("isEmpty")))._then()._return(JExpr._null());
-    final JInvocation firstCharacter = value.invoke("substring").arg(JExpr.lit(0)).arg(JExpr.lit(1)).invoke(
-        "toUpperCase");
+    final JInvocation firstCharacter = value.invoke("substring")
+        .arg(JExpr.lit(0))
+        .arg(JExpr.lit(1))
+        .invoke(
+            "toUpperCase");
     final JInvocation restCharacters = value.invoke("substring").arg(JExpr.lit(1)).arg(value.invoke("length"));
     body._return(firstCharacter.plus(restCharacters));
     return method;

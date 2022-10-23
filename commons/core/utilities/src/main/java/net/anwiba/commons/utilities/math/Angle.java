@@ -62,10 +62,16 @@ public final class Angle {
     return degree(degree + minute / 60. + second / 3600.0);
   }
 
+  public static Angle fullCircle() {
+    return radian(TWO_PI);
+  }
+
   public static final double TWO_PI = 2. * MathWrapper.PI;
   public static final double RHO_DEGREE = 180. / MathWrapper.PI;
   public static final double RHO_GON = 200. / MathWrapper.PI;
   public static final double RHO_SEMI_CIRCLE = 1. / MathWrapper.PI;
+
+  private static final double OMEGA = 0.0000001;
 
   private final double value;
 
@@ -105,29 +111,59 @@ public final class Angle {
     return Double.isNaN(this.value) || Double.isInfinite(this.value);
   }
 
+  public boolean isFullCircle() {
+    return Math.abs(this.value) > TWO_PI
+        || (Math.abs(this.value) > OMEGA && moduloPositive(OMEGA) < OMEGA);
+  }
+
+  public Angle divide(double divider) {
+    if (isUndefined() || Double.isNaN(divider)) {
+      return Angle.radian(Double.NaN);
+    }
+    return Angle.radian(value / divider);
+  }
+
+  public Angle multiply(double factor) {
+    if (isUndefined() || Double.isNaN(factor)) {
+      return Angle.radian(Double.NaN);
+    }
+    return Angle.radian(value * factor);
+  }
+
   public Angle add(final Angle angle) {
     if (isUndefined() || angle.isUndefined()) {
       return Angle.radian(Double.NaN);
     }
-    return Angle.radian(nonNegativ(radian()) + angle.nonNegativ().radian());
+    return Angle.radian(moduloPositive(radian()) + angle.moduloPositive().radian());
   }
 
   public Angle subtract(final Angle angle) {
     if (isUndefined() || angle.isUndefined()) {
       return Angle.radian(Double.NaN);
     }
-    return Angle.radian(nonNegativ(radian()) - angle.nonNegativ().radian());
+    return Angle.radian(moduloPositive(radian()) - angle.moduloPositive().radian());
   }
 
-  public Angle nonNegativ() {
+  public Angle moduloPositive() {
     if (isUndefined()) {
       return this;
     }
-    return Angle.radian(nonNegativ(radian()));
+    return Angle.radian(moduloPositive(radian()));
   }
 
-  private static double nonNegativ(final double radian) {
-    return radian > 0 ? radian : ((radian % TWO_PI) + TWO_PI) % TWO_PI;
+  private static double moduloPositive(final double radian) {
+    return radian > 0 ? radian % TWO_PI : (radian % TWO_PI) + TWO_PI;
+  }
+
+  public Angle moduloNegativ() {
+    if (isUndefined()) {
+      return this;
+    }
+    return Angle.radian(moduloNegativ(radian()));
+  }
+  
+  private static double moduloNegativ(final double radian) {
+    return radian < 0 ? radian % TWO_PI : (radian % TWO_PI) - TWO_PI;
   }
 
   public static double sin(final Angle value) {
@@ -140,5 +176,12 @@ public final class Angle {
 
   public static double tan(final Angle value) {
     return MathWrapper.tan(value.radian());
+  }
+
+  public Angle modulo() {
+    if (isUndefined()) {
+      return Angle.radian(Double.NaN);
+    }
+    return Angle.radian(value % TWO_PI);
   }
 }

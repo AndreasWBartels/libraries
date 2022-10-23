@@ -23,10 +23,14 @@ package net.anwiba.commons.image.awt;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
+import java.util.List;
+
+import net.anwiba.commons.image.ImageUtilities;
 
 public class BufferedImageMetadataFactory {
 
   public BufferedImageMetadata create(final BufferedImage image) {
+    boolean isIndexed = image.getColorModel() instanceof IndexColorModel;
     final BufferedImageMetadata metadata = new BufferedImageMetadata(
         image.getWidth(),
         image.getHeight(),
@@ -35,7 +39,10 @@ public class BufferedImageMetadataFactory {
         image.getColorModel().getColorSpace().getType(),
         image.getColorModel().getTransferType(),
         image.getColorModel().getTransparency(),
-        image.getColorModel() instanceof IndexColorModel);
+        isIndexed,
+        isIndexed
+            ? ImageUtilities.getColors((IndexColorModel) image.getColorModel()) 
+            : List.of());
     return metadata;
   }
 }

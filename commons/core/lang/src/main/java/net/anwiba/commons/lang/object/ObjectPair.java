@@ -49,17 +49,20 @@ public class ObjectPair<F, S> implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(firstObject, secondObject);
+    return Objects.hash(this.firstObject, this.secondObject);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
+  public boolean equals(final Object obj) {
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     ObjectPair other = (ObjectPair) obj;
     return Objects.equals(this.firstObject, other.firstObject) && Objects.equals(this.secondObject, other.secondObject);
   }

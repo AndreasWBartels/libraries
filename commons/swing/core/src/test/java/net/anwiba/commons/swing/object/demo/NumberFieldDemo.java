@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 import org.junit.jupiter.api.Test;
 
 import net.anwiba.commons.swing.object.IObjectField;
-import net.anwiba.commons.swing.object.NumberField;
+import net.anwiba.commons.swing.object.numeric.NumberField;
 
 public class NumberFieldDemo extends AbstractObjectFieldDemo {
 

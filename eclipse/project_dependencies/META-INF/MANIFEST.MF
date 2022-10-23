@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Automatic-Module-Name: net.anwiba.eclipse.project.dependencies
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.1.158
+Bundle-Version: 1.2.50
 Bundle-Name: Dependencies
 Bundle-SymbolicName: net.anwiba.eclipse.project.dependencies;singleton:=true
 Bundle-Activator: net.anwiba.eclipse.project.dependency.plugin.DependenciesPlugin
@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.databinding,
  net.anwiba.eclipse.commons,
  net.anwiba.eclipse.libraries
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Import-Package: 
  org.eclipse.core.databinding.observable.list,

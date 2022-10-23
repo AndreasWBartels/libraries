@@ -21,13 +21,28 @@
  */
 package net.anwiba.commons.http;
 
+import java.util.Objects;
+
 public final class Authentication implements IAuthentication {
+  
+  public enum Mode{
+    LAZY,
+    PREEMPTIVE,
+    FORCED
+  }
+  
   private final String userName;
   private final String password;
+  private final Mode mode;
 
   public Authentication(String userName, String password) {
+    this(userName, password, Mode.LAZY);
+  }
+
+  public Authentication(String userName, String password, Mode mode) {
     this.userName = userName;
     this.password = password;
+    this.mode = mode;
   }
 
   @Override
@@ -39,4 +54,24 @@ public final class Authentication implements IAuthentication {
   public String getPassword() {
     return this.password;
   }
-} 
+
+  @Override
+  public boolean isLazy() {
+    return Objects.equals(Mode.LAZY, mode);
+  }
+  
+  @Override
+  public boolean isPreemptive() {
+    return Objects.equals(Mode.PREEMPTIVE, mode);
+  }
+
+  @Override
+  public boolean isForces() {
+    return Objects.equals(Mode.FORCED, mode);
+  }
+
+  @Override
+  public String toString() {
+    return this.userName + ";" + password;
+  }
+}

@@ -51,14 +51,14 @@ import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.parser.UrlParser;
 import net.anwiba.commons.reference.utilities.FileUtilities;
 import net.anwiba.commons.reference.utilities.IFileExtensions;
 import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.reference.utilities.UriUtilities;
 import net.anwiba.commons.reference.utilities.UrlToUriConverter;
 import net.anwiba.commons.utilities.ArrayUtilities;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
 
 public class ClassLoaderUtilities {
 

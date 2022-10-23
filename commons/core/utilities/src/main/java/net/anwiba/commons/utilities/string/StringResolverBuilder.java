@@ -23,19 +23,35 @@
 package net.anwiba.commons.utilities.string;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 
 import net.anwiba.commons.ensure.Ensure;
+import net.anwiba.commons.lang.functional.ConversionException;
+import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.utilities.provider.INamedValueProvider;
+import net.anwiba.commons.utilities.regex.tokenizer.RegExpUtilities;
 
 public class StringResolverBuilder {
 
-  final private HashMap<String, String> map = new HashMap<>();
+  final private HashMap<String, String> map = new LinkedHashMap<>();
   private IStringAppender errorHandler = new StringAppender();
   private Pattern pattern = IStringResolver.PLACEHOLDER_PATTERN;
+  private Pattern converterPattern = null;
 
   public StringResolverBuilder errorHandler(@SuppressWarnings("hiding") final IStringAppender errorHandler) {
     this.errorHandler = errorHandler;
+    return this;
+  }
+
+  @SuppressWarnings("hiding")
+  public StringResolverBuilder converterPattern(final String converterPattern) {
+    return converterPattern(Pattern.compile(converterPattern));
+  }
+
+  @SuppressWarnings("hiding")
+  public StringResolverBuilder converterPattern(final Pattern converterPattern) {
+    this.converterPattern = converterPattern;
     return this;
   }
 
@@ -62,18 +78,24 @@ public class StringResolverBuilder {
   }
 
   public IStringResolver build() {
-    return new StringResolver(this.errorHandler, new INamedValueProvider<String, RuntimeException>() {
+    final IConverter<String, String, ConversionException> valueConverter =
+        this.converterPattern == null
+            ? value -> value
+            : value -> RegExpUtilities.replace(this.converterPattern, value, this.map.keySet());
+    return new StringResolver(this.errorHandler,
+        valueConverter,
+        new INamedValueProvider<String, RuntimeException>() {
 
-      @Override
-      public String getValue(final String name) throws RuntimeException {
-        return StringResolverBuilder.this.map.get(name);
-      }
+          @Override
+          public String getValue(final String name) throws RuntimeException {
+            return StringResolverBuilder.this.map.get(name);
+          }
 
-      @Override
-      public Iterable<String> getNames() {
-        return StringResolverBuilder.this.map.keySet();
-      }
-    }, this.pattern);
+          @Override
+          public Iterable<String> getNames() {
+            return StringResolverBuilder.this.map.keySet();
+          }
+        },
+        this.pattern);
   }
-
 }

@@ -27,6 +27,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import net.anwiba.commons.swing.tree.ReloadableFolderTreeNode;
+
 public class JTreeUtilities {
 
   public static void expandAll(final JTree tree, final DefaultMutableTreeNode node) {
@@ -34,6 +36,9 @@ public class JTreeUtilities {
   }
 
   static void internalExpandAll(final JTree tree, final DefaultMutableTreeNode node) {
+    if (node instanceof ReloadableFolderTreeNode reloadableNode && !reloadableNode.isInitialized()) {
+      return;
+    }
     tree.expandPath(new TreePath(node.getPath()));
     for (int i = 0; i < node.getChildCount(); ++i) {
       internalExpandAll(tree, (DefaultMutableTreeNode) node.getChildAt(i));
@@ -48,6 +53,12 @@ public class JTreeUtilities {
     synchronized (tree) {
       int row = 0;
       while (row < tree.getRowCount()) {
+        TreePath path = tree.getPathForRow(row);
+        if (path.getLastPathComponent() instanceof ReloadableFolderTreeNode node
+            && !node.isInitialized()) {
+          row++;
+          continue;
+        };
         tree.expandRow(row);
         row++;
       }

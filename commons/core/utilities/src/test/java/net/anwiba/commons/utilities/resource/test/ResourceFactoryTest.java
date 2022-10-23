@@ -38,7 +38,7 @@ import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.PathResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
 import net.anwiba.commons.reference.ResourceReferenceUtilities;
-import net.anwiba.commons.reference.UrlResourceReference;
+import net.anwiba.commons.reference.URLResourceReference;
 import net.anwiba.commons.reference.utilities.IoUtilities;
 import net.anwiba.commons.utilities.OperationSystemUtilities;
 
@@ -66,7 +66,7 @@ public class ResourceFactoryTest {
   public void UncUrlResource() throws Exception {
     final IResourceReference resourceReference = this.factory.create("file://dumpsrv/export/Betroffeneflaeche.shp");
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UrlResourceReference.class));
+    assertThat(resourceReference, instanceOf(URLResourceReference.class));
     assertThat(resourceReference.toString(), equalTo("file://dumpsrv/export/Betroffeneflaeche.shp"));
     if (OperationSystemUtilities.isUnix()) {
       return;
@@ -82,7 +82,7 @@ public class ResourceFactoryTest {
       return;
     }
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UrlResourceReference.class));
+    assertThat(resourceReference, instanceOf(URLResourceReference.class));
     assertThat(resourceReference.toString(), equalTo("file://dumpsrv/export/Betroffeneflaeche.shp"));
     // assertConnection(resource);
   }
@@ -96,7 +96,7 @@ public class ResourceFactoryTest {
       return;
     }
     assertThat(resourceReference, notNullValue());
-    assertThat(resourceReference, instanceOf(UrlResourceReference.class));
+    assertThat(resourceReference, instanceOf(URLResourceReference.class));
     assertThat(resourceReference.toString(), equalTo("file://dumpsrv/export/Betroffeneflaeche.shp"));
     // assertConnection(resource);
   }

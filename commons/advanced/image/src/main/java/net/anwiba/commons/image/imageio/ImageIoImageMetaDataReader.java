@@ -25,6 +25,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -34,12 +35,13 @@ import javax.imageio.stream.ImageInputStream;
 import net.anwiba.commons.image.IImageMetaDataReader;
 import net.anwiba.commons.image.IImageMetadata;
 import net.anwiba.commons.image.ImageMetadata;
+import net.anwiba.commons.image.ImageUtilities;
 import net.anwiba.commons.image.InvalidImageMetadata;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.message.MessageBuilder;
+import net.anwiba.commons.message.Message;
 
 public class ImageIoImageMetaDataReader implements IImageMetaDataReader {
 
@@ -57,8 +59,7 @@ public class ImageIoImageMetaDataReader implements IImageMetaDataReader {
       logger.log(ILevel.WARNING, "missing reader");
       final IOException exception = new IOException("missing reader");
       logger.log(ILevel.DEBUG, "missing reader", exception);
-      return new InvalidImageMetadata(
-          new MessageBuilder().setError().setText(exception.getMessage()).setThrowable(exception).build());
+      return new InvalidImageMetadata(Message.error(exception.getMessage()).throwable(exception).build());
     }
     ImageReader imageReader = null;
     try {
@@ -72,6 +73,7 @@ public class ImageIoImageMetaDataReader implements IImageMetaDataReader {
       final ColorModel colorModel = imageType.getColorModel();
       int numColorComponents = colorModel.getNumColorComponents();
       int numBands = colorModel.getNumComponents();
+      boolean isIndexed = colorModel instanceof IndexColorModel;
       final ImageMetadata metadata = new ImageMetadata(
           width,
           height,
@@ -80,7 +82,10 @@ public class ImageIoImageMetaDataReader implements IImageMetaDataReader {
           colorModel.getColorSpace().getType(),
           colorModel.getTransferType(),
           colorModel.getTransparency(),
-          colorModel instanceof IndexColorModel);
+          isIndexed,
+          isIndexed
+              ? ImageUtilities.getColors((IndexColorModel) colorModel)
+              : List.of());
       return metadata;
     } finally {
       imageReader.setInput(null);

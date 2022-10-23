@@ -3,13 +3,15 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>anwiba-commons-preferences</artifactId>
+  <name>commons preferences</name>
   <description>anwiba commons preferences project</description>
+
+  <artifactId>anwiba-commons-preferences</artifactId>
 
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>commons-advanced</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
 
   <scm>

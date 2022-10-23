@@ -35,12 +35,14 @@ public interface IColumnMetaData {
 
   public String getTypeName();
 
-  public int getLength();
+  public long getLength();
 
   public int getScale();
 
   public boolean isKey();
 
   public boolean isNullable();
+
+  boolean isAutoIncrement();
 
 }

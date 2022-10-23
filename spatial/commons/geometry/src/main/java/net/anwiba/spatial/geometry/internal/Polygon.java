@@ -25,6 +25,7 @@ package net.anwiba.spatial.geometry.internal;
 import java.util.Arrays;
 import java.util.Objects;
 
+import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.spatial.coordinate.CoordinateSequenceUtilities;
 import net.anwiba.spatial.coordinate.ICoordinateSequence;
 import net.anwiba.spatial.coordinatereferencesystem.ICoordinateReferenceSystem;
@@ -89,6 +90,15 @@ public class Polygon extends AbstractGeometry implements IPolygon {
   @Override
   public Iterable<ILinearRing> getInnerRings() {
     return Arrays.asList(this.innerRings);
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "(" + this.outerRing.toString() +
+        (innerRings == null || innerRings.length == 0
+            ? ""
+            : ", (" + String.join(",", Streams.of(innerRings).convert(i -> i.toString())) + ")")
+        + ")";
   }
 
   @Override

@@ -23,6 +23,8 @@ package net.anwiba.commons.utilities.string;
 
 import java.util.regex.Pattern;
 
+import net.anwiba.commons.lang.functional.ConversionException;
+import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.utilities.provider.INamedValueProvider;
 
 public class StringResolver extends AbstractStringResolver {
@@ -35,6 +37,14 @@ public class StringResolver extends AbstractStringResolver {
     final IStringAppender errorHandler,
     final INamedValueProvider<String, RuntimeException> provider,
     final Pattern pattern) {
-    super(errorHandler, pattern, provider);
+    this(errorHandler, value -> value, provider, pattern);
+  }
+
+  public StringResolver(
+      final IStringAppender errorHandler,
+      final IConverter<String, String, ConversionException> valueConverter,
+      final INamedValueProvider<String, RuntimeException> provider,
+      final Pattern pattern) {
+    super(errorHandler, valueConverter, pattern, provider);
   }
 }

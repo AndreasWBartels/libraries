@@ -21,13 +21,17 @@
  */
 package net.anwiba.commons.jdbc.constraint;
 
+import java.util.Objects;
+
 public enum ConstraintType {
-  CHECK('C'), FOREIGN_KEY('F'), PRIMARY_KEY('P'), UNIQUE('U'), NONE('N');
+  CHECK('C'), FOREIGN_KEY('F'), PRIMARY_KEY('P', "PK"), UNIQUE('U'), NONE('N');
 
   private final char id;
+  private String[] shortNames;
 
-  private ConstraintType(final char id) {
+  private ConstraintType(final char id, String... shortNames) {
     this.id = id;
+    this.shortNames = shortNames;
   }
 
   public static ConstraintType getTypeById(final char id) {
@@ -41,9 +45,19 @@ public enum ConstraintType {
   }
 
   public static ConstraintType getTypeById(final String string) {
-    if (string == null || string.length() != 1) {
+    if (string == null) {
       return ConstraintType.NONE;
     }
-    return getTypeById(string.charAt(0));
+    if (string.length() == 1) {
+      return getTypeById(string.charAt(0));
+    }
+    for (ConstraintType type : values()) {
+      for (String shortName : type.shortNames) {
+        if (Objects.equals(shortName, string.toUpperCase())) {
+          return type;
+        }
+      }
+    }
+    return ConstraintType.NONE;
   }
 }

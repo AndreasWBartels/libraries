@@ -21,16 +21,16 @@
  */
 package net.anwiba.commons.swing.action;
 
-import java.lang.reflect.InvocationTargetException;
-
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
+import java.lang.reflect.InvocationTargetException;
+
 @FunctionalInterface
 public interface IActionTask<I, O> {
 
-  O excecute(IMessageCollector monitor, ICanceler canceler, I value)
+  O execute(IMessageCollector monitor, ICanceler canceler, I value)
       throws InvocationTargetException,
       CanceledException;
 

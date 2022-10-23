@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -50,7 +50,7 @@ import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.message.IMessageCollector;
-import net.anwiba.commons.message.MessageBuilder;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public class ApacheImageContainer extends AbstractImageContainer implements IImageContainer {
@@ -59,7 +59,8 @@ public class ApacheImageContainer extends AbstractImageContainer implements IIma
 
   public ApacheImageContainer(final RenderingHints hints,
       final ApacheImageMetadata imageMetadata,
-      final IByteSourceConnector byteSourceConnector,final IImageMetadataAdjustor metadataAdjustor) {
+      final IByteSourceConnector byteSourceConnector,
+      final IImageMetadataAdjustor metadataAdjustor) {
     this(hints, imageMetadata, new ObjectList<IImageOperation>(), byteSourceConnector, metadataAdjustor);
   }
 
@@ -74,8 +75,15 @@ public class ApacheImageContainer extends AbstractImageContainer implements IIma
 
   @Override
   protected IImageContainer
-      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations,final IImageMetadataAdjustor metadataAdjustor) {
-    return new ApacheImageContainer(hints, (ApacheImageMetadata) metadata, operations, this.byteSourceConnector, metadataAdjustor);
+      adapt(final RenderingHints hints,
+          final IImageMetadata metadata,
+          final IObjectList<IImageOperation> operations,
+          final IImageMetadataAdjustor metadataAdjustor) {
+    return new ApacheImageContainer(hints,
+        (ApacheImageMetadata) metadata,
+        operations,
+        this.byteSourceConnector,
+        metadataAdjustor);
   }
 
   @Override
@@ -112,20 +120,13 @@ public class ApacheImageContainer extends AbstractImageContainer implements IIma
     IOptional<ImageParser, RuntimeException> imageParser = getImageParser(byteSource);
     if (imageParser.isEmpty()) {
       return new InvalidImageMetadata(
-          new MessageBuilder()
-              .setText("Unsupported image format")
-              .setThrowable(new UnsupportedOperationException("Unsupported image format"))
-              .setError()
+          Message.error("Unsupported image format")
+              .throwable(new UnsupportedOperationException("Unsupported image format"))
               .build());
     }
     try {
       final ImageParser parser = imageParser.get();
       ImageInfo imageInfo = parser.getImageInfo(byteSource);
-      imageInfo.getBitsPerPixel();
-      imageInfo.getColorType();
-      imageInfo.isProgressive();
-      imageInfo.isTransparent();
-
       return new ApacheImageMetadata(
           imageInfo.getWidth(),
           imageInfo.getHeight(),
@@ -137,58 +138,35 @@ public class ApacheImageContainer extends AbstractImageContainer implements IIma
           false);
     } catch (ImageReadException | IOException | RuntimeException exception) {
       return new InvalidImageMetadata(
-          new MessageBuilder()
-              .setText(exception.getMessage())
-              .setThrowable(exception)
-              .setError()
-              .build());
+          Message.error(exception).build());
     }
   }
 
   private int guessNumberOfComponents(final ImageInfo imageInfo) {
-    ColorType colorType = imageInfo.getColorType();
+    final ColorType colorType = imageInfo.getColorType();
     return Set.of(colorType.BW, colorType.GRAYSCALE).contains(colorType)
         ? 1
         : 3;
   }
 
   private int guessNumberOfBands(final ImageInfo imageInfo) {
-    return guessNumberOfComponents(imageInfo) + 
+    return guessNumberOfComponents(imageInfo) +
         (imageInfo.isTransparent() ? 1 : 0);
   }
 
   private int guessColorSpaceType(final ImageInfo imageInfo) {
-    ColorType colorType = imageInfo.getColorType();
-    switch (colorType) {
-      case BW: {
-        return ColorSpace.TYPE_GRAY;
-      }
-      case CMYK: {
-        return ColorSpace.TYPE_CMYK;
-      }
-      case GRAYSCALE: {
-        return ColorSpace.TYPE_GRAY;
-      }
-      case RGB: {
-        return ColorSpace.TYPE_RGB;
-      }
-      case OTHER: {
-        return ColorSpace.TYPE_RGB;
-      }
-      case UNKNOWN: {
-        return ColorSpace.TYPE_RGB;
-      }
-      case YCC: {
-        return ColorSpace.TYPE_YCbCr;
-      }
-      case YCCK: {
-        return ColorSpace.TYPE_YCbCr;
-      }
-      case YCbCr: {
-        return ColorSpace.TYPE_YCbCr;
-      }
-    }
-    return ColorSpace.TYPE_RGB;
+    final ColorType colorType = imageInfo.getColorType();
+    return switch (colorType) {
+      case BW -> ColorSpace.TYPE_GRAY;
+      case CMYK -> ColorSpace.TYPE_CMYK;
+      case GRAYSCALE -> ColorSpace.TYPE_GRAY;
+      case RGB -> ColorSpace.TYPE_RGB;
+      case YCC -> ColorSpace.TYPE_YCbCr;
+      case YCCK -> ColorSpace.TYPE_YCbCr;
+      case YCbCr -> ColorSpace.TYPE_YCbCr;
+      case OTHER -> ColorSpace.TYPE_RGB;
+      case UNKNOWN -> ColorSpace.TYPE_RGB;
+    };
   }
 
   private int guessTransparency(final ImageInfo imageInfo) {

@@ -21,14 +21,55 @@
  */
 package net.anwiba.commons.utilities.io;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.Objects;
-
 import net.anwiba.commons.lang.functional.IClosableIterator;
 import net.anwiba.commons.lang.functional.IConsumer;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
 public interface IClosableIoIterator<T> extends Closeable, IClosableIterator<T, IOException> {
+
+  static <T> IClosableIoIterator<T> empty() {
+    return new IClosableIoIterator<>() {
+      @Override
+      public void close() throws IOException {
+        // nothing to do
+      }
+
+      @Override
+      public T next() throws IOException {
+        throw new NoSuchElementException();
+      }
+
+      @Override
+      public boolean hasNext() throws IOException {
+        return false;
+      }
+    };
+  }
+
+  static <T> IClosableIoIterator<T> of(final Iterator<T> iterator) {
+    return new IClosableIoIterator<T>() {
+
+      @Override
+      public boolean hasNext() throws IOException {
+        return iterator.hasNext();
+      }
+
+      @Override
+      public T next() throws IOException {
+        return iterator.next();
+      }
+
+      @Override
+      public void close() throws IOException {
+
+      }
+    };
+  }
 
   default void foreach(final IConsumer<? super T, IOException> action) throws IOException {
     Objects.requireNonNull(action);

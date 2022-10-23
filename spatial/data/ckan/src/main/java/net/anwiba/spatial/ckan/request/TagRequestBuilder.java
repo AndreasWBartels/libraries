@@ -21,8 +21,6 @@
  */
 package net.anwiba.spatial.ckan.request;
 
-import java.text.MessageFormat;
-
 import net.anwiba.commons.http.Authentication;
 import net.anwiba.commons.http.IAuthentication;
 import net.anwiba.commons.http.IRequest;
@@ -32,6 +30,8 @@ import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.spatial.ckan.utilities.CkanUtilities;
+
+import java.text.MessageFormat;
 
 public class TagRequestBuilder {
 
@@ -72,7 +72,7 @@ public class TagRequestBuilder {
     public IRequest build() throws CreationException {
       final RequestBuilder builder =
           RequestBuilder.get(MessageFormat.format(CkanUtilities.getBaseUrl(this.url, "tag_search"), this.url)); //$NON-NLS-1$
-      If.isTrue(this.allFields).excecute(() -> builder.query("all_fields", "True")); //$NON-NLS-1$ //$NON-NLS-2$
+      If.isTrue(this.allFields).execute(() -> builder.query("all_fields", "True")); //$NON-NLS-1$ //$NON-NLS-2$
       Optional.of(this.key).convert(k -> builder.header("X-CKAN-API-Key", k)); //$NON-NLS-1$
       Optional.of(this.authentication).consume(a -> builder.authentication(a.getUsername(), a.getPassword()));
       return builder.build();

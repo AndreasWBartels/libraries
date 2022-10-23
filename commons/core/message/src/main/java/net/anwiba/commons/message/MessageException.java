@@ -36,7 +36,7 @@ public class MessageException extends Exception {
   }
 
   public MessageException(final String message, final Throwable throwable, final MessageType type) {
-    this(new MessageBuilder().setText(message).setThrowable(throwable).setType(type).build());
+    this(Message.text(message).throwable(throwable).type(type).build());
   }
 
   public MessageType getMessageType() {

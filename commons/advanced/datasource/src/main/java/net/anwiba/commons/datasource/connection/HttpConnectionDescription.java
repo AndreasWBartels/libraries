@@ -29,24 +29,24 @@ import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.reference.url.IAuthentication;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.parser.UrlParser;
+import net.anwiba.commons.utilities.property.Properties;
 
-public class HttpConnectionDescription extends AbstractHttpConnectionDescription implements
-    IResourceReferenceConnectionDescription {
+public class HttpConnectionDescription extends AbstractHttpConnectionDescription {
 
   private static final long serialVersionUID = 1L;
 
   public HttpConnectionDescription(
-    final String host,
-    final int port,
-    final String path,
-    final String userName,
-    final String password,
-    final IParameters parameters,
-    final boolean sslEnabled) {
-    super(host, port, path, userName, password, parameters, sslEnabled);
+      final String host,
+      final int port,
+      final String path,
+      final String userName,
+      final String password,
+      final IParameters parameters,
+      final boolean sslEnabled) {
+    super(host, port, path, userName, password, parameters, sslEnabled, Properties.empty());
   }
 
   @Override

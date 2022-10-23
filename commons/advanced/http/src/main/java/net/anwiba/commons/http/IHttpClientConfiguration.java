@@ -23,6 +23,7 @@ package net.anwiba.commons.http;
 
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 
+import net.anwiba.commons.http.HttpClientConfigurationBuilder.ConfigMode;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
 
@@ -35,5 +36,11 @@ public interface IHttpClientConfiguration {
   default IOptional<IHttpProxyConfiguration, RuntimeException> getProxyConfiguration() {
     return Optional.empty();
   }
+
+  void close();
+
+  String getUserAgent();
+
+  ConfigMode getConfigMode();
 
 }

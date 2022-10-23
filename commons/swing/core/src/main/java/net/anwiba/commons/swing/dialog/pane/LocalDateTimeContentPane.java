@@ -21,6 +21,18 @@
  */
 package net.anwiba.commons.swing.dialog.pane;
 
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.message.Message;
+import net.anwiba.commons.model.IChangeableObjectListener;
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.model.ObjectModel;
+import net.anwiba.commons.swing.date.MonthView;
+import net.anwiba.commons.swing.dialog.DataState;
+import net.anwiba.commons.swing.object.IObjectField;
+import net.anwiba.commons.swing.object.numeric.IntegerFieldBuilder;
+import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
+import net.anwiba.commons.utilities.validation.IValidationResult;
+
 import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,18 +41,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
-import net.anwiba.commons.lang.optional.Optional;
-import net.anwiba.commons.message.MessageBuilder;
-import net.anwiba.commons.model.IChangeableObjectListener;
-import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.swing.date.MonthView;
-import net.anwiba.commons.swing.dialog.DataState;
-import net.anwiba.commons.swing.object.IObjectField;
-import net.anwiba.commons.swing.object.IntegerFieldBuilder;
-import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
-import net.anwiba.commons.utilities.validation.IValidationResult;
 
 public final class LocalDateTimeContentPane extends AbstractContentPane {
 
@@ -55,7 +55,7 @@ public final class LocalDateTimeContentPane extends AbstractContentPane {
     this.dateTimeModel = model;
     this.model = new ObjectModel<>(Optional.of(this.dateTimeModel.get()).getOr(() -> {
       getDataStateModel().set(DataState.MODIFIED);
-      LocalDateTime now = UserDateTimeUtilities.now();
+      LocalDateTime now = UserDateTimeUtilities.now().toLocalDateTime();
       return LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), now.getHour(), now.getMinute(), 0, 0);
     }));
   }
@@ -120,7 +120,7 @@ public final class LocalDateTimeContentPane extends AbstractContentPane {
       }
 
       private void set(final String string, final String message) {
-        getMessageModel().set(new MessageBuilder().setText(string + ", " + message).setError().build());
+        getMessageModel().set(Message.error(string + ", " + message).build());
         getDataStateModel().set(DataState.INVALIDE);
       }
     };

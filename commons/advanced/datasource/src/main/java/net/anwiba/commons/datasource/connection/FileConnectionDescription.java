@@ -28,7 +28,8 @@ import net.anwiba.commons.datasource.DataSourceType;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceUtilities;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.IAuthentication;
+import net.anwiba.commons.utilities.property.Properties;
 
 public class FileConnectionDescription extends AbstractConnectionDescription implements IFileConnectionDescription {
 
@@ -36,7 +37,7 @@ public class FileConnectionDescription extends AbstractConnectionDescription imp
   private final IResourceReference reference;
 
   public FileConnectionDescription(final IResourceReference reference) {
-    super(DataSourceType.FILE);
+    super(DataSourceType.FILE, Properties.empty());
     this.reference = reference;
   }
 

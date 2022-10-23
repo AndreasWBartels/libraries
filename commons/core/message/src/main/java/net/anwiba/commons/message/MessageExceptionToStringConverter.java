@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,21 +22,22 @@
 package net.anwiba.commons.message;
 
 import net.anwiba.commons.lang.exception.IThrowableToStringConverter;
+import net.anwiba.commons.lang.exception.ThrowableConverterResult;
 
 final public class MessageExceptionToStringConverter implements
     IThrowableToStringConverter {
 
   @Override
-  public String toString(final Throwable throwable) {
-    return getMessage(throwable).getText();
+  public boolean isApplicable(final Throwable throwable) {
+    return throwable instanceof MessageException;
+  }
+
+  @Override
+  public ThrowableConverterResult convert(final Throwable throwable) {
+    return ThrowableConverterResult.of(getMessage(throwable).getText());
   }
 
   private IMessage getMessage(final Throwable throwable) {
     return ((MessageException) throwable).getMessageObject();
-  }
-
-  @Override
-  public boolean isApplicable(final Throwable throwable) {
-    return throwable instanceof MessageException;
   }
 }

@@ -27,7 +27,7 @@ import net.anwiba.commons.thread.cancel.ICanceler;
 
 public interface IJob {
 
-  void excecute(IMessageCollector monitor, ICanceler canceler) throws ExcecutionFaildException, CanceledException;
+  void execute(IMessageCollector monitor, ICanceler canceler) throws ExcecutionFaildException, CanceledException;
 
   String getTitle();
 

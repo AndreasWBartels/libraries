@@ -23,6 +23,11 @@ package net.anwiba.tools.generator.java.bean.factory;
 
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.isInstanceOfMap;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+
 import java.util.List;
 
 import com.sun.codemodel.JBlock;
@@ -33,14 +38,12 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.lang.optional.IOptional;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-
 public class GetterFactory extends AbstractSourceFactory {
 
-  public GetterFactory(final JCodeModel codeModel) {
-    super(codeModel);
+  public GetterFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    super(codeModel, annotationClassfactory);
   }
 
   public void create(

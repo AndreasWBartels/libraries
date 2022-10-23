@@ -25,6 +25,7 @@ package net.anwiba.spatial.geometry.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anwiba.commons.lang.stream.Streams;
 import net.anwiba.spatial.coordinate.CoordinateSequenceUtilities;
 import net.anwiba.spatial.coordinate.ICoordinateSequence;
 import net.anwiba.spatial.coordinatereferencesystem.ICoordinateReferenceSystem;
@@ -90,5 +91,10 @@ public abstract class AbstractGeometryCollection<T extends IBaseGeometry> extend
   @Override
   public int getNumberOfGeometries() {
     return this.geometries.size();
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "((" + String.join(",", Streams.of(geometries()).convert(i -> i.toString()))  +")";
   }
 }

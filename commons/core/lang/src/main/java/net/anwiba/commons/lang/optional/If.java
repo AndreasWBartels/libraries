@@ -45,12 +45,12 @@ public class If implements IIf {
   }
 
   @Override
-  public <O> IOptional<O, RuntimeException> excecute(final ISupplier<O, RuntimeException> supplier) {
-    return excecute(RuntimeException.class, supplier);
+  public <O> IOptional<O, RuntimeException> execute(final ISupplier<O, RuntimeException> supplier) {
+    return execute(RuntimeException.class, supplier);
   }
 
   @Override
-  public <O, E extends Exception> IOptional<O, E> excecute(
+  public <O, E extends Exception> IOptional<O, E> execute(
       final Class<E> exceptionClass,
       final ISupplier<O, E> supplier)
       throws E {
@@ -61,7 +61,7 @@ public class If implements IIf {
   }
 
   @Override
-  public <E extends Exception> IIf excecute(final IBlock<E> block) throws E {
+  public <E extends Exception> IIf execute(final IBlock<E> block) throws E {
     if (this.value) {
       block.execute();
     }

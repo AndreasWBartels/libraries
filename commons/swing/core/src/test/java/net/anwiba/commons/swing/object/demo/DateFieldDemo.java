@@ -29,8 +29,8 @@ import javax.swing.JPanel;
 
 import org.junit.jupiter.api.Test;
 
-import net.anwiba.commons.swing.object.DateField;
 import net.anwiba.commons.swing.object.IObjectField;
+import net.anwiba.commons.swing.object.temporal.DateField;
 
 public class DateFieldDemo extends AbstractObjectFieldDemo {
 

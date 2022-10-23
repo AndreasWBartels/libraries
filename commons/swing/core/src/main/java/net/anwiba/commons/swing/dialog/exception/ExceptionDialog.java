@@ -42,11 +42,9 @@ public class ExceptionDialog extends MessageDialog {
 
   public ExceptionDialog(final Window owner, final Throwable throwable) {
     this(owner,
-        Message.builder()
-            .setText(throwable.getClass().getSimpleName())
-            .setDescription(throwable.getMessage())
-            .setThrowable(throwable)
-            .setError()
+        Message.error(throwable.getClass().getSimpleName())
+            .description(throwable.getMessage())
+            .throwable(throwable)
             .build());
   }
 

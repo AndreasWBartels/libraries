@@ -440,7 +440,7 @@ public abstract class AbstractObjectTextField<T> implements IObjectTextField<T> 
     return this.model;
   }
 
-  public void setHorizontalAlignment(final int alignment) {
+  protected void setHorizontalAlignment(final int alignment) {
     this.textField.setHorizontalAlignment(alignment);
   }
 

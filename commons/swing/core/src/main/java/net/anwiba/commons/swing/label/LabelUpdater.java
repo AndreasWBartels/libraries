@@ -44,12 +44,7 @@ public final class LabelUpdater<T> implements IChangeableObjectListener {
   @Override
   public void objectChanged() {
     final T value = this.model.get();
-    GuiUtilities.invokeLater(new Runnable() {
-
-      @Override
-      public void run() {
-        LabelUpdater.this.label.setText(LabelUpdater.this.converter.toString(value));
-      }
-    });
+    System.out.println(this.converter.toString(value));
+    GuiUtilities.invokeLater(() -> this.label.setText(this.converter.toString(value)));
   }
 }

@@ -14,12 +14,8 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
-
-  <properties>
-    <net.anwiba.commons.version>1.1.158</net.anwiba.commons.version>
-  </properties>
 
   <scm>
     <connection>${scm.url.net.anwiba.base}/libraries.git</connection>

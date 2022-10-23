@@ -21,16 +21,25 @@
  */
 package net.anwiba.commons.http;
 
+import net.anwiba.commons.http.apache.HttpContextFactory;
+import net.anwiba.commons.http.apache.RequestToHttpUriRequestConverter;
+
 public class HttpRequestExecutorFactory implements IHttpRequestExecutorFactory {
 
-  private final IHttpClientConfiguration configuration;
+  private final IHttpClientConfigurationFactory configurationFactory;
 
-  HttpRequestExecutorFactory(final IHttpClientConfiguration configuration) {
-    this.configuration = configuration;
+  HttpRequestExecutorFactory(final IHttpClientConfigurationFactory configurationFactory) {
+    this.configurationFactory = configurationFactory;
   }
 
   @Override
   public IHttpRequestExecutor create() {
-    return new HttpRequestExecutor(this.configuration.getMode(), new HttpClientFactory(this.configuration));
+    final IHttpClientConfiguration configuration = configurationFactory.create();
+    return new HttpRequestExecutor(
+        new HttpClientFactory(),
+        new HttpContextFactory(),
+        new RequestToHttpUriRequestConverter(configuration.getMode()),
+        configuration
+        );
   }
 }

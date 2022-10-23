@@ -27,4 +27,10 @@ public interface IAuthentication {
 
   String getUsername();
 
+  boolean isPreemptive();
+
+  boolean isForces();
+
+  boolean isLazy();
+
 }

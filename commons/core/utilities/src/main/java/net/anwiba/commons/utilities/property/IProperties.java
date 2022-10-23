@@ -25,19 +25,15 @@ import java.io.Serializable;
 
 public interface IProperties extends Serializable {
 
-  int getNumberOfProperties();
-
-  IProperty getProperty(int index);
-  
   String getValue(String name);
 
   Iterable<IProperty> properties();
 
+  boolean isEmpty();
+
   boolean contains(String name);
-  
+
   Iterable<String> getNames();
-  
-  IProperties adapt(int rowIndex, IProperty parameter);
 
   String getValueOrDefault(String string, String value);
 

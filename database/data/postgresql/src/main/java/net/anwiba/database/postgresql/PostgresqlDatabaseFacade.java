@@ -21,29 +21,16 @@
  */
 package net.anwiba.database.postgresql;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
 import net.anwiba.commons.jdbc.DatabaseUtilities;
 import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
 import net.anwiba.commons.jdbc.database.DatabaseFacade;
-import net.anwiba.commons.jdbc.database.IRegistrableDatabaseFacade;
+import net.anwiba.commons.jdbc.database.IRegisterableDatabaseFacade;
 import net.anwiba.commons.jdbc.name.DatabaseConstraintName;
 import net.anwiba.commons.jdbc.name.DatabaseIndexName;
-import net.anwiba.commons.jdbc.name.DatabaseSequenceName;
 import net.anwiba.commons.jdbc.name.DatabaseTriggerName;
 import net.anwiba.commons.jdbc.name.IDatabaseConstraintName;
 import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
+import net.anwiba.commons.jdbc.name.IDatabaseSchemaName;
 import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
 import net.anwiba.commons.jdbc.name.IDatabaseTableName;
 import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
@@ -52,25 +39,23 @@ import net.anwiba.commons.jdbc.software.ServiceDatabaseSoftware;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IProcedure;
 import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.utilities.time.TimeZoneUtilities;
 import net.anwiba.database.postgresql.utilities.PostgresqlUtilities;
 
-public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistrableDatabaseFacade {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TimeZone;
+
+public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegisterableDatabaseFacade {
 
   public PostgresqlDatabaseFacade() {
-  }
-
-  @Override
-  public List<IDatabaseSequenceName> getSequences(final Connection connection, final String schema)
-      throws SQLException {
-    final List<IDatabaseSequenceName> names = new ArrayList<>();
-    try (ResultSet resultSet = connection.getMetaData().getTables(null, schema, null, new String[]{ "SEQUENCE" }); //$NON-NLS-1$
-    ) {
-      while (resultSet.next()) {
-        names.add(new DatabaseSequenceName(resultSet.getString(2), resultSet.getString(3)));
-      }
-    }
-    return names;
   }
 
   @Override
@@ -78,34 +63,40 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
     return true;
   }
 
-  @SuppressWarnings("nls")
+  // show timezone
+  // show all
+
   @Override
-  public List<String> getSchemaNames(final Connection connection, final String catalog) throws SQLException {
-    final Set<String> schemaNamesBlackList = new HashSet<>(Arrays.asList("pg_catalog", "information_schema"));
-    final DatabaseMetaData metaData = connection.getMetaData();
-    final LinkedList<String> result = new LinkedList<>();
-    try (final ResultSet resultSet = metaData.getSchemas()) {
-      while (resultSet.next()) {
-        final String schemaName = resultSet.getString(1);
-        if (schemaNamesBlackList.contains(schemaName)) {
-          continue;
-        }
-        result.add(schemaName);
-      }
-    }
-    return result;
+  public TimeZone getTimeZone(final ICanceler canceler, final Connection connection) throws SQLException {
+    return DatabaseUtilities.result(
+        canceler,
+        connection,
+        "show timezone",
+        (IConverter<IOptional<IResult, SQLException>, TimeZone, SQLException>) optional -> optional
+            .convert(v -> TimeZoneUtilities.get(v.getString(1)))
+            .get());
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public ResultSet getSequenceMetadata(final Connection connection, final IDatabaseSequenceName name)
+  public boolean isInformationSchema(final IDatabaseSchemaName schemaName) {
+    return schemaName != null
+        && schemaName.getSchemaName() != null
+        && Set.of("information_schema", "pg_catalog").contains(schemaName.getSchemaName());
+  }
+
+  @Override
+  public ResultSet getSequenceMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseSequenceName name)
       throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
-        "select * \n"
-            + "  from information_schema.sequences\n"
-            + " where sequence_schema = ?\n"
-            + "   and sequence_name = ?", //$NON-NLS-1$
+        """
+            select *
+              from information_schema.sequences
+             where sequence_schema = ?
+               and sequence_name = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, name.getSchemaName());
           value.setObject(2, name.getSequenceName());
@@ -117,21 +108,24 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
     return Objects.equals(ServiceDatabaseSoftware.POSTGRES.getDriverName(), context.getDriverName());
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public List<IDatabaseTriggerName> getTriggers(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseTriggerName> getTriggers(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
-        "select ns.nspname\n"
-            + "        , tg.tgname \n"
-            + "  from pg_trigger tg,\n"
-            + "          pg_class rc,\n"
-            + "          pg_namespace ns\n"
-            + "where rc.oid = tg.tgrelid\n"
-            + "   and ns.oid = rc.relnamespace\n"
-            + "   and ns.nspname = ?\n"
-            + "   and rc.relname = ?", //$NON-NLS-1$
+        """
+            select ns.nspname
+                    , tg.tgname
+              from pg_trigger tg,
+                      pg_class rc,
+                      pg_namespace ns
+            where rc.oid = tg.tgrelid
+               and ns.oid = rc.relnamespace
+               and ns.nspname = ?
+               and rc.relname = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, tableName.getSchemaName());
           value.setObject(2, tableName.getTableName());
@@ -141,38 +135,44 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
             value.getString(2)));
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public ResultSet getTriggerMetadata(final Connection connection, final IDatabaseTriggerName name)
+  public ResultSet getTriggerMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTriggerName name)
       throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
-        "select * \n"
-            + "  from information_schema.triggers\n"
-            + " where trigger_schema = ?\n"
-            + "   and trigger_name = ?", //$NON-NLS-1$
+        """
+            select *
+              from information_schema.triggers
+             where trigger_schema = ?
+               and trigger_name = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, name.getSchemaName());
           value.setObject(2, name.getTriggerName());
         });
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public String getTriggerStatement(final Connection connection, final IDatabaseTriggerName name) throws SQLException {
+  public String getTriggerStatement(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTriggerName name) throws SQLException {
     final String triggerFunction = DatabaseUtilities.result(
+        canceler,
         connection,
-        " select pr.proname\n"
-            + "         ,pr.prosrc \n"
-            + "   from pg_trigger tg\n"
-            + "         , pg_class rc\n"
-            + "         , pg_namespace ns\n"
-            + "         , pg_proc pr\n"
-            + " where pr.oid = tg.tgfoid\n"
-            + "    and rc.oid = tg.tgrelid\n"
-            + "    and ns.oid = rc.relnamespace\n"
-            + "    and ns.nspname = ?\n"
-            + "    and tg.tgname = ?", //$NON-NLS-1$
+        """
+            select pr.proname
+                    ,pr.prosrc
+              from pg_trigger tg
+                    , pg_class rc
+                    , pg_namespace ns
+                    , pg_proc pr
+            where pr.oid = tg.tgfoid
+               and rc.oid = tg.tgrelid
+               and ns.oid = rc.relnamespace
+               and ns.nspname = ?
+               and tg.tgname = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, name.getSchemaName());
           value.setObject(2, name.getTriggerName());
@@ -184,11 +184,13 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
         }).getOr(() -> ""));
 
     final List<String> events = DatabaseUtilities.results(
+        canceler,
         connection,
-        "select event_manipulation\n"
-            + "  from information_schema.triggers\n"
-            + " where trigger_schema = ?\n"
-            + "   and trigger_name = ?", //$NON-NLS-1$
+        """
+            select event_manipulation
+              from information_schema.triggers
+             where trigger_schema = ?
+               and trigger_name = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, name.getSchemaName());
           value.setObject(2, name.getTriggerName());
@@ -196,14 +198,16 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
         (IConverter<IResult, String, SQLException>) value -> value.getString(1));
 
     final String trigger = DatabaseUtilities.result(
+        canceler,
         connection,
-        "select distinct action_timing \n"
-            + "        , event_object_table\n"
-            + "        , action_orientation\n"
-            + "        , action_statement\n"
-            + "  from information_schema.triggers\n"
-            + " where trigger_schema = ?\n"
-            + "   and trigger_name = ?", //$NON-NLS-1$
+        """
+            select distinct action_timing
+                    , event_object_table
+                    , action_orientation
+                    , action_statement
+              from information_schema.triggers
+             where trigger_schema = ?
+               and trigger_name = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, name.getSchemaName());
           value.setObject(2, name.getTriggerName());
@@ -233,26 +237,29 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
     return true;
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public List<IDatabaseIndexName> getIndicies(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseIndexName> getIndicies(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
-        "select distinct s.nspname as schema,\n"
-            + "       i.relname as index\n"
-            + "  from pg_index ki,\n"
-            + "       pg_namespace s,\n"
-            + "       pg_class t,\n"
-            + "       pg_class i,\n"
-            + "       pg_attribute a\n"
-            + " where ki.indrelid = t.oid\n"
-            + "   and ki.indexrelid = i.oid\n"
-            + "   and s.oid = t.relnamespace\n"
-            + "   and t.oid = a.attrelid\n"
-            + "   and a.attnum = ANY (ki.indkey)\n"
-            + "   and s.nspname = ?\n"
-            + "   and t.relname = ?", //$NON-NLS-1$
+        """
+            select distinct s.nspname as schema,
+                   i.relname as index
+              from pg_index ki,
+                   pg_namespace s,
+                   pg_class t,
+                   pg_class i,
+                   pg_attribute a
+             where ki.indrelid = t.oid
+               and ki.indexrelid = i.oid
+               and s.oid = t.relnamespace
+               and t.oid = a.attrelid
+               and a.attnum = ANY (ki.indkey)
+               and s.nspname = ?
+               and t.relname = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, tableName.getSchemaName());
           value.setObject(2, tableName.getTableName());
@@ -262,27 +269,30 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
             value.getString(2)));
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public ResultSet getIndexMetadata(final Connection connection, final IDatabaseIndexName name) throws SQLException {
+  public ResultSet getIndexMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseIndexName name) throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
-        "select s.nspname as schema,\n"
-            + "       i.relname as index,\n"
-            + "       a.attname as column,\n"
-            + "       ki.*\n"
-            + "  from pg_index ki,\n"
-            + "       pg_namespace s,\n"
-            + "       pg_class t,\n"
-            + "       pg_class i,\n"
-            + "       pg_attribute a\n"
-            + " where ki.indrelid = t.oid\n"
-            + "   and ki.indexrelid = i.oid\n"
-            + "   and s.oid = t.relnamespace\n"
-            + "   and t.oid = a.attrelid\n"
-            + "   and a.attnum = ANY (ki.indkey)\n"
-            + "   and s.nspname = ?\n"
-            + "   and i.relname = ?",
+        """
+            select s.nspname as schema,
+                   i.relname as index,
+                   a.attname as column,
+                   ki.*
+              from pg_index ki,
+                   pg_namespace s,
+                   pg_class t,
+                   pg_class i,
+                   pg_attribute a
+             where ki.indrelid = t.oid
+               and ki.indexrelid = i.oid
+               and s.oid = t.relnamespace
+               and t.oid = a.attrelid
+               and a.attnum = ANY (ki.indkey)
+               and s.nspname = ?
+               and i.relname = ?""",
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, name.getSchemaName());
           value.setObject(2, name.getIndexName());
@@ -290,25 +300,23 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
   }
 
   @Override
-  public boolean supportsIndicies() {
-    return true;
-  }
-
-  @SuppressWarnings("nls")
-  @Override
-  public List<IDatabaseConstraintName> getConstraints(final Connection connection, final IDatabaseTableName tableName)
+  public List<IDatabaseConstraintName> getConstraints(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return DatabaseUtilities.results(
+        canceler,
         connection,
-        "select s.nspname,\n"
-            + "       c.conname\n"
-            + "  from pg_namespace s,\n"
-            + "       pg_class t,\n"
-            + "       pg_constraint c\n"
-            + " where s.nspname = ?\n"
-            + "   and s.oid = t.relnamespace\n"
-            + "   and t.relname = ?\n"
-            + "   and t.oid = c.conrelid",
+        """
+            select s.nspname,
+                   c.conname
+              from pg_namespace s,
+                   pg_class t,
+                   pg_constraint c
+             where s.nspname = ?
+               and s.oid = t.relnamespace
+               and t.relname = ?
+               and t.oid = c.conrelid""",
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, tableName.getSchemaName());
           value.setObject(2, tableName.getTableName());
@@ -318,16 +326,20 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
             value.getString(2)));
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public ResultSet getConstraintMetadata(final Connection connection, final IDatabaseConstraintName name)
+  public ResultSet getConstraintMetadata(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName table,
+      final IDatabaseConstraintName name)
       throws SQLException {
     return DatabaseUtilities.resultSet(
+        canceler,
         connection,
-        "select * \n"
-            + "  from information_schema.table_constraints\n"
-            + " where constraint_schema = ?\n"
-            + "   and constraint_name = ?", //$NON-NLS-1$
+        """
+            select *
+              from information_schema.table_constraints
+             where constraint_schema = ?
+               and constraint_name = ?""", //$NON-NLS-1$
         (IProcedure<PreparedStatement, SQLException>) value -> {
           value.setObject(1, name.getSchemaName());
           value.setObject(2, name.getConstraintName());
@@ -340,7 +352,9 @@ public class PostgresqlDatabaseFacade extends DatabaseFacade implements IRegistr
   }
 
   @Override
-  public String getTableStatement(final Connection connection, final IDatabaseTableName tableName)
+  public String getTableStatement(final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseTableName tableName)
       throws SQLException {
     return PostgresqlUtilities.createStatement(connection, tableName.getSchemaName(), tableName.getTableName());
   }

@@ -35,8 +35,9 @@ import net.anwiba.commons.ensure.Ensure;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.reference.url.IAuthentication;
 import net.anwiba.commons.reference.utilities.PathUtilities;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.utilities.property.Properties;
 
 public class FileSystemConnectionDescription extends AbstractConnectionDescription implements
     IFileSystemConnectionDescription {
@@ -65,7 +66,7 @@ public class FileSystemConnectionDescription extends AbstractConnectionDescripti
   }
 
   public FileSystemConnectionDescription(final Path root, final Path homePath) {
-    super(DataSourceType.FILESYSTEM);
+    super(DataSourceType.FILESYSTEM, Properties.empty());
     Ensure.ensureArgumentNotNull(root);
     Ensure.ensureArgumentNotNull(homePath);
     this.rootPath = root;

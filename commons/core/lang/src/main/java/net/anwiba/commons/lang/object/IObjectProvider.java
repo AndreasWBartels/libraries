@@ -36,4 +36,8 @@ public interface IObjectProvider<T> {
     return Optional.of(get());
   }
 
+  public default <E extends Exception> IOptional<T, E> optional(final Class<E> exceptionClass) {
+    return Optional.of(exceptionClass, get());
+  }
+
 }

@@ -21,6 +21,12 @@
  */
 package net.anwiba.commons.reference.utilities;
 
+import net.anwiba.commons.lang.exception.Throwables;
+import net.anwiba.commons.lang.functional.IBlock;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.logging.ILogger;
+import net.anwiba.commons.logging.Logging;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -35,13 +41,9 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-
-import net.anwiba.commons.lang.functional.IBlock;
-import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.Logging;
 
 public class IoUtilities {
 
@@ -136,39 +138,50 @@ public class IoUtilities {
     return writer.toString();
   }
 
-  public static void close(final Closeable closeable) {
-    if (closeable != null) {
-      try {
-        closeable.close();
-      } catch (final IOException exception) {
-        logger.log(ILevel.DEBUG, exception.getMessage(), exception);
-      }
-    }
-  }
-
-  public static void toss(final IOException exception) throws IOException {
-    if (exception != null) {
-      throw exception;
-    }
-  }
-
-  public static IOException close(final Closeable closeable, final IOException exception) {
-    if (closeable == null) {
-      return exception;
-    }
+  public static IOException close(final AutoCloseable closeable) {
     try {
-      closeable.close();
-      return exception;
-    } catch (final IOException ioException) {
-      if (exception == null) {
-        return ioException;
-      }
-      exception.addSuppressed(ioException);
-      return exception;
+      Optional.of(Exception.class, closeable).consume(AutoCloseable::close).get();
+      return null;
+    } catch (final Exception e) {
+      return asIOException(e);
     }
   }
 
-  public static IOException execute(final IBlock<IOException> block, final IOException exception) {
+  public static IOException close(final Closeable closeable, final Closeable other, final Closeable... others) {
+    List<Throwable> throwables = new LinkedList<>();
+    Optional.of(close(closeable)).consume(throwables::add);
+    Optional.of(close(other)).consume(throwables::add);
+    for (Closeable value : others) {
+      Optional.of(close(value)).consume(throwables::add);
+    }
+    return Throwables.concat(IoUtilities::asIOException, throwables);
+  }
+
+  public static void closeAndThrow(final Closeable closeable, final Closeable other, final Closeable... others)
+      throws IOException {
+    IOException exception = close(closeable, other, others);
+    throwIfNotNull(exception);
+  }
+
+  public static IOException close(final IOException exception, final AutoCloseable closeable) {
+    return Throwables.concat(IoUtilities::asIOException, exception, close(closeable));
+  }
+
+  public static void throwIfNotNull(final Throwable throwable) throws IOException {
+    Throwables.throwIfNotNull(IoUtilities::asIOException, throwable);
+  }
+
+  public static void throwIfNotEmpty(final List<Throwable> throwables) throws IOException {
+    Throwables.throwIfNotEmpty(t -> asIOException(t), throwables);
+  }
+
+  public static IOException asIOException(final Throwable throwable) {
+    return Optional.of(throwable)
+        .convert(e -> (e instanceof IOException ioe) ? ioe : new IOException(e.getMessage(), e))
+        .get();
+  }
+
+  public static IOException execute(final IOException exception, final IBlock<IOException> block) {
     if (block == null) {
       return exception;
     }
@@ -176,11 +189,7 @@ public class IoUtilities {
       block.execute();
       return exception;
     } catch (final IOException ioException) {
-      if (exception == null) {
-        return ioException;
-      }
-      exception.addSuppressed(ioException);
-      return exception;
+      return Throwables.concat(t -> asIOException(t), exception, ioException);
     }
   }
 
@@ -221,22 +230,6 @@ public class IoUtilities {
     }
   }
 
-  public static void throwException(final List<Throwable> throwables) throws IOException {
-    final IOException exception = (IOException) throwables.stream().reduce((i, e) -> {
-      if (i instanceof IOException) {
-        i.addSuppressed(e);
-        return i;
-      }
-      IOException ex = new IOException(i.getMessage(), i);
-      ex.addSuppressed(e);
-      return ex;
-    }).orElse(null);
-    if (exception == null) {
-      return;
-    }
-    throw exception;
-  }
-
   public static boolean contentEquals(final File file, final File other) throws FileNotFoundException, IOException {
     if (Objects.equals(file, other)) {
       return true;
@@ -248,6 +241,9 @@ public class IoUtilities {
       return false;
     }
     if (file.exists() && other.exists()) {
+      if (file.length() != other.length()) {
+        return false;
+      }
       try (InputStream inputStream = new FileInputStream(file)) {
         try (InputStream otherInputStream = new FileInputStream(other)) {
           if (inputStream.read() != otherInputStream.read()) {
@@ -260,5 +256,4 @@ public class IoUtilities {
       return false;
     }
   }
-
 }

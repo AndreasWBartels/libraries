@@ -22,10 +22,11 @@
 // Copyright (c) 2009 by Andreas W. Bartels
 package net.anwiba.spatial.coordinatereferencesystem;
 
-import java.io.Serializable;
-
+import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.GeographicCoordinateSystem;
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.ICoordinateSystem;
 import net.anwiba.spatial.coordinatereferencesystem.coordinatesystem.ToWgs84;
+
+import java.io.Serializable;
 
 public interface ICoordinateReferenceSystem extends Serializable {
 
@@ -36,5 +37,11 @@ public interface ICoordinateReferenceSystem extends Serializable {
   public ICoordinateSystem getCoordinateSystem();
 
   ICoordinateReferenceSystem adapt(ToWgs84 towgs84);
+
+  public ICoordinateReferenceSystem adapt(int srid);
+
+  default boolean isGeographic() {
+    return getCoordinateSystem() instanceof GeographicCoordinateSystem;
+  }
 
 }

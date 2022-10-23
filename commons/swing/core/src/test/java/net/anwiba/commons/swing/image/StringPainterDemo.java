@@ -45,7 +45,7 @@ import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
-import net.anwiba.commons.swing.object.DoubleFieldBuilder;
+import net.anwiba.commons.swing.object.numeric.DoubleFieldBuilder;
 import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.testing.demo.JFrames;
 

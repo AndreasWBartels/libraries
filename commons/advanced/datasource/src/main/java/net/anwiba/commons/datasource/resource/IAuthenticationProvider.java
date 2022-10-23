@@ -21,7 +21,7 @@
  */
 package net.anwiba.commons.datasource.resource;
 
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.IAuthentication;
 
 public interface IAuthenticationProvider {
 

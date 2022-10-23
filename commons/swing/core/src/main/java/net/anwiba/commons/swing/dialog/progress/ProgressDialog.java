@@ -26,6 +26,7 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.BorderFactory;
@@ -118,6 +119,8 @@ public class ProgressDialog extends AbstractMessageDialog implements IProgressBa
   private final IProgressMonitor progressMonitor;
   private final JPanel contentPane;
 
+  private ExecutorService cancelThreadExecutor;
+
   public ProgressDialog(final Window owner, final String title, final IMessage message) {
     super(owner, title, message, GuiIcons.INFORMATION_ICON.getLargeIcon(), DialogType.CANCEL);
     this.contentPane = new JPanel();
@@ -130,7 +133,14 @@ public class ProgressDialog extends AbstractMessageDialog implements IProgressBa
 
   @Override
   protected boolean cancel() {
-    Executors.newSingleThreadExecutor()
+    if (!this.canceler.isEnabled() || this.canceler.isCanceled()) {
+      return false;
+    }
+    if (this.cancelThreadExecutor == null) {
+      return false;
+    }
+    this.cancelThreadExecutor = Executors.newSingleThreadExecutor();
+    this.cancelThreadExecutor
         .execute(
             () -> this.canceler.cancel());
     return false;
@@ -187,7 +197,7 @@ public class ProgressDialog extends AbstractMessageDialog implements IProgressBa
       }
       throw (E) exception;
     }
-    if (DialogResult.CANCEL.equals(dialog.getResult())) {
+    if (dialog.getCanceler().isCanceled() || DialogResult.CANCEL.equals(dialog.getResult())) {
       throw new CanceledException();
     }
     return resultContainer.get();

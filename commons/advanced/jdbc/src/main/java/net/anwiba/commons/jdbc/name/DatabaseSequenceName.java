@@ -73,11 +73,8 @@ public class DatabaseSequenceName implements IDatabaseSequenceName {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof IDatabaseSequenceName)) {
-      return false;
-    }
-    final IDatabaseSequenceName other = (IDatabaseSequenceName) obj;
-    return ObjectUtilities.equals(this.catalogName, other.getCatalogName()) //
+    return obj instanceof IDatabaseSequenceName other
+        && ObjectUtilities.equals(this.catalogName, other.getCatalogName()) //
         && ObjectUtilities.equals(this.schemaName, other.getSchemaName()) //
         && ObjectUtilities.equals(this.sequenceName, other.getSequenceName());
   }

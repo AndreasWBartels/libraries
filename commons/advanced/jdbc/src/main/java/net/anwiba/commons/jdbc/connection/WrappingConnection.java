@@ -21,6 +21,11 @@
  */
 package net.anwiba.commons.jdbc.connection;
 
+import net.anwiba.commons.lang.functional.IProcedure;
+import net.anwiba.commons.lang.functional.ISupplier;
+import net.anwiba.commons.logging.ILogger;
+import net.anwiba.commons.logging.Logging;
+
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -40,11 +45,28 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import net.anwiba.commons.lang.functional.IProcedure;
-
 public final class WrappingConnection implements Connection {
+
+  private static ILogger logger = Logging.getLogger(WrappingConnection.class);
   private final Connection connection;
   private final IProcedure<WrappingConnection, SQLException> closeProcedure;
+  private String connectionHash;
+
+  public WrappingConnection(
+      final Connection connection) {
+    this(connection, wrappingConnection -> {
+      try {
+        @SuppressWarnings("resource")
+        final Connection wrappedConnection = wrappingConnection.getConnection();
+        logger.fine(() -> ConnectionUtilities.hash(wrappingConnection) + " connection close"); //$NON-NLS-1$
+        wrappedConnection.close();
+        logger.debug(() -> ConnectionUtilities.hash(wrappingConnection) + " connection closed"); //$NON-NLS-1$
+      } catch (final SQLException exception) {
+        logger.debug(() -> ConnectionUtilities.hash(wrappingConnection) + "connection couldn't close"); //$NON-NLS-1$
+        throw exception;
+      }
+    });
+  }
 
   public WrappingConnection(
       final Connection connection,
@@ -55,6 +77,19 @@ public final class WrappingConnection implements Connection {
 
   public Connection getConnection() {
     return this.connection;
+  }
+
+  @Override
+  public int hashCode() {
+    return this.connection.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof WrappingConnection other) {
+      return this.connection.equals(other.connection);
+    }
+    return this.connection.equals(obj);
   }
 
   @SuppressWarnings("unchecked")
@@ -69,6 +104,30 @@ public final class WrappingConnection implements Connection {
   @Override
   public boolean isWrapperFor(final Class<?> iface) throws SQLException {
     return iface.isInstance(this.connection) || this.connection.isWrapperFor(iface);
+  }
+
+  private String connectionHash() {
+    if (this.connectionHash == null) {
+      this.connectionHash = ConnectionUtilities.hash(this);
+    }
+    return this.connectionHash;
+  }
+
+  private <S extends Statement> S createAndLog(final String statementString, final ISupplier<S, SQLException> supplier)
+      throws SQLException {
+    try {
+      logger.fine(() -> connectionHash() + " " + ConnectionUtilities.nullHash()
+          + (statementString == null ? " statement create" : " statement create: " + statementString));
+      S wrappedStatement = supplier.supply();
+      logger.debug(() -> connectionHash() + " " + ConnectionUtilities.hash(wrappedStatement)
+          + (statementString == null ? " statement created" : " statement created: " + statementString));
+      return wrappedStatement;
+    } catch (SQLException exception) {
+      logger.debug(() -> connectionHash() + " " + ConnectionUtilities.nullHash()
+          + (statementString == null ? " statement creation failed"
+              : " statement creation failed: " + statementString));
+      throw exception;
+    }
   }
 
   @Override
@@ -153,33 +212,40 @@ public final class WrappingConnection implements Connection {
       final int resultSetConcurrency,
       final int resultSetHoldability)
       throws SQLException {
-    return this.connection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    return createAndLog(sql,
+        () -> new WrappedPreparedStatement(sql,
+            this.connection.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability)));
   }
 
   @Override
   public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency)
       throws SQLException {
-    return this.connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
+    return createAndLog(sql,
+        () -> new WrappedPreparedStatement(sql,
+            this.connection.prepareStatement(sql, resultSetType, resultSetConcurrency)));
   }
 
   @Override
   public PreparedStatement prepareStatement(final String sql, final String[] columnNames) throws SQLException {
-    return this.connection.prepareStatement(sql, columnNames);
+    return createAndLog(sql,
+        () -> new WrappedPreparedStatement(sql, this.connection.prepareStatement(sql, columnNames)));
   }
 
   @Override
   public PreparedStatement prepareStatement(final String sql, final int[] columnIndexes) throws SQLException {
-    return this.connection.prepareStatement(sql, columnIndexes);
+    return createAndLog(sql,
+        () -> new WrappedPreparedStatement(sql, this.connection.prepareStatement(sql, columnIndexes)));
   }
 
   @Override
   public PreparedStatement prepareStatement(final String sql, final int autoGeneratedKeys) throws SQLException {
-    return this.connection.prepareStatement(sql, autoGeneratedKeys);
+    return createAndLog(sql,
+        () -> new WrappedPreparedStatement(sql, this.connection.prepareStatement(sql, autoGeneratedKeys)));
   }
 
   @Override
   public PreparedStatement prepareStatement(final String sql) throws SQLException {
-    return this.connection.prepareStatement(sql);
+    return createAndLog(sql, () -> new WrappedPreparedStatement(sql, this.connection.prepareStatement(sql)));
   }
 
   @Override
@@ -189,18 +255,20 @@ public final class WrappingConnection implements Connection {
       final int resultSetConcurrency,
       final int resultSetHoldability)
       throws SQLException {
-    return this.connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    return createAndLog(sql,
+        () -> new WrappedCallableStatement(sql,
+            this.connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability)));
   }
 
   @Override
   public CallableStatement prepareCall(final String sql, final int resultSetType, final int resultSetConcurrency)
       throws SQLException {
-    return this.connection.prepareCall(sql, resultSetType, resultSetConcurrency);
+    return new WrappedCallableStatement(sql, this.connection.prepareCall(sql, resultSetType, resultSetConcurrency));
   }
 
   @Override
   public CallableStatement prepareCall(final String sql) throws SQLException {
-    return this.connection.prepareCall(sql);
+    return new WrappedCallableStatement(sql, this.connection.prepareCall(sql));
   }
 
   @Override
@@ -289,17 +357,20 @@ public final class WrappingConnection implements Connection {
       final int resultSetConcurrency,
       final int resultSetHoldability)
       throws SQLException {
-    return this.connection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+    return createAndLog(null,
+        () -> new WrappedStatement(
+            this.connection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability)));
   }
 
   @Override
   public Statement createStatement(final int resultSetType, final int resultSetConcurrency) throws SQLException {
-    return this.connection.createStatement(resultSetType, resultSetConcurrency);
+    return createAndLog(null,
+        () -> new WrappedStatement(this.connection.createStatement(resultSetType, resultSetConcurrency)));
   }
 
   @Override
   public Statement createStatement() throws SQLException {
-    return this.connection.createStatement();
+    return createAndLog(null, () -> new WrappedStatement(this.connection.createStatement()));
   }
 
   @Override
@@ -345,9 +416,5 @@ public final class WrappingConnection implements Connection {
   @Override
   public void abort(final Executor executor) throws SQLException {
     this.connection.abort(executor);
-  }
-
-  public Connection getWarredConnection() {
-    return this.connection;
   }
 }

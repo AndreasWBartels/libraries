@@ -24,8 +24,12 @@ package net.anwiba.commons.utilities;
 public class DoubleArrays {
 
   public static double[] copy(final double[] values) {
-    final double[] result = new double[values.length];
-    System.arraycopy(values, 0, result, 0, values.length);
+    return copy(values, 0, values.length);
+  }
+
+  public static double[] copy(final double[] values, int startIndex, int numberOfValues) {
+    final double[] result = new double[numberOfValues];
+    System.arraycopy(values, startIndex, result, 0, numberOfValues);
     return result;
   }
 

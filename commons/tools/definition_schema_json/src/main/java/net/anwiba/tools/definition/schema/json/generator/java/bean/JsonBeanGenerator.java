@@ -21,11 +21,6 @@
  */
 package net.anwiba.tools.definition.schema.json.generator.java.bean;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.tools.definition.schema.json.JSSDReader;
@@ -33,17 +28,32 @@ import net.anwiba.tools.definition.schema.json.gramma.element.JObject;
 import net.anwiba.tools.definition.schema.json.gramma.parser.JssdParserException;
 import net.anwiba.tools.generator.java.bean.BeanGenerator;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class JsonBeanGenerator {
 
-  private final BeanGenerator generator = new BeanGenerator();
   private final String encoding = "UTF-8"; //$NON-NLS-1$
   private final JObjectToBeanConverter objectToBeanConverter;
   private final String comment;
   private final JSSDReader jssdReader = new JSSDReader();
+  private final BeanGenerator generator;
 
   public JsonBeanGenerator(final String packageName, final String comment, final boolean isBuilderBeanPatternEnabled) {
     this.comment = comment;
     this.objectToBeanConverter = new JObjectToBeanConverter(packageName, isBuilderBeanPatternEnabled);
+    this.generator = new BeanGenerator(name -> {
+      try {
+        return (Class<? extends java.lang.annotation.Annotation>)
+          com.fasterxml.jackson.annotation.JacksonAnnotation.class
+              .getClassLoader()
+              .loadClass(name);
+      } catch (final ClassNotFoundException exception) {
+        throw new CreationException(exception.getMessage(), exception);
+      }
+    });
   }
 
   public void add(final InputStream inputStream, final String name)

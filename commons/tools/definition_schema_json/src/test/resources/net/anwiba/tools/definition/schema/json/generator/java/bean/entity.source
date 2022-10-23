@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Entity {
 
-    private final Map<String, Object> _unknownMembers = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> _unknownMembers = new LinkedHashMap<>();
 
     @JsonAnySetter
     public void set(final String name, final Object value) {

@@ -21,32 +21,35 @@
  */
 package net.anwiba.database.sqlite.connection;
 
+import net.anwiba.commons.jdbc.DatabaseUtilities;
+import net.anwiba.commons.jdbc.connection.ConnectionUtilities;
+import net.anwiba.commons.lang.optional.Optional;
+import net.anwiba.commons.lang.stream.Streams;
+import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.logging.ILogger;
+import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.utilities.property.IProperties;
+import net.anwiba.database.sqlite.ISqliteConnstants;
+
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import org.sqlite.SQLiteConfig;
 
-import net.anwiba.commons.jdbc.DatabaseUtilities;
-import net.anwiba.commons.jdbc.connection.WrappingConnection;
-import net.anwiba.commons.lang.functional.IProcedure;
-import net.anwiba.commons.logging.ILevel;
-import net.anwiba.commons.logging.ILogger;
-import net.anwiba.commons.logging.Logging;
-import net.anwiba.database.sqlite.ISqliteConnstants;
-
 public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
 
-  private static ILogger logger = Logging.getLogger(SqliteDatabaseConnector.class.getName());
+  private static ILogger logger = Logging.getLogger(SqliteDatabaseConnector.class);
   private final ISqliteDatabaseConnectorConfiguration configuration;
   private final Map<String, ISqliteCapabilities> capabilities = Collections
       .synchronizedMap(new HashMap<>());
-  private static final int TIMEOUT = 10;
 
   public SqliteDatabaseConnector(final ISqliteDatabaseConnectorConfiguration configuration) {
     this.configuration = configuration;
@@ -58,23 +61,14 @@ public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
   }
 
   @Override
-  public boolean isConnectable(final String url, final String userName, final String password) {
-    try (Connection connection = connectReadOnly(url, userName, password, TIMEOUT)) {
-      return true;
-    } catch (final SQLException exception) {
-      logger.log(ILevel.WARNING, exception.getLocalizedMessage(), exception);
-      return false;
-    }
-  }
-
-  @Override
   public synchronized Connection connectReadOnly(
       final String url,
       final String userName,
       final String password,
-      final int timeout)
+      final int timeout,
+      final IProperties properties)
       throws SQLException {
-    return connect(url, userName, password, false, timeout, true);
+    return connect(url, userName, password, false, timeout, true, properties);
   }
 
   @Override
@@ -83,26 +77,29 @@ public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
       final String userName,
       final String password,
       final boolean isAutoCommitEnabled,
-      final int timeout)
+      final int timeout,
+      final IProperties properties)
       throws SQLException {
-    return connect(url, userName, password, isAutoCommitEnabled, timeout, false);
+    return connect(url, userName, password, isAutoCommitEnabled, timeout, false, properties);
   }
 
-  @SuppressWarnings("nls")
   public synchronized Connection connect(
       final String url,
       final String userName,
       final String password,
       final boolean isAutoCommitEnabled,
       final int timeout,
-      final boolean isReadOnly)
+      final boolean isReadOnly,
+      final IProperties properties)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "connect to '" + url + "' readonly '" + isReadOnly + "'");
-    final Properties properties = getProperties(userName, password, isReadOnly, timeout);
+    logger.debug(() -> "connect to '" + url + "' readonly '" + isReadOnly + "'");
     if (isReadOnly) {
-      return getConnetion(url, properties, false, timeout);
+      return getConnetion(url, false, timeout, getProperties(userName, password, isReadOnly, timeout, properties));
     }
-    return getConnetion(url, properties, isAutoCommitEnabled, timeout);
+    return getConnetion(url,
+        isAutoCommitEnabled,
+        timeout,
+        getProperties(userName, password, isReadOnly, timeout, properties));
   }
 
   @SuppressWarnings("unused")
@@ -110,24 +107,30 @@ public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
       final String userName,
       final String password,
       final boolean isReadOnly,
-      final int timeout) {
+      final int timeout,
+      final IProperties properties) {
     final SQLiteConfig config = new SQLiteConfig();
     config.setReadOnly(isReadOnly);
     config.setSharedCache(true);
     config.enableLoadExtension(true);
-    return config.toProperties();
+    Properties settings = config.toProperties();
+    Optional.of(userName).consume(value -> settings.put("user", value));
+    Optional.of(password).consume(value -> settings.put("password", value));
+    Streams.of(properties.properties())
+        .filter(property -> Objects.nonNull(property.getValue()))
+        .forEach(property -> settings.put(property.getName(), property.getValue()));
+    return settings;
   }
 
-  @SuppressWarnings("resource")
   private Connection
-      getConnetion(final String url, final Properties properties, final boolean isAutoCommitEnabled, final int timeout)
+      getConnetion(final String url, final boolean isAutoCommitEnabled, final int timeout, final Properties properties)
           throws SQLException {
     final Connection connection = createConnection(url, properties, timeout);
     connection.setAutoCommit(isAutoCommitEnabled);
     if (!this.capabilities.containsKey(url)) {
       this.capabilities.put(url, checkCapabilities(connection));
     }
-    return wrap(url, connection);
+    return connection;
   }
 
   private Connection createConnection(
@@ -135,55 +138,54 @@ public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
       final Properties properties,
       final int timeout)
       throws SQLException {
+    Driver driver = DriverManager.getDriver(url);
+    if (driver == null) {
+      throw new SQLException(ConnectionUtilities.nullHash() + " connection create failed, unsupporterd url");
+    }
     if (timeout == -1) {
-      return DriverManager.getConnection(url, properties);
+      return driver.connect(url, properties);
     }
     final int loginTimeout = DriverManager.getLoginTimeout();
     try {
-      DriverManager.setLoginTimeout(timeout);
-      return DriverManager.getConnection(url, properties);
+      return driver.connect(url, properties);
     } finally {
       DriverManager.setLoginTimeout(loginTimeout);
     }
   }
 
-  @SuppressWarnings("nls")
   private ISqliteCapabilities checkCapabilities(final Connection connection) throws SQLException {
     final SqliteCapabilitiesBuilder builder = new SqliteCapabilitiesBuilder();
     try (final Statement statement = connection.createStatement()) {
       statement.setQueryTimeout(30); // set timeout to 30 sec.
       final String sqliteVersion = getSqliteVersion(statement);
       builder.setSqliteVersion(sqliteVersion);
-      logger.log(ILevel.DEBUG, "sqlite version '" + sqliteVersion + "'");
+      logger.fine(() -> "sqlite version '" + sqliteVersion + "'");
       for (final ILibrary extension : this.configuration.getExtensions()) {
         try {
-          logger.log(ILevel.DEBUG, "try to load extention '" + extension.getName() + "'");
-          logger.log(ILevel.DEBUG, "extention loaded '" + extension.getResource() + "'");
+          logger.fine(() -> "try to load extention '" + extension.getName() + "'");
+          logger.fine(() -> "extention loaded '" + extension.getResource() + "'");
         } catch (final Exception exception) {
           logger.log(ILevel.WARNING, "Couldn't load extention '" + extension.getName() + "'");
           logger.log(ILevel.DEBUG, exception.getMessage(), exception);
         }
       }
       final String spatiaLiteVersion = getSpatiaLiteVersion(statement);
-      logger.log(ILevel.DEBUG, "spatialite version '" + spatiaLiteVersion + "'");
+      logger.fine(() -> "spatialite version '" + spatiaLiteVersion + "'");
       if (spatiaLiteVersion != null) {
         builder.setSpatiaLiteVersion(spatiaLiteVersion);
       } else {
         final ILibrary spatialiteLibrary = this.configuration.getSpatialite();
         if (spatialiteLibrary != null) {
           try {
-            logger.log(ILevel.DEBUG, "try to load extention 'spatialite'");
+            logger.fine(() -> "try to load extention 'spatialite'");
             statement.execute("SELECT load_extension('" + spatialiteLibrary.getResource() + "')");
-            logger.log(ILevel.DEBUG, "extention loaded '" + spatialiteLibrary.getResource() + "'");
+            logger.fine(() -> "extention loaded '" + spatialiteLibrary.getResource() + "'");
             final String loadedSpatiaLiteVersion = getSpatiaLiteVersion(statement);
-            logger.log(ILevel.DEBUG, "loaded spatialite version '" + loadedSpatiaLiteVersion + "'");
+            logger.fine(() -> "loaded spatialite version '" + loadedSpatiaLiteVersion + "'");
             builder.setSpatiaLiteVersion(loadedSpatiaLiteVersion);
           } catch (final Exception exception) {
-            logger
-                .log(
-                    ILevel.WARNING,
-                    "Couldn't load extention '" + spatialiteLibrary.getResource() + "'");
-            logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+            logger.warning(() -> "Couldn't load extention '" + spatialiteLibrary.getResource() + "'");
+            logger.debug(() -> exception.getMessage(), exception);
           }
         }
       }
@@ -203,7 +205,7 @@ public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
             "table", //$NON-NLS-1$
             "geometry_columns") //$NON-NLS-1$
         == 0) {
-      logger.log(ILevel.DEBUG, "no spatialite"); //$NON-NLS-1$
+      logger.fine(() -> "no spatialite"); //$NON-NLS-1$
       return;
     }
     if (DatabaseUtilities
@@ -212,32 +214,12 @@ public final class SqliteDatabaseConnector implements ISqliteDatabaseConnector {
             "PRAGMA table_info('geometry_columns')", //$NON-NLS-1$
             "name", //$NON-NLS-1$
             "type")) { //$NON-NLS-1$
-      logger.log(ILevel.DEBUG, "spatialite 2.0 structur spatialite"); //$NON-NLS-1$
+      logger.fine(() -> "spatialite 2.0 structur spatialite"); //$NON-NLS-1$
       builder.setSpatiaLiteDatabaseVersion("2.0"); //$NON-NLS-1$
       return;
     }
-    logger.log(ILevel.DEBUG, "spatialite 4.0 structur spatialite"); //$NON-NLS-1$
+    logger.fine(() -> "spatialite 4.0 structur spatialite"); //$NON-NLS-1$
     builder.setSpatiaLiteDatabaseVersion("4.0"); //$NON-NLS-1$
-  }
-
-  private WrappingConnection wrap(
-      @SuppressWarnings("unused") final String url,
-      final Connection connection) {
-    return new WrappingConnection(connection, new IProcedure<WrappingConnection, SQLException>() {
-
-      @Override
-      public void execute(final WrappingConnection wrappingConnection) throws SQLException {
-        try {
-          @SuppressWarnings("resource")
-          final Connection wrappedConnection = wrappingConnection.getConnection();
-          logger.log(ILevel.DEBUG, "close connection"); //$NON-NLS-1$
-          wrappedConnection.close();
-        } catch (final SQLException exception) {
-          logger.log(ILevel.WARNING, "Couldn't close connection"); //$NON-NLS-1$
-          throw exception;
-        }
-      }
-    });
   }
 
   private String getSpatiaLiteVersion(final Statement statement) {

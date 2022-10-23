@@ -9,7 +9,7 @@ public class Bean {
 
     private String name = null;
     private String type = "Bean";
-    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> properties = new LinkedHashMap<>();
 
     public Bean(final String name, final Map<String, Object> properties) {
         this.name = name;
@@ -39,7 +39,7 @@ import java.util.Map;
 public class BeanBuilder {
 
     private String name = null;
-    private final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> properties = new LinkedHashMap<>();
 
     public BeanBuilder() {
     }

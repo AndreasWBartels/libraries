@@ -21,32 +21,11 @@
  */
 package net.anwiba.commons.jdbc;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
+import net.anwiba.commons.jdbc.connection.ConnectionUtilities;
 import net.anwiba.commons.jdbc.connection.IDatabaseConnector;
 import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
+import net.anwiba.commons.jdbc.connection.WrappedResultSet;
+import net.anwiba.commons.jdbc.connection.WrappedStatement;
 import net.anwiba.commons.jdbc.constraint.Constraint;
 import net.anwiba.commons.jdbc.constraint.ConstraintType;
 import net.anwiba.commons.jdbc.result.IResult;
@@ -56,10 +35,13 @@ import net.anwiba.commons.jdbc.result.ResultSetToResultsAdapter;
 import net.anwiba.commons.jdbc.value.IDatabaseValue;
 import net.anwiba.commons.lang.counter.Counter;
 import net.anwiba.commons.lang.counter.ICounter;
+import net.anwiba.commons.lang.counter.IntCounter;
 import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.exception.Throwables;
 import net.anwiba.commons.lang.functional.ConversionException;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IApplicable;
+import net.anwiba.commons.lang.functional.IBiFunction;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IClosableIterator;
 import net.anwiba.commons.lang.functional.ICloseable;
@@ -68,10 +50,12 @@ import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.functional.IFunction;
+import net.anwiba.commons.lang.functional.IInterruptableBiFunction;
 import net.anwiba.commons.lang.functional.IInterruptableFunction;
 import net.anwiba.commons.lang.functional.IInterruptableProcedure;
+import net.anwiba.commons.lang.functional.IObserver;
+import net.anwiba.commons.lang.functional.IObserverFactory;
 import net.anwiba.commons.lang.functional.IProcedure;
-import net.anwiba.commons.lang.functional.IWatcher;
 import net.anwiba.commons.lang.number.ComparableNumber;
 import net.anwiba.commons.lang.object.ObjectUtilities;
 import net.anwiba.commons.lang.optional.IOptional;
@@ -81,205 +65,349 @@ import net.anwiba.commons.lang.primitive.IBooleanContainer;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.logging.ILogger;
 import net.anwiba.commons.logging.Logging;
+import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.utilities.collection.IterableUtilities;
 import net.anwiba.commons.utilities.string.StringUtilities;
+import net.anwiba.commons.utilities.time.ZonedDateTimeUtilities;
 import net.anwiba.commons.version.IVersion;
 import net.anwiba.commons.version.VersionBuilder;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class DatabaseUtilities {
 
   private static ILogger logger = Logging.getLogger(DatabaseUtilities.class);
 
-  public static Driver loadDriver(final String driverName) {
+  public static SQLException close(final AutoCloseable closeable) {
     try {
-      final Enumeration<Driver> drivers = DriverManager.getDrivers();
-      while (drivers.hasMoreElements()) {
-        final Driver driver = drivers.nextElement();
-        if (driver.getClass().getName().equals(driverName)) {
-          return driver;
+      if (closeable instanceof Connection connection) {
+        if (connection.isClosed()) {
+          return null;
         }
+        closeable.close();
+        return null;
       }
-      @SuppressWarnings("unchecked")
-      final Class<Driver> driverClass = (Class<Driver>) Class.forName(driverName);
-      if (driverClass != null) {
-        final Driver driver = driverClass.getDeclaredConstructor().newInstance();
-        DriverManager.registerDriver(driver);
-        return driver;
+      if (closeable instanceof Statement statement) {
+        if (statement.isClosed()) {
+          return null;
+        }
+        closeable.close();
+        return null;
       }
-    } catch (final ClassNotFoundException exception) {
+      if (closeable instanceof ResultSet resultSet) {
+        if (resultSet.isClosed()) {
+          return null;
+        }
+        closeable.close();
+        return null;
+      }
+      Optional.of(Exception.class, closeable).consume(AutoCloseable::close).get();
+      return null;
+    } catch (final Exception e) {
+      return asSQLException(e);
+    }
+  }
+
+  public static SQLException close(final SQLException exception,
+      final AutoCloseable closeable,
+      final AutoCloseable other,
+      final AutoCloseable... others) {
+    return Optional.of(close(closeable, other, others))
+        .convert(e -> {
+          if (exception != null) {
+            exception.addSuppressed(e);
+            return exception;
+          }
+          return e;
+        })
+        .getOr(() -> exception);
+  }
+
+  public static SQLException close(final AutoCloseable closeable,
+      final AutoCloseable other,
+      final AutoCloseable... others) {
+    List<Throwable> throwables = new LinkedList<>();
+    Optional.of(close(closeable)).consume(throwables::add);
+    Optional.of(close(other)).consume(throwables::add);
+    for (AutoCloseable value : others) {
+      Optional.of(close(value)).consume(throwables::add);
+    }
+    return Throwables.concat(DatabaseUtilities::asSQLException, throwables);
+  }
+
+  public static SQLException close(final SQLException exception,
+      final AutoCloseable closeable) {
+    return Throwables.concat(DatabaseUtilities::asSQLException, exception, close(closeable));
+  }
+
+  public static WrappedResultSet wrapWithUnclosableStatement(final ResultSet resultSet) throws SQLException {
+    return new WrappedResultSet(resultSet, new WrappedStatement(resultSet.getStatement(), closable -> {}));
+  }
+
+  public static void throwIfNotNull(final Throwable throwable) throws SQLException {
+    Throwables.throwIfNotNull(DatabaseUtilities::asSQLException, throwable);
+  }
+
+  public static void throwIfNotEmpty(final List<Throwable> throwables) throws SQLException {
+    Throwables.throwIfNotEmpty(DatabaseUtilities::asSQLException, throwables);
+  }
+
+  public static SQLException asSQLException(final Throwable throwable) {
+    return Optional.of(throwable)
+        .convert(e -> (e instanceof SQLException ioe) ? ioe : new SQLException(e.getMessage(), e))
+        .get();
+  }
+
+  public static void execute(final Connection connection, final File file)
+      throws FileNotFoundException,
+      IOException,
+      SQLException {
+    execute(connection, file, ";");
+  }
+
+  public static void execute(final Connection connection, final File file, final String commandEnd)
+      throws FileNotFoundException,
+      IOException,
+      SQLException {
+    StringBuilder builder = new StringBuilder();
+    ICounter counter = new Counter(0);
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        String trimed = line.trim();
+        if (trimed.isBlank() || "COMMIT;".equalsIgnoreCase(trimed)) {
+          continue;
+        }
+        builder.append(trimed);
+        if (trimed.endsWith(commandEnd)) {
+          String statementString = builder.toString();
+          try {
+            execute(connection, statementString.substring(0, statementString.length() - 1));
+            counter.increment();
+            if (!connection.getAutoCommit() && counter.value() == 500) {
+              counter.set(0);
+              connection.commit();
+            }
+            builder = new StringBuilder();
+            continue;
+          } catch (SQLException exception) {
+            String message = exception.getCause().getMessage();
+            if (message.startsWith("[SQLITE_ERROR] SQL error or missing database (unrecognized token:")) {
+              continue;
+            }
+            throw exception;
+          }
+        }
+        builder.append("\n");
+      }
+    }
+    if (!connection.getAutoCommit() && counter.value() > 0) {
+      connection.commit();
+    }
+  }
+
+  public static boolean execute(final Connection connection, final String statementString)
+      throws SQLException {
+    return execute(
+        connection,
+        statementString,
+        (IProcedure<PreparedStatement, SQLException>) statement -> {
+          // nothing to do
+        });
+  }
+
+  public static final boolean execute(
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> procedure)
+      throws SQLException {
+    return execute(connection, statementString, procedure, each -> {
       // nothing to do
-    } catch (final InstantiationException exception) {
+    });
+  }
+
+  public static final boolean execute(
+      final Connection connection,
+      final String statementString,
+      final Object... values)
+      throws SQLException {
+    return execute(connection, statementString, setter(values), each -> {
       // nothing to do
-    } catch (final IllegalAccessException exception) {
-      // nothing to do
+    });
+  }
+
+  public static boolean execute(
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IProcedure<ResultSet, SQLException> resultProcedure)
+      throws SQLException {
+    return execute(b -> () -> {},
+        connection,
+        statementString,
+        prepareProcedure,
+        (IBiFunction<PreparedStatement, IBooleanContainer, Boolean, SQLException>) (statement, flag) -> {
+          if (statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              resultProcedure.execute(resultSet);
+              return true;
+            }
+          }
+          return statement.getUpdateCount() > 0;
+        });
+  }
+
+  public static <T> T execute(
+      final IDatabaseConnector connector,
+      final IJdbcConnectionDescription connectionDescription,
+      final IFunction<Connection, T, SQLException> function)
+      throws SQLException {
+    try (Connection connection = connector.connectWritable(connectionDescription, true)) {
+      return function.execute(connection);
+    }
+  }
+
+  public static <T> T execute(
+      final IDatabaseConnector connector,
+      final IJdbcConnectionDescription connectionDescription,
+      final IInterruptableFunction<Connection, T, SQLException> function)
+      throws SQLException,
+      CanceledException {
+    try (Connection connection = connector.connectWritable(connectionDescription, true)) {
+      return function.execute(connection);
+    } finally {
+    }
+  }
+
+  public static void execute(
+      final IDatabaseConnector connector,
+      final IJdbcConnectionDescription connectionDescription,
+      final IProcedure<Connection, SQLException> procedure)
+      throws SQLException {
+    try (Connection connection = connector.connectWritable(connectionDescription, true)) {
+      procedure.execute(connection);
+    }
+  }
+
+  public static <T> T execute(
+      final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IBiFunction<PreparedStatement, IBooleanContainer, T, SQLException> function)
+      throws SQLException {
+    return execute(canceler.observerFactory(), connection, statementString, setter(), function);
+  }
+
+  public static <T> T execute(
+      final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IBiFunction<PreparedStatement, IBooleanContainer, T, SQLException> function)
+      throws SQLException {
+    return execute(canceler.observerFactory(), connection, statementString, prepareProcedure, function);
+  }
+
+  public static <T> T execute(
+      final IObserverFactory cancelObserverFactory,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IBiFunction<PreparedStatement, IBooleanContainer, T, SQLException> function)
+      throws SQLException {
+    String connectionHash = ConnectionUtilities.hash(connection);
+    String statementHash = ConnectionUtilities.nullHash();
+    IBooleanContainer flag = new BooleanContainer(true);
+    try (
+        final PreparedStatement statement = connection.prepareStatement(statementString);
+        final ICloseable<RuntimeException> cancler = cancelObserverFactory.create(silent(() -> {
+          flag.set(false);
+          statement.cancel();
+        }, () -> connectionHash + " " + ConnectionUtilities.hash(statement) + " statement canceled"))) {
+      statementHash = ConnectionUtilities.hash(statement);
+      prepareProcedure.execute(statement);
+      return function.execute(statement, flag);
     } catch (final SQLException exception) {
-      // nothing to do
-    } catch (IllegalArgumentException e) {
-      // nothing to do
-    } catch (InvocationTargetException e) {
-      // nothing to do
-    } catch (NoSuchMethodException e) {
-      // nothing to do
-    } catch (SecurityException e) {
-      // nothing to do
-    }
-    return null;
-  }
-
-  public static Connection createConnection(
-      final String url,
-      final String user,
-      final String password,
-      final boolean isReadOnly)
-      throws SQLException {
-    final Connection connection = DriverManager.getConnection(url, user, password);
-    connection.setReadOnly(isReadOnly);
-    return connection;
-  }
-
-  public static Connection createConnection(
-      final String url,
-      final String user,
-      final String password)
-      throws SQLException {
-    return DriverManager.getConnection(url, user, password);
-  }
-
-  public static void close(final Connection connection) {
-
-    try {
-      if (connection != null) {
-        connection.close();
-      }
-    } catch (final SQLException e) {
-      // nothing todo
+      throw new SQLException(connectionHash + " " + statementHash + " statement failed", exception);
     }
   }
 
-  public static <O> SQLException close(
-      final IClosableIterator<O, SQLException> iteratror,
-      final SQLException exception) {
-    if (iteratror == null) {
-      return exception;
-    }
-    try {
-      iteratror.close();
-      return exception;
-    } catch (final SQLException sqlException) {
-      if (exception == null) {
-        return sqlException;
-      }
-      exception.addSuppressed(sqlException);
-      return exception;
-    }
+  public static <T> T execute(
+      final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IInterruptableBiFunction<PreparedStatement, IBooleanContainer, T, SQLException> function)
+      throws SQLException,
+      CanceledException {
+    return execute(canceler.observerFactory(), connection, statementString, interruptableStetter(), function);
   }
 
-  public static SQLException close(final Connection connection, final SQLException exception) {
-    if (connection == null) {
-      return exception;
-    }
-    try {
-      // if (connection.isClosed()) {
-      // return exception;
-      // }
-      connection.close();
-      return exception;
-    } catch (final SQLException sqlException) {
-      if (exception == null) {
-        return sqlException;
-      }
-      exception.addSuppressed(sqlException);
-      return exception;
-    }
+  public static <T> T execute(
+      final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IInterruptableProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IInterruptableBiFunction<PreparedStatement, IBooleanContainer, T, SQLException> function)
+      throws SQLException,
+      CanceledException {
+    return execute(canceler.observerFactory(), connection, statementString, prepareProcedure, function);
   }
 
-  public static SQLException close(final Statement statement, final SQLException exception) {
-    if (statement == null) {
-      return exception;
-    }
-    try {
-      // if (statement.isClosed()) {
-      // return exception;
-      // }
-      statement.close();
-      return exception;
-    } catch (final SQLException sqlException) {
-      if (exception == null) {
-        return sqlException;
-      }
-      exception.addSuppressed(sqlException);
-      return exception;
-    }
-  }
-
-  public static SQLException close(final ResultSet resultSet, final SQLException exception) {
-    if (resultSet == null) {
-      return exception;
-    }
-    try {
-      // if (resultSet.isClosed()) {
-      // return exception;
-      // }
-      resultSet.close();
-      return exception;
-    } catch (final SQLException sqlException) {
-      if (exception == null) {
-        return sqlException;
-      }
-      exception.addSuppressed(sqlException);
-      return exception;
-    }
-  }
-
-  public static SQLException close(final IResults results, final SQLException exception) {
-    if (results == null) {
-      return exception;
-    }
-    try {
-      // if (results.isClosed()) {
-      // return exception;
-      // }
-      results.close();
-      return exception;
-    } catch (final SQLException sqlException) {
-      if (exception == null) {
-        return sqlException;
-      }
-      exception.addSuppressed(sqlException);
-      return exception;
-    }
-  }
-
-  public static void close(final IResults results) {
-
-    try {
-      if (results != null) {
-        results.close();
-      }
-    } catch (final SQLException e) {
-      // nothing todo
-    }
-  }
-
-  public static void close(final Statement statement) {
-
-    try {
-      if (statement != null) {
-        statement.close();
-      }
-    } catch (final SQLException e) {
-      // nothing todo
-    }
-  }
-
-  public static void close(final ResultSet resultSet) {
-
-    try {
-      if (resultSet != null) {
-        resultSet.close();
-      }
-    } catch (final SQLException e) {
-      // nothing todo
+  public static <T> T execute(
+      final IObserverFactory cancelObserverFactory,
+      final Connection connection,
+      final String statementString,
+      final IInterruptableProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IInterruptableBiFunction<PreparedStatement, IBooleanContainer, T, SQLException> function)
+      throws SQLException,
+      CanceledException {
+    String connectionHash = ConnectionUtilities.hash(connection);
+    String statementHash = ConnectionUtilities.nullHash();
+    IBooleanContainer flag = new BooleanContainer(true);
+    try (
+        final PreparedStatement statement = connection.prepareStatement(statementString);
+        final ICloseable<RuntimeException> cancler = cancelObserverFactory.create(silent(() -> {
+          flag.set(false);
+          statement.cancel();
+        }, () -> connectionHash + " " + ConnectionUtilities.hash(statement) + " statement canceled"))) {
+      statementHash = ConnectionUtilities.hash(statement);
+      prepareProcedure.execute(statement);
+      return function.execute(statement, flag);
+    } catch (final SQLException exception) {
+      throw new SQLException(connectionHash + " " + statementHash + " statement failed", exception);
     }
   }
 
@@ -297,8 +425,8 @@ public class DatabaseUtilities {
   }
 
   public static double getVersionAsDouble(final Connection connection) throws SQLException {
-    final int mayor = DatabaseUtilities.getMajorVersion(connection);
-    final int minor = DatabaseUtilities.getMinorVersion(connection);
+    final int mayor = getMajorVersion(connection);
+    final int minor = getMinorVersion(connection);
     final double version = mayor + Double.parseDouble("0." + String.valueOf(minor)); //$NON-NLS-1$
     return version;
   }
@@ -321,37 +449,29 @@ public class DatabaseUtilities {
 
   public static Map<String, Constraint> readConstraints(
       final Connection connection,
-      final String selectStatement,
+      final String statementString,
       final String schemaName,
       final String tableName)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Query: Schema " + schemaName + " table " + tableName); //$NON-NLS-1$ //$NON-NLS-2$
-    logger.log(ILevel.DEBUG, "Query: " + selectStatement); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(selectStatement)) {
-      final Map<String, Constraint> constraints = new HashMap<>();
-      statement.setString(1, schemaName);
-      statement.setString(2, tableName);
-      if (statement.execute()) {
-        try (ResultSet resultSet = statement.getResultSet();) {
-          while (resultSet.next()) {
-            final String columnName = resultSet.getString(1);
-            final String constraintName = resultSet.getString(2);
-            final ConstraintType constraintType = ConstraintType
-                .getTypeById(resultSet.getString(3));
-            final String condition = resultSet.getString(4);
-            final Constraint constraint = getConstraint(
-                constraints,
-                constraintName,
-                constraintType,
-                condition);
-            constraint.add(columnName);
-          }
-        }
-      }
-      return constraints;
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + selectStatement + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+    final Map<String, Constraint> constraints = new HashMap<>();
+    foreach(ICanceler.dummy().observerFactory(),
+        connection,
+        statementString,
+        setter(schemaName, tableName),
+        result -> {
+          final String columnName = result.getString(1);
+          final String constraintName = result.getString(2);
+          final ConstraintType constraintType = ConstraintType
+              .getTypeById(result.getString(3));
+          final String condition = result.getString(4);
+          final Constraint constraint = getConstraint(
+              constraints,
+              constraintName,
+              constraintType,
+              condition);
+          constraint.add(columnName);
+        });
+    return constraints;
   }
 
   public static Constraint getConstraint(
@@ -392,169 +512,69 @@ public class DatabaseUtilities {
     return owner == null ? connection.getMetaData().getUserName() : owner;
   }
 
-  public static <T> List<T> results(
-      final IDatabaseConnector connector,
-      final IJdbcConnectionDescription connectionDescription,
-      final String statementString,
-      final IConverter<IResult, T, SQLException> function)
-      throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
-      return results(connection, statementString, function);
-    }
-  }
-
-  public static <T> List<T> results(
-      final IDatabaseConnector connector,
-      final IJdbcConnectionDescription connectionDescription,
-      final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IResult, T, SQLException> function)
-      throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
-      return results(connection, statementString, prepareProcedure, function);
-    }
-  }
-
-  public static <T> List<T> results(
-      final Connection connection,
-      final String statementString,
-      final IConverter<IResult, T, SQLException> function)
-      throws SQLException {
-    return results(
-        connection,
-        statementString,
-        (IProcedure<PreparedStatement, SQLException>) statement -> {
-          // nothing to do
-        },
-        function);
-  }
-
-  public static <T> List<T> results(
-      final Connection connection,
-      final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IResult, T, SQLException> resultProcedure)
-      throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      prepareProcedure.execute(statement);
-      final List<T> resultList = new ArrayList<>();
-      if (statement.execute()) {
-        try (final ResultSet resultSet = statement.getResultSet()) {
-          final IResult result = new ResultSetToResultAdapter(resultSet);
-          while (resultSet.next()) {
-            final T object = resultProcedure.convert(result);
-            if (object == null) {
-              continue;
-            }
-            resultList.add(object);
-          }
-        }
-      }
-      return resultList;
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-  }
-
-  public static <T> List<T> results(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
-      final Connection connection,
-      final String statementString,
-      final IConverter<IResult, T, SQLException> resultFunction)
-      throws SQLException {
-    return results(cancelWatcherFactory, connection, statementString, s -> {}, resultFunction);
-  }
-
-  public static <T> List<T> results(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
-      final Connection connection,
-      final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IResult, T, SQLException> resultConverter)
-      throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    IBooleanContainer flag = new BooleanContainer(true);
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      try (final ICloseable<RuntimeException> cancler = cancelWatcherFactory.create(() -> {
-        try {
-          flag.set(false);
-          statement.cancel();
-        } catch (final SQLException exception) {
-        }
-      })) {
-        prepareProcedure.execute(statement);
-        final List<T> resultList = new ArrayList<>();
-        if (flag.isTrue() && statement.execute()) {
-          try (final ResultSet resultSet = statement.getResultSet()) {
-            final IResult result = new ResultSetToResultAdapter(resultSet);
-            while (flag.isTrue() && resultSet.next()) {
-              final T object = resultConverter.convert(result);
-              if (object == null) {
-                continue;
-              }
-              resultList.add(object);
-            }
-          }
-        }
-        return resultList;
-      }
-    }
-  }
-
-  public static void foreach(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
-      final Connection connection,
-      final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConsumer<IResult, SQLException> resultConsumer)
-      throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    IBooleanContainer flag = new BooleanContainer(true);
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      try (final ICloseable<RuntimeException> cancler = cancelWatcherFactory.create(() -> {
-        try {
-          flag.set(false);
-          statement.cancel();
-        } catch (final SQLException exception) {
-        }
-      })) {
-        prepareProcedure.execute(statement);
-        if (flag.isTrue() && statement.execute()) {
-          try (final ResultSet resultSet = statement.getResultSet()) {
-            final IResult result = new ResultSetToResultAdapter(resultSet);
-            while (flag.isTrue() && resultSet.next()) {
-              resultConsumer.consume(result);
-            }
-          }
-        }
-      }
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-  }
-
   public static ResultSet resultSet(final Connection connection, final String string)
       throws SQLException {
     return resultSet(connection, string, value -> {});
   }
 
-  @SuppressWarnings("resource")
-  public static <T> ResultSet resultSet(
+  public static ResultSet resultSet(
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try {
-      logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-      final PreparedStatement statement = connection.prepareStatement(statementString);
+    return resultSet(ICanceler.dummy(), connection, statementString, prepareProcedure);
+  }
+
+  public static ResultSet resultSet(
+      final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
+    return resultSet(canceler.observerFactory(), connection, statementString, prepareProcedure);
+  }
+
+  public static ResultSet resultSet(
+      final IObserverFactory cancelObserverFactory,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
+    return resultSet(cancelObserverFactory,
+        connection,
+        statementString,
+        prepareProcedure,
+        (IBiFunction<PreparedStatement, IBooleanContainer, ResultSet, SQLException>) (statement, flag) -> {
+          if (flag.isTrue() && statement.execute()) {
+            return statement.getResultSet();
+          }
+          return null;
+        });
+  }
+
+  public static ResultSet resultSet(
+      final IObserverFactory cancelObserverFactory,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IBiFunction<PreparedStatement, IBooleanContainer, ResultSet, SQLException> function)
+      throws SQLException {
+    final String connectionHash = ConnectionUtilities.hash(connection);
+    final IBooleanContainer flag = new BooleanContainer(true);
+    // attention do not close the statement
+    final PreparedStatement statement = connection.prepareStatement(statementString);
+    final String statementHash = ConnectionUtilities.hash(statement);
+    try (
+        final ICloseable<RuntimeException> cancler = cancelObserverFactory.create(silent(() -> {
+          flag.set(false);
+          statement.cancel();
+        }, () -> connectionHash + " " + ConnectionUtilities.hash(statement) + " statement canceled"))) {
       prepareProcedure.execute(statement);
-      if (statement.execute()) {
-        return statement.getResultSet();
-      }
-      return null;
+      final ResultSet resultSet = function.execute(statement, flag);
+      //      statement.isCloseOnCompletion(); // isn't supported by sap hana
+      return resultSet;
     } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
+      throw new SQLException(connectionHash + " " + statementHash + " statement failed", exception);
     }
   }
 
@@ -564,9 +584,10 @@ public class DatabaseUtilities {
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
-      return stringResult(connection, statementString, prepareProcedure);
-    }
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, String,
+            SQLException>) connection -> stringResult(connection, statementString, prepareProcedure));
   }
 
   public static String stringResult(
@@ -574,7 +595,7 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    return stringResult(connection, statementString, setterProcedur(values));
+    return stringResult(connection, statementString, setter(values));
   }
 
   public static String stringResult(
@@ -604,15 +625,36 @@ public class DatabaseUtilities {
     return result(connection, statementString, prepareProcedure, resultFunction);
   }
 
+  public static Double doubleResult(
+      final Connection connection,
+      final String statementString,
+      final Object... values)
+      throws SQLException {
+    return doubleResult(connection, statementString, setter(values));
+  }
+
+  public static Double doubleResult(
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
+    return result(connection,
+        statementString,
+        prepareProcedure,
+        (IConverter<IOptional<IResult, SQLException>, Double,
+            SQLException>) optional -> optional.convert(result -> result.getDouble(1)).get());
+  }
+
   public static Long longResult(
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
-      return longResult(connection, statementString, prepareProcedure);
-    }
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, Long,
+            SQLException>) connection -> longResult(connection, statementString, prepareProcedure));
   }
 
   public static Long longResult(
@@ -620,7 +662,7 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    return longResult(connection, statementString, setterProcedur(values));
+    return longResult(connection, statementString, setter(values));
   }
 
   public static Long longResult(
@@ -628,17 +670,11 @@ public class DatabaseUtilities {
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    final IConverter<IResult, Long, SQLException> resultFunction = new IConverter<>() {
-
-      @Override
-      public Long convert(final IResult value) throws SQLException {
-        if (value == null) {
-          return null;
-        }
-        return value.getLong(1);
-      }
-    };
-    return longResult(connection, statementString, prepareProcedure, resultFunction);
+    return result(connection,
+        statementString,
+        prepareProcedure,
+        (IConverter<IOptional<IResult, SQLException>, Long,
+            SQLException>) optional -> optional.convert(result -> result.getLong(1)).get());
   }
 
   public static Long longResult(
@@ -656,9 +692,10 @@ public class DatabaseUtilities {
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
-      return booleanResult(connection, statementString, prepareProcedure);
-    }
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, Boolean,
+            SQLException>) connection -> booleanResult(connection, statementString, prepareProcedure));
   }
 
   public static boolean booleanResult(
@@ -666,7 +703,7 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    return booleanResult(connection, statementString, setterProcedur(values));
+    return booleanResult(connection, statementString, setter(values));
   }
 
   public static boolean booleanResult(
@@ -678,13 +715,9 @@ public class DatabaseUtilities {
         connection,
         statementString,
         prepareProcedure,
-        new IConverter<IOptional<IResult, SQLException>, Boolean, SQLException>() {
-
-          @Override
-          public Boolean convert(final IOptional<IResult, SQLException> value) throws SQLException {
-            return value.convert(v -> v.getBoolean(1, false)).getOr(() -> Boolean.FALSE);
-          }
-        });
+        (IConverter<IOptional<IResult, SQLException>, Boolean,
+            SQLException>) value -> value.convert(v -> v.getBoolean(1, false)).getOr(() -> Boolean.FALSE))
+                .booleanValue();
   }
 
   public static <T> T result(
@@ -694,28 +727,135 @@ public class DatabaseUtilities {
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
       final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
       throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
-      return result(connection, statementString, prepareProcedure, resultFunction);
-    }
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, T,
+            SQLException>) connection -> result(connection, statementString, prepareProcedure, resultFunction));
   }
 
   public static <T> T result(
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription,
       final String statementString,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultConverter)
       throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
-      return result(connection, statementString, resultFunction);
-    }
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, T, SQLException>) connection -> result(connection, statementString, resultConverter));
+  }
+
+  public static <T> T result(
+      final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> converter)
+      throws SQLException {
+    return result(
+        canceler,
+        connection,
+        statementString,
+        (IProcedure<PreparedStatement, SQLException>) statement -> {
+          // nothing to do
+        },
+        converter);
   }
 
   public static <T> T result(
       final Connection connection,
       final String statementString,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> function)
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> converter)
       throws SQLException {
     return result(
+        connection,
+        statementString,
+        (IProcedure<PreparedStatement, SQLException>) statement -> {
+          // nothing to do
+        },
+        converter);
+  }
+
+  public static <T> T result(
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultConverter)
+      throws SQLException {
+    return result(ICanceler.dummy(),
+        connection,
+        statementString,
+        prepareProcedure,
+        resultConverter);
+  }
+
+  public static <T> T result(
+      final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      throws SQLException {
+    return result(canceler.observerFactory(), connection, statementString, prepareProcedure, resultFunction);
+  }
+
+  public static <T> T result(
+      final IObserverFactory cancelObserverFactory,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      throws SQLException {
+    return execute(cancelObserverFactory,
+        connection,
+        statementString,
+        prepareProcedure,
+        (IBiFunction<PreparedStatement, IBooleanContainer, T, SQLException>) (statement, flag) -> {
+          if (flag.isTrue() && statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              final IResult result = new ResultSetToResultAdapter(resultSet, (c, i, o, d) -> o);
+              if (flag.isTrue() && resultSet.next()) {
+                final T value = resultFunction.convert(Optional.of(SQLException.class, result));
+                if (resultSet.next()) {
+                  throw new SQLException(ConnectionUtilities.hash(connection) + " "
+                      + ConnectionUtilities.hash(statement) + " statement result isn't unique");
+                }
+                return value;
+              }
+            }
+          }
+          return resultFunction.convert(Optional.<IResult, SQLException>empty(SQLException.class));
+        });
+  }
+
+  public static <T> List<T> results(
+      final IDatabaseConnector connector,
+      final IJdbcConnectionDescription connectionDescription,
+      final String statementString,
+      final IConverter<IResult, T, SQLException> function)
+      throws SQLException {
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, List<T>, SQLException>) connection -> results(connection, statementString, function));
+  }
+
+  public static <T> List<T> results(
+      final IDatabaseConnector connector,
+      final IJdbcConnectionDescription connectionDescription,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<IResult, T, SQLException> function)
+      throws SQLException {
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, List<T>,
+            SQLException>) connection -> results(connection, statementString, prepareProcedure, function));
+  }
+
+  public static <T> List<T> results(
+      final Connection connection,
+      final String statementString,
+      final IConverter<IResult, T, SQLException> function)
+      throws SQLException {
+    return results(
         connection,
         statementString,
         (IProcedure<PreparedStatement, SQLException>) statement -> {
@@ -724,66 +864,32 @@ public class DatabaseUtilities {
         function);
   }
 
-  public static <T> T result(
+  public static <T> List<T> results(
+      final ICanceler canceler,
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      final IConverter<IResult, T, SQLException> resultConverter)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      prepareProcedure.execute(statement);
-      if (statement.execute()) {
-        try (final ResultSet resultSet = statement.getResultSet()) {
-          final IResult result = new ResultSetToResultAdapter(resultSet);
-          if (resultSet.next()) {
-            final T value = resultFunction.convert(Optional.of(SQLException.class, result));
-            if (resultSet.next()) {
-              throw new SQLException("Statement result isn't unique '" + statementString + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-            return value;
-          }
-        }
-      }
-      return resultFunction.convert(Optional.<IResult, SQLException>empty(SQLException.class));
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+    return results(canceler.observerFactory(), connection, statementString, s -> {}, resultConverter);
   }
 
-  public static <T> T result(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
+  public static <T> List<T> results(
+      final IObserverFactory cancelObserverFactory,
+      final Connection connection,
+      final String statementString,
+      final IConverter<IResult, T, SQLException> resultConverter)
+      throws SQLException {
+    return results(cancelObserverFactory, connection, statementString, s -> {}, resultConverter);
+  }
+
+  public static <T> List<T> results(
+      final ICanceler canceler,
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IConverter<IOptional<IResult, SQLException>, T, SQLException> resultFunction)
+      final IConverter<IResult, T, SQLException> resultConverter)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      try (final ICloseable<RuntimeException> cancler = cancelWatcherFactory.create(() -> {
-        try {
-          statement.cancel();
-        } catch (final SQLException exception) {
-        }
-      })) {
-        prepareProcedure.execute(statement);
-        if (statement.execute()) {
-          try (final ResultSet resultSet = statement.getResultSet()) {
-            final IResult result = new ResultSetToResultAdapter(resultSet);
-            if (resultSet.next()) {
-              final T value = resultFunction.convert(Optional.of(SQLException.class, result));
-              if (resultSet.next()) {
-                throw new SQLException("Statement result isn't unique '" + statementString + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-              }
-              return value;
-            }
-          }
-        }
-        return resultFunction.convert(Optional.<IResult, SQLException>empty(SQLException.class));
-      }
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+    return results(canceler.observerFactory(), connection, statementString, prepareProcedure, resultConverter);
   }
 
   public static <T> List<T> results(
@@ -802,9 +908,10 @@ public class DatabaseUtilities {
       final IInterruptableFunction<IResult, T, SQLException> resultFunction)
       throws SQLException,
       CanceledException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
-      return results(b -> () -> {}, connection, statementString, s -> {}, resultFunction);
-    }
+    return execute(connector,
+        connectionDescription,
+        (IInterruptableFunction<Connection, List<T>,
+            SQLException>) connection -> results(b -> () -> {}, connection, statementString, s -> {}, resultFunction));
   }
 
   public static <T> List<T> results(
@@ -818,42 +925,70 @@ public class DatabaseUtilities {
   }
 
   public static <T> List<T> results(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
+      final IObserverFactory cancelObserverFactory,
       final Connection connection,
       final String statementString,
-      final IInterruptableProcedure<PreparedStatement, SQLException> prepareClosure,
+      final IInterruptableProcedure<PreparedStatement, SQLException> prepareProcedure,
       final IInterruptableFunction<IResult, T, SQLException> resultProcedure)
       throws SQLException,
       CanceledException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    IBooleanContainer flag = new BooleanContainer(true);
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      try (final ICloseable<RuntimeException> cancler = cancelWatcherFactory.create(() -> {
-        try {
-          flag.set(false);
-          statement.cancel();
-        } catch (final SQLException exception) {
-        }
-      })) {
+    return execute(cancelObserverFactory,
+        connection,
+        statementString,
+        prepareProcedure,
+        (IInterruptableBiFunction<PreparedStatement, IBooleanContainer, List<T>, SQLException>) (statement, flag) -> {
+          final List<T> resultList = new ArrayList<>();
+          if (flag.isTrue() && statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              final IResult result = new ResultSetToResultAdapter(resultSet, (c, i, o, d) -> o);
+              while (flag.isTrue() && resultSet.next()) {
+                final T object = resultProcedure.execute(result);
+                if (object != null) {
+                  resultList.add(object);
+                }
+              }
+            }
+          }
+          return resultList;
+        });
+  }
 
-        prepareClosure.execute(statement);
-        final List<T> resultList = new ArrayList<>();
-        if (flag.isTrue() && statement.execute()) {
-          try (final ResultSet resultSet = statement.getResultSet()) {
-            final IResult result = new ResultSetToResultAdapter(resultSet);
-            while (flag.isTrue() && resultSet.next()) {
-              final T object = resultProcedure.execute(result);
-              if (object != null) {
+  public static <T> List<T> results(
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<IResult, T, SQLException> resultProcedure)
+      throws SQLException {
+    return results(b -> () -> {}, connection, statementString, prepareProcedure, resultProcedure);
+  }
+
+  public static <T> List<T> results(
+      final IObserverFactory cancelObserverFactory,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<IResult, T, SQLException> resultConverter)
+      throws SQLException {
+    return execute(cancelObserverFactory,
+        connection,
+        statementString,
+        prepareProcedure,
+        (IBiFunction<PreparedStatement, IBooleanContainer, List<T>, SQLException>) (statement, flag) -> {
+          final List<T> resultList = new ArrayList<>();
+          if (flag.isTrue() && statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              final IResult result = new ResultSetToResultAdapter(resultSet, (c, i, o, d) -> o);
+              while (flag.isTrue() && resultSet.next()) {
+                final T object = resultConverter.convert(result);
+                if (object == null) {
+                  continue;
+                }
                 resultList.add(object);
               }
             }
           }
-        }
-        return resultList;
-      }
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+          return resultList;
+        });
   }
 
   public static <T> T aggregate(
@@ -862,7 +997,7 @@ public class DatabaseUtilities {
       final String statementString,
       final IConverter<Iterable<IResult>, T, SQLException> function)
       throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
+    try (Connection connection = connector.connectReadOnly(connectionDescription)) {
       return aggregate(connection, statementString, function);
     }
   }
@@ -883,76 +1018,65 @@ public class DatabaseUtilities {
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
       final IConverter<Iterable<IResult>, T, SQLException> resultProcedure)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      prepareProcedure.execute(statement);
-      if (statement.execute()) {
-        try (final ResultSet resultSet = statement.getResultSet()) {
-          final List<SQLException> exceptions = new ArrayList<>(4);
-          final IResult result = new ResultSetToResultAdapter(resultSet);
-          final Iterable<IResult> iterable = () -> new Iterator<>() {
-
-            @Override
-            public boolean hasNext() {
-              try {
-                return resultSet.next();
-              } catch (final SQLException exception) {
-                exceptions.add(exception);
-                return false;
-              }
-            }
-
-            @Override
-            public IResult next() {
-              return result;
-            }
-          };
-          try {
-            return resultProcedure.convert(iterable);
-          } catch (SQLException exception) {
-            for (final SQLException sqlException : exceptions) {
-              sqlException.addSuppressed(exception);
-              exception = sqlException;
-            }
-            throw exception;
-          }
-        }
-      }
-      return resultProcedure.convert(new ArrayList<IResult>());
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+    return aggregate(b -> () -> {}, connection, statementString, prepareProcedure, resultProcedure);
   }
 
-  public static boolean execute(
+  public static <T> T aggregate(
+      final ICanceler canceler,
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
-      final IProcedure<ResultSet, SQLException> resultProcedure)
+      final IConverter<Iterable<IResult>, T, SQLException> resultProcedure)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      prepareProcedure.execute(statement);
-      if (statement.execute()) {
-        try (final ResultSet resultSet = statement.getResultSet()) {
-          resultProcedure.execute(resultSet);
-          return true;
-        }
-      }
-      return statement.getUpdateCount() > 0;
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+    return aggregate(canceler.observerFactory(), connection, statementString, prepareProcedure, resultProcedure);
   }
 
-  public static final boolean execute(
+  public static <T> T aggregate(
+      final IObserverFactory cancelObserverFactory,
       final Connection connection,
       final String statementString,
-      final Object... values)
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<Iterable<IResult>, T, SQLException> resultProcedure)
       throws SQLException {
-    return execute(connection, statementString, setterProcedur(values), each -> {
-      // nothing to do
-    });
+    return execute(cancelObserverFactory,
+        connection,
+        statementString,
+        prepareProcedure,
+        (IBiFunction<PreparedStatement, IBooleanContainer, T, SQLException>) (statement, flag) -> {
+          if (statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              final List<SQLException> exceptions = new ArrayList<>(4);
+              final IResult result = new ResultSetToResultAdapter(resultSet, (c, i, o, d) -> o);
+              final Iterable<IResult> iterable = () -> new Iterator<>() {
+
+                @Override
+                public boolean hasNext() {
+                  try {
+                    return flag.isTrue() && resultSet.next();
+                  } catch (final SQLException exception) {
+                    exceptions.add(exception);
+                    return false;
+                  }
+                }
+
+                @Override
+                public IResult next() {
+                  return result;
+                }
+              };
+              try {
+                return resultProcedure.convert(iterable);
+              } catch (SQLException exception) {
+                for (final SQLException sqlException : exceptions) {
+                  sqlException.addSuppressed(exception);
+                  exception = sqlException;
+                }
+                throw exception;
+              }
+            }
+          }
+          return resultProcedure.convert(new ArrayList<IResult>());
+        });
   }
 
   public static final boolean call(
@@ -960,7 +1084,7 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    return call(connection, statementString, setterProcedur(values), each -> {
+    return call(connection, statementString, setter(values), each -> {
       // nothing to do
     });
   }
@@ -981,8 +1105,9 @@ public class DatabaseUtilities {
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
       final IProcedure<ResultSet, SQLException> resultProcedure)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
+    String statementHash = ConnectionUtilities.nullHash();
     try (CallableStatement statement = connection.prepareCall(statementString)) {
+      statementHash = ConnectionUtilities.hash(statement);
       prepareProcedure.execute(statement);
       if (statement.execute()) {
         try (final ResultSet resultSet = statement.getResultSet()) {
@@ -992,36 +1117,44 @@ public class DatabaseUtilities {
       }
       return statement.getUpdateCount() > 0;
     } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
+      throw new SQLException(ConnectionUtilities.hash(connection) + " " + statementHash + " statement failed",
+          exception);
     }
   }
 
-  public static IProcedure<PreparedStatement, SQLException> setterProcedur(
-      final List objects) {
+  @SuppressWarnings("nls")
+  public static IProcedure<PreparedStatement, SQLException> setter(
+      final Object... objects) {
+    return setter(Arrays.asList(objects));
+  }
+
+  public static IProcedure<PreparedStatement, SQLException> setter(final List objects) {
     return statement -> {
       for (int i = 0; i < objects.size(); ++i) {
-        logger.log(ILevel.DEBUG, "  value: " + toDebugString(objects.get(i)));
         final Object adjustValue = adjustValue(objects.get(i));
-        if (adjustValue == null) {
-          statement.setNull(i + 1, 0);
-          continue;
-        }
+        //        if (adjustValue == null) {
+        //          statement.setNull(i + 1, 0);
+        //          continue;
+        //        }
         statement.setObject(i + 1, adjustValue);
       }
     };
   }
 
   @SuppressWarnings("nls")
-  public static IProcedure<PreparedStatement, SQLException> setterProcedur(
+  public static IInterruptableProcedure<PreparedStatement, SQLException> interruptableStetter(
       final Object... objects) {
+    return interruptableStetter(Arrays.asList(objects));
+  }
+
+  public static IInterruptableProcedure<PreparedStatement, SQLException> interruptableStetter(final List objects) {
     return statement -> {
-      for (int i = 0; i < objects.length; ++i) {
-        logger.log(ILevel.DEBUG, "  value: " + toDebugString(objects[i]));
-        final Object adjustValue = adjustValue(objects[i]);
-        if (adjustValue == null) {
-          statement.setNull(i + 1, 0);
-          continue;
-        }
+      for (int i = 0; i < objects.size(); ++i) {
+        final Object adjustValue = adjustValue(objects.get(i));
+        //        if (adjustValue == null) {
+        //          statement.setNull(i + 1, 0);
+        //          continue;
+        //        }
         statement.setObject(i + 1, adjustValue);
       }
     };
@@ -1031,17 +1164,33 @@ public class DatabaseUtilities {
     if (value == null) {
       return null;
     }
-    if (value instanceof java.util.Date
-        && !(value instanceof java.sql.Date
-            || value instanceof java.sql.Timestamp
-            || value instanceof java.sql.Time)) {
-      return new java.sql.Timestamp(((java.util.Date) value).getTime());
+    if (value instanceof java.util.Date date) {
+      return new java.sql.Timestamp(date.getTime());
+    }
+    if (value instanceof ZonedDateTime zonedDateTime) {
+      return Timestamp.valueOf(zonedDateTime
+          .toInstant()
+          .atZone(ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone())
+          .toLocalDateTime());
+    }
+    if (value instanceof LocalDateTime localDateTime) {
+      final ZonedDateTime dateTime = localDateTime.atZone(ZonedDateTimeUtilities.getUserZone())
+          .toInstant()
+          .atZone(
+              ZonedDateTimeUtilities.getCoordinatedUniversalTimeZone());
+      return Timestamp.valueOf(dateTime.toLocalDateTime());
+    }
+    if (value instanceof LocalDate localDate) {
+      return java.sql.Date.valueOf(localDate);
+    }
+    if (value instanceof LocalTime localTime) {
+      return java.sql.Time.valueOf(localTime);
     }
     if (value instanceof ComparableNumber) {
       return adjustValue(value);
     }
-    if (value instanceof Double) {
-      if (Double.isNaN((double) value)) {
+    if (value instanceof Double doubleValue) {
+      if (Double.isNaN(doubleValue.doubleValue())) {
         return null;
       }
       return value;
@@ -1055,9 +1204,10 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    try (Connection connection = connector.connectReadOnly(connectionDescription);) {
-      return count(connection, statementString, values);
-    }
+    return execute(connector,
+        connectionDescription,
+        (IFunction<Connection, Integer,
+            SQLException>) connection -> count(connection, statementString, values));
   }
 
   public static int count(
@@ -1065,28 +1215,29 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    return count(connection, statementString, setterProcedur(values));
+    return count(connection, statementString, setter(values));
   }
 
-  public static Long next(final Connection connection, final String nextValueStatement)
+  public static Long next(final Connection connection, final String statementString)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + nextValueStatement); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(nextValueStatement)) {
-      if (statement.execute()) {
-        try (final ResultSet resultSet = statement.getResultSet()) {
-          if (resultSet.next()) {
-            final Number number = (Number) resultSet.getObject(1);
-            if (number == null) {
-              return null;
+    return execute(b -> () -> {},
+        connection,
+        statementString,
+        setter(),
+        (IBiFunction<PreparedStatement, IBooleanContainer, Long, SQLException>) (statement, flag) -> {
+          if (statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              if (resultSet.next()) {
+                final Number number = (Number) resultSet.getObject(1);
+                if (number == null) {
+                  return null;
+                }
+                return number.longValue();
+              }
             }
-            return number.longValue();
           }
-        }
-      }
-      return null;
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + nextValueStatement + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+          return null;
+        });
   }
 
   public static int count(
@@ -1094,12 +1245,25 @@ public class DatabaseUtilities {
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (PreparedStatement statement = connection.prepareStatement(statementString)) {
-      return count(statement, prepareProcedure);
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+    return execute(b -> () -> {},
+        connection,
+        statementString,
+        prepareProcedure,
+        (IBiFunction<PreparedStatement, IBooleanContainer, Integer, SQLException>) (statement, flag) -> {
+          if (statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              if (resultSet.next()) {
+                final Object object = resultSet.getObject(1);
+                if (!(object instanceof Number)) {
+                  return 0;
+                }
+                final Number number = (Number) object;
+                return number.intValue();
+              }
+            }
+          }
+          return 0;
+        });
   }
 
   public static int count(
@@ -1140,36 +1304,6 @@ public class DatabaseUtilities {
     return count.booleanValue();
   }
 
-  public static boolean execute(final Connection connection, final String statementString)
-      throws SQLException {
-    return execute(
-        connection,
-        statementString,
-        (IProcedure<PreparedStatement, SQLException>) statement -> {
-          // nothing to do
-        });
-  }
-
-  public static final boolean execute(
-      final Connection connection,
-      final String statementString,
-      final IProcedure<PreparedStatement, SQLException> procedure)
-      throws SQLException {
-    return execute(connection, statementString, procedure, each -> {
-      // nothing to do
-    });
-  }
-
-  public static void execute(
-      final IDatabaseConnector connector,
-      final IJdbcConnectionDescription connectionDescription,
-      final IProcedure<Connection, SQLException> procedure)
-      throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription, true)) {
-      procedure.execute(connection);
-    }
-  }
-
   public static boolean exists(
       final IDatabaseConnector connector,
       final IJdbcConnectionDescription connectionDescription) {
@@ -1187,19 +1321,7 @@ public class DatabaseUtilities {
       final String[] returnColumns,
       final Object... values)
       throws SQLException {
-    return update(connection, statementString, returnColumns, setterProcedur(values));
-  }
-
-  public static List<Object> update(
-      final IDatabaseConnector connector,
-      final IJdbcConnectionDescription connectionDescription,
-      final String updatetStatement,
-      final String[] returnColumns,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
-      throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription, true)) {
-      return update(connection, updatetStatement, returnColumns, prepareProcedure);
-    }
+    return update(connection, statementString, returnColumns, setter(values));
   }
 
   public static List<Object> update(
@@ -1208,9 +1330,13 @@ public class DatabaseUtilities {
       final String[] returnColumns,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (
-        PreparedStatement statement = connection.prepareStatement(statementString, returnColumns)) {
+    String connectionHash = ConnectionUtilities.hash(connection);
+    String statementHash = ConnectionUtilities.nullHash();
+    try (PreparedStatement statement =
+        returnColumns == null || returnColumns.length == 0
+            ? connection.prepareStatement(statementString, Statement.RETURN_GENERATED_KEYS)
+            : connection.prepareStatement(statementString, returnColumns)) {
+      statementHash = ConnectionUtilities.hash(statement);
       prepareProcedure.execute(statement);
       final int numberOfChangedRows = statement.executeUpdate();
       if (numberOfChangedRows == 0) {
@@ -1220,14 +1346,23 @@ public class DatabaseUtilities {
       try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
         while (generatedKeys.next()) {
           final Object key = generatedKeys.getObject(1);
-          logger.log(ILevel.DEBUG, "    key: " + toDebugString(key)); //$NON-NLS-1$
+          logger.debug(ConnectionUtilities.hash(connection) + " " + ConnectionUtilities.hash(statement) //$NON-NLS-1$
+              + " statement generated key: " + ConnectionUtilities.toDebugString(key));
           keys.add(key);
         }
       }
       return keys;
     } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
+      throw new SQLException(connectionHash + " " + statementHash + " statement failed", exception);
     }
+  }
+
+  public static List<Object> update(
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
+    return update(connection, statementString, null, prepareProcedure);
   }
 
   public static List<Object> update(
@@ -1235,7 +1370,21 @@ public class DatabaseUtilities {
       final String statementString,
       final Object... values)
       throws SQLException {
-    return update(connection, statementString, setterProcedur(values));
+    return update(connection, statementString, setter(values));
+  }
+
+  public static List<Object> update(
+      final IDatabaseConnector connector,
+      final IJdbcConnectionDescription connectionDescription,
+      final String updatetStatement,
+      final String[] returnColumns,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      throws SQLException {
+    return execute(
+        connector,
+        connectionDescription,
+        (IFunction<Connection, List<Object>,
+            SQLException>) connection -> update(connection, updatetStatement, returnColumns, prepareProcedure));
   }
 
   public static List<Object> update(
@@ -1244,44 +1393,39 @@ public class DatabaseUtilities {
       final String updatetStatement,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure)
       throws SQLException {
-    try (Connection connection = connector.connectWritable(connectionDescription, true)) {
-      return update(connection, updatetStatement, prepareProcedure);
-    }
+    return execute(
+        connector,
+        connectionDescription,
+        (IFunction<Connection, List<Object>,
+            SQLException>) connection -> update(connection, updatetStatement, prepareProcedure));
   }
 
-  public static List<Object> update(
+  public static void foreach(
+      final IObserverFactory cancelObserverFactory,
       final Connection connection,
       final String statementString,
-      final IProcedure<PreparedStatement, SQLException> prepareProcedure)
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConsumer<IResult, SQLException> resultConsumer)
       throws SQLException {
-    logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
-    try (PreparedStatement statement = connection
-        .prepareStatement(statementString, Statement.RETURN_GENERATED_KEYS)) {
-      try {
-        prepareProcedure.execute(statement);
-        final int numberOfChangedRows = statement.executeUpdate();
-        if (numberOfChangedRows == 0) {
-          return new ArrayList<>();
-        }
-        final ArrayList<Object> keys = new ArrayList<>();
-        try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-          while (generatedKeys.next()) {
-            final Object key = generatedKeys.getObject(1);
-            logger.log(ILevel.DEBUG, "    key: " + toDebugString(key)); //$NON-NLS-1$
-            keys.add(key);
+    execute(cancelObserverFactory,
+        connection,
+        statementString,
+        prepareProcedure,
+        (IBiFunction<PreparedStatement, IBooleanContainer, Void, SQLException>) (statement, flag) -> {
+          if (flag.isTrue() && statement.execute()) {
+            try (final ResultSet resultSet = statement.getResultSet()) {
+              final IResult result = new ResultSetToResultAdapter(resultSet, (c, i, o, d) -> o);
+              while (flag.isTrue() && resultSet.next()) {
+                resultConsumer.consume(result);
+              }
+            }
           }
-        }
-        return keys;
-      } catch (final SQLException exception) {
-        throw exception;
-      }
-    } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
-    }
+          return null;
+        });
   }
 
   public static <I> ICloseableConsumer<I, Boolean, SQLException> update(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
+      final IObserverFactory cancelObserverFactory,
       final Connection connection,
       final String statementString,
       final IConverter<I, List<IDatabaseValue>, SQLException> converter) {
@@ -1314,7 +1458,8 @@ public class DatabaseUtilities {
           }
           statement.setObject(i, value.getObject(connection));
         } catch (final SQLException exception) {
-          logger.log(ILevel.WARNING, "Couldn't set value on column '" + i + "'", exception); //$NON-NLS-1$ //$NON-NLS-2$
+          logger.warning("Couldn't set value on column '" + i + "'", exception);
+          logger.debug(exception.getMessage(), exception);
           if (value.getTypeName() != null) {
             statement.setNull(i, value.getType(), value.getTypeName());
           } else {
@@ -1323,29 +1468,31 @@ public class DatabaseUtilities {
         }
       }
     };
-    return update(cancelWatcherFactory, connection, statementString, aggregator);
+    return update(cancelObserverFactory, connection, statementString, aggregator);
   }
 
   public static <I> ICloseableConsumer<I, Boolean, SQLException> update(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
+      final IObserverFactory cancelObserverFactory,
       final Connection connection,
       final String statementString,
       final IAggregator<PreparedStatement, I, Boolean, SQLException> aggregator) {
 
     return new ICloseableConsumer<>() {
 
-      private IWatcher statementCancler;
+      private final String connectionHash = ConnectionUtilities.hash(connection);
+      private String statementHash = ConnectionUtilities.nullHash();
+      private IObserver statementCancelObserver;
       private boolean isClosed = false;
       private PreparedStatement statement;
+      private final IBooleanContainer cancelFlag = new BooleanContainer(false);
 
       @Override
       public void close() throws SQLException {
         if (this.isClosed) {
-          throw new SQLException("consumer is closed"); //$NON-NLS-1$
+          throw new SQLException(this.connectionHash + " " + this.statementHash + "consumer is closed");
         }
         this.isClosed = true;
-        this.statementCancler.close();
-        final SQLException exception = DatabaseUtilities.close(this.statement, null);
+        final SQLException exception = DatabaseUtilities.close(this.statementCancelObserver, this.statement);
         if (exception != null) {
           throw exception;
         }
@@ -1353,8 +1500,11 @@ public class DatabaseUtilities {
 
       @Override
       public Boolean consume(final I object) throws SQLException {
+        if (this.cancelFlag.isTrue()) {
+          return false;
+        }
         if (this.isClosed) {
-          throw new SQLException("consumer is closed"); //$NON-NLS-1$
+          throw new SQLException(this.connectionHash + " " + this.statementHash + "consumer is closed");
         }
         if (this.statement == null) {
           initialize();
@@ -1367,21 +1517,19 @@ public class DatabaseUtilities {
       }
 
       private void initialize() throws SQLException {
-        logger.log(ILevel.DEBUG, statementString);
         this.statement = connection.prepareStatement(statementString);
-        this.statementCancler = cancelWatcherFactory.create(() -> {
-          try {
-            this.statement.cancel();
-          } catch (final SQLException exception) {
-          }
-        });
+        this.statementCancelObserver = cancelObserverFactory.create(silent(() -> {
+          this.cancelFlag.set(true);
+          this.statement.cancel();
+        }, () -> this.connectionHash + " " + ConnectionUtilities.hash(this.statement) + " statement canceled"));
+        this.statementHash = ConnectionUtilities.hash(this.statement);
       }
     };
   }
 
   public static void add(final PreparedStatement statement, final Object... values)
       throws SQLException {
-    add(statement, setterProcedur(values));
+    add(statement, setter(values));
   }
 
   public static void add(
@@ -1429,18 +1577,19 @@ public class DatabaseUtilities {
   }
 
   public static <T> IClosableIterator<T, SQLException> query(
-      final IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> cancelWatcherFactory,
+      final IObserverFactory cancelObserverFactory,
       final Connection connection,
       final String statementString,
       final IProcedure<PreparedStatement, SQLException> prepareProcedure,
       final IConverter<IResult, T, SQLException> converter) {
-
     return new IClosableIterator<>() {
 
+      private final String connectionHash = ConnectionUtilities.hash(connection);
       private boolean isClosed = false;
+      private final IBooleanContainer cancelFlag = new BooleanContainer(false);
       private IResults results;
       private T value;
-      private IWatcher statementCancler;
+      private IObserver statementCancleObserver;
       private PreparedStatement statement;
 
       @Override
@@ -1448,12 +1597,11 @@ public class DatabaseUtilities {
         if (this.isClosed) {
           throw new SQLException("iterator is closed"); //$NON-NLS-1$
         }
-        this.statementCancler.close();
-        SQLException exception = DatabaseUtilities.close(this.results, null);
-        exception = DatabaseUtilities.close(this.statement, exception);
-        this.isClosed = true;
-        if (exception != null) {
-          throw exception;
+        try {
+          SQLException exception = DatabaseUtilities.close(this.statementCancleObserver, this.results, this.statement);
+          DatabaseUtilities.throwIfNotNull(exception);
+        } finally {
+          this.isClosed = true;
         }
       }
 
@@ -1471,6 +1619,9 @@ public class DatabaseUtilities {
           }
         }
         while (this.results.hasNext()) {
+          if (this.cancelFlag.isTrue()) {
+            return false;
+          }
           final IResult result = this.results.next();
           this.value = converter.convert(result);
           if (this.value != null) {
@@ -1481,17 +1632,16 @@ public class DatabaseUtilities {
       }
 
       private IResults initialize() throws SQLException {
-        logger.log(ILevel.DEBUG, statementString);
         this.statement = connection.prepareStatement(statementString);
-        this.statementCancler = cancelWatcherFactory.create(() -> {
-          try {
-            this.statement.cancel();
-          } catch (final SQLException exception) {
-          }
-        });
+        this.statementCancleObserver = cancelObserverFactory.create(silent(() -> {
+          this.cancelFlag.set(true);
+          this.statement.cancel();
+        }, () -> this.connectionHash + " " + ConnectionUtilities.hash(this.statement) + " statement canceled"));
         prepareProcedure.execute(this.statement);
         if (this.statement.execute()) {
-          return new ResultSetToResultsAdapter(this.statement.getResultSet());
+          return new ResultSetToResultsAdapter(
+              this.statement.getResultSet(),
+              (c, i, o, d) -> o);
         }
         return null;
       }
@@ -1513,21 +1663,6 @@ public class DatabaseUtilities {
     };
   }
 
-  private static String toDebugString(final Object object) {
-    if (object == null) {
-      return null;
-    }
-    if (object.getClass().isArray()) {
-      return object.getClass().getSimpleName();
-    }
-    return String.valueOf(object);
-  }
-
-  public static String getSchemaName(final Connection connection, final String schemaName)
-      throws SQLException {
-    return (schemaName == null ? connection.getMetaData().getUserName() : schemaName);
-  }
-
   public static void createIfNotExists(
       final Connection connection,
       final String schemaName,
@@ -1545,7 +1680,6 @@ public class DatabaseUtilities {
       final String schemaName,
       final String tableName)
       throws SQLException {
-
     try (ResultSet tables = connection
         .getMetaData()
         .getTables(
@@ -1568,7 +1702,6 @@ public class DatabaseUtilities {
   public static boolean execute(final Statement statement, final String statementString)
       throws SQLException {
     try {
-      logger.log(ILevel.DEBUG, "Statement: " + statementString); //$NON-NLS-1$
       if (!statement.execute(statementString)) {
         return false;
       }
@@ -1582,7 +1715,10 @@ public class DatabaseUtilities {
         return true;
       }
     } catch (final SQLException exception) {
-      throw new SQLException("Executing statement '" + statementString + "' faild", exception); //$NON-NLS-1$ //$NON-NLS-2$
+      throw new SQLException(
+          ConnectionUtilities.hash(statement.getConnection()) + " " + ConnectionUtilities.hash(statement)
+              + " statement failed",
+          exception);
     }
   }
 
@@ -1597,7 +1733,8 @@ public class DatabaseUtilities {
       }
 
     } catch (final SQLException exception) {
-      logger.log(ILevel.WARNING, exception.getMessage());
+      logger.warning(exception.getMessage());
+      logger.fine(exception.getMessage(), exception);
     }
     return null;
   }
@@ -1609,7 +1746,6 @@ public class DatabaseUtilities {
     return createSelectStatement(tableName, columnNames, null, valueColumnNames);
   }
 
-  @SuppressWarnings("nls")
   public static String createSelectStatement(
       final String tableName,
       final Iterable<String> conditionColumnNames,
@@ -1659,7 +1795,6 @@ public class DatabaseUtilities {
     return createIdentifierSelectStatement(tableName, identifierColumnName, null, valueColumnNames);
   }
 
-  @SuppressWarnings("nls")
   public static String createIdentifierSelectStatement(
       final String tableName,
       final String identifierColumnName,
@@ -1713,8 +1848,13 @@ public class DatabaseUtilities {
 
   public static boolean create(final Connection connection, final String statementString)
       throws SQLException {
+    String statementHash = ConnectionUtilities.nullHash();
     try (Statement statement = connection.createStatement()) {
+      statementHash = ConnectionUtilities.hash(statement);
       return statement.execute(statementString);
+    } catch (final SQLException exception) {
+      throw new SQLException(ConnectionUtilities.hash(connection) + " " + statementHash + " statement failed",
+          exception);
     }
   }
 
@@ -1723,9 +1863,9 @@ public class DatabaseUtilities {
       final ResultSetMetaData metaData = resultSet.getMetaData();
       final List<Object> values = new ArrayList<>();
       for (int i = 0; i < metaData.getColumnCount(); i++) {
-        values.add(toDebugString(resultSet.getObject(i + 1)));
+        values.add(ConnectionUtilities.toDebugString(resultSet.getObject(i + 1)));
       }
-      return IterableUtilities.toString(values, ", ", s -> toDebugString(s)); //$NON-NLS-1$
+      return IterableUtilities.toString(values, ", ", s -> ConnectionUtilities.toDebugString(s)); //$NON-NLS-1$
     } catch (final ConversionException exception) {
       throw new SQLException(exception);
     }
@@ -1758,7 +1898,6 @@ public class DatabaseUtilities {
         updateStatement);
   }
 
-  @SuppressWarnings("nls")
   private static String createInsertStatement(
       final String tableName,
       final String[] identifiers,
@@ -1816,7 +1955,6 @@ public class DatabaseUtilities {
     return builder.toString();
   }
 
-  @SuppressWarnings("nls")
   private static String createUpdateStatement(
       final String tableName,
       final String[] identifiers,
@@ -1856,7 +1994,6 @@ public class DatabaseUtilities {
     return builder.toString();
   }
 
-  @SuppressWarnings("nls")
   private static String createSelectExistsStatement(
       final String tableName,
       final String[] identifiers) {
@@ -1884,39 +2021,6 @@ public class DatabaseUtilities {
     return (int) string.chars().filter(ch -> ch == '?').count();
   }
 
-  public static void execute(final Connection connection, final File file)
-      throws FileNotFoundException,
-      IOException,
-      SQLException {
-    StringBuilder builder = new StringBuilder();
-    ICounter counter = new Counter(0);
-    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        String trimed = line.trim();
-        if (trimed.isBlank() || "COMMIT;".equalsIgnoreCase(trimed)) {
-          continue;
-        }
-        builder.append(trimed);
-        if (trimed.endsWith(";")) {
-          String statementString = builder.toString();
-          execute(connection, statementString.substring(0, statementString.length() - 1));
-          counter.increment();
-          if (!connection.getAutoCommit() && counter.value() == 500) {
-            counter.set(0);
-            connection.commit();
-          }
-          builder = new StringBuilder();
-          continue;
-        }
-        builder.append("\n");
-      }
-    }
-    if (!connection.getAutoCommit() && counter.value() > 0) {
-      connection.commit();
-    }
-  }
-
   public static IVersion version(final Connection connection) throws SQLException {
     DatabaseMetaData metaData = connection.getMetaData();
     int majorVersion = metaData.getDatabaseMajorVersion();
@@ -1924,4 +2028,326 @@ public class DatabaseUtilities {
     return new VersionBuilder().setMajor(majorVersion).setMinor(minorVersion).build();
   }
 
+  public static IClosableIterator<IResult, SQLException> iterator(final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure) {
+    return iterator(canceler, connection, statementString, prepareProcedure, r -> r);
+  }
+
+  public static <T> IClosableIterator<T, SQLException> iterator(final ICanceler canceler,
+      final Connection connection,
+      final String statementString,
+      final IProcedure<PreparedStatement, SQLException> prepareProcedure,
+      final IConverter<IResult, T, SQLException> resultConverter) {
+    return new IClosableIterator<T, SQLException>() {
+
+      private final String connectionHash = ConnectionUtilities.hash(connection);
+      private IClosableIterator<T, SQLException> delegator;
+      private IObserver observer;
+      private PreparedStatement statement;
+
+      @Override
+      public void close() throws SQLException {
+        DatabaseUtilities.close(this.delegator, this.statement, this.observer);
+      }
+
+      @Override
+      public boolean hasNext() throws SQLException {
+        if (canceler.isCanceled()) {
+          return false;
+        }
+        if (this.delegator == null) {
+          this.statement = connection.prepareStatement(statementString);
+          this.observer = canceler.observer(silent(() -> {
+            this.statement.cancel();
+          }, () -> this.connectionHash + " " + ConnectionUtilities.hash(this.statement) + " statement canceled"));
+          prepareProcedure.execute(this.statement);
+          if (!this.statement.execute()) {
+            return false;
+          }
+          this.delegator = DatabaseUtilities.iterator(canceler, this.statement, resultConverter);
+        }
+        return this.delegator.hasNext();
+      }
+
+      @Override
+      public T next() throws SQLException {
+        return this.delegator.next();
+      }
+
+    };
+  }
+
+  public static IClosableIterator<IResult, SQLException> iterator(final ICanceler canceler,
+      final PreparedStatement statement) {
+    return iterator(canceler, statement, r -> r);
+  }
+
+  public static <T> IClosableIterator<T, SQLException> iterator(final ICanceler canceler,
+      final PreparedStatement statement,
+      final IConverter<IResult, T, SQLException> resultConverter) {
+    return new IClosableIterator<T, SQLException>() {
+
+      private IClosableIterator<T, SQLException> delegator;
+      private ResultSet resultSet;
+
+      @Override
+      public void close() throws SQLException {
+        DatabaseUtilities.close(this.delegator, this.resultSet);
+      }
+
+      @Override
+      public boolean hasNext() throws SQLException {
+        if (this.delegator == null) {
+          this.resultSet = statement.getResultSet();
+          this.delegator =
+              DatabaseUtilities.iterator(canceler, this.resultSet, resultConverter);
+        }
+        return this.delegator.hasNext();
+      }
+
+      @Override
+      public T next() throws SQLException {
+        return this.delegator.next();
+      }
+    };
+  }
+
+  public static <T> IClosableIterator<T, SQLException> iterator(final ICanceler canceler,
+      final ResultSet resultSet,
+      final IConverter<IResult, T, SQLException> resultConverter) {
+    return new IClosableIterator<T, SQLException>() {
+
+      T object;
+
+      @Override
+      public void close() throws SQLException {
+      }
+
+      @Override
+      public boolean hasNext() throws SQLException {
+        if (this.object != null) {
+          return true;
+        }
+        while (!canceler.isCanceled() && resultSet.next()) {
+          final IResult result = new ResultSetToResultAdapter(resultSet, (c, i, o, d) -> o);
+          T value = resultConverter.convert(result);
+          if (value != null) {
+            this.object = value;
+            return true;
+          }
+        }
+        return false;
+      }
+
+      @Override
+      public T next() throws SQLException {
+        try {
+          return this.object;
+        } finally {
+          this.object = null;
+        }
+      }
+    };
+  }
+
+  public static <T> List<T> metadatas(final ICanceler canceler,
+      final Connection connection,
+      final IFactory<DatabaseMetaData, ResultSet, SQLException> resultSetFactory,
+      final IConverter<ResultSet, T, SQLException> resultConverter) throws SQLException {
+    final DatabaseMetaData metaData = connection.getMetaData();
+    final Set<T> result = new LinkedHashSet<>();
+    try (final ResultSet resultSet = resultSetFactory.create(metaData)) {
+      while (!canceler.isCanceled() && resultSet.next()) {
+        T value = resultConverter.convert(resultSet);
+        Optional.of(value).consume(v -> result.add(v));
+      }
+    }
+    return List.copyOf(result);
+  }
+
+  public static Integer getInteger(final ResultSet resultSet, final int index) throws SQLException {
+    int value = resultSet.getInt(index);
+    return resultSet.wasNull() ? null : Integer.valueOf(value);
+  }
+
+  public static Long getLong(final ResultSet resultSet, final int index) throws SQLException {
+    long value = resultSet.getLong(index);
+    return resultSet.wasNull() ? null : Long.valueOf(value);
+  }
+
+  public static Double getDouble(final ResultSet resultSet, final int index) throws SQLException {
+    double value = resultSet.getDouble(index);
+    return resultSet.wasNull() ? null : Double.valueOf(value);
+  }
+
+  public static Runnable silent(final IBlock<SQLException> block) {
+    return () -> {
+      try {
+        block.execute();
+      } catch (SQLException e) {
+        logger.fine(e.getMessage(), e);
+      }
+    };
+  }
+
+  public static Runnable silent(final IBlock<SQLException> block, final Supplier<String> loggerMessage) {
+    return () -> {
+      try {
+        logger.debug(loggerMessage.get());
+        block.execute();
+      } catch (SQLException e) {
+        logger.fine(e.getMessage(), e);
+      }
+    };
+  }
+
+  public static void
+      commit(final Connection connection, final IntCounter executeCounter, final SQLException exception)
+          throws SQLException {
+    try {
+      if (executeCounter.value() > 0) {
+        if (!connection.getAutoCommit()) {
+          connection.commit();
+        }
+      }
+      throwIfNotNull(exception);
+    } catch (final SQLException commitException) {
+      if (exception == null) {
+        throw commitException;
+      }
+      exception.addSuppressed(commitException);
+      throw exception;
+    }
+  }
+
+  public static SQLException rollback(final Connection connection,
+      final IntCounter executeCounter,
+      final SQLException exception) {
+    if (executeCounter.value() > 0) {
+      try {
+        if (!connection.getAutoCommit()) {
+          connection.rollback();
+        }
+        return exception;
+      } catch (final SQLException rollbackException) {
+        if (exception == null) {
+          return rollbackException;
+        }
+        exception.addSuppressed(rollbackException);
+        return exception;
+      }
+    }
+    return exception;
+  }
+
+  public static void setValueToStatement(final Connection connection,
+      final PreparedStatement statement,
+      final int i,
+      final IDatabaseValue value) throws SQLException {
+    try {
+      if (value.getObject(connection) == null) {
+        setNullToStatement(statement, i, value);
+        return;
+      }
+      statement.setObject(i, value.getObject(connection));
+    } catch (final SQLException exception) {
+      logger.debug(
+          () -> ConnectionUtilities.hash(connection) + " " + ConnectionUtilities.hash(statement)
+              + " statement, couldn't set value on column '" + i + "'",
+          exception);
+      setNullToStatement(statement, i, value);
+    }
+  }
+
+  private static void setNullToStatement(final PreparedStatement statement, final int i, final IDatabaseValue value)
+      throws SQLException {
+    if (value.getTypeName() != null) {
+      statement.setNull(i, value.getType(), value.getTypeName());
+    } else {
+      statement.setNull(i, value.getType());
+    }
+  }
+
+  public static int executeBatch(
+      final IntCounter insertCounter,
+      final IntCounter executeCounter,
+      final PreparedStatement statement) throws SQLException {
+    final int[] result = statement.executeBatch();
+    executeCounter.next();
+    insertCounter.reset();
+    int sum = 0;
+    for (final int i : result) {
+      if (PreparedStatement.EXECUTE_FAILED == i) {
+        final SQLWarning warnings = statement.getWarnings();
+        Optional.of(warnings).consume(w -> logger.warning(() -> w.getMessage(), w));
+        return -1;
+      }
+      if (PreparedStatement.SUCCESS_NO_INFO == i) {
+        return -1;
+      }
+      sum += i;
+    }
+    return sum;
+  }
+
+  public static PreparedStatement createStatement(final Connection connection, final String statementString)
+      throws SQLException {
+    return connection.prepareStatement(statementString, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+  }
+
+  public static boolean isSupported(final String url) {
+    return DriverManager.drivers().anyMatch(d -> {
+      try {
+        return d.acceptsURL(url);
+      } catch (SQLException exception) {
+        return false;
+      }
+    });
+  }
+
+  public static void openLogWriter() {
+    String logTargetFileName = System.getProperty("net.anwiba.jdbc.logtarget", null);
+    if (logTargetFileName == null || logTargetFileName.isBlank()) {
+      return;
+    }
+    if (Objects.equals(logTargetFileName.toLowerCase(), "sysout")) {
+      DriverManager.setLogWriter(new PrintWriter(System.out));
+      return;
+    }
+    if (Objects.equals(logTargetFileName.toLowerCase(), "syserr")) {
+      DriverManager.setLogWriter(new PrintWriter(System.err));
+      return;
+    }
+    try {
+      final File file = new File(logTargetFileName);
+      if (!Files.exists(file.toPath())) {
+        Files.createFile(file.toPath());
+      }
+      if (Files.isDirectory(file.toPath())) {
+        throw new IOException("JDBC-log targe '" + logTargetFileName + "', is a directory");
+      }
+      PrintWriter logWriter = new PrintWriter(file);
+      DriverManager.setLogWriter(logWriter);
+    } catch (IOException exception) {
+      logger.debug("Couldn't set JDBC-log file '" + logTargetFileName + "', " + exception.getMessage(), exception);
+    }
+  }
+
+  public static void closeLogWriter() {
+    String logTargetFileName = System.getProperty("net.anwiba.jdbc.log.target", null);
+    if (Objects.equals(logTargetFileName.toLowerCase(), "sysout")
+        || Objects.equals(logTargetFileName.toLowerCase(), "syserr")) {
+      DriverManager.setLogWriter(null);
+      return;
+    }
+    @SuppressWarnings("resource")
+    PrintWriter logWriter = DriverManager.getLogWriter();
+    if (logWriter == null) {
+      return;
+    }
+    DriverManager.setLogWriter(null);
+    logWriter.close();
+  }
 }

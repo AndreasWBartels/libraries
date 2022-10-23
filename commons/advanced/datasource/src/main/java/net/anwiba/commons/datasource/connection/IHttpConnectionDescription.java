@@ -22,25 +22,26 @@
 package net.anwiba.commons.datasource.connection;
 
 import net.anwiba.commons.lang.parameter.IParameters;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.IAuthentication;
 
 public interface IHttpConnectionDescription extends IResourceReferenceConnectionDescription {
 
   String getUserName();
 
-  int getPort();
-
   String getPassword();
 
   String getHost();
+  
+  int getPort();
 
   String getPath();
 
+  IParameters getParameters();
+  
   boolean isSslEnabled();
 
-  IParameters getParameters();
-
   String getUrlString();
+
 
   @Override
   IHttpConnectionDescription adapt(IAuthentication authentication);

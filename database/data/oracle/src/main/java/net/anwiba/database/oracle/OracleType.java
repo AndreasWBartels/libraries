@@ -21,123 +21,123 @@
  */
 package net.anwiba.database.oracle;
 
-import net.anwiba.commons.jdbc.metadata.IDataBaseType;
+import net.anwiba.commons.jdbc.metadata.IDatabaseType;
 import oracle.jdbc.OracleTypes;
 
-public enum OracleType implements IDataBaseType {
+public enum OracleType implements IDatabaseType {
 
   NUMBER(OracleTypes.NUMBER) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitNumber();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitNumber();
     }
   },
   FLOAT(OracleTypes.FLOAT) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitFloat();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitFloat();
     }
   },
   VARCHAR2(OracleTypes.VARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitVarchar();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitVarchar();
     }
   },
   NVARCHAR2(OracleTypes.NVARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitVarchar();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitVarchar();
     }
   },
   INTERVALDS(OracleTypes.INTERVALDS) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   INTERVALYM(OracleTypes.INTERVALYM) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TIMESTAMPLTZ(OracleTypes.TIMESTAMPLTZ) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   TIMESTAMPTZ(OracleTypes.TIMESTAMPTZ) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   PLSQL_INDEX_TABLE(OracleTypes.PLSQL_INDEX_TABLE) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BFILE(OracleTypes.BFILE) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   CURSOR(OracleTypes.CURSOR) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   RAW(OracleTypes.RAW) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   LONGVARCHAR(OracleTypes.LONGVARCHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BINARY_FLOAT(OracleTypes.BINARY_FLOAT) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   BINARY_DOUBLE(OracleTypes.BINARY_DOUBLE) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   FIXED_CHAR(OracleTypes.FIXED_CHAR) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   OPAQUE(OracleTypes.OPAQUE) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   JAVA_STRUCT(OracleTypes.JAVA_STRUCT) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnsupportedType();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnsupportedType();
     }
   },
   UNKNOWN(Integer.MAX_VALUE) {
     @Override
-    public <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E {
-      visitor.visitUnknown();
+    public <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitUnknown();
     }
   };
 
@@ -146,6 +146,12 @@ public enum OracleType implements IDataBaseType {
   private OracleType(final int code) {
     this.code = code;
   }
+
+  @Override
+  public String getName() {
+    return name();
+  }
+  
 
   public static OracleType getType(final int code) {
     for (final OracleType oracleType : OracleType.values()) {
@@ -161,7 +167,7 @@ public enum OracleType implements IDataBaseType {
     return this.code;
   }
 
-  public abstract <T, E extends Exception> void accept(final IOracleTypeVisitor<T, E> visitor) throws E;
+  public abstract <T, E extends Exception> T accept(final IOracleTypeVisitor<T, E> visitor) throws E;
 
   public static OracleType getByName(final String name) {
     for (final OracleType type : OracleType.values()) {

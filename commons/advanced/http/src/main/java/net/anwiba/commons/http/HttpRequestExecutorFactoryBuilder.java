@@ -21,130 +21,58 @@
  */
 package net.anwiba.commons.http;
 
-import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.io.HttpClientConnectionManager;
-
-import net.anwiba.commons.lang.optional.IOptional;
-import net.anwiba.commons.lang.optional.Optional;
-
 public class HttpRequestExecutorFactoryBuilder implements IHttpRequestExecutorFactoryBuilder {
 
-  private IHttpClientConfiguration configuration = new IHttpClientConfiguration() {
+  private HttpClientConfigurationBuilder builder;
 
-    @Override
-    public HttpConnectionMode getMode() {
-      return HttpConnectionMode.CLOSE;
-    }
+  public HttpRequestExecutorFactoryBuilder() {
+    builder = new HttpClientConfigurationBuilder();
+  }
 
-    @Override
-    public HttpClientConnectionManager getManager() {
-      return new BasicHttpClientConnectionManager();
-    }
-  };
-
+  public HttpRequestExecutorFactoryBuilder(IHttpClientConfiguration configuration) {
+    builder = new HttpClientConfigurationBuilder(configuration);
+  }
+  
   @Override
-  public IHttpRequestExecutorFactoryBuilder setProxy(final String scheme, final String hostname, final int port) {
-    this.proxyConfiguration = new IHttpProxyConfiguration() {
-
-      @Override
-      public int getPort() {
-        return port;
-      }
-
-      @Override
-      public String getHost() {
-        return hostname;
-      }
-
-      @Override
-      public String getScheme() {
-        return scheme;
-      }
-    };
+  public HttpRequestExecutorFactoryBuilder setUserAgent(final String userAgent) {
+    builder.setUserAgent(userAgent);
     return this;
   }
 
-  final PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
-      new PoolingHttpClientConnectionManager();
-  private IHttpProxyConfiguration proxyConfiguration = null;
+  @Override
+  public IHttpRequestExecutorFactoryBuilder setProxy(final String scheme, final String hostname, final int port) {
+    builder.setProxy(scheme, hostname, port);
+    return this;
+  }
 
-  public HttpRequestExecutorFactoryBuilder() {
-    super();
+  @Override
+  public IHttpRequestExecutorFactoryBuilder
+      setProxy(final String scheme, final String hostname, final int port, String username, String password) {
+    builder.setProxy(scheme, hostname, port, username, password);
+    return this;
   }
 
   @Override
   public IHttpRequestExecutorFactoryBuilder usePoolingConnection() {
-    this.configuration = new IHttpClientConfiguration() {
-
-      @Override
-      public HttpConnectionMode getMode() {
-        return HttpConnectionMode.KEEP_ALIVE;
-      }
-
-      @Override
-      public HttpClientConnectionManager getManager() {
-        return HttpRequestExecutorFactoryBuilder.this.poolingHttpClientConnectionManager;
-      }
-    };
+    builder.usePoolingConnection();
     return this;
   }
 
   @Override
   public IHttpRequestExecutorFactoryBuilder useAlwaysTheSameConnection() {
-    this.configuration = new IHttpClientConfiguration() {
-
-      final BasicHttpClientConnectionManager basicHttpClientConnectionManager = new BasicHttpClientConnectionManager();
-
-      @Override
-      public HttpConnectionMode getMode() {
-        return HttpConnectionMode.KEEP_ALIVE;
-      }
-
-      @Override
-      public HttpClientConnectionManager getManager() {
-        return this.basicHttpClientConnectionManager;
-      }
-    };
+    builder.useAlwaysTheSameConnection();
     return this;
   }
 
   @Override
   public IHttpRequestExecutorFactoryBuilder useAlwaysANewConnection() {
-    this.configuration = new IHttpClientConfiguration() {
-
-      @Override
-      public HttpConnectionMode getMode() {
-        return HttpConnectionMode.CLOSE;
-      }
-
-      @Override
-      public HttpClientConnectionManager getManager() {
-        return new BasicHttpClientConnectionManager();
-      }
-    };
+    builder.useAlwaysANewConnection();
     return this;
   }
 
   @Override
   public IHttpRequestExecutorFactory build() {
-    return new HttpRequestExecutorFactory(new IHttpClientConfiguration() {
-
-      @Override
-      public HttpConnectionMode getMode() {
-        return HttpRequestExecutorFactoryBuilder.this.configuration.getMode();
-      }
-
-      @Override
-      public HttpClientConnectionManager getManager() {
-        return HttpRequestExecutorFactoryBuilder.this.configuration.getManager();
-      }
-
-      @Override
-      public IOptional<IHttpProxyConfiguration, RuntimeException> getProxyConfiguration() {
-        return Optional.of(HttpRequestExecutorFactoryBuilder.this.proxyConfiguration);
-      }
-    });
+    return new HttpRequestExecutorFactory(() -> builder.build());
   }
 
 }

@@ -21,14 +21,32 @@
  */
 package net.anwiba.database.swing.console.tree;
 
+import net.anwiba.commons.jdbc.connection.IDatabaseConnector;
+import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
+import net.anwiba.commons.jdbc.database.IDatabaseFacade;
+import net.anwiba.commons.jdbc.database.INamedTableFilter;
+import net.anwiba.commons.jdbc.name.DatabaseSchemaName;
+import net.anwiba.commons.jdbc.name.IDatabaseColumnName;
+import net.anwiba.commons.jdbc.name.IDatabaseConstraintName;
+import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
+import net.anwiba.commons.jdbc.name.IDatabaseSchemaName;
+import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
+import net.anwiba.commons.jdbc.name.IDatabaseTableName;
+import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
+import net.anwiba.commons.jdbc.name.IDatabaseViewName;
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.functional.IFunction;
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.swing.tree.ReloadableFolderTreeNode;
+import net.anwiba.commons.thread.cancel.ICanceler;
+import net.anwiba.database.swing.console.SqlConsoleMessages;
+
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,93 +54,46 @@ import java.util.Set;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
-import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
-import net.anwiba.commons.jdbc.database.IDatabaseFacade;
-import net.anwiba.commons.jdbc.database.INamedTableFilter;
-import net.anwiba.commons.jdbc.name.DatabaseTableName;
-import net.anwiba.commons.jdbc.name.IDatabaseConstraintName;
-import net.anwiba.commons.jdbc.name.IDatabaseIndexName;
-import net.anwiba.commons.jdbc.name.IDatabaseSequenceName;
-import net.anwiba.commons.jdbc.name.IDatabaseTableName;
-import net.anwiba.commons.jdbc.name.IDatabaseTriggerName;
-import net.anwiba.commons.lang.functional.IFactory;
-import net.anwiba.commons.lang.functional.IWatcher;
-import net.anwiba.commons.model.IBooleanModel;
-import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.swing.tree.LazyFolderTreeNode;
-import net.anwiba.commons.thread.cancel.ICanceler;
-import net.anwiba.database.swing.console.SqlConsoleMessages;
-
 public final class SchemaTreeFactory {
 
   private static net.anwiba.commons.logging.ILogger logger =
       net.anwiba.commons.logging.Logging.getLogger(SchemaTreeFactory.class);
   private final IDatabaseFacade databaseFacade;
-  private final IObjectModel<Connection> connectionModel;
   private final IObjectModel<String> statusModel;
-  private final IBooleanModel isDisconnectedModel;
-  private final IBooleanModel isConnectedModel;
+  private final IDatabaseConnector databaseConnector;
 
   public SchemaTreeFactory(
+      final IDatabaseConnector databaseConnector,
       final IDatabaseFacade databaseFacade,
-      final IObjectModel<Connection> connectionModel,
-      final IObjectModel<String> statusModel,
-      final IBooleanModel isDisconnectedModel,
-      final IBooleanModel isConnectedModel) {
+      final IObjectModel<String> statusModel) {
+    this.databaseConnector = databaseConnector;
     this.databaseFacade = databaseFacade;
-    this.connectionModel = connectionModel;
     this.statusModel = statusModel;
-    this.isDisconnectedModel = isDisconnectedModel;
-    this.isConnectedModel = isConnectedModel;
   }
 
-  @SuppressWarnings("resource")
   public DefaultMutableTreeNode
-      create(final ICanceler canceler, final IJdbcConnectionDescription description, final String schema) {
+      create(final ICanceler canceler, final IJdbcConnectionDescription description, final String schema)
+          throws CanceledException {
     this.statusModel.set(SqlConsoleMessages.working);
-    final DefaultMutableTreeNode root = new DefaultMutableTreeNode(description.getUrl());
-    try {
-      final Connection connection = this.connectionModel.get();
-      final boolean isClosed = connection.isClosed();
-      if (isClosed) {
-        this.isConnectedModel.set(!isClosed);
-        this.isDisconnectedModel.set(isClosed);
-        this.statusModel.set(SqlConsoleMessages.connectionIsClosed);
-        return root;
-      }
-      final String catalog = getCatalog();
-      final Set<String> schemaNames = new HashSet<>(this.databaseFacade.getSchemaNames(connection, catalog));
-      final DatabaseMetaData metaData = connection.getMetaData();
+    final DefaultMutableTreeNode root = new DefaultMutableTreeNode(description);
+    try (final Connection connection = this.databaseConnector.connectReadOnly(description)) {
+      final String catalog = getCatalog(connection);
+      //      final DatabaseMetaData metaData = connection.getMetaData();
       final Map<String, DefaultMutableTreeNode> schemas = new LinkedHashMap<>();
       if (schema != null) {
-        addSchema(connection, metaData, root, catalog, schema, schemas);
+        addSchema(description, new DatabaseSchemaName(catalog, schema), schemas, root);
       } else {
         if (canceler.isCanceled()) {
           return null;
         }
-        try (final ResultSet resultSet = metaData.getSchemas()) {
-          try (IWatcher watcher = canceler.watcherFactory().create(() -> {
-            try {
-              resultSet.close();
-            } catch (SQLException e) {
-              // nothing to do
-            }
-          })) {
-            while (resultSet.next()) {
-              if (canceler.isCanceled()) {
-                return null;
-              }
-              final String schemaName = resultSet.getString(1);
-              if (!schemaNames.contains(schemaName)) {
-                continue;
-              }
-              addSchema(connection, metaData, root, catalog, schemaName, schemas);
-            }
-          }
+        final Set<IDatabaseSchemaName> schemaNames =
+            new LinkedHashSet<>(this.databaseFacade.getSchemaNames(canceler, connection, catalog));
+        for (IDatabaseSchemaName schemaName : schemaNames) {
+          addSchema(description, schemaName, schemas, root);
         }
       }
       if (schemas.isEmpty()) {
-        addSchema(connection, metaData, root, catalog, schema, schemas);
+        addSchema(description, new DatabaseSchemaName(catalog, schema), schemas, root);
       }
       this.statusModel.set(SqlConsoleMessages.done);
       return root;
@@ -134,258 +105,268 @@ public final class SchemaTreeFactory {
   }
 
   private void addSchema(
-      final Connection connection,
-      final DatabaseMetaData metaData,
-      final DefaultMutableTreeNode root,
-      final String catalog,
-      final String schemaName,
-      final Map<String, DefaultMutableTreeNode> schemas) {
-    final DefaultMutableTreeNode schemaNode = schemaName == null
+      final IJdbcConnectionDescription description,
+      final IDatabaseSchemaName schemaName,
+      final Map<String, DefaultMutableTreeNode> schemas,
+      final DefaultMutableTreeNode root) {
+    final DefaultMutableTreeNode schemaNode = schemaName.getSchemaName() == null
         ? root
         : new DefaultMutableTreeNode(schemaName);
-    schemaNode.add(createTablesNode(connection, metaData, catalog, schemaName));
-    schemaNode.add(createViewsNode(metaData, catalog, schemaName));
+    schemaNode.add(createTablesNode(description, schemaName));
+    schemaNode.add(createViewsNode(description, schemaName));
     if (this.databaseFacade.supportsSequences()) {
-      schemaNode.add(createSequencesNode(connection, schemaName));
+      schemaNode.add(createSequencesNode(description, schemaName));
     }
     for (final INamedTableFilter filter : this.databaseFacade.getTableFilters()) {
-      schemaNode.add(createOtherNodes(connection, metaData, catalog, schemaName, filter));
+      schemaNode.add(createOtherNodes(description, schemaName, filter));
     }
-    if (schemaName != null) {
+    if (root != schemaNode) {
       root.add(schemaNode);
     }
-    schemas.put(schemaName, schemaNode);
+    schemas.put(schemaName.getSchemaName(), schemaNode);
   }
 
-  private LazyFolderTreeNode<String> createSequencesNode(final Connection connection, final String schemaName) {
-    return new LazyFolderTreeNode<>(
-        new IFactory<String, List<DefaultMutableTreeNode>, RuntimeException>() {
-
-          @Override
-          public List<DefaultMutableTreeNode> create(final String value) throws RuntimeException {
-            try {
-              final List<IDatabaseSequenceName> sequences =
-                  SchemaTreeFactory.this.databaseFacade.getSequences(connection, schemaName);
-              final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-              for (final IDatabaseSequenceName sequence : sequences) {
-                nodes.add(new DefaultMutableTreeNode(sequence));
-              }
-              return nodes;
-            } catch (final Exception exception) {
-              logger.debug(exception.getMessage(), exception);
-              return Collections.emptyList();
+  private ReloadableFolderTreeNode<Object> createSequencesNode(final IJdbcConnectionDescription description,
+      final IDatabaseSchemaName schemaName) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<IDatabaseSequenceName> sequences =
+                SchemaTreeFactory.this.databaseFacade.getSequences(ICanceler.DummyCanceler, connection, schemaName);
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            for (final IDatabaseSequenceName sequence : sequences) {
+              nodes.add(new DefaultMutableTreeNode(sequence));
             }
+            SchemaTreeFactory.this.statusModel.set(SqlConsoleMessages.done);
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
           }
-        },
+        }),
         SqlConsoleMessages.sequences);
   }
 
-  private LazyFolderTreeNode<String> createViewsNode(
-      final DatabaseMetaData metaData,
-      final String catalog,
-      final String schemaName) {
-    return new LazyFolderTreeNode<>(
-        new IFactory<String, List<DefaultMutableTreeNode>, RuntimeException>() {
-
-          @Override
-          public List<DefaultMutableTreeNode> create(final String value) throws RuntimeException {
-            try (final ResultSet tablesResultSet =
-                metaData.getTables(catalog, schemaName, null, new String[] { "VIEW" })) { //$NON-NLS-1$
-              final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-              while (tablesResultSet.next()) {
-                final String schema = tablesResultSet.getString(2);
-                final String name = tablesResultSet.getString(3);
-                final IDatabaseTableName table = new DatabaseTableName(schema, name);
-                nodes.add(new DefaultMutableTreeNode(table));
+  private ReloadableFolderTreeNode<Object> createViewsNode(
+      final IJdbcConnectionDescription description,
+      final IDatabaseSchemaName schemaName) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<IDatabaseViewName> viewNames =
+                getViewNames(ICanceler.DummyCanceler, connection, schemaName);
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            for (IDatabaseViewName view : viewNames) {
+              if (!SchemaTreeFactory.this.databaseFacade.isView(view)) {
+                continue;
               }
-              return nodes;
-            } catch (final Exception exception) {
-              logger.debug(exception.getMessage(), exception);
-              return Collections.emptyList();
+              final DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(view);
+              tableNode.add(createViewColumnsNode(description, view));
+              nodes.add(tableNode);
             }
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
           }
-        },
+        }),
         SqlConsoleMessages.views);
   }
 
-  private LazyFolderTreeNode<String> createTablesNode(
-      final Connection connection,
-      final DatabaseMetaData metaData,
-      final String catalog,
-      final String schemaName) {
-    return new LazyFolderTreeNode<>(
-        new IFactory<String, List<DefaultMutableTreeNode>, RuntimeException>() {
-
-          @Override
-          public List<DefaultMutableTreeNode> create(final String value) throws RuntimeException {
-            List<IDatabaseTableName> tableNames = getTableNames(connection, catalog, schemaName);
+  private ReloadableFolderTreeNode<Object> createTablesNode(
+      final IJdbcConnectionDescription description,
+      final IDatabaseSchemaName schemaName) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<IDatabaseTableName> tableNames =
+                getTableNames(ICanceler.DummyCanceler, connection, schemaName);
             final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
             for (IDatabaseTableName table : tableNames) {
               if (!SchemaTreeFactory.this.databaseFacade.isTable(table)) {
                 continue;
               }
               final DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(table);
+              tableNode.add(createTableColumnsNode(description, table));
               if (SchemaTreeFactory.this.databaseFacade.supportsConstaints()) {
-                tableNode.add(createConstraintsNode(connection, table));
+                tableNode.add(createConstraintsNode(description, table));
               }
-              if (SchemaTreeFactory.this.databaseFacade.supportsIndicies()) {
-                tableNode.add(createIndiciesNode(connection, table));
-              }
+              tableNode.add(createIndiciesNode(description, table));
               if (SchemaTreeFactory.this.databaseFacade.supportsTrigger()) {
-                tableNode.add(createTriggersNode(connection, table));
+                tableNode.add(createTriggersNode(description, table));
               }
               nodes.add(tableNode);
             }
             return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
           }
-
-          private List<IDatabaseTableName>
-              getTableNames(final Connection connection, final String catalog, final String schemaName) {
-            try {
-              if (SchemaTreeFactory.this.databaseFacade.supportsTables()) {
-                return SchemaTreeFactory.this.databaseFacade.getTables(connection, schemaName);
-              }
-            } catch (SQLException exception) {
-              exception.printStackTrace();
-            }
-            try (final ResultSet tablesResultSet =
-                metaData.getTables(catalog, schemaName, null, new String[] { "TABLE" })) { //$NON-NLS-1$
-              List<IDatabaseTableName> names = new ArrayList<IDatabaseTableName>();
-              final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-              while (tablesResultSet.next()) {
-                final String schema = tablesResultSet.getString(2);
-                final String name = tablesResultSet.getString(3);
-                names.add(new DatabaseTableName(schema, name));
-              }
-              return names;
-            } catch (SQLException exception) {
-              logger.debug(exception.getMessage(), exception);
-              return List.of();
-            }
-          }
-        },
+        }),
         SqlConsoleMessages.tables);
   }
 
-  private LazyFolderTreeNode<String> createOtherNodes(
+  private List<IDatabaseTableName> getTableNames(
+      final ICanceler canceler,
       final Connection connection,
-      final DatabaseMetaData metaData,
-      final String catalog,
-      final String schemaName,
-      final INamedTableFilter filter) {
-    return new LazyFolderTreeNode<>(
-        new IFactory<String, List<DefaultMutableTreeNode>, RuntimeException>() {
+      final IDatabaseSchemaName schemaName) throws SQLException,
+      CanceledException {
+    return this.databaseFacade.getTables(canceler, connection, schemaName);
+  }
 
-          @Override
-          public List<DefaultMutableTreeNode> create(final String value) throws RuntimeException {
-            try (final ResultSet tablesResultSet =
-                metaData.getTables(catalog, schemaName, null, new String[] { "TABLE" })) { //$NON-NLS-1$
-              final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-              while (tablesResultSet.next()) {
-                final String schema = tablesResultSet.getString(2);
-                final String name = tablesResultSet.getString(3);
-                final IDatabaseTableName table = new DatabaseTableName(schema, name);
-                if (!filter.accept(table)) {
-                  continue;
-                }
-                final DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(table);
-                if (SchemaTreeFactory.this.databaseFacade.supportsConstaints()) {
-                  tableNode.add(createConstraintsNode(connection, table));
-                }
-                if (SchemaTreeFactory.this.databaseFacade.supportsIndicies()) {
-                  tableNode.add(createIndiciesNode(connection, table));
-                }
-                if (SchemaTreeFactory.this.databaseFacade.supportsTrigger()) {
-                  tableNode.add(createTriggersNode(connection, table));
-                }
-                nodes.add(tableNode);
+  private List<IDatabaseViewName> getViewNames(
+      final ICanceler canceler,
+      final Connection connection,
+      final IDatabaseSchemaName schemaName) throws SQLException,
+      CanceledException {
+    return this.databaseFacade.getViews(canceler, connection, schemaName);
+  }
+
+  private ReloadableFolderTreeNode<Object> createOtherNodes(
+      final IJdbcConnectionDescription description,
+      final IDatabaseSchemaName schemaName,
+      final INamedTableFilter filter) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<IDatabaseTableName> tableNames =
+                getTableNames(ICanceler.DummyCanceler, connection, schemaName);
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            for (IDatabaseTableName table : tableNames) {
+              if (!filter.accept(table)) {
+                continue;
               }
-              return nodes;
-            } catch (final Exception exception) {
-              logger.debug(exception.getMessage(), exception);
-              return Collections.emptyList();
+              final DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(table);
+              tableNode.add(createTableColumnsNode(description, table));
+              if (SchemaTreeFactory.this.databaseFacade.supportsConstaints()) {
+                tableNode.add(createConstraintsNode(description, table));
+              }
+              tableNode.add(createIndiciesNode(description, table));
+              if (SchemaTreeFactory.this.databaseFacade.supportsTrigger()) {
+                tableNode.add(createTriggersNode(description, table));
+              }
+              nodes.add(tableNode);
             }
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
           }
-        },
+        }),
         filter.getName());
   }
 
-  private MutableTreeNode createIndiciesNode(final Connection connection, final IDatabaseTableName table) {
-    return new LazyFolderTreeNode<>(
-        new IFactory<String, List<DefaultMutableTreeNode>, RuntimeException>() {
-
-          @Override
-          public List<DefaultMutableTreeNode> create(final String value) throws RuntimeException {
-            try {
-              final List<IDatabaseIndexName> names =
-                  SchemaTreeFactory.this.databaseFacade.getIndicies(connection, table);
-              final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-              for (final IDatabaseIndexName name : names) {
-                nodes.add(new DefaultMutableTreeNode(name));
-              }
-              return nodes;
-            } catch (final Exception exception) {
-              logger.debug(exception.getMessage(), exception);
-              return Collections.emptyList();
+  private MutableTreeNode createIndiciesNode(
+      final IJdbcConnectionDescription description,
+      final IDatabaseTableName table) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<IDatabaseIndexName> names =
+                SchemaTreeFactory.this.databaseFacade.getIndicies(ICanceler.DummyCanceler, connection, table);
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            for (final IDatabaseIndexName name : names) {
+              nodes.add(new DefaultMutableTreeNode(name));
             }
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
           }
-        },
+        }),
         SqlConsoleMessages.indicies);
   }
 
-  private MutableTreeNode createTriggersNode(final Connection connection, final IDatabaseTableName table) {
-    return new LazyFolderTreeNode<>(
-        new IFactory<String, List<DefaultMutableTreeNode>, RuntimeException>() {
-
-          @Override
-          public List<DefaultMutableTreeNode> create(final String value) throws RuntimeException {
-            try {
-              final List<IDatabaseTriggerName> names =
-                  SchemaTreeFactory.this.databaseFacade.getTriggers(connection, table);
-              final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-              for (final IDatabaseTriggerName name : names) {
-                nodes.add(new DefaultMutableTreeNode(name));
-              }
-              return nodes;
-            } catch (final Exception exception) {
-              logger.debug(exception.getMessage(), exception);
-              return Collections.emptyList();
+  private MutableTreeNode createTriggersNode(
+      final IJdbcConnectionDescription description,
+      final IDatabaseTableName table) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<IDatabaseTriggerName> names =
+                SchemaTreeFactory.this.databaseFacade.getTriggers(ICanceler.DummyCanceler, connection, table);
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            for (final IDatabaseTriggerName name : names) {
+              nodes.add(new DefaultMutableTreeNode(name));
             }
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
           }
-        },
+        }),
         SqlConsoleMessages.triggers);
   }
 
-  private MutableTreeNode createConstraintsNode(final Connection connection, final IDatabaseTableName tableName) {
-    return new LazyFolderTreeNode<>(
-        new IFactory<String, List<DefaultMutableTreeNode>, RuntimeException>() {
-
-          @Override
-          public List<DefaultMutableTreeNode> create(final String value) throws RuntimeException {
-            try {
-              final List<IDatabaseConstraintName> names =
-                  SchemaTreeFactory.this.databaseFacade.getConstraints(connection, tableName);
-              final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
-              for (final IDatabaseConstraintName name : names) {
-                nodes.add(new DefaultMutableTreeNode(name));
-              }
-              return nodes;
-            } catch (final Exception exception) {
-              logger.debug(exception.getMessage(), exception);
-              return Collections.emptyList();
+  private MutableTreeNode createTableColumnsNode(
+      final IJdbcConnectionDescription description,
+      final IDatabaseTableName table) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            final List<IDatabaseColumnName> names =
+                SchemaTreeFactory.this.databaseFacade.getTableColumns(ICanceler.DummyCanceler, connection, table);
+            for (final IDatabaseColumnName name : names) {
+              nodes.add(new DefaultMutableTreeNode(name));
             }
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
           }
+        }),
+        SqlConsoleMessages.columns);
+  }
 
-        },
+  private MutableTreeNode createViewColumnsNode(
+      final IJdbcConnectionDescription description,
+      final IDatabaseViewName view) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            final List<IDatabaseColumnName> names =
+                SchemaTreeFactory.this.databaseFacade.getViewColumns(ICanceler.DummyCanceler, connection, view);
+            for (final IDatabaseColumnName name : names) {
+              nodes.add(new DefaultMutableTreeNode(name));
+            }
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
+          }
+        }),
+        SqlConsoleMessages.columns);
+  }
+
+  private MutableTreeNode createConstraintsNode(
+      final IJdbcConnectionDescription description,
+      final IDatabaseTableName tableName) {
+    return new ReloadableFolderTreeNode<>(
+        value -> execute(description, connection -> {
+          try {
+            List<IDatabaseConstraintName> names = SchemaTreeFactory.this.databaseFacade
+                .getConstraints(ICanceler.DummyCanceler, connection, tableName);
+            final List<DefaultMutableTreeNode> nodes = new ArrayList<>();
+            for (final IDatabaseConstraintName name : names) {
+              nodes.add(new DefaultMutableTreeNode(name));
+            }
+            return nodes;
+          } catch (CanceledException exception) {
+            return List.of();
+          }
+        }),
         SqlConsoleMessages.constraints);
   }
 
-  private String getCatalog() {
-    try {
-      return this.connectionModel.get().getCatalog();
-    } catch (final AbstractMethodError | Exception exception) {
+  private List<DefaultMutableTreeNode> execute(final IJdbcConnectionDescription description,
+      final IFunction<Connection, List<DefaultMutableTreeNode>, SQLException> function) {
+    SchemaTreeFactory.this.statusModel.set(SqlConsoleMessages.working);
+    try (final Connection connection = this.databaseConnector.connectReadOnly(description)) {
+      List<DefaultMutableTreeNode> nodes = function.execute(connection);
+      SchemaTreeFactory.this.statusModel.set(SqlConsoleMessages.done);
+      return nodes;
+    } catch (final Exception exception) {
       logger.debug(exception.getMessage(), exception);
-      return null;
+      SchemaTreeFactory.this.statusModel.set(exception.getMessage());
+      return Collections.emptyList();
     }
+  }
+
+  private String getCatalog(final Connection connection) throws SQLException {
+    return connection.getCatalog();
   }
 }

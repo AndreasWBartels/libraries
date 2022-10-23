@@ -43,6 +43,8 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 
+import net.anwiba.commons.graphic.color.IColor;
+
 public interface IGraphics {
 
   IGraphicResolution getGraphicResolution();
@@ -109,6 +111,10 @@ public interface IGraphics {
 
   void setBackground(Color color);
 
+  default void setBackground(IColor color) {
+    setBackground(color.toColor());
+  };
+
   Color getBackground();
 
   Stroke getStroke();
@@ -121,11 +127,19 @@ public interface IGraphics {
 
   Color getColor();
 
+  default void setColor(IColor c) {
+    setColor(c.toColor());
+  }
+
   void setColor(Color c);
 
   void setPaintMode();
 
-  void setXORMode(Color c1);
+  default void setXORMode(IColor c) {
+    setXORMode(c.toColor());
+  }
+
+  void setXORMode(Color c);
 
   Font getFont();
 
@@ -175,7 +189,15 @@ public interface IGraphics {
 
   boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer);
 
+  default boolean drawImage(Image img, int x, int y, IColor bgcolor, ImageObserver observer) {
+    return drawImage(img, x, y, bgcolor.toColor(), observer);
+  }
+
   boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer);
+
+  default boolean drawImage(Image img, int x, int y, int width, int height, IColor bgcolor, ImageObserver observer) {
+    return drawImage(img, x, y, width, height, bgcolor.toColor(), observer);
+  }
 
   boolean drawImage(
       Image img,
@@ -201,5 +223,20 @@ public interface IGraphics {
       int sy2,
       Color bgcolor,
       ImageObserver observer);
+
+  default boolean drawImage(
+      Image img,
+      int dx1,
+      int dy1,
+      int dx2,
+      int dy2,
+      int sx1,
+      int sy1,
+      int sx2,
+      int sy2,
+      IColor bgcolor,
+      ImageObserver observer) {
+    return drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor.toColor(), observer);
+  }
 
 }

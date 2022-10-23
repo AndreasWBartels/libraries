@@ -24,22 +24,22 @@ package net.anwiba.tools.icons.generator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
 import net.anwiba.tools.icons.configuration.IIconSizesConfiguration;
 import net.anwiba.tools.icons.configuration.IOutput;
 import net.anwiba.tools.icons.configuration.IconResource;
 import net.anwiba.tools.icons.configuration.IconSizeConfiguration;
 import net.anwiba.tools.icons.configuration.IconSizesConfiguration;
 import net.anwiba.tools.icons.schema.configuration.Class;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
 
 public class GuiIconsClassWriterTest {
 
@@ -108,7 +108,7 @@ public class GuiIconsClassWriterTest {
     final StringBuilder builder = new StringBuilder();
     builder.append(MessageFormat.format(
         "// Copyright (c) {0} by Andreas W. Bartels (bartels@anwiba.net)\n", //$NON-NLS-1$
-        new SimpleDateFormat("yyyy").format(new Date()))); //$NON-NLS-1$
+        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy")))); //$NON-NLS-1$
     builder.append("package net.anwiba.gui.icon;\n"); //$NON-NLS-1$
     builder.append("\n"); //$NON-NLS-1$
     builder.append("import net.anwiba.commons.swing.icon.GuiIcon;\n"); //$NON-NLS-1$

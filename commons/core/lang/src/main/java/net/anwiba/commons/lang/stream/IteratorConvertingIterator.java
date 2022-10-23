@@ -27,13 +27,15 @@ import java.util.NoSuchElementException;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IIterator;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public final class IteratorConvertingIterator<I, O, E extends Exception> implements IIterator<O, E> {
 
   private final IIterator<I, E> iterator;
   private final IAcceptor<I> acceptor;
   private final IConverter<I, O, E> converter;
-  private O item = null;
+  private IOptional<O, RuntimeException> item = null;
 
   public IteratorConvertingIterator(
       final IIterator<I, E> input,
@@ -46,9 +48,13 @@ public final class IteratorConvertingIterator<I, O, E extends Exception> impleme
 
   @Override
   public boolean hasNext() throws E {
+    if (this.item != null) {
+      return true;
+    }
     while (this.iterator.hasNext()) {
       final I i = this.iterator.next();
-      if (this.acceptor.accept(i) && (this.item = this.converter.convert(i)) != null) {
+      if (this.acceptor.accept(i)) {
+        this.item = Optional.of(this.converter.convert(i));
         return true;
       }
     }
@@ -58,8 +64,8 @@ public final class IteratorConvertingIterator<I, O, E extends Exception> impleme
   @Override
   public O next() throws E {
     try {
-      if (this.item != null || hasNext()) {
-        return this.item;
+      if (hasNext()) {
+        return this.item.get();
       }
       throw new NoSuchElementException();
     } finally {

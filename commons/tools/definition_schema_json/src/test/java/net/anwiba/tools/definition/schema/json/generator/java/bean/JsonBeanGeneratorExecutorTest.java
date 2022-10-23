@@ -32,7 +32,7 @@ public class JsonBeanGeneratorExecutorTest {
 
   @SuppressWarnings("nls")
   @Test
-  public void excecute() throws IOException {
+  public void execute() throws IOException {
     final JsonBeanGeneratorExecutor excecutor = new JsonBeanGeneratorExecutor(
         new File("src/test/resources"),
         getClass().getPackage().getName(),
@@ -54,7 +54,7 @@ public class JsonBeanGeneratorExecutorTest {
             System.err.println(message);
           }
         });
-    excecutor.excecute(new File("target/test/generated"));
+    excecutor.execute(new File("target/test/generated"));
     assertTrue(true);
   }
 

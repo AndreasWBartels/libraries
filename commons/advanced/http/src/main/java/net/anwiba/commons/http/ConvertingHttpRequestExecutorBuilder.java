@@ -23,7 +23,7 @@ package net.anwiba.commons.http;
 
 public class ConvertingHttpRequestExecutorBuilder implements IConvertingHttpRequestExecutorBuilder {
 
-  IHttpRequestExecutorFactoryBuilder builder = new HttpRequestExecutorFactoryBuilder();
+  private HttpClientConfigurationBuilder builder = new HttpClientConfigurationBuilder();
 
   @Override
   public IConvertingHttpRequestExecutorBuilder useAlwaysTheSameConnection() {
@@ -39,13 +39,14 @@ public class ConvertingHttpRequestExecutorBuilder implements IConvertingHttpRequ
 
   @Override
   public IConvertingHttpRequestExecutorBuilder usePoolingConnection() {
+    this.builder.usePoolingConnection();
     return this;
   }
 
   @SuppressWarnings("resource")
   @Override
   public IConvertingHttpRequestExecutor build() {
-    final IHttpRequestExecutor executor = this.builder.build().create();
+    final IHttpRequestExecutor executor = new HttpRequestExecutorFactory(() -> this.builder.build()).create();
     return new ConvertingHttpRequestExecutor(executor);
   }
 

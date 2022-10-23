@@ -30,9 +30,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import net.anwiba.commons.datasource.DataSourceType;
-import net.anwiba.commons.datasource.DataSourceVersion;
 import net.anwiba.commons.lang.optional.Optional;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.IAuthentication;
 
 public class MemoryConnectionDescription implements IMemoryConnectionDescription {
 
@@ -126,10 +125,5 @@ public class MemoryConnectionDescription implements IMemoryConnectionDescription
   @Override
   public String getFormat() {
     return getDataSourceType().name();
-  }
-
-  @Override
-  public DataSourceVersion getVersion() {
-    return new DataSourceVersion(1, 0, null);
   }
 }

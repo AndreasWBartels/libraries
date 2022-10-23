@@ -26,6 +26,9 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import net.anwiba.commons.image.histogram.Histogram;
+import net.anwiba.commons.image.imagen.ImagenHistogramToHistogramConverter;
+import net.anwiba.commons.image.imagen.ImagenImageContainerUtilities;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.image.operation.ImageCropOperation;
 import net.anwiba.commons.image.operation.ImageInvertOperation;
@@ -41,22 +44,23 @@ import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.message.Message;
-import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
 public abstract class AbstractImageContainer implements IImageContainer {
 
-
   private static net.anwiba.commons.logging.ILogger logger = net.anwiba.commons.logging.Logging
       .getLogger(AbstractImageContainer.class);
+
+  private final ImagenHistogramToHistogramConverter imagenHistogramToHistogramConverter = new ImagenHistogramToHistogramConverter();
   private final IMutableObjectList<IImageOperation> operations = new ObjectList<>();
   private IImageMetadata metadata;
   private final RenderingHints hints;
-  private IImageMetadataAdjustor metadataAdjustor;
+  private final IImageMetadataAdjustor metadataAdjustor;
 
   public AbstractImageContainer(final RenderingHints hints,
       final IImageMetadata metadata,
-      final IObjectList<IImageOperation> operations, IImageMetadataAdjustor metadataAdjustor) {
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor) {
     this.hints = hints;
     this.metadata = metadata;
     this.metadataAdjustor = metadataAdjustor;
@@ -67,25 +71,83 @@ public abstract class AbstractImageContainer implements IImageContainer {
   public BufferedImage asBufferImage(final IMessageCollector messageCollector, final ICanceler canceler)
       throws CanceledException {
     try {
-      final BufferedImage image = read(messageCollector, canceler, this.hints, this.operations, metadataAdjustor);
+      final BufferedImage image = read(messageCollector, canceler, this.hints, this.operations, this.metadataAdjustor);
       canceler.check();
       return image;
     } catch (IllegalArgumentException exception) {
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       messageCollector
-          .addMessage(Message.builder().setText(exception.getMessage()).setThrowable(exception).setError().build());
+          .addMessage(Message.error(exception.getMessage()).throwable(exception).build());
       return null;
     } catch (IOException exception) {
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       messageCollector
-          .addMessage(Message.builder().setText(exception.getMessage()).setThrowable(exception).setError().build());
+          .addMessage(Message.error(exception.getMessage()).throwable(exception).build());
       return null;
     }
   }
 
   @Override
-  public void dispose() {
-    // nothing to do
+  public Number[][] getValues(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final int x,
+      final int y,
+      final int width,
+      final int height) throws CanceledException {
+    try {
+      return read(messageCollector, canceler, this.hints, this.operations, this.metadataAdjustor, x, y, width, height);
+    } catch (IllegalArgumentException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+      messageCollector
+          .addMessage(Message.error(exception.getMessage()).throwable(exception).build());
+      return null;
+    } catch (IOException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+      messageCollector
+          .addMessage(Message.error(exception.getMessage()).throwable(exception).build());
+      return null;
+    }
+  }
+
+
+  protected Number[][] read(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor,
+      final int x,
+      final int y,
+      final int width,
+      final int height) throws CanceledException,
+      IOException {
+    return IImageContainer.super.getValues(messageCollector, canceler, x, y, width, height);
+  }
+
+  @Override
+  public Histogram getHistogram(IMessageCollector messageCollector, ICanceler canceler)  throws CanceledException {
+    try {
+      org.eclipse.imagen.Histogram histogram = readHistogram(messageCollector, canceler, this.hints, this.operations, this.metadataAdjustor);
+      return imagenHistogramToHistogramConverter.convert(histogram);
+    } catch (IllegalArgumentException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+      messageCollector
+          .addMessage(Message.error(exception.getMessage()).throwable(exception).build());
+      return null;
+    } catch (IOException exception) {
+      logger.log(ILevel.DEBUG, exception.getMessage(), exception);
+      messageCollector
+          .addMessage(Message.error(exception.getMessage()).throwable(exception).build());
+      return null;
+    }
+  }
+  
+  protected org.eclipse.imagen.Histogram readHistogram(IMessageCollector messageCollector,
+      ICanceler canceler,
+      RenderingHints hints,
+      IObjectList<IImageOperation> operations,
+      IImageMetadataAdjustor metadataAdjustor) throws CanceledException,
+      IOException {
+    return ImagenImageContainerUtilities.getHistogram(asBufferImage(messageCollector, canceler), hints);
   }
 
   @Override
@@ -158,23 +220,18 @@ public abstract class AbstractImageContainer implements IImageContainer {
         IImageMetadata metadata = read(ICanceler.DummyCanceler, this.hints);
         if (metadata == null) {
           return new InvalidImageMetadata(
-              new MessageBuilder()
-                  .setText("Couldn't read image metadata")
-                  .setError()
+              Message.error("Couldn't read image metadata")
                   .build());
         }
         for (IImageOperation operation : this.operations) {
-          metadata = metadataAdjustor.adjust(metadata, operation);
+          metadata = this.metadataAdjustor.adjust(metadata, operation);
         }
         this.metadata = metadata;
       }
       return this.metadata;
     } catch (IOException | CanceledException exception) {
       return new InvalidImageMetadata(
-          new MessageBuilder()
-              .setText(exception.getMessage())
-              .setThrowable(exception)
-              .setError()
+          Message.error(exception)
               .build());
     }
   }
@@ -207,7 +264,8 @@ public abstract class AbstractImageContainer implements IImageContainer {
   private IImageContainer create(final IImageMetadata metadata, final IImageOperation operation) {
     return adapt(this.hints,
         metadata == null ? null : this.metadataAdjustor.adjust(metadata, operation),
-        addTo(this.operations, operation), metadataAdjustor);
+        addTo(this.operations, operation),
+        this.metadataAdjustor);
   }
 
   private IObjectList<IImageOperation> addTo(final IObjectList<IImageOperation> operations,
@@ -218,14 +276,17 @@ public abstract class AbstractImageContainer implements IImageContainer {
   protected abstract IImageMetadata read(final ICanceler canceler, final RenderingHints hints) throws CanceledException,
       IOException;
 
-  protected abstract BufferedImage
-      read(final IMessageCollector messageCollector,
-          final ICanceler canceler,
-          final RenderingHints hints,
-          final IObjectList<IImageOperation> operations, IImageMetadataAdjustor metadataAdjustor)
-          throws CanceledException,
-          IOException;
+  protected abstract BufferedImage read(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor)
+      throws CanceledException,
+      IOException;
 
-  protected abstract IImageContainer
-      adapt(final RenderingHints hints, final IImageMetadata metadata, final IObjectList<IImageOperation> operations, IImageMetadataAdjustor metadataAdjustor);
+  protected abstract IImageContainer adapt(final RenderingHints hints,
+      final IImageMetadata metadata,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor);
+
 }

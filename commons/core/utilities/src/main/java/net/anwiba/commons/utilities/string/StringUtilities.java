@@ -496,4 +496,8 @@ public class StringUtilities {
       wrap(final String str, final int wrapLength, final String newLineStr, final boolean wrapLongWords) {
     return WordUtils.wrap(str, wrapLength, newLineStr, wrapLongWords);
   }
+
+  public static boolean containsWhitespaces(String message) {
+    return Pattern.compile(".*\s.*").matcher(message).find();
+  }
 }

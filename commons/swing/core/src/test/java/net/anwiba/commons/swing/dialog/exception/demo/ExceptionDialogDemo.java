@@ -38,12 +38,10 @@ public class ExceptionDialogDemo {
   @Test
   public void demoOwnMessage() {
     show(frame -> new ExceptionDialog(frame,
-        Message.builder()
-            .setText("NullPointerException")
-            .setDescription(
+        Message.error("NullPointerException")
+            .description(
                 "Fehler im Programm, bitte mache Sie eine Fehlermeldung im Bugzilla. Fügen Sie dabei bitte die Details an.")
-            .setThrowable(new NullPointerException())
-            .setError()
+            .throwable(new NullPointerException())
             .build()));
   }
 }

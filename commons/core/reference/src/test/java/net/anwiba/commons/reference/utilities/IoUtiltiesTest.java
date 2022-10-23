@@ -34,7 +34,7 @@ public class IoUtiltiesTest {
   public void test() throws Exception {
 
     assertThrows(IOException.class, () -> {
-      IoUtilities.throwException(List.of(new ClassCastException("foo"), new RuntimeException("x")));
+      IoUtilities.throwIfNotEmpty(List.of(new ClassCastException("foo"), new RuntimeException("x")));
     });
   }
 

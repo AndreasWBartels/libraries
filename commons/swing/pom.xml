@@ -12,7 +12,7 @@
   <parent>
     <groupId>net.anwiba.commons</groupId>
     <artifactId>commons</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
 
   <scm>
@@ -117,37 +117,13 @@
 
       <dependency>
         <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-attribute</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-authorization</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <artifactId>anwiba-commons-bookmark</artifactId>
-        <groupId>net.anwiba.commons</groupId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-crypto</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-data</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-database</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -184,20 +160,6 @@
       <dependency>
         <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-workflow</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- commons-program -->
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-application</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-license</artifactId>
         <version>${project.version}</version>
       </dependency>
 

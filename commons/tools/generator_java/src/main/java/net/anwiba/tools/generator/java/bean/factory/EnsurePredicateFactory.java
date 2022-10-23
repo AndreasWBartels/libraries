@@ -24,6 +24,9 @@ package net.anwiba.tools.generator.java.bean.factory;
 import static net.anwiba.commons.ensure.Conditions.notNull;
 import static net.anwiba.commons.ensure.Ensure.ensureThatArgument;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JStatement;
@@ -33,8 +36,10 @@ public class EnsurePredicateFactory extends AbstractSourceFactory {
 
   private final JClass ensureClass;
 
-  public EnsurePredicateFactory(final JCodeModel codeModel) {
-    super(codeModel);
+  public EnsurePredicateFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    super(codeModel, annotationClassfactory);
     this.ensureClass = _classByNames(java.util.Objects.class.getName());
   }
 

@@ -21,6 +21,9 @@
  */
 package net.anwiba.commons.image.awt;
 
+import java.awt.Color;
+import java.util.List;
+
 import net.anwiba.commons.image.IImageMetadata;
 
 class BufferedImageMetadata implements IImageMetadata {
@@ -33,6 +36,7 @@ class BufferedImageMetadata implements IImageMetadata {
   private final int transparency;
   private final int dataType;
   private final boolean isIndexed;
+  private final List<Color> colors;
 
   public BufferedImageMetadata(
       final float width,
@@ -42,7 +46,8 @@ class BufferedImageMetadata implements IImageMetadata {
       final int colorSpaceType,
       final int dataType,
       final int transparency,
-      final boolean isIndexed) {
+      final boolean isIndexed,
+      final List<Color> colors) {
     this.width = width;
     this.height = height;
     this.numberOfComponents = numberOfComponents;
@@ -51,6 +56,7 @@ class BufferedImageMetadata implements IImageMetadata {
     this.transparency = transparency;
     this.dataType = dataType;
     this.isIndexed = isIndexed;
+    this.colors = colors;
   }
 
   @Override
@@ -91,5 +97,10 @@ class BufferedImageMetadata implements IImageMetadata {
   @Override
   public boolean isIndexed() {
     return isIndexed;
+  }
+  
+  @Override
+  public List<Color> getColors() {
+    return colors;
   }
 }

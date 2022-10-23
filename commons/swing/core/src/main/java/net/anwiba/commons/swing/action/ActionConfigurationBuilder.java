@@ -21,21 +21,17 @@
  */
 package net.anwiba.commons.swing.action;
 
-import java.awt.Component;
-import java.beans.PropertyChangeListener;
-import java.lang.reflect.InvocationTargetException;
-
-import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConsumer;
-import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.model.BooleanModel;
 import net.anwiba.commons.model.IBooleanDistributor;
 import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
 import net.anwiba.commons.swing.icon.IGuiIcon;
-import net.anwiba.commons.thread.cancel.ICanceler;
+
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 
 public class ActionConfigurationBuilder {
 
@@ -156,23 +152,13 @@ public class ActionConfigurationBuilder {
       return this.procedure;
     }
     if (this.task != null) {
-      return new ActionProcedurBuilder<Void, Void>().setTitle(this.name).setTask(new IActionTask<Void, Void>() {
-
-        @Override
-        public Void excecute(final IMessageCollector monitor, final ICanceler canceler, final Void value)
-            throws InvocationTargetException,
-            CanceledException {
-          ActionConfigurationBuilder.this.task.execute();
-          return null;
-        }
+      return new ActionProcedurBuilder<Void, Void>().setTitle(this.name).setTask((monitor, canceler, value) -> {
+        ActionConfigurationBuilder.this.task.execute();
+        return null;
       }).build();
     }
-    return new IActionProcedure() {
-
-      @Override
-      public void execute(final Component value) throws RuntimeException {
-        // nothing to do
-      }
+    return value -> {
+      // nothing to do
     };
   }
 

@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class Bean {
 
     private String type = "Bean";
-    private final static HashMap<String, Class> _classes = new HashMap<String, Class>();
+    private final static HashMap<String, Class> _classes = new HashMap<>();
 
     public static Bean create(String type) {
         if (_isNullOrTrimmedEmpty(type)) {

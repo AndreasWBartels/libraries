@@ -21,6 +21,10 @@
  */
 package net.anwiba.commons.swing.date;
 
+import net.anwiba.commons.swing.date.event.DateSelectionEvent;
+import net.anwiba.commons.swing.date.event.DateSelectionListener;
+import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
@@ -36,10 +40,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.anwiba.commons.swing.date.event.DateSelectionEvent;
-import net.anwiba.commons.swing.date.event.DateSelectionListener;
-import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
-
 class DatePanel extends JPanel {
 
   private static final long serialVersionUID = 1L;
@@ -53,7 +53,7 @@ class DatePanel extends JPanel {
 
   JLabel dayLabel = null;
   boolean isSelected = false;
-  static LocalDateTime currentDay = UserDateTimeUtilities.now();
+  static LocalDateTime currentDay = UserDateTimeUtilities.now().toLocalDateTime();
 
   DatePanel() {
     setLayout(new BorderLayout());

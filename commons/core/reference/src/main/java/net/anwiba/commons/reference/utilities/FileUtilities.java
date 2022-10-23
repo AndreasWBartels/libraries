@@ -91,10 +91,14 @@ public class FileUtilities {
   }
 
   public static boolean hasExtension(final File file, final String... extentions) {
+    return hasExtension(file.getPath(), extentions);
+  }
+
+  public static boolean hasExtension(final String path, final String... extentions) {
     if (extentions.length == 1) {
-      return file.getPath().endsWith(extentions[0]);
+      return path.endsWith(extentions[0]);
     }
-    final String value = getExtension(file);
+    final String value = getExtension(path);
     if (value == null) {
       return false;
     }

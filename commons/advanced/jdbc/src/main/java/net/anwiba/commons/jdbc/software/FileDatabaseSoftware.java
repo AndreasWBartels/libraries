@@ -21,67 +21,83 @@
  */
 package net.anwiba.commons.jdbc.software;
 
+import net.anwiba.commons.jdbc.connection.ConnectionUtilities;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
+
 import java.sql.Driver;
 import java.util.Arrays;
 import java.util.List;
-
-import net.anwiba.commons.jdbc.DatabaseUtilities;
+import java.util.function.Predicate;
 
 public enum FileDatabaseSoftware implements IDatabaseSoftware {
   DERBY(
-      "org.derby.JDBC", //$NON-NLS-1$
-      "jdbc:derby:memory", //$NON-NLS-1$
+      "org.apache.derby.iapi.jdbc.AutoloadedDriver", //$NON-NLS-1$
+      "jdbc:derby", //$NON-NLS-1$
       0, //
-      "${protocol}:${database};create=true", //$NON-NLS-1$
-      "java.lang.Object") { //$NON-NLS-1$
+      "${protocol}:${database}", //$NON-NLS-1$
+      d -> false) { //$NON-NLS-1$
   },
   SQLITE(
       "org.sqlite.JDBC", //$NON-NLS-1$
       "jdbc:sqlite", //$NON-NLS-1$
       0, //
+      // https://sqlite.org/uri.html
       "${protocol}:${database}", //$NON-NLS-1$
-      "java.lang.Object") { //$NON-NLS-1$
+      d -> true) { //$NON-NLS-1$
   },
   SPATIALITE(
       "org.spatialite.JDBC", //$NON-NLS-1$
       "jdbc:spatialite", //$NON-NLS-1$
       0, //
       "${protocol}:${database}", //$NON-NLS-1$
-      "java.lang.Object") { //$NON-NLS-1$
+      d -> true) { //$NON-NLS-1$
   },
   H2(
       "org.h2.Driver", //$NON-NLS-1$
       "jdbc:h2", //$NON-NLS-1$
       0, //
       "${protocol}:${database}", //$NON-NLS-1$
-      "org.locationtech.jts.geom.Geometry") { //$NON-NLS-1$
+      d -> true) { //$NON-NLS-1$
+
+    @Override
+    public IOptional<String, RuntimeException> getDefaultSchema() {
+      return Optional.of("PUBLIC");
+    }
+  },
+  HSQLDB(
+      "org.hsqldb.jdbc.JDBCDriver", //$NON-NLS-1$
+      "jdbc:hsqldb", //$NON-NLS-1$
+      0, //
+      "${protocol}:${database}", //$NON-NLS-1$
+      d -> false) { //$NON-NLS-1$
   };
 
   private transient Driver driver;
   private final String protocol;
   private final int port;
-  private final String geometryClassName;
   private final String driverName;
   private IJdbcPattern jdbcPattern;
+  private Predicate<FileDatabaseSoftware> isGisSupportApplicablePredicate;
 
   private FileDatabaseSoftware(
       final String driverName,
       final String protocol,
       final int port,
       final String jdbcUrlPattern,
-      final String geometryClassName) {
+      final Predicate<FileDatabaseSoftware> isGisSupportApplicablePredicate) {
     this.driverName = driverName;
-    this.driver = DatabaseUtilities.loadDriver(driverName);
+    this.isGisSupportApplicablePredicate = isGisSupportApplicablePredicate;
+    this.driver = ConnectionUtilities.loadDriver(driverName);
     this.protocol = protocol;
     this.port = port;
-    this.geometryClassName = geometryClassName;
     this.jdbcPattern = new JdbcPattern(getDefaultJdbcUrlPatternName(), jdbcUrlPattern);
   }
 
   @Override
   public Driver getDriver() {
     if (this.driver == null) {
-      final Driver _driver = DatabaseUtilities.loadDriver(this.driverName);
+      final Driver _driver = ConnectionUtilities.loadDriver(this.driverName);
       this.driver = _driver;
     }
     return this.driver;
@@ -109,12 +125,7 @@ public enum FileDatabaseSoftware implements IDatabaseSoftware {
 
   @Override
   public boolean isGisSupportApplicable() {
-    try {
-      Class.forName(this.geometryClassName);
-      return true;
-    } catch (final ClassNotFoundException exception) {
-      return false;
-    }
+    return this.isGisSupportApplicablePredicate.test(this);
   }
 
   public static FileDatabaseSoftware getByUrl(final String url) {
@@ -140,6 +151,11 @@ public enum FileDatabaseSoftware implements IDatabaseSoftware {
     return this.jdbcPattern;
   }
 
+  @Override
+  public List<IJdbcPattern> getJdbcUrlPatterns() {
+    return Arrays.asList(this.jdbcPattern);
+  }
+
   public static FileDatabaseSoftware getByDriverNamw(final String driverName) {
     if (driverName == null) {
       return null;
@@ -153,8 +169,29 @@ public enum FileDatabaseSoftware implements IDatabaseSoftware {
     return null;
   }
 
-  @Override
-  public List<IJdbcPattern> getJdbcUrlPatterns() {
-    return Arrays.asList(this.jdbcPattern);
+  public static FileDatabaseSoftware getByName(final String name) {
+    if (name == null) {
+      return null;
+    }
+    final FileDatabaseSoftware[] values = values();
+    for (final FileDatabaseSoftware serviceDatabaseSoftware : values) {
+      if (name.equalsIgnoreCase(serviceDatabaseSoftware.name())) {
+        return serviceDatabaseSoftware;
+      }
+    }
+    return null;
+  }
+
+  public static FileDatabaseSoftware getByProtocol(final String protocol) {
+    if (protocol == null) {
+      return null;
+    }
+    final FileDatabaseSoftware[] values = values();
+    for (final FileDatabaseSoftware serviceDatabaseSoftware : values) {
+      if (protocol.equalsIgnoreCase(serviceDatabaseSoftware.getProtocol())) {
+        return serviceDatabaseSoftware;
+      }
+    }
+    return null;
   }
 }

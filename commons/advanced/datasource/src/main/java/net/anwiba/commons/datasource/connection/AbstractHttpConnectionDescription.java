@@ -21,11 +21,6 @@
  */
 package net.anwiba.commons.datasource.connection;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
-import java.util.Objects;
-
 import net.anwiba.commons.datasource.DataSourceType;
 import net.anwiba.commons.lang.exception.CreationException;
 import net.anwiba.commons.lang.exception.UnreachableCodeReachedException;
@@ -33,9 +28,15 @@ import net.anwiba.commons.lang.parameter.IParameter;
 import net.anwiba.commons.lang.parameter.IParameters;
 import net.anwiba.commons.reference.IResourceReference;
 import net.anwiba.commons.reference.ResourceReferenceFactory;
-import net.anwiba.commons.utilities.io.url.Authentication;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.Authentication;
+import net.anwiba.commons.reference.url.IAuthentication;
+import net.anwiba.commons.utilities.property.IProperties;
 import net.anwiba.commons.utilities.string.StringUtilities;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.MessageFormat;
+import java.util.Objects;
 
 @SuppressWarnings("nls")
 public abstract class AbstractHttpConnectionDescription extends AbstractConnectionDescription implements
@@ -59,8 +60,9 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
       final String userName,
       final String password,
       final IParameters parameters,
-      final boolean sslEnabled) {
-    super(DataSourceType.SERVICE);
+      final boolean sslEnabled,
+      final IProperties properties) {
+    super(DataSourceType.SERVICE, properties);
     this.host = host;
     this.port = port;
     this.path = path;
@@ -101,13 +103,13 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
     return this.parameters;
   }
 
-  @SuppressWarnings("exports")
   @Override
   public IResourceReference getResourceReference() {
     try {
+      // TODO save login information
       return new ResourceReferenceFactory().create(getUrl());
     } catch (final CreationException exception) {
-      throw new UnreachableCodeReachedException();
+      throw new UnreachableCodeReachedException(exception);
     }
   }
 
@@ -116,7 +118,7 @@ public abstract class AbstractHttpConnectionDescription extends AbstractConnecti
     try {
       return new URI(getUrlString());
     } catch (final URISyntaxException exception) {
-      throw new UnreachableCodeReachedException();
+      throw new UnreachableCodeReachedException(exception);
     }
   }
 

@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -51,15 +51,16 @@ public class OracleSequenceUtilities {
       throws SQLException {
     Ensure.ensureArgumentNotNull(connection);
     Ensure.ensureArgumentNotNull(tableName);
-    final String sqlStatement = "select SEQUENCE_NAME from ALL_SEQUENCES where SEQUENCE_OWNER = ? AND (SEQUENCE_NAME = 'SEQ_"
-        + tableName
-        + "' OR SEQUENCE_NAME = '"
-        + tableName
-        + "_SEQ')";
+    final String sqlStatement =
+        "select SEQUENCE_NAME from ALL_SEQUENCES where SEQUENCE_OWNER = ? AND (SEQUENCE_NAME = 'SEQ_"
+            + tableName
+            + "' OR SEQUENCE_NAME = '"
+            + tableName
+            + "_SEQ')";
     return DatabaseUtilities.stringResult(
         connection,
         sqlStatement,
-        value -> value.setObject(1, DatabaseUtilities.getSchemaName(connection, schemaName).toUpperCase()));
+        value -> value.setObject(1, OracleUtilities.getSchemaName(connection, schemaName).toUpperCase()));
   }
 
   public static boolean hasSequenceForTable(final Connection connection, final String ownerName, final String tableName)
@@ -86,7 +87,7 @@ public class OracleSequenceUtilities {
       final long maximum) throws SQLException {
     createCyclingSequence(
         connection,
-        new DatabaseTableName(DatabaseUtilities.getSchemaName(connection, schemaName), sequenceName),
+        new DatabaseTableName(OracleUtilities.getSchemaName(connection, schemaName), sequenceName),
         maximum);
   }
 
@@ -94,7 +95,7 @@ public class OracleSequenceUtilities {
       throws SQLException {
     createSequence(
         connection,
-        new DatabaseSequenceName(DatabaseUtilities.getSchemaName(connection, schemaName), sequenceName),
+        new DatabaseSequenceName(OracleUtilities.getSchemaName(connection, schemaName), sequenceName),
         DEFAULT_SEQUENCE_START_VALUE);
   }
 
@@ -105,7 +106,7 @@ public class OracleSequenceUtilities {
       final long startWith) throws SQLException {
     createSequence(
         connection,
-        new DatabaseSequenceName(DatabaseUtilities.getSchemaName(connection, schemaName), sequenceName),
+        new DatabaseSequenceName(OracleUtilities.getSchemaName(connection, schemaName), sequenceName),
         startWith);
   }
 
@@ -150,7 +151,7 @@ public class OracleSequenceUtilities {
       final String schemaName,
       final String tableName) throws SQLException {
     return new DatabaseSequenceName(
-        DatabaseUtilities.getSchemaName(connection, schemaName),
+        OracleUtilities.getSchemaName(connection, schemaName),
         OracleUtilities.createName(tableName.trim(), "SEQ")); //$NON-NLS-1$
   }
 
@@ -159,7 +160,7 @@ public class OracleSequenceUtilities {
       final String schemaName,
       final String tableName) throws SQLException {
     return new DatabaseTriggerName(
-        DatabaseUtilities.getSchemaName(connection, schemaName),
+        OracleUtilities.getSchemaName(connection, schemaName),
         OracleUtilities.createName(tableName.trim(), "TIG")); //$NON-NLS-1$
   }
 
@@ -179,7 +180,7 @@ public class OracleSequenceUtilities {
     DatabaseUtilities.call(
         connection,
         OracleUtilitiesStatementString.CallableAdjustSequenceStatement,
-        DatabaseUtilities.getSchemaName(connection, schemaName),
+        OracleUtilities.getSchemaName(connection, schemaName),
         tableName,
         columnName,
         sequenceName.getSchemaName(),
@@ -195,10 +196,10 @@ public class OracleSequenceUtilities {
     DatabaseUtilities.call(
         connection,
         OracleUtilitiesStatementString.CallableAdjustSequenceStatement,
-        DatabaseUtilities.getSchemaName(connection, schemaName),
+        OracleUtilities.getSchemaName(connection, schemaName),
         tableName,
         columnName,
-        DatabaseUtilities.getSchemaName(connection, schemaName),
+        OracleUtilities.getSchemaName(connection, schemaName),
         sequenceName);
   }
 
@@ -209,7 +210,7 @@ public class OracleSequenceUtilities {
     createSequenceTrigger(
         connection,
         new DatabaseColumnName(
-            new DatabaseTableName(DatabaseUtilities.getSchemaName(connection, null), tableName.trim()),
+            new DatabaseTableName(OracleUtilities.getSchemaName(connection, null), tableName.trim()),
             columnName),
         triggerName,
         sequenceName);
@@ -222,13 +223,14 @@ public class OracleSequenceUtilities {
       final String triggerName,
       final String sequenceName,
       final String columnName) throws SQLException {
+    final String schema = OracleUtilities.getSchemaName(connection, schemaName);
     createSequenceTrigger(
         connection,
         new DatabaseColumnName(
-            new DatabaseTableName(DatabaseUtilities.getSchemaName(connection, schemaName), tableName),
+            new DatabaseTableName(schema, tableName),
             columnName),
-        new DatabaseTriggerName(DatabaseUtilities.getSchemaName(connection, schemaName), triggerName),
-        new DatabaseSequenceName(DatabaseUtilities.getSchemaName(connection, schemaName), sequenceName));
+        new DatabaseTriggerName(schema, triggerName),
+        new DatabaseSequenceName(schema, sequenceName));
   }
 
   public static void createSequenceTrigger(
@@ -277,7 +279,7 @@ public class OracleSequenceUtilities {
   }
 
   public static long getNextIdValue(final Connection connection, final String sequenceName) throws SQLException {
-    final String schemaName = DatabaseUtilities.getSchemaName(connection, null);
+    final String schemaName = OracleUtilities.getSchemaName(connection, null);
     return next(connection, schemaName, sequenceName);
   }
 
@@ -311,7 +313,7 @@ public class OracleSequenceUtilities {
       throws SQLException {
     final String statementString = //
         "           DROP SEQUENCE " //$NON-NLS-1$
-            + DatabaseUtilities.getSchemaName(connection, schemaName)
+            + OracleUtilities.getSchemaName(connection, schemaName)
             + "." //$NON-NLS-1$
             + sequenceName;
     DatabaseUtilities.execute(connection, statementString);

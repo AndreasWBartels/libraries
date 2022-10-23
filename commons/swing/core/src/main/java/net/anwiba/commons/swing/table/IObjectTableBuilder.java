@@ -21,13 +21,6 @@
  */
 package net.anwiba.commons.swing.table;
 
-import java.awt.Image;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.swing.JComponent;
-
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IFactory;
@@ -39,6 +32,14 @@ import net.anwiba.commons.swing.table.action.ITableTextFieldActionFactory;
 import net.anwiba.commons.swing.table.action.ITableTextFieldKeyListenerFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.swing.table.renderer.NumberTableCellRenderer;
+
+import java.awt.Color;
+import java.awt.Image;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.swing.JComponent;
 
 public interface IObjectTableBuilder<T> {
 
@@ -59,6 +60,8 @@ public interface IObjectTableBuilder<T> {
   IObjectTableBuilder<T> addEditObjectAction(IColumnObjectFactory<T, T, RuntimeException> factory);
 
   IObjectTableBuilder<T> addRemoveObjectsAction();
+
+  IObjectTableBuilder<T> addClearTableAction();
 
   IObjectTableBuilder<T> addMoveObjectUpAction();
 
@@ -142,6 +145,8 @@ public interface IObjectTableBuilder<T> {
   IObjectTableBuilder<T> addObjectColumn(String title, IFunction<T, Object, RuntimeException> provider, int size);
 
   IObjectTableBuilder<T> addImageColumn(String title, IFunction<T, Image, RuntimeException> provider, int size);
+
+  IObjectTableBuilder<T> addColorColumn(String title, IFunction<T, Color, RuntimeException> provider, int size);
 
   IObjectTableBuilder<T> addDoubleColumn(String title,
       IFunction<T, Double, RuntimeException> provider,

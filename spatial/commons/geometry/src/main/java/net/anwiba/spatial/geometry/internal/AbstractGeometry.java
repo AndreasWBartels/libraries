@@ -96,6 +96,11 @@ public abstract class AbstractGeometry implements IGeometry {
   }
 
   @Override
+  public String toString() {
+    return getClass().getSimpleName() + getCoordinateSequence().toString();
+  }
+
+  @Override
   public int hashCode() {
     return Objects.hash(coordinateReferenceSystem, dimension, envelope);
   }

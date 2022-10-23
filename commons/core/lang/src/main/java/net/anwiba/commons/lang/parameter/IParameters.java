@@ -21,12 +21,13 @@
  */
 package net.anwiba.commons.lang.parameter;
 
-import java.io.Serializable;
-import java.util.function.Consumer;
-
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.stream.IStream;
 import net.anwiba.commons.lang.stream.Streams;
+
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 public interface IParameters extends Serializable {
 
@@ -56,5 +57,9 @@ public interface IParameters extends Serializable {
 
   default IStream<IParameter, RuntimeException> stream() {
     return Streams.of(parameters());
+  }
+
+  default boolean contains(IParameter parameter) {
+    return contains(parameter.getName()) && Objects.equals(getValue(parameter.getName()), parameter.getValue());
   }
 }

@@ -34,8 +34,8 @@ import java.util.Locale;
 
 public class SystemDateTimeUtilities {
 
-  public static LocalDateTime now() {
-    return LocalDateTime.now();
+  public static ZonedDateTime now() {
+    return ZonedDateTime.now(ZonedDateTimeUtilities.getSystemZone());
   }
 
   public static LocalDateTime atSystemZone(final ZonedDateTime dateTime) {

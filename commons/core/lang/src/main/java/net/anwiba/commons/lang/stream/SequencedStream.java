@@ -22,19 +22,6 @@
 
 package net.anwiba.commons.lang.stream;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.IntFunction;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
@@ -50,15 +37,30 @@ import net.anwiba.commons.lang.functional.ISupplier;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.IntFunction;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 class SequencedStream<T, E extends Exception> implements IStream<T, E> {
 
   private final IIterable<T, E> iterable;
   private final Class<E> exceptionClass;
   private final ICloseable<E> closeable;
 
-//  SequencedStream(final Class<E> exceptionClass, final IIterable<T, E> iterable) {
-//    this(exceptionClass, iterable, () -> {});
-//  }
+  //  SequencedStream(final Class<E> exceptionClass, final IIterable<T, E> iterable) {
+  //    this(exceptionClass, iterable, () -> {});
+  //  }
 
   SequencedStream(final Class<E> exceptionClass, final IIterable<T, E> iterable, final ICloseable<E> closeable) {
     this.exceptionClass = exceptionClass;
@@ -83,18 +85,23 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public IStream<T, E> distinct() {
-    final Set<T> set = new LinkedHashSet<>();
-    return filter(i -> set.add(i));
-  }
-
-  @Override
-  public IStream<T, E> execute() {
+  public IStream<T, E> sort(final Comparator<T> comparator) {
     try {
-      return Streams.of(this.exceptionClass, asList(), this.closeable);
+      List<T> visited = new LinkedList<>();
+      this.iterable.foreach(t -> {
+        visited.add(t);
+      });
+      Collections.sort(visited, comparator);
+      return Streams.of(this.exceptionClass, visited, this.closeable);
     } catch (final Exception exception) {
       return stream(this.exceptionClass, exception, this.closeable);
     }
+  }
+
+  @Override
+  public IStream<T, E> distinct() {
+    final Set<T> set = new LinkedHashSet<>();
+    return filter(i -> set.add(i));
   }
 
   @Override
@@ -121,6 +128,20 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
       List<T> visited = new LinkedList<>();
       this.iterable.foreach(t -> {
         consumer.consume(t);
+        visited.add(t);
+      });
+      return Streams.of(this.exceptionClass, visited, this.closeable);
+    } catch (final Exception exception) {
+      return stream(this.exceptionClass, exception, this.closeable);
+    }
+  }
+
+  @Override
+  public IStream<T, E> foreachAsOptional(final IConsumer<IOptional<T, E>, E> consumer) {
+    try {
+      List<T> visited = new LinkedList<>();
+      this.iterable.foreach(t -> {
+        consumer.consume(Optional.of(this.exceptionClass, t));
         visited.add(t);
       });
       return Streams.of(this.exceptionClass, visited, this.closeable);
@@ -217,6 +238,22 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
     });
   }
 
+  @Override
+  public <O> Iterable<O> asIterable() throws E {
+    return this.iterable.aggregate(new ArrayList<O>(), (l, t) -> {
+      l.add((O) t);
+      return l;
+    });
+  }
+
+  @Override
+  public <O> Iterator<O> asIterator() throws E {
+    return this.iterable.aggregate(new ArrayList<O>(), (l, t) -> {
+      l.add((O) t);
+      return l;
+    }).iterator();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <O> Set<O> asSet() throws E {
@@ -294,8 +331,8 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
   }
 
   @Override
-  public void throwIfFailed() throws E {
-    // nothing to do
+  public IStream<T, E> throwIfFailed() throws E {
+    return this;
   }
 
   @Override
@@ -314,6 +351,15 @@ class SequencedStream<T, E extends Exception> implements IStream<T, E> {
       l.add(t);
       return l;
     });
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    try {
+      return toIterable().iterator();
+    } catch (Exception exception) {
+      throw new IllegalStateException(exception.getMessage(), exception);
+    }
   }
 
   @Override

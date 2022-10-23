@@ -1,27 +1,29 @@
 Manifest-Version: 1.0
 Automatic-Module-Name: net.anwiba.eclipse.libraries
 Bundle-ManifestVersion: 2
-Bundle-Version: 1.1.158
+Bundle-Version: 1.2.50
 Bundle-Name: Libaries
 Bundle-SymbolicName: net.anwiba.eclipse.libraries;singleton:=true
 Bundle-Vendor: Andreas Bartels
-Bundle-RequiredExecutionEnvironment: JavaSE-11
-Bundle-ClassPath: lib/anwiba-commons-ensure-1.1.158.jar,
- lib/anwiba-commons-lang-1.1.158.jar,utilities
- lib/anwiba-commons-logging-1.1.158.jar,
- lib/anwiba-commons-message-1.1.158.jar,
- lib/anwiba-commons-model-1.1.158.jar,
- lib/anwiba-commons-reference-1.1.158.jar,
- lib/anwiba-commons-thread-1.1.158.jar,
- lib/anwiba-commons-utilities-1.1.158.jar,
- lib/anwiba-commons-version-1.1.158.jar,
- lib/anwiba-tools-graphml-1.1.158.jar,
- lib/anwiba-tools-icons-1.1.158.jar,
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-ClassPath: lib/anwiba-commons-ensure-1.2.50.jar,
+ lib/anwiba-commons-lang-1.2.50.jar,
+ lib/anwiba-commons-logging-1.2.50.jar,
+ lib/anwiba-commons-message-1.2.50.jar,
+ lib/anwiba-commons-model-1.2.50.jar,
+ lib/anwiba-commons-reference-1.2.50.jar,
+ lib/anwiba-commons-thread-1.2.50.jar,
+ lib/anwiba-commons-utilities-1.2.50.jar,
+ lib/anwiba-commons-version-1.2.50.jar,
+ lib/anwiba-tools-graphml-1.2.50.jar,
+ lib/anwiba-tools-icons-1.2.50.jar,
  lib/commons-lang3-3.12.0.jar,
  lib/jakarta.activation-2.0.1.jar
- lib/jakarta.xml.bind-api-3.0.1.jar
- lib/log4j-api-2.14.1.jar,
- lib/log4j-core-2.14.1.jar
+ lib/jakarta.xml.bind-api-4.0.0.jar
+ lib/jaxb-core-4.0.0.jar
+ lib/jaxb-runtme-4.0.0.jar
+ lib/log4j-api-2.17.2.jar,
+ lib/log4j-core-2.17.2.jar
 Eclipse-BuddyPolicy: dependent
 Eclipse-BundleShape: dir
 Export-Package: 

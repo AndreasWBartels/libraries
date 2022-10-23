@@ -21,6 +21,10 @@
  */
 package net.anwiba.commons.jdbc;
 
+import net.anwiba.commons.lang.counter.Counter;
+import net.anwiba.commons.lang.counter.ICounter;
+import net.anwiba.commons.lang.optional.If;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -28,10 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import net.anwiba.commons.lang.counter.Counter;
-import net.anwiba.commons.lang.counter.ICounter;
-import net.anwiba.commons.lang.optional.If;
 
 public class BatchTransfer implements IBatchTransfer {
 
@@ -68,9 +68,12 @@ public class BatchTransfer implements IBatchTransfer {
 
   @Override
   public int[] transfer() throws SQLException {
-    try (PreparedStatement selectExistsStatement = this.connection.prepareStatement(this.selectExistsStatementString)) {
-      try (PreparedStatement insertStatement = this.connection.prepareStatement(this.insertStatementString)) {
-        try (PreparedStatement updateStatement = this.connection.prepareStatement(this.updateStatementString)) {
+    try (PreparedStatement selectExistsStatement =
+        DatabaseUtilities.createStatement(this.connection, this.selectExistsStatementString)) {
+      try (PreparedStatement insertStatement =
+          DatabaseUtilities.createStatement(this.connection, this.insertStatementString)) {
+        try (PreparedStatement updateStatement =
+            DatabaseUtilities.createStatement(this.connection, this.updateStatementString)) {
           return transfer(selectExistsStatement, insertStatement, updateStatement);
         }
       }
@@ -85,20 +88,20 @@ public class BatchTransfer implements IBatchTransfer {
     final ICounter insertCounter = new Counter(0);
     final ICounter updateCounter = new Counter(0);
     for (final Object[] objects : this.values) {
-      if (DatabaseUtilities.count(selectExistsStatement, DatabaseUtilities.setterProcedur(identifiers(objects))) > 0) {
+      if (DatabaseUtilities.count(selectExistsStatement, DatabaseUtilities.setter(identifiers(objects))) > 0) {
         DatabaseUtilities
-            .add(updateStatement, DatabaseUtilities.setterProcedur(concat(values(objects), identifiers(objects))));
+            .add(updateStatement, DatabaseUtilities.setter(concat(values(objects), identifiers(objects))));
         updateCounter.increment();
       } else {
-        DatabaseUtilities.add(insertStatement, DatabaseUtilities.setterProcedur(objects));
+        DatabaseUtilities.add(insertStatement, DatabaseUtilities.setter(objects));
         insertCounter.increment();
       }
     }
     final List<Integer> results = new LinkedList<>();
-    If.isTrue(insertCounter.value() > 0).excecute(() -> {
+    If.isTrue(insertCounter.value() > 0).execute(() -> {
       results.addAll(IntStream.of((DatabaseUtilities.transfer(insertStatement))).boxed().collect(Collectors.toList()));
     });
-    If.isTrue(updateCounter.value() > 0).excecute(() -> {
+    If.isTrue(updateCounter.value() > 0).execute(() -> {
       results.addAll(IntStream.of((DatabaseUtilities.transfer(updateStatement))).boxed().collect(Collectors.toList()));
     });
     return results.stream().mapToInt(i -> i.intValue()).toArray();

@@ -22,21 +22,7 @@
 
 package net.anwiba.commons.swing.table;
 
-import java.awt.Image;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.DefaultCellEditor;
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.TableCellEditor;
-
+import net.anwiba.commons.image.ImageUtilities;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.comparable.ComparableComparator;
 import net.anwiba.commons.lang.comparable.NumberComparator;
@@ -63,6 +49,22 @@ import net.anwiba.commons.swing.ui.IObjectUiCellRendererConfiguration;
 import net.anwiba.commons.swing.ui.ObjectUiBuilder;
 import net.anwiba.commons.swing.ui.ObjectUiListCellRenderer;
 import net.anwiba.commons.swing.ui.ObjectUiTableCellRenderer;
+
+import java.awt.Color;
+import java.awt.Image;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.TableCellEditor;
 
 public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
 
@@ -348,6 +350,26 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   }
 
   @Override
+  public IObjectTableBuilder<T> addColorColumn(final String title,
+      final IFunction<T, Color, RuntimeException> provider,
+      final int size) {
+    this.builder.addColumnConfiguration(new ObjectListColumnConfiguration<>(title, object -> {
+      if (object == null) {
+        return null;
+      }
+      return provider.execute(object);
+    },
+        new ObjectUiTableCellRenderer<>(new ObjectUiBuilder<Color>().text(o -> null)
+            .icon(o -> Optional.of(o).convert(i -> new ImageIcon(ImageUtilities.create(64, 12, i))).get())
+            .build()),
+        size,
+        Color.class,
+        false,
+        null));
+    return this;
+  }
+
+  @Override
   public IObjectTableBuilder<T> addBooleanColumn(final String title,
       final IFunction<T, Boolean, RuntimeException> provider,
       final int size) {
@@ -425,6 +447,12 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
   @Override
   public IObjectTableBuilder<T> addRemoveObjectsAction() {
     this.builder.addRemoveObjectsAction();
+    return this;
+  }
+
+  @Override
+  public IObjectTableBuilder<T> addClearTableAction() {
+    this.builder.addClearTableAction();
     return this;
   }
 
@@ -508,4 +536,5 @@ public class ObjectTableBuilder<T> implements IObjectTableBuilder<T> {
     setValues(values.stream().asList());
     return this;
   }
+
 }

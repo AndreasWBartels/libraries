@@ -55,7 +55,7 @@ public final class ExceptionProducer implements IResultProducer<IOException> {
       }
     }
     final byte[] array = IoUtilities.toByteArray(inputStream);
-    throw new HttpRequestException(
+    throw new HttpResponseException(
         "Unexpected response content type '" + contentType + "'", // //$NON-NLS-1$ //$NON-NLS-2$
         url,
         statusCode,

@@ -21,21 +21,23 @@
  */
 package net.anwiba.database.swing.console.converter;
 
+import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
+import net.anwiba.commons.lang.object.IObjectToStringConverter;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
-import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
-import net.anwiba.commons.lang.functional.IApplicable;
-import net.anwiba.commons.lang.object.IObjectToStringConverter;
-import net.anwiba.commons.lang.object.ObjectPair;
 
 public class DataBaseTableCellValueToStringConverterRegistry
     implements
     IDataBaseTableCellValueToStringConverterRegistry,
     IDataBaseTableCellValueToStringConverterProvider {
 
-  final private List<ObjectPair<IApplicable<ObjectPair<IJdbcConnectionDescription, String>>, IObjectToStringConverter<Object>>> factories = new LinkedList<>();
+  final private List<DataBaseTableCellValueToStringConverter> factories = new LinkedList<>();
+
+  public DataBaseTableCellValueToStringConverterRegistry(
+      final List<DataBaseTableCellValueToStringConverter> converters) {
+    converters.forEach(c -> add(c));
+  }
 
   @Override
   public IObjectToStringConverter<Object> get(
@@ -43,28 +45,15 @@ public class DataBaseTableCellValueToStringConverterRegistry
       final String columnTypeName) {
     return this.factories
         .stream()
-        .filter(o -> o.getFirstObject().isApplicable(new ObjectPair<>(description, columnTypeName)))
+        .filter(o -> o.applicable().isApplicable(description) && o.typeNames().contains(columnTypeName))
         .findFirst()
-        .map(o -> o.getSecondObject())
+        .map(o -> o.dataBaseTableCellValueToStringConverter())
         .orElseGet(() -> null);
   }
 
   @Override
-  public void add(
-      final IApplicable<IJdbcConnectionDescription> applicable,
-      final Set<String> typeNames,
-      final IObjectToStringConverter<Object> dataBaseTableCellValueToStringConverter) {
-    this.factories.add(
-        new ObjectPair<IApplicable<ObjectPair<IJdbcConnectionDescription, String>>, IObjectToStringConverter<Object>>(
-            new IApplicable<ObjectPair<IJdbcConnectionDescription, String>>() {
-              @Override
-              public boolean isApplicable(final ObjectPair<IJdbcConnectionDescription, String> context) {
-                final boolean isApplicable = applicable.isApplicable(context.getFirstObject());
-                final boolean equalsIgnoreCase = typeNames.contains(context.getSecondObject());
-                return isApplicable && equalsIgnoreCase;
-              }
-            },
-            dataBaseTableCellValueToStringConverter));
+  public void add(final DataBaseTableCellValueToStringConverter converter) {
+    this.factories.add(converter);
   }
 
 }

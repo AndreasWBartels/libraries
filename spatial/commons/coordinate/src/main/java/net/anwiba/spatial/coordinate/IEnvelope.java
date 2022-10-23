@@ -62,4 +62,8 @@ public interface IEnvelope extends Serializable {
 
   public IEnvelope intersection(IEnvelope envelope);
 
+  public IEnvelope withMeasured(double d, double e);
+
+  public IEnvelope withAltitude(double d, double e);
+
 }

@@ -12,7 +12,7 @@
   <parent>
     <groupId>net.anwiba</groupId>
     <artifactId>anwiba-maven-default</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
 
   <dependencyManagement>
@@ -108,55 +108,13 @@
 
       <dependency>
         <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-attribute</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-authorization</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-bookmark</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-crypto</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
       <dependency>
         <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-data</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-database</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-datasource</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-entity</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-groovy</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
@@ -192,24 +150,6 @@
 
       <dependency>
         <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-table</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-persistence-color</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-persistence-condition</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-preferences</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
@@ -226,39 +166,13 @@
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
-      <!-- commons-program -->
-
       <dependency>
+        <artifactId>anwiba-commons-resource-cache</artifactId>
         <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-application</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-license</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
       <!-- commons-swing -->
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-swing-application</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-swing-attribute</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-swing-color-chooser</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>net.anwiba.commons</groupId>
@@ -275,20 +189,8 @@
       </dependency>
 
       <dependency>
-        <artifactId>anwiba-commons-swing-datasource</artifactId>
-        <groupId>net.anwiba.commons</groupId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>net.anwiba.commons</groupId>
         <artifactId>anwiba-commons-swing-icon</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-swing-image</artifactId>
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
@@ -304,49 +206,7 @@
         <version>${net.anwiba.commons.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-swing-database-connection</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.commons</groupId>
-        <artifactId>anwiba-commons-swing-bookmark</artifactId>
-        <version>${net.anwiba.commons.version}</version>
-      </dependency>
-
       <!-- database-data -->
-
-      <dependency>
-        <groupId>net.anwiba.database</groupId>
-        <artifactId>anwiba-database-access</artifactId>
-        <version>${net.anwiba.database.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.database</groupId>
-        <artifactId>anwiba-database-dbase</artifactId>
-        <version>${net.anwiba.database.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.database</groupId>
-        <artifactId>anwiba-database-derby</artifactId>
-        <version>${net.anwiba.database.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.database</groupId>
-        <artifactId>anwiba-database-h2</artifactId>
-        <version>${net.anwiba.database.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.database</groupId>
-        <artifactId>anwiba-database-hana</artifactId>
-        <version>${net.anwiba.database.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>net.anwiba.database</groupId>
@@ -357,12 +217,6 @@
       <dependency>
         <groupId>net.anwiba.database</groupId>
         <artifactId>anwiba-database-postgresql</artifactId>
-        <version>${net.anwiba.database.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.database</groupId>
-        <artifactId>anwiba-database-spatialite</artifactId>
         <version>${net.anwiba.database.version}</version>
       </dependency>
 
@@ -388,39 +242,6 @@
         <version>${net.anwiba.database.version}</version>
       </dependency>
 
-      <!-- object-commons -->
-
-      <dependency>
-        <groupId>net.anwiba.object</groupId>
-        <artifactId>anwiba-object-table</artifactId>
-        <version>${net.anwiba.object.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.object</groupId>
-        <artifactId>anwiba-object-database</artifactId>
-        <version>${net.anwiba.object.version}</version>
-      </dependency>
-
-      <!-- object-data -->
-
-      <dependency>
-        <groupId>net.anwiba.object</groupId>
-        <artifactId>anwiba-object-dbase-converter</artifactId>
-        <version>${net.anwiba.object.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.object</groupId>
-        <artifactId>anwiba-object-dbase-table</artifactId>
-        <version>${net.anwiba.object.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>net.anwiba.object</groupId>
-        <artifactId>anwiba-object-oracle-table</artifactId>
-        <version>${net.anwiba.object.version}</version>
-      </dependency>
 
     </dependencies>
   </dependencyManagement>

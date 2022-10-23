@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -39,6 +39,9 @@ import net.anwiba.commons.version.VersionUtilities;
 
 public final class ContentType implements IContentType {
 
+  // see: https://datatracker.ietf.org/doc/html/rfc2046
+  // see: https://datatracker.ietf.org/doc/html/rfc2048
+  
   private static enum State {
     primary, sub, version, parametername, parametervalue
   }
@@ -247,20 +250,37 @@ public final class ContentType implements IContentType {
         .instanceOf(IContentType.class);
   }
 
+  public static IOptional<IContentType, CreationException> parse(final String contentType) {
+      if (contentType == null) {
+        return Optional.empty(CreationException.class);
+      }
+      try {
+        return Optional
+            .of(CreationException.class ,Parser.parse(contentType));
+      } catch (CreationException exception) {
+        return Optional.failed(CreationException.class, exception);
+      }
+  }
+
   public static IOptional<IContentType, RuntimeException> from(final String contentType) {
     try {
       if (contentType == null) {
         return Optional.empty();
       }
       IContentType type = Parser.parse(contentType);
-      return Optional
-          .of(from(type.getPrimaryType().toString(),
-              type.getSecondaryType().toString(),
-              type.getVersion().get(),
-              filter(type.getParameters())));
+      return search(type);
     } catch (CreationException exception) {
       return Optional.empty();
+//      return Optional.failed(RuntimeException.class,new IllegalArgumentException(exception.getMessage(), exception));
     }
+  }
+
+  private static IOptional<IContentType, RuntimeException> search(IContentType type) {
+    return Optional
+        .of(from(type.getPrimaryType().toString(),
+            type.getSecondaryType().toString(),
+            type.getVersion().get(),
+            filter(type.getParameters())));
   }
 
   public static IContentType from(final String primaryType, final String subType) {
@@ -437,6 +457,30 @@ public final class ContentType implements IContentType {
     return Streams.of(this.fileExtensions)
         .first(type -> type.equalsIgnoreCase(extension))
         .isAccepted();
+  }
+
+  public static IOptional<String, RuntimeException> getDefaultFileExtension(IContentType contentType) {
+    IOptional<IContentType, RuntimeException> optional = search(contentType);
+    if (optional.isEmpty()) {
+      return Optional.empty();
+    }
+    return ((ContentType)optional.get()).getDefaultFileExtension();
+  }
+  
+  public static List<String> getFileExtensions(IContentType contentType) {
+    IOptional<IContentType, RuntimeException> optional = search(contentType);
+    if (optional.isEmpty()) {
+      return List.of();
+    }
+    return ((ContentType)optional.get()).getFileExtensions();
+  }
+  
+  public static boolean hasFileExtension(IContentType contentType, final String extension) {
+    IOptional<IContentType, RuntimeException> optional = search(contentType);
+    if (optional.isEmpty()) {
+      return false;
+    }
+    return ((ContentType)optional.get()).hasFileExtension(extension);
   }
 
   @Override

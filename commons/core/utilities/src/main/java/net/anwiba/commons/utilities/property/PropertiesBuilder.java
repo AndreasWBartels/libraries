@@ -24,30 +24,57 @@ package net.anwiba.commons.utilities.property;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import net.anwiba.commons.lang.stream.Streams;
 
 public final class PropertiesBuilder {
 
-  private final Map<String, IProperty> parameters = new LinkedHashMap<>();
+  private final Map<String, IProperty> properties = new LinkedHashMap<>();
 
-  public PropertiesBuilder() {
+  PropertiesBuilder() {
   }
 
-  public PropertiesBuilder(final IProperties properties) {
-    Streams.of(properties.properties()).foreach(p -> this.parameters.put(p.getName(), p));
+  PropertiesBuilder(final IProperties properties) {
+    Streams.of(properties.properties()).foreach(p -> this.properties.put(p.getName(), p));
   }
 
-  public PropertiesBuilder add(final String name, final String value) {
-    return add(new Property(name, value));
+  public PropertiesBuilder put(final String name, final String value) {
+    return put(new Property(name, value));
   }
 
-  public PropertiesBuilder add(final IProperty parameter) {
-    this.parameters.put(parameter.getName(), parameter);
+  public PropertiesBuilder put(final IProperty property) {
+    this.properties.put(property.getName(), property);
     return this;
   }
 
   public IProperties build() {
-    return new Properties(new ArrayList<>(this.parameters.values()));
+    return new Properties(new ArrayList<>(this.properties.values()));
+  }
+
+  public PropertiesBuilder consume(final Consumer<PropertiesBuilder> consumer) {
+    consumer.accept(this);
+    return this;
+  }
+
+  public PropertiesBuilder putIfAbsent(final String name, final String value) {
+    return putIfAbsent(new Property(name, value));
+  }
+
+  private PropertiesBuilder putIfAbsent(final Property property) {
+    this.properties.putIfAbsent(property.getName(), property);
+    return this;
+  }
+
+  public PropertiesBuilder putIfAbsentIgnoreCase(final String name, final String value) {
+    return putIfAbsentIgnoreCase(new Property(name, value));
+  }
+
+  private PropertiesBuilder putIfAbsentIgnoreCase(final Property property) {
+    if (this.properties.keySet().stream().anyMatch(k -> k.equalsIgnoreCase(property.getName()))) {
+      return this;
+    }
+    this.properties.put(property.getName(), property);
+    return this;
   }
 }

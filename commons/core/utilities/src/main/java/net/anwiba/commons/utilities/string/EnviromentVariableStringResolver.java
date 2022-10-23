@@ -26,12 +26,15 @@ import net.anwiba.commons.utilities.provider.IContextValueProvider;
 public class EnviromentVariableStringResolver extends AbstractStringResolver {
 
   public EnviromentVariableStringResolver(final IStringAppender errorHandler) {
-    super(errorHandler, ENV_PATTERN, new IContextValueProvider<String, String, RuntimeException>() {
+    super(errorHandler,
+        value -> value,
+        ENV_PATTERN,
+        new IContextValueProvider<String, String, RuntimeException>() {
 
-      @Override
-      public String getValue(final String name) throws RuntimeException {
-        return System.getenv(name);
-      }
-    });
+          @Override
+          public String getValue(final String name) throws RuntimeException {
+            return System.getenv(name);
+          }
+        });
   }
 }

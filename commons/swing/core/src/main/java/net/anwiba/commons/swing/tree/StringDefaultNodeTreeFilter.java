@@ -21,7 +21,6 @@
  */
 package net.anwiba.commons.swing.tree;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -50,11 +49,12 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
 
       private boolean evaluate(final TreeNode node) {
         final String upperCase = string.toUpperCase();
-        if (node instanceof DefaultMutableTreeNode) {
+        if (node instanceof DefaultMutableTreeNode objectNode) {
           boolean flag = false;
           for (final IToStringConverter toStringConverter : converters) {
-            if (toStringConverter.isApplicable(((DefaultMutableTreeNode) node).getUserObject())) {
-              flag |= contains(toStringConverter.toString(((DefaultMutableTreeNode) node).getUserObject()), upperCase);
+            Object userObject = objectNode.getUserObject();
+            if (toStringConverter.isApplicable(userObject)) {
+              flag |= contains(toStringConverter.toString(userObject), upperCase);
             }
           }
           return flag || evaluate(iterable(node));
@@ -84,8 +84,8 @@ public class StringDefaultNodeTreeFilter implements IDefaultTreeNodeFilter {
   }
 
   Iterable<TreeNode> iterable(final TreeNode parent) {
-    if (parent instanceof LazyFolderTreeNode && !((LazyFolderTreeNode) parent).isInitialize()) {
-      return () -> new ArrayList<TreeNode>().iterator();
+    if (parent instanceof ReloadableFolderTreeNode node && (!node.isInitialized() || node.isLoading() )) {
+      return () -> List.<TreeNode>of().iterator();
     }
     return new Iterable<TreeNode>() {
 

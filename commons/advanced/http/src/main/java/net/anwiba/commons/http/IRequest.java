@@ -26,6 +26,8 @@ import java.io.InputStream;
 
 import net.anwiba.commons.cache.resource.ILifeTime;
 import net.anwiba.commons.lang.functional.IClosure;
+import net.anwiba.commons.lang.functional.IConsumer;
+import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.lang.parameter.IParameters;
@@ -44,11 +46,21 @@ public interface IRequest {
 
   IClosure<InputStream, IOException> getContent();
 
-  String getMimeType();
+  default <T> T getContent(IConverter<InputStream, T, IOException> converter) throws IOException {
+    try (InputStream stream = getContent().execute()) {
+      return converter.convert(stream);
+    }
+  }
 
-  String getEncoding();
+  default void getContent(IConsumer<InputStream, IOException> converter) throws IOException {
+    try (InputStream stream = getContent().execute()) {
+      converter.consume(stream);
+    }
+  }
 
-  String getUserAgent();
+  String getContentMimeType();
+
+  String getContentCharset();
 
   IParameters getProperties();
 

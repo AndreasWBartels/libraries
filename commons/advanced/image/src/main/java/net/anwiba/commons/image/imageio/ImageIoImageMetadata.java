@@ -21,6 +21,9 @@
  */
 package net.anwiba.commons.image.imageio;
 
+import java.awt.Color;
+import java.util.List;
+
 import javax.imageio.ImageTypeSpecifier;
 
 import net.anwiba.commons.image.IImageMetadata;
@@ -37,6 +40,7 @@ class ImageIoImageMetadata implements IImageMetadata {
   private final int dataType;
   private final int transparency;
   private final boolean isIndexed;
+  private final List<Color> colors;
 
   public ImageIoImageMetadata(
       final int index,
@@ -48,7 +52,8 @@ class ImageIoImageMetadata implements IImageMetadata {
       final int dataType,
       final int transparency,
       final ImageTypeSpecifier imageType,
-      final boolean isIndexed) {
+      final boolean isIndexed,
+      final List<Color> colors) {
     this.index = index;
     this.width = width;
     this.height = height;
@@ -59,6 +64,7 @@ class ImageIoImageMetadata implements IImageMetadata {
     this.transparency = transparency;
     this.imageType = imageType;
     this.isIndexed = isIndexed;
+    this.colors = colors;
   }
 
   @Override
@@ -107,5 +113,10 @@ class ImageIoImageMetadata implements IImageMetadata {
   @Override
   public boolean isIndexed() {
     return isIndexed;
+  }
+  
+  @Override
+  public List<Color> getColors() {
+    return this.colors;
   }
 }

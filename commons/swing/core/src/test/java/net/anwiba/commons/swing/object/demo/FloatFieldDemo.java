@@ -27,8 +27,8 @@ import javax.swing.JPanel;
 
 import org.junit.jupiter.api.Test;
 
-import net.anwiba.commons.swing.object.FloatField;
 import net.anwiba.commons.swing.object.IObjectField;
+import net.anwiba.commons.swing.object.numeric.FloatField;
 
 public class FloatFieldDemo extends AbstractObjectFieldDemo {
 

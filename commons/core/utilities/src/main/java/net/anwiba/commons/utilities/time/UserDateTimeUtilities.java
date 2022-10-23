@@ -49,8 +49,9 @@ public class UserDateTimeUtilities {
     return userDateTime.atZone(ZonedDateTimeUtilities.getUserZone());
   }
 
-  public static LocalDateTime now() {
-    return LocalDateTimeUtilities.atZone(ZonedDateTime.now(), ZonedDateTimeUtilities.getUserZone());
+  public static ZonedDateTime now() {
+    return ZonedDateTime.now(ZonedDateTimeUtilities.getUserZone());
+    //    return LocalDateTimeUtilities.atZone(ZonedDateTime.now(), ZonedDateTimeUtilities.getUserZone());
   }
 
   public static LocalDateTime atUserZone(final ZonedDateTime dateTime) {

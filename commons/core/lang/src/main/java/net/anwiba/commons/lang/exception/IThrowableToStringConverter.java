@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,10 +21,57 @@
  */
 package net.anwiba.commons.lang.exception;
 
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
+
+import java.util.List;
+import java.util.function.Function;
+
 public interface IThrowableToStringConverter {
 
-  boolean isApplicable(Throwable throwable);
+  default boolean isApplicable(final Throwable throwable) {
+    return getThrowableClass()
+        .convert(throwableClass -> throwableClass.isInstance(throwable))
+        .getOr(() -> Boolean.FALSE)
+        .booleanValue();
+  }
 
-  String toString(Throwable throwable);
+  ThrowableConverterResult convert(final Throwable throwable);
 
+  default IOptional<Class<? extends Throwable>, RuntimeException> getThrowableClass() {
+    return Optional.empty();
+  }
+
+  static <E extends Throwable> IThrowableToStringConverter of(final Class<E> throwableClass,
+      final Function<Throwable, String> toStringConverter) {
+    return new IThrowableToStringConverter() {
+
+      @Override
+      public IOptional<Class<? extends Throwable>, RuntimeException> getThrowableClass() {
+        return Optional.of(throwableClass);
+      }
+
+      @Override
+      public ThrowableConverterResult convert(final Throwable throwable) {
+        return ThrowableConverterResult.of(toStringConverter.apply(throwable));
+      }
+    };
+  }
+
+  default void addTo(final List<String> messages, final String title, final int value) {
+    addTo(messages, title, String.valueOf(value));
+  }
+
+  default void addTo(final List<String> messages, final String title, final boolean value) {
+    addTo(messages, title, String.valueOf(value));
+  }
+
+  default void addTo(final List<String> messages, final String title, final String value) {
+    if (value == null || value.isBlank()) {
+      return;
+    }
+    StringBuilder builder = new StringBuilder();
+    builder.append(title).append("=").append(value);
+    messages.add(builder.toString());
+  }
 }

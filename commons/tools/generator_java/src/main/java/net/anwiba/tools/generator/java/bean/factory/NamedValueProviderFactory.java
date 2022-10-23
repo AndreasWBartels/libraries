@@ -25,6 +25,12 @@ import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_ITERA
 import static net.anwiba.tools.generator.java.bean.JavaConstants.JAVA_LANG_STRING;
 import static net.anwiba.tools.generator.java.bean.factory.SourceFactoryUtilities.createAddIfNullReturnNullClosure;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.NamedValueProvider;
+import net.anwiba.tools.generator.java.bean.configuration.Type;
+
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -33,15 +39,12 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.NamedValueProvider;
-import net.anwiba.tools.generator.java.bean.configuration.Type;
-
 public class NamedValueProviderFactory extends AbstractSourceFactory {
 
-  public NamedValueProviderFactory(final JCodeModel codeModel) {
-    super(codeModel);
+  public NamedValueProviderFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    super(codeModel, annotationClassfactory);
   }
 
   public void create(final JDefinedClass instance, final NamedValueProvider configuration, final JFieldVar field)

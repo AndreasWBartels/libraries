@@ -73,6 +73,12 @@ public enum DatabaseType {
       return visitor.visitDouble();
     }
   },
+  DOUBLE_PRECISION(Types.DOUBLE) {
+    @Override
+    public <T, E extends Exception> T accept(final IDatabaseTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitDouble();
+    }
+  },
   NUMERIC(Types.NUMERIC) {
     @Override
     public <T, E extends Exception> T accept(final IDatabaseTypeVisitor<T, E> visitor) throws E {
@@ -115,7 +121,19 @@ public enum DatabaseType {
       return visitor.visitTime();
     }
   },
+  TIME_WITH_TIMEZONE(Types.TIME_WITH_TIMEZONE) {
+    @Override
+    public <T, E extends Exception> T accept(final IDatabaseTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitTimeWithTimeZone();
+    }
+  },
   TIMESTAMP(Types.TIMESTAMP) {
+    @Override
+    public <T, E extends Exception> T accept(final IDatabaseTypeVisitor<T, E> visitor) throws E {
+      return visitor.visitTimeStampWithTimeZone();
+    }
+  },
+  TIMESTAMP_WITH_TIMEZONE(Types.TIMESTAMP_WITH_TIMEZONE) {
     @Override
     public <T, E extends Exception> T accept(final IDatabaseTypeVisitor<T, E> visitor) throws E {
       return visitor.visitTimeStamp();
@@ -268,8 +286,12 @@ public enum DatabaseType {
   }
 
   public static DatabaseType getByName(final String name) {
+    if (name == null) {
+      return null;
+    }
+    String normedName = name.trim().replaceAll(" ", "_").toUpperCase();
     for (final DatabaseType databaseType : DatabaseType.values()) {
-      if (databaseType.name().equals(name.trim().toUpperCase())) {
+      if (databaseType.name().equals(normedName)) {
         return databaseType;
       }
     }

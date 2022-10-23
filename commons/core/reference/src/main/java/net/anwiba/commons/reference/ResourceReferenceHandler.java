@@ -122,7 +122,12 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     return resourceReference.accept(new IResourceReferenceVisitor<OutputStream, IOException>() {
 
       @Override
-      public OutputStream visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+      public OutputStream visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws IOException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public OutputStream visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
         try {
           return ResourceReferenceHandler.this.connector.openOutputStream(getUri(urlResourceReference));
         } catch (final URISyntaxException exception) {
@@ -131,7 +136,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public OutputStream visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+      public OutputStream visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
         return ResourceReferenceHandler.this.connector.openOutputStream(uriResourceReference.getUri());
       }
 
@@ -177,7 +182,12 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     return resourceReference.accept(new IResourceReferenceVisitor<InputStream, IOException>() {
 
       @Override
-      public InputStream visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+      public InputStream visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws IOException {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public InputStream visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
         try {
           return ResourceReferenceHandler.this.connector
               .openInputStream(getUri(urlResourceReference), contentTypeAcceptor);
@@ -187,7 +197,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public InputStream visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+      public InputStream visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
         return ResourceReferenceHandler.this.connector
             .openInputStream(uriResourceReference.getUri(), contentTypeAcceptor);
       }
@@ -230,7 +240,12 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     return resourceReference.accept(new IResourceReferenceVisitor<Boolean, RuntimeException>() {
 
       @Override
-      public Boolean visitUrlResource(final UrlResourceReference urlResourceReference) {
+      public Boolean visitUrlResource(final UniformResourceLocatorReference urlResourceReference) {
+        return Boolean.FALSE;
+      }
+
+      @Override
+      public Boolean visitURLResource(final URLResourceReference urlResourceReference) {
         try {
           if (isFileSystemResource(urlResourceReference)) {
             File file = getFile(urlResourceReference);
@@ -243,7 +258,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public Boolean visitUriResource(final UriResourceReference uriResourceReference) {
+      public Boolean visitURIResource(final URIResourceReference uriResourceReference) {
         try {
           if (isFileSystemResource(uriResourceReference)) {
             File file = getFile(uriResourceReference);
@@ -289,7 +304,12 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     return resourceReference.accept(new IResourceReferenceVisitor<Boolean, RuntimeException>() {
 
       @Override
-      public Boolean visitUrlResource(final UrlResourceReference urlResourceReference) {
+      public Boolean visitUrlResource(final UniformResourceLocatorReference urlResourceReference) {
+        return Boolean.FALSE;
+      }
+
+      @Override
+      public Boolean visitURLResource(final URLResourceReference urlResourceReference) {
         try {
           return Boolean.valueOf(ResourceReferenceHandler.this.connector.canRead(getUri(urlResourceReference)));
         } catch (final URISyntaxException exception) {
@@ -298,7 +318,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public Boolean visitUriResource(final UriResourceReference uriResourceReference) {
+      public Boolean visitURIResource(final URIResourceReference uriResourceReference) {
         return Boolean.valueOf(ResourceReferenceHandler.this.connector.canRead(uriResourceReference.getUri()));
       }
 
@@ -334,7 +354,12 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     return resourceReference.accept(new IResourceReferenceVisitor<Boolean, RuntimeException>() {
 
       @Override
-      public Boolean visitUrlResource(final UrlResourceReference urlResourceReference) {
+      public Boolean visitUrlResource(final UniformResourceLocatorReference urlResourceReference) {
+        return Boolean.FALSE;
+      }
+
+      @Override
+      public Boolean visitURLResource(final URLResourceReference urlResourceReference) {
         try {
           return Boolean.valueOf(ResourceReferenceHandler.this.connector.canWrite(getUri(urlResourceReference)));
         } catch (final URISyntaxException exception) {
@@ -343,7 +368,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public Boolean visitUriResource(final UriResourceReference uriResourceReference) {
+      public Boolean visitURIResource(final URIResourceReference uriResourceReference) {
         return Boolean.valueOf(ResourceReferenceHandler.this.connector.canWrite(uriResourceReference.getUri()));
       }
 
@@ -399,7 +424,12 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     return resourceReference.accept(new IResourceReferenceVisitor<Long, RuntimeException>() {
 
       @Override
-      public Long visitUrlResource(final UrlResourceReference urlResourceReference) {
+      public Long visitUrlResource(final UniformResourceLocatorReference urlResourceReference) {
+        return Long.valueOf(-1l);
+      }
+
+      @Override
+      public Long visitURLResource(final URLResourceReference urlResourceReference) {
         try {
           return Long.valueOf(ResourceReferenceHandler.this.connector.getContentLength(getUri(urlResourceReference)));
         } catch (final IOException | URISyntaxException exception) {
@@ -408,7 +438,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public Long visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
+      public Long visitURIResource(final URIResourceReference uriResourceReference) throws RuntimeException {
         try {
           return Long.valueOf(ResourceReferenceHandler.this.connector.getContentLength(uriResourceReference.getUri()));
         } catch (final IOException exception) {
@@ -521,12 +551,17 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     final IResourceReferenceVisitor<String, RuntimeException> visitor = new IResourceReferenceVisitor<>() {
 
       @Override
+      public String visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException  {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public String visitFileResource(final FileResourceReference fileResourceReference) throws RuntimeException {
         return getContentType(fileResourceReference.getFile().toPath());
       }
 
       @Override
-      public String visitUrlResource(final UrlResourceReference urlResourceReference) throws RuntimeException {
+      public String visitURLResource(final URLResourceReference urlResourceReference) throws RuntimeException {
         try {
           if (isFileSystemResource(resourceReference)) {
             return getContentType(getPath(urlResourceReference));
@@ -542,7 +577,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public String visitUriResource(final UriResourceReference uriResourceReference) throws RuntimeException {
+      public String visitURIResource(final URIResourceReference uriResourceReference) throws RuntimeException {
         try {
           if (isFileSystemResource(resourceReference)) {
             return getContentType(getPath(uriResourceReference));
@@ -593,12 +628,17 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     final IResourceReferenceVisitor<FileTime, IOException> visitor = new IResourceReferenceVisitor<>() {
 
       @Override
+      public FileTime visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException  {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public FileTime visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
         return lastModified(fileResourceReference.getFile().toPath());
       }
 
       @Override
-      public FileTime visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+      public FileTime visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
         try {
           if (isFileSystemResource(urlResourceReference)) {
             return lastModified(getPath(urlResourceReference));
@@ -610,7 +650,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public FileTime visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+      public FileTime visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
         try {
           if (isFileSystemResource(uriResourceReference)) {
             return lastModified(getPath(uriResourceReference));
@@ -644,12 +684,17 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     final IResourceReferenceVisitor<FileTime, IOException> visitor = new IResourceReferenceVisitor<>() {
 
       @Override
+      public FileTime visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException  {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public FileTime visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
         return visitPathResource(new PathResourceReference(fileResourceReference.getFile().toPath()));
       }
 
       @Override
-      public FileTime visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+      public FileTime visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
         try {
           if (isFileSystemResource(urlResourceReference)) {
             return visitFileResource(new FileResourceReference(getFile(urlResourceReference)));
@@ -661,7 +706,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public FileTime visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+      public FileTime visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
         try {
           if (isFileSystemResource(uriResourceReference)) {
             return visitFileResource(new FileResourceReference(getFile(uriResourceReference)));
@@ -695,12 +740,17 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     final IResourceReferenceVisitor<FileTime, IOException> visitor = new IResourceReferenceVisitor<>() {
 
       @Override
+      public FileTime visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException  {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public FileTime visitFileResource(final FileResourceReference fileResourceReference) throws IOException {
         return visitPathResource(new PathResourceReference(fileResourceReference.getFile().toPath()));
       }
 
       @Override
-      public FileTime visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+      public FileTime visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
         try {
           if (isFileSystemResource(urlResourceReference)) {
             return visitFileResource(new FileResourceReference(getFile(urlResourceReference)));
@@ -712,7 +762,7 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
       }
 
       @Override
-      public FileTime visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+      public FileTime visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
         try {
           if (isFileSystemResource(uriResourceReference)) {
             return visitFileResource(new FileResourceReference(getFile(uriResourceReference)));
@@ -754,18 +804,23 @@ public class ResourceReferenceHandler implements IResourceReferenceHandler {
     final IResourceReferenceVisitor<IResourceReference, IOException> visitor = new IResourceReferenceVisitor<>() {
 
       @Override
+      public IResourceReference visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws RuntimeException  {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
       public IResourceReference visitFileResource(final FileResourceReference fileResourceReference)
           throws IOException {
         return copyTo(fileResourceReference);
       }
 
       @Override
-      public IResourceReference visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+      public IResourceReference visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
         return copyTo(urlResourceReference);
       }
 
       @Override
-      public IResourceReference visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+      public IResourceReference visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
         return copyTo(uriResourceReference);
       }
 

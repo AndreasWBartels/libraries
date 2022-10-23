@@ -31,25 +31,42 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
+import net.anwiba.tools.generator.java.bean.configuration.Annotation;
+import net.anwiba.tools.generator.java.bean.configuration.BeanBuilder;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.tools.generator.java.bean.configuration.Annotation;
-import net.anwiba.tools.generator.java.bean.configuration.BeanBuilder;
-
 public class BeanGeneratorTest {
 
   private static final String COPYRIGHT = ""; //$NON-NLS-1$
   private static final String JAVADOC = "javadoc text\nthis is for testing";
+  private final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+      CreationException> annotationClassfactory =
+          new IFactory<>() {
+
+            @Override
+            public Class<? extends java.lang.annotation.Annotation> create(final String name) throws CreationException {
+              try {
+                return (Class<? extends java.lang.annotation.Annotation>) this
+                    .getClass()
+                    .getClassLoader()
+                    .loadClass(name);
+              } catch (final ClassNotFoundException exception) {
+                throw new CreationException(exception.getMessage(), exception);
+              }
+            }
+          };
 
   @SuppressWarnings({ "nls" })
   @Test
   public void mutable() throws CreationException, IOException {
-    final BeanGenerator generator = new BeanGenerator();
+    final BeanGenerator generator = new BeanGenerator(this.annotationClassfactory);
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.comment(JAVADOC);
     builder.member(member(type(String.class.getName()).build(), "name")
@@ -72,7 +89,7 @@ public class BeanGeneratorTest {
   @SuppressWarnings({ "nls" })
   @Test
   public void imutable() throws CreationException, IOException {
-    final BeanGenerator generator = new BeanGenerator();
+    final BeanGenerator generator = new BeanGenerator(this.annotationClassfactory);
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.setEnableBuilder(true);
     builder.setMutable(false);
@@ -89,7 +106,7 @@ public class BeanGeneratorTest {
   @SuppressWarnings({ "nls" })
   @Test
   public void namedValueProvider() throws CreationException, IOException {
-    final BeanGenerator generator = new BeanGenerator();
+    final BeanGenerator generator = new BeanGenerator(this.annotationClassfactory);
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
     builder.properties(
@@ -107,7 +124,7 @@ public class BeanGeneratorTest {
   @SuppressWarnings({ "nls" })
   @Test
   public void beanBuilder() throws CreationException, IOException {
-    final BeanGenerator generator = new BeanGenerator();
+    final BeanGenerator generator = new BeanGenerator(this.annotationClassfactory);
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.setMutable(false);
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
@@ -127,7 +144,7 @@ public class BeanGeneratorTest {
   @SuppressWarnings({ "nls" })
   @Test
   public void creatorBuilder() throws CreationException, IOException {
-    final BeanGenerator generator = new BeanGenerator();
+    final BeanGenerator generator = new BeanGenerator(this.annotationClassfactory);
     final BeanBuilder builder = bean("net.anwiba.test.Bean");
     builder.member(member(type(String.class.getName()).build(), "type").value("Bean").isSetterEnabled(false).build());
     builder.creator(

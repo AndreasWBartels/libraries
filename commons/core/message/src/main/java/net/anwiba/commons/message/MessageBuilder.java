@@ -29,7 +29,7 @@ import net.anwiba.commons.lang.exception.Throwables;
 import net.anwiba.commons.lang.optional.IOptional;
 import net.anwiba.commons.lang.stream.Streams;
 
-public class MessageBuilder implements IMessageBuilder {
+class MessageBuilder implements IMessageBuilder {
 
   public final static List<IThrowableToMessagePresentationConverter> resolvers = new ArrayList<>();
 
@@ -47,59 +47,59 @@ public class MessageBuilder implements IMessageBuilder {
   private Object goal = null;
 
   @Override
-  public IMessageBuilder setMessage(final IMessage message) {
-    setText(message.getText());
-    setDescription(message.getDescription());
-    setThrowable(message.getThrowable());
-    setType(message.getMessageType());
-    setGoal(message.getGoal());
+  public IMessageBuilder message(final IMessage message) {
+    text(message.getText());
+    description(message.getDescription());
+    throwable(message.getThrowable());
+    type(message.getMessageType());
+    goal(message.getGoal());
     return this;
   }
 
   @Override
-  public IMessageBuilder setInfo() {
+  public IMessageBuilder info() {
     this.type = MessageType.INFO;
     return this;
   }
 
   @Override
-  public IMessageBuilder setWarning() {
+  public IMessageBuilder warning() {
     this.type = MessageType.WARNING;
     return this;
   }
 
   @Override
-  public IMessageBuilder setError() {
+  public IMessageBuilder error() {
     this.type = MessageType.ERROR;
     return this;
   }
 
   @Override
-  public IMessageBuilder setType(final MessageType type) {
+  public IMessageBuilder type(final MessageType type) {
     this.type = type;
     return this;
   }
 
   @Override
-  public IMessageBuilder setText(final String text) {
+  public IMessageBuilder text(final String text) {
     this.text = text;
     return this;
   }
 
   @Override
-  public IMessageBuilder setDescription(final String description) {
+  public IMessageBuilder description(final String description) {
     this.description = description;
     return this;
   }
 
   @Override
-  public IMessageBuilder setThrowable(final Throwable throwable) {
+  public IMessageBuilder throwable(final Throwable throwable) {
     this.throwable = throwable;
     return this;
   }
 
   @Override
-  public IMessageBuilder setGoal(final Object goal) {
+  public IMessageBuilder goal(final Object goal) {
     this.goal = goal;
     return this;
   }
@@ -148,8 +148,8 @@ public class MessageBuilder implements IMessageBuilder {
   }
 
   @Override
-  public IMessageBuilder setQuery() {
-    return setType(MessageType.QUERY);
+  public IMessageBuilder query() {
+    return type(MessageType.QUERY);
   }
 
   static String toDetailInfo(final Throwable throwable) {
@@ -160,10 +160,7 @@ public class MessageBuilder implements IMessageBuilder {
       return optional.get();
     }
     
-    if (Throwables.isApplicable(throwable)) {
-      return String.join("\n", Throwables.toString(throwable), " ",  Throwables.toStackTraceString(throwable));
-    }
-    return Throwables.toStackTraceString(throwable);
+    return String.join("\n", Throwables.getExtendedMessage(throwable), " ",  Throwables.toStackTraceString(throwable));
   }
 
 }

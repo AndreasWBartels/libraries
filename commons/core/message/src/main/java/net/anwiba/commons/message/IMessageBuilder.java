@@ -22,28 +22,38 @@
 
 package net.anwiba.commons.message;
 
+import java.text.MessageFormat;
+
 public interface IMessageBuilder {
 
-  IMessageBuilder setType(MessageType type);
+  IMessageBuilder type(MessageType type);
 
-  IMessageBuilder setText(String text);
+  IMessageBuilder text(String text);
 
-  IMessageBuilder setDescription(String description);
+  default IMessageBuilder text(String description, Object... objects) {
+    return text(MessageFormat.format(description, objects));
+  }
 
-  IMessageBuilder setThrowable(Throwable throwable);
+  IMessageBuilder description(String description);
+
+  default IMessageBuilder description(String description, Object... objects) {
+    return description(MessageFormat.format(description, objects));
+  }
+
+  IMessageBuilder throwable(Throwable throwable);
 
   IMessage build();
 
-  IMessageBuilder setInfo();
+  IMessageBuilder info();
 
-  IMessageBuilder setWarning();
+  IMessageBuilder warning();
 
-  IMessageBuilder setError();
+  IMessageBuilder error();
 
-  IMessageBuilder setQuery();
+  IMessageBuilder query();
 
-  IMessageBuilder setMessage(IMessage message);
+  IMessageBuilder message(IMessage message);
 
-  IMessageBuilder setGoal(Object nature);
+  IMessageBuilder goal(Object nature);
 
 }

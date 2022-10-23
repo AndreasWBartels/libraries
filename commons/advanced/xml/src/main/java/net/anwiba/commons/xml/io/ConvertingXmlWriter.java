@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import javax.xml.transform.OutputKeys;
 
 import net.anwiba.commons.lang.parameter.IParameters;
-import net.anwiba.commons.utilities.property.PropertiesBuilder;
+import net.anwiba.commons.utilities.property.Properties;
 import net.anwiba.commons.utilities.registry.AbstractApplicableRegistry;
 import net.anwiba.commons.utilities.registry.IApplicableRegistry;
 
@@ -74,9 +74,9 @@ public class ConvertingXmlWriter<C> implements IConvertingXmlWriter<C> {
     persister.write(object,
         parameters,
         outputStream,
-        new PropertiesBuilder()
-            .add(OutputKeys.INDENT, this.isIndentEnabled ? "yes" : "no")
-            .add(OutputKeys.OMIT_XML_DECLARATION, this.isOmitXMLDeclaration ? "yes" : "no")
+        Properties.builder()
+            .put(OutputKeys.INDENT, this.isIndentEnabled ? "yes" : "no")
+            .put(OutputKeys.OMIT_XML_DECLARATION, this.isOmitXMLDeclaration ? "yes" : "no")
             .build());
   }
 }

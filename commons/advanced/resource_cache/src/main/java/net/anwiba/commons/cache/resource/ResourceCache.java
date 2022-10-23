@@ -532,6 +532,10 @@ public class ResourceCache implements IResourceCache {
           return ResourceCacheListResult.empty();
         }
         final IResourceReference resourceReference = object.getResourceReference();
+        if (!resourceReferenceHandler.exists(resourceReference)) {
+          remove(key);
+          return ResourceCacheListResult.empty();
+        }
         final ICachingRule cachingRule = object.getCachingRule();
         final IResourceCacheConfiguration configuration =
             getConfiguration(cachingRule, key, object.getContentType()).get();

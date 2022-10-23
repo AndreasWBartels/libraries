@@ -21,6 +21,8 @@
  */
 package net.anwiba.database.swing.console.result;
 
+import net.anwiba.commons.model.IObjectModel;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -29,21 +31,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.anwiba.commons.model.IObjectModel;
-
 public class ResultSetAdapter {
+
+  static ResultSetAdapter empty = new ResultSetAdapter(
+      0,
+      1,
+      Arrays.asList("empty"), //$NON-NLS-1$
+      Arrays.asList(Object.class),
+      Arrays.asList("object"),
+      Collections.emptyList(),
+      null,
+      Collections.emptyList());
 
   public static ResultSetAdapter create(final IObjectModel<String> statusModel, final ResultSet set) {
 
     if (set == null) {
-      return new ResultSetAdapter(
-          0,
-          1,
-          Arrays.asList("empty"), //$NON-NLS-1$
-          Arrays.asList(Object.class),
-          Collections.emptyList(),
-          null,
-          Collections.emptyList());
+      return empty;
     }
 
     try {
@@ -63,30 +66,32 @@ public class ResultSetAdapter {
         columnNames.add(metaData.getColumnName(i));
         columnClasses.add(getColumnClassForName(metaData.getColumnClassName(i)));
         columnTypes.add(metaData.getColumnType(i));
-        columnTypeNames.add(metaData.getColumnTypeName(i));
+        columnTypeNames.add(getColumnTypeName(metaData, i));
       }
 
-      if ((set.getType() == ResultSet.TYPE_SCROLL_INSENSITIVE || set.getType() == ResultSet.TYPE_SCROLL_SENSITIVE)
-          && (set.getConcurrency() == ResultSet.CONCUR_READ_ONLY
-              || set.getConcurrency() == ResultSet.CONCUR_UPDATABLE)) {
+      final int scrollType = set.getType();
+      final int concurrency = set.getConcurrency();
+      if ((scrollType == ResultSet.TYPE_SCROLL_INSENSITIVE || scrollType == ResultSet.TYPE_SCROLL_SENSITIVE)
+          && (concurrency == ResultSet.CONCUR_READ_ONLY || concurrency == ResultSet.CONCUR_UPDATABLE)) {
         set.beforeFirst();
+        int start = set.getRow();
         set.last();
         rowCount = set.getRow();
-        set.beforeFirst();
         resultSet = set;
-      } else {
-        int counter = 0;
-        final List<List<Object>> rows = new ArrayList<>();
-        final ResultSetToRowConverter converter = new ResultSetToRowConverter(
-            columnTypes,
-            columnTypeNames,
-            columnCount);
-        while (set.next()) {
-          rows.add(converter.convert(set));
-          counter++;
+        if (set.absolute(start) && start == set.getRow()) {
+          resultSet = set;
+        } else {
+          set.beforeFirst();
+          if (start == set.getRow()) {
+            resultSet = set;
+          } else {
+            resultList = getRows(columnTypes, columnTypeNames, columnCount, set);
+            rowCount = resultList.size();
+          }
         }
-        resultList = rows;
-        rowCount = counter;
+      } else {
+        resultList = getRows(columnTypes, columnTypeNames, columnCount, set);
+        rowCount = resultList.size();
       }
 
       return new ResultSetAdapter(
@@ -95,20 +100,46 @@ public class ResultSetAdapter {
           columnNames,
           columnClasses,
           columnTypeNames,
+          columnTypes,
           resultSet,
           resultList);
 
     } catch (final Exception exception) {
       statusModel.set(exception.getMessage());
-      return new ResultSetAdapter(
-          0,
-          1,
-          Arrays.asList("empty"), //$NON-NLS-1$
-          Arrays.asList(Object.class),
-          Collections.emptyList(),
-          null,
-          Collections.emptyList());
+      return empty;
     }
+  }
+
+  private static String getColumnTypeName(final ResultSetMetaData metaData, final int i) throws SQLException {
+    long precision = metaData.getPrecision(i);
+    long scale = metaData.getScale(i);
+    final String columnTypeName = metaData.getColumnTypeName(i);
+    return columnTypeName + typeNameConstaints(precision, scale);
+  }
+
+  private static String typeNameConstaints(final long precision, final long scale) {
+    if (precision == 0) {
+      return "";
+    }
+    if (scale == 0) {
+      return "(" + precision + ")";
+    }
+    return "(" + precision + "," + scale + ")";
+  }
+
+  protected static List<List<Object>> getRows(final List<Integer> columnTypes,
+      final List<String> columnTypeNames,
+      final int columnCount,
+      final ResultSet set) throws SQLException {
+    final List<List<Object>> rows = new ArrayList<>();
+    final ResultSetToRowConverter converter = new ResultSetToRowConverter(
+        columnTypes,
+        columnTypeNames,
+        columnCount);
+    while (set.next()) {
+      rows.add(converter.convert(set));
+    }
+    return rows;
   }
 
   private static Class<?> getColumnClassForName(final String columnClassName) {
@@ -127,6 +158,7 @@ public class ResultSetAdapter {
   private final List<String> columnTypeNames;
   private final ResultSet resultSet;
   private final List<List<Object>> resultList;
+  private final List<Integer> columnTypes;
 
   public ResultSetAdapter(
       final int rowCount,
@@ -134,6 +166,7 @@ public class ResultSetAdapter {
       final List<String> columnNames,
       @SuppressWarnings("rawtypes") final List<Class> columnClasses,
       final List<String> columnTypeNames,
+      final List<Integer> columnTypes,
       final ResultSet resultSet,
       final List<List<Object>> resultList) {
     this.rowCount = rowCount;
@@ -141,6 +174,7 @@ public class ResultSetAdapter {
     this.columnNames = columnNames;
     this.columnClasses = columnClasses;
     this.columnTypeNames = columnTypeNames;
+    this.columnTypes = columnTypes;
     this.resultSet = resultSet;
     this.resultList = resultList;
   }
@@ -151,6 +185,22 @@ public class ResultSetAdapter {
 
   public int getColumnCount() {
     return this.columnCount;
+  }
+
+  public List<String> getColumnNames() {
+    return this.columnNames;
+  }
+
+  public List<String> getColumnTypeNames() {
+    return this.columnTypeNames;
+  }
+
+  public List<Integer> getColumnTypes() {
+    return this.columnTypes;
+  }
+
+  public List<Class> getColumnClasses() {
+    return this.columnClasses;
   }
 
   public String getColumnName(final int columnIndex) {
@@ -184,7 +234,11 @@ public class ResultSetAdapter {
       return null;
     }
     try {
-      this.resultSet.absolute(rowIndex + 1);
+      if (this.resultSet.absolute(rowIndex + 1)) {
+        return this.resultSet.getObject(columnIndex + 1);
+      }
+      this.resultSet.beforeFirst();
+      this.resultSet.relative(rowIndex + 1);
       return this.resultSet.getObject(columnIndex + 1);
     } catch (final SQLException exception) {
       return null;

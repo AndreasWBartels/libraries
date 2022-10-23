@@ -23,18 +23,16 @@ package net.anwiba.database.oracle;
 
 public interface IOracleTypeVisitor<T, E extends Exception> {
 
-  public void visitUnsupportedType() throws E;
+  public T visitUnsupportedType() throws E;
 
-  public T result();
+  public T visitRowId() throws E;
 
-  public void visitRowId() throws E;
+  public T visitUnknown() throws E;
 
-  public void visitUnknown() throws E;
+  public T visitVarchar() throws E;
 
-  public void visitVarchar() throws E;
+  public T visitFloat() throws E;
 
-  public void visitFloat() throws E;
-
-  public void visitNumber() throws E;
+  public T visitNumber() throws E;
 
 }

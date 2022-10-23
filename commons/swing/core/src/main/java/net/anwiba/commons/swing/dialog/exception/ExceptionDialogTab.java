@@ -34,11 +34,9 @@ import net.anwiba.commons.swing.icons.GuiIcons;
 public class ExceptionDialogTab extends AbstractDialogTab {
 
   public ExceptionDialogTab(final Throwable throwable) {
-    this(Message.builder()
-        .setText(throwable.getClass().getSimpleName())
-        .setDescription(throwable.getMessage())
-        .setThrowable(throwable)
-        .setError()
+    this(Message.error(throwable.getClass().getSimpleName())
+        .description(throwable.getMessage())
+        .throwable(throwable)
         .build());
   }
 

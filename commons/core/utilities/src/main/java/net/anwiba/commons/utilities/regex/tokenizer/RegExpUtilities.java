@@ -21,10 +21,107 @@
  */
 package net.anwiba.commons.utilities.regex.tokenizer;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.IntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegExpUtilities {
+
+  private record Replacement(int start, int end, String value) {
+  }
+
+  public static String replace(Pattern pattern, String value, Collection<String> names) {
+    int length = value.length();
+    Replacement replacement = new Replacement(length, length, value);
+    do {
+      replacement = replace(pattern, replacement.value(), replacement.start(), names);
+    } 
+    while (replacement.start() > 0);
+    return replacement.value();
+  }
+
+  private static Replacement replace(Pattern pattern, String value, int until, Collection<String> names) {
+    Matcher matcher = pattern.matcher(value.substring(0, until));
+    if (!matcher.find() || matcher.groupCount() == 0) {
+      return new Replacement(-1, -1, value);
+    }
+    List<Replacement> replacements = new LinkedList<>();
+    for (String name : names) {
+      int start = matcher.start(name);
+      int end = matcher.end(name);
+      if (start > -1) {
+        replacements.add(new Replacement(start, end, name));
+      }
+    }
+    if (replacements.isEmpty()) {
+      return new Replacement(-1, -1, value);
+    }
+    Collections.sort(replacements, Comparator.comparing(object -> Integer.valueOf(object.start())));
+    StringBuilder builder = new StringBuilder();
+    int pos = 0;
+    for (Replacement replacement : replacements) {
+      if (replacement.start() > pos) {
+        builder.append(value.substring(pos, replacement.start()));
+      }
+      builder.append("${");
+      builder.append(replacement.value());
+      builder.append("}");
+      pos = replacement.end();
+    }
+    if (pos < value.length()) {
+      builder.append(value.substring(pos));
+    }
+    String string = builder.toString();
+    return new Replacement(replacements.iterator().next().start(), string.length(), string);
+  }
+
+  public static String replace(
+      Pattern pattern,
+      String group,
+      String value,
+      IntFunction<String> valueFactory) {
+    if (value == null) {
+      return null;
+    }
+    int length = value.length();
+    Replacement replacement = new Replacement(length, length, value);
+    do {
+      replacement = replace(pattern, group, replacement.value(), replacement.start(), valueFactory);
+    }
+    while (replacement.start() > 0);
+    return replacement.value();
+  }
+
+  private static Replacement replace(
+      Pattern pattern,
+      String group,
+      String value,
+      int until,
+      IntFunction<String> valueFactory) {
+    Matcher matcher = pattern.matcher(value.substring(0, until));
+    int start = 0;
+    if (!matcher.find()
+        || matcher.groupCount() == 0
+        || (start = matcher.start(group)) < 0) {
+      return new Replacement(-1, -1, value);
+    }
+    StringBuilder builder = new StringBuilder();
+    if (start > 0) {
+      builder.append(value.substring(0, start));
+    }
+    int end = matcher.end(group);
+    builder.append(valueFactory.apply(end - start));
+    if (end < value.length()) {
+      builder.append(value.substring(end));
+    }
+    String string = builder.toString();
+    return new Replacement(start, string.length(), string);
+  }
 
   public static String[] getGroups(final Matcher matcher) {
     final String[] groups = new String[matcher.groupCount() + 1];

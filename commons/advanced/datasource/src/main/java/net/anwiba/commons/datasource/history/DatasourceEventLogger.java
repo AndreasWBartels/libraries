@@ -21,9 +21,6 @@
  */
 package net.anwiba.commons.datasource.history;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 import net.anwiba.commons.datasource.constaint.IResourceConstraint;
 import net.anwiba.commons.datasource.constaint.IResourceConstraintProvider;
 import net.anwiba.commons.datasource.constaint.IResourceConstraintStorage;
@@ -42,6 +39,9 @@ import net.anwiba.commons.thread.process.IProcessManager;
 import net.anwiba.commons.thread.queue.IQueueNameConstans;
 import net.anwiba.commons.utilities.time.UserDateTimeUtilities;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class DatasourceEventLogger implements IDatasourceEventLogger {
 
   private static net.anwiba.commons.logging.ILogger logger =
@@ -52,10 +52,10 @@ public class DatasourceEventLogger implements IDatasourceEventLogger {
   private final IProcessManager processManager;
 
   public DatasourceEventLogger(
-    final IProcessManager processManager,
-    final IDatasourceEventStorage eventStorage,
-    final IResourceConstraintProvider constraintProvider,
-    final IResourceConstraintStorage constraintStorage) {
+      final IProcessManager processManager,
+      final IDatasourceEventStorage eventStorage,
+      final IResourceConstraintProvider constraintProvider,
+      final IResourceConstraintStorage constraintStorage) {
     this.processManager = processManager;
     this.eventStorage = eventStorage;
     this.constraintProvider = constraintProvider;
@@ -71,7 +71,7 @@ public class DatasourceEventLogger implements IDatasourceEventLogger {
       final String condition,
       final Long numberOfRows,
       final Duration duration) {
-    final LocalDateTime date = UserDateTimeUtilities.now();
+    final LocalDateTime date = UserDateTimeUtilities.now().toLocalDateTime();
     this.processManager.execute(new AbstractProcess(IQueueNameConstans.AUDIT_LOGGING_QUEUE, "Audit logging", false) {
 
       @Override

@@ -37,7 +37,6 @@ import javax.swing.SwingConstants;
 import net.anwiba.commons.lang.exception.CanceledException;
 import net.anwiba.commons.message.IMessageConstants;
 import net.anwiba.commons.message.Message;
-import net.anwiba.commons.message.MessageBuilder;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IChangeableObjectListener;
 import net.anwiba.commons.model.IObjectDistributor;
@@ -79,8 +78,7 @@ public class ListChooserDialog<T> extends AbstractMessageDialog implements IValu
     @Override
     public void objectChanged() {
       if (!ListChooserDialog.this.validStateModel.get().isValid()) {
-        setMessage(
-            new MessageBuilder().setText(ListChooserDialog.this.validStateModel.get().getMessage()).setError().build());
+        setMessage(Message.error(ListChooserDialog.this.validStateModel.get().getMessage()).build());
         setTryEnabled(false);
         setOkEnabled(false);
         return;
@@ -204,11 +202,9 @@ public class ListChooserDialog<T> extends AbstractMessageDialog implements IValu
       setOkEnabled(false);
       final Throwable targetException = exception.getTargetException();
       setMessage(
-          Message.builder()
-              .setText(this.chooserPanel.getMessage().getText())
-              .setDescription(targetException.getMessage())
-              .setThrowable(targetException)
-              .setError()
+          Message.error(this.chooserPanel.getMessage().getText())
+              .description(targetException.getMessage())
+              .throwable(targetException)
               .build());
       return false;
     }

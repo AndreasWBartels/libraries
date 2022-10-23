@@ -22,13 +22,13 @@
 
 package net.anwiba.commons.lang.optional;
 
-import java.util.Optional;
-
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IBlock;
 import net.anwiba.commons.lang.functional.IConsumer;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.ISupplier;
+
+import java.util.Optional;
 
 public interface IOptional<T, E extends Exception> {
 
@@ -74,6 +74,6 @@ public interface IOptional<T, E extends Exception> {
 
   boolean isEmpty();
 
-  void throwIfFaild() throws E;
+  IOptional<T, E> throwIfFaild() throws E;
 
 }

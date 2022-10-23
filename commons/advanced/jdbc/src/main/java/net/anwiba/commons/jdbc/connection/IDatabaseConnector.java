@@ -21,10 +21,16 @@
  */
 package net.anwiba.commons.jdbc.connection;
 
+import net.anwiba.commons.jdbc.DatabaseUtilities;
+import net.anwiba.commons.utilities.property.IProperties;
+import net.anwiba.commons.utilities.property.Properties;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public interface IDatabaseConnector {
+
+  static final int TIMEOUT = 10;
 
   default Connection connectReadOnly(final IJdbcConnectionDescription description)
       throws SQLException {
@@ -39,22 +45,28 @@ public interface IDatabaseConnector {
         description.getUrl(),
         description.getUserName(),
         description.getPassword(),
-        timeout);
+        timeout,
+        description.getProperties());
   }
 
-  Connection connectReadOnly(String url, String userName, String password, int timeout)
+  default Connection connectReadOnly(final String url, final String userName, final String password, final int timeout)
+      throws SQLException {
+    return connectReadOnly(url, userName, password, timeout, Properties.empty());
+  }
+
+  Connection connectReadOnly(String url, String userName, String password, int timeout, IProperties properties)
       throws SQLException;
 
   default Connection connectWritable(
       final IJdbcConnectionDescription description,
-      boolean isAutoCommitEnabled)
+      final boolean isAutoCommitEnabled)
       throws SQLException {
     return connectWritable(description, isAutoCommitEnabled, -1);
   }
 
   default Connection connectWritable(
       final IJdbcConnectionDescription description,
-      boolean isAutoCommitEnabled,
+      final boolean isAutoCommitEnabled,
       final int timeout)
       throws SQLException {
     return connectWritable(
@@ -62,7 +74,23 @@ public interface IDatabaseConnector {
         description.getUserName(),
         description.getPassword(),
         isAutoCommitEnabled,
-        timeout);
+        timeout,
+        description.getProperties());
+  }
+
+  default Connection connectWritable(
+      final String url,
+      final String userName,
+      final String password,
+      final boolean isAutoCommitEnabled,
+      final int timeout)
+      throws SQLException {
+    return connectWritable(url,
+        userName,
+        password,
+        isAutoCommitEnabled,
+        timeout,
+        Properties.empty());
   }
 
   Connection connectWritable(
@@ -70,16 +98,33 @@ public interface IDatabaseConnector {
       String userName,
       String password,
       boolean isAutoCommitEnabled,
-      int timeout)
+      int timeout,
+      IProperties properties)
       throws SQLException;
 
   default boolean isConnectable(final IJdbcConnectionDescription description) {
     return isConnectable(
         description.getUrl(),
         description.getUserName(),
-        description.getPassword());
+        description.getPassword(),
+        description.getProperties());
   }
 
-  boolean isConnectable(String url, String userName, String password);
+  default boolean isConnectable(final String url, final String userName, final String password) {
+    return isConnectable(url, userName, password, Properties.empty());
+  }
+
+  default boolean
+      isConnectable(final String url, final String userName, final String password, final IProperties properties) {
+    if (!DatabaseUtilities.isSupported(url)) {
+      return false;
+    }
+
+    try (Connection connection = connectReadOnly(url, userName, password, TIMEOUT, properties)) {
+      return true;
+    } catch (final SQLException exception) {
+      return false;
+    }
+  }
 
 }

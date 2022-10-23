@@ -37,9 +37,11 @@ import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
+import java.awt.image.renderable.ParameterBlock;
 import java.util.Hashtable;
 import java.util.Objects;
 
+import org.eclipse.imagen.Histogram;
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.JAI;
@@ -500,4 +502,10 @@ public class ImagenImageContainerUtilities {
     return JAI.create("format", parameterBlock, renderingHints); //$NON-NLS-1$
   }
 
+  public static Histogram getHistogram(RenderedImage renderedImage, final RenderingHints hints) {
+    ParameterBlock pb = new ParameterBlock();
+    pb.addSource(renderedImage);
+    RenderedOp op = JAI.create("histogram", pb, hints);
+    return (Histogram) op.getProperty("histogram");
+  }
 }

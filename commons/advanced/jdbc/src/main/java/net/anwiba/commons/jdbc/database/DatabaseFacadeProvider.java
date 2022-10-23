@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels 
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,18 +26,13 @@ import java.util.List;
 
 import net.anwiba.commons.jdbc.connection.IJdbcConnectionDescription;
 
-public class DatabaseFacadeProvider implements IDatabaseFacadeProvider, IDatabaseFacadeRegistry {
+public class DatabaseFacadeProvider implements IDatabaseFacadeProvider {
 
   final DatabaseFacade databaseFacade = new DatabaseFacade();
-  private final List<IRegistrableDatabaseFacade> facades = new ArrayList<>();
+  private final List<IRegisterableDatabaseFacade> facades = new ArrayList<>();
 
-  public DatabaseFacadeProvider(final List<IRegistrableDatabaseFacade> facades) {
+  public DatabaseFacadeProvider(final List<IRegisterableDatabaseFacade> facades) {
     this.facades.addAll(facades);
-  }
-
-  @Override
-  public void add(final IRegistrableDatabaseFacade facade) {
-    this.facades.add(facade);
   }
 
   @Override

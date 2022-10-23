@@ -32,4 +32,6 @@ module net.anwiba.database.oracle {
   requires net.anwiba.commons.reference;
   requires net.anwiba.commons.utilities;
   requires com.oracle.database.jdbc;
+  requires net.anwiba.commons.thread;
+  requires net.anwiba.commons.message;
 }

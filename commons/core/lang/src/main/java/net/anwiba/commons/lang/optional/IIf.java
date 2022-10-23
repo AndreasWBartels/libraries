@@ -26,11 +26,11 @@ import net.anwiba.commons.lang.functional.ISupplier;
 
 public interface IIf {
 
-  <O> IOptional<O, RuntimeException> excecute(ISupplier<O, RuntimeException> supplier);
+  <O> IOptional<O, RuntimeException> execute(ISupplier<O, RuntimeException> supplier);
 
-  <O, E extends Exception> IOptional<O, E> excecute(Class<E> exceptionClass, ISupplier<O, E> supplier) throws E;
+  <O, E extends Exception> IOptional<O, E> execute(Class<E> exceptionClass, ISupplier<O, E> supplier) throws E;
 
-  <E extends Exception> IIf excecute(IBlock<E> consumer) throws E;
+  <E extends Exception> IIf execute(IBlock<E> consumer) throws E;
 
   <O> IOptional<O, RuntimeException> or(ISupplier<O, RuntimeException> supplier);
 

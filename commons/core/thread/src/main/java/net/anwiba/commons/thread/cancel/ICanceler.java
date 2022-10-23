@@ -24,9 +24,8 @@ package net.anwiba.commons.thread.cancel;
 import java.io.Serializable;
 
 import net.anwiba.commons.lang.exception.CanceledException;
-import net.anwiba.commons.lang.functional.IBlock;
-import net.anwiba.commons.lang.functional.IFactory;
-import net.anwiba.commons.lang.functional.IWatcher;
+import net.anwiba.commons.lang.functional.IObserver;
+import net.anwiba.commons.lang.functional.IObserverFactory;
 
 public interface ICanceler extends Serializable {
 
@@ -69,6 +68,10 @@ public interface ICanceler extends Serializable {
       // nothing to do
     }
   };
+  
+  public static ICanceler dummy() {
+    return DummyCanceler;
+  }
 
   public void cancel();
 
@@ -81,33 +84,27 @@ public interface ICanceler extends Serializable {
   void addCancelerListener(ICancelerListener listener);
 
   void removeCancelerListener(ICancelerListener listener);
-
-  default <T, E extends Exception> IFactory<IBlock<RuntimeException>, IWatcher, RuntimeException> watcherFactory() {
-    return closure -> {
-      final ICancelerListener listener = new ICancelerListener() {
-        @Override
-        public void canceled() {
-          removeCancelerListener(this);
-          closure.execute();
-        }
-      };
-      addCancelerListener(listener);
-      return new IWatcher() {
-
-        @Override
-        public void check() throws CanceledException {
-          if (isCanceled()) {
-            removeCancelerListener(listener);
-            throw new CanceledException();
-          }
-        }
-
-        @Override
-        public void close() throws RuntimeException {
-          removeCancelerListener(listener);
-        }
-      };
+  
+  default IObserver observer(Runnable runnable) {
+    final ICancelerListener listener = new ICancelerListener() {
+      @Override
+      public void canceled() {
+        removeCancelerListener(this);
+        runnable.run();
+      }
     };
+    addCancelerListener(listener);
+    return new IObserver() {
+
+      @Override
+      public void close() throws RuntimeException {
+        removeCancelerListener(listener);
+      }
+    };
+  }
+
+  default IObserverFactory observerFactory() {
+    return runnable -> ICanceler.this.observer(runnable);
   }
 
   void removeAllCancelerListener();

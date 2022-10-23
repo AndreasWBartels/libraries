@@ -21,11 +21,11 @@
  */
 package net.anwiba.commons.graphic;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-
 import net.anwiba.commons.lang.optional.If;
 import net.anwiba.commons.lang.optional.Optional;
+
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
 
@@ -124,8 +124,6 @@ class ClosableGraphics extends AbstractGraphics implements IClosableGraphics {
         .of(this.rendering)
         .consume(value -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, value))
         .or(() -> this.graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT));
-    If.isTrue(this.dispose).excecute(() -> {
-      this.graphics.dispose();
-    });
+    If.isTrue(this.dispose).execute(this.graphics::dispose);
   }
 }

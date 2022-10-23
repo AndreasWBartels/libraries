@@ -48,4 +48,8 @@ public class OracleUtilitiesStatementString extends AbstractStatementString {
   public static String NumberOfEntriesPreparedStatement;
   public static String GetSessionCountPreparedStatement;
 
+  public static String ColumnMetaDataStatement;
+  public static String ConstrainStatement;
+  public static String ConstraintTypesStatement;
+
 }

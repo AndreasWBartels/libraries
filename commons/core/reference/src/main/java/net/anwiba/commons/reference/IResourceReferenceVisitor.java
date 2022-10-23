@@ -25,9 +25,11 @@ public interface IResourceReferenceVisitor<O, E extends Exception> {
 
   public O visitFileResource(FileResourceReference fileResourceReference) throws E;
 
-  public O visitUrlResource(UrlResourceReference urlResourceReference) throws E;
+  public O visitUrlResource(UniformResourceLocatorReference urlResourceReference) throws E;
 
-  public O visitUriResource(UriResourceReference uriResourceReference) throws E;
+  public O visitURLResource(URLResourceReference urlResourceReference) throws E;
+
+  public O visitURIResource(URIResourceReference uriResourceReference) throws E;
 
   public O visitMemoryResource(MemoryResourceReference memoryResourceReference) throws E;
 

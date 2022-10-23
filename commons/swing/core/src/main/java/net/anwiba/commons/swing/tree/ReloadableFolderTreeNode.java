@@ -22,8 +22,10 @@
 package net.anwiba.commons.swing.tree;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -32,13 +34,22 @@ import javax.swing.tree.MutableTreeNode;
 
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.logging.ILevel;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class ReloadableFolderTreeNode<T> extends DefaultMutableTreeNode {
+
+  public enum State {
+    UNKNOWN,
+    LOADING,
+    INITALIZED,
+    FAILED
+  }
 
   private static final long serialVersionUID = 1L;
   private static net.anwiba.commons.logging.ILogger logger =
       net.anwiba.commons.logging.Logging.getLogger(ReloadableFolderTreeNode.class.getName());
-  private boolean isInitialize = false;
+
+  private final AtomicReference<State> state = new AtomicReference<>(State.UNKNOWN);
   private final IFactory<T, List<DefaultMutableTreeNode>, RuntimeException> initializer;
 
   public ReloadableFolderTreeNode(
@@ -46,30 +57,45 @@ public class ReloadableFolderTreeNode<T> extends DefaultMutableTreeNode {
     final T userObject) {
     super(userObject);
     this.initializer = initializer;
+    this.children = new Vector<>();
   }
 
+
+  @Override
+  public boolean isLeaf() {
+    return false;
+  }
+  
   @Override
   public void add(final MutableTreeNode newChild) {
-    this.isInitialize = true;
+    state.set(State.INITALIZED);
     super.add(newChild);
   }
 
-  public boolean isInitialize() {
-    return this.isInitialize;
+  public boolean isInitialized() {
+    return Objects.equals(state.get(), State.INITALIZED);
   }
 
-  public void reset() {
-    if (!this.isInitialize) {
-      return;
-    }
-    this.children = null;
-    this.isInitialize = false;
+  public boolean isLoading() {
+    return Objects.equals(state.get(), State.LOADING);
   }
 
   public void load(final DefaultTreeModel treeModel) {
-    if (isInitialize(true)) {
+    if (isInitialized() || isLoading()) {
       return;
     }
+    loadTo(treeModel, () -> {});
+  }
+
+  public void reload(final DefaultTreeModel treeModel, Runnable postProcess) {
+    if (isLoading()) {
+      return;
+    }
+    loadTo(treeModel, postProcess);
+  }
+
+  private void loadTo(final DefaultTreeModel treeModel, Runnable postProcess) {
+    state.set(State.LOADING);
     SwingWorker<List<DefaultMutableTreeNode>, Void> worker = new SwingWorker<>() {
       @SuppressWarnings("unchecked")
       @Override
@@ -80,13 +106,32 @@ public class ReloadableFolderTreeNode<T> extends DefaultMutableTreeNode {
       @Override
       protected void done() {
         try {
-          ReloadableFolderTreeNode.this.children = new Vector<>(get());
-          treeModel.nodeStructureChanged(ReloadableFolderTreeNode.this);
+          List<DefaultMutableTreeNode> loadedNodes = get();
+          if (loadedNodes == null) {
+            state.set(State.UNKNOWN);
+            super.done();
+            return;
+          }
+          state.set(State.INITALIZED);
+          GuiUtilities.invokeLater(() -> {
+            List<MutableTreeNode> nodes = children.stream().map(n -> (MutableTreeNode)n).toList();
+            for (MutableTreeNode defaultMutableTreeNode : nodes) {
+              treeModel.removeNodeFromParent(defaultMutableTreeNode);
+            }
+            for (MutableTreeNode mutableTreeNode : loadedNodes) {
+              treeModel.insertNodeInto(mutableTreeNode, ReloadableFolderTreeNode.this, children.size());
+            }
+            postProcess.run();
+            treeModel.reload(ReloadableFolderTreeNode.this);
+          });
           super.done();
         } catch (InterruptedException exception) {
+          logger.log(ILevel.ERROR, exception.getMessage(), exception);
+          state.set(State.UNKNOWN);
           super.done();
         } catch (ExecutionException exception) {
           logger.log(ILevel.WARNING, exception.getMessage(), exception);
+          state.set(State.FAILED);
           super.done();
         }
       }
@@ -94,9 +139,4 @@ public class ReloadableFolderTreeNode<T> extends DefaultMutableTreeNode {
     worker.execute();
   }
 
-  private synchronized boolean isInitialize(final boolean value) {
-    boolean initialize = this.isInitialize;
-    this.isInitialize = value;
-    return initialize;
-  }
 }

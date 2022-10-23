@@ -25,8 +25,6 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 public interface IHttpClientFactory {
 
-  IHttpClientConfiguration getClientConfiguration();
-
-  CloseableHttpClient create();
+  CloseableHttpClient create(final IHttpClientConfiguration configuration);
 
 }

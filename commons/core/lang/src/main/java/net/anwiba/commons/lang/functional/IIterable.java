@@ -28,6 +28,8 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 
 import net.anwiba.commons.lang.counter.IntCounter;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public interface IIterable<O, E extends Exception> {
 
@@ -48,16 +50,16 @@ public interface IIterable<O, E extends Exception> {
     IIterator<O, E> iterator = iterator();
     return Spliterators.spliteratorUnknownSize(new Iterator<O>() {
 
-      O value;
+      private IOptional<O, RuntimeException> item = null;
 
       @Override
       public boolean hasNext() {
-        if (this.value != null) {
+        if (this.item != null) {
           return true;
         }
         try {
           if (iterator.hasNext()) {
-            this.value = iterator.next();
+            this.item = Optional.of(iterator.next());
             return true;
           }
           return false;
@@ -70,28 +72,32 @@ public interface IIterable<O, E extends Exception> {
       public O next() {
         try {
           if (hasNext()) {
-            return this.value;
+            return this.item.get();
           } else {
             throw new NoSuchElementException();
           }
         } finally {
-          this.value = null;
+          this.item = null;
         }
       }
     }, 0);
   }
 
   default IIterator<O, E> iterator(final IAcceptor<O> acceptor) {
+    final IIterator<O, E> iterator = iterator();
     return new IIterator<O, E>() {
 
-      private final IIterator<O, E> iterator = iterator();
-      private O item = null;
+      private IOptional<O, RuntimeException> item = null;
 
       @Override
       public boolean hasNext() throws E {
-        while (this.iterator.hasNext()) {
-          final O i = this.iterator.next();
-          if (acceptor.accept(i) && (this.item = i) != null) {
+        if (this.item != null) {
+          return true;
+        }
+        while (iterator.hasNext()) {
+          final O i = iterator.next();
+          if (acceptor.accept(i)) {
+            this.item = Optional.of(i);
             return true;
           }
         }
@@ -101,8 +107,8 @@ public interface IIterable<O, E extends Exception> {
       @Override
       public O next() throws E {
         try {
-          if (this.item != null || hasNext()) {
-            return this.item;
+          if (hasNext()) {
+            return this.item.get();
           }
           throw new NoSuchElementException();
         } finally {

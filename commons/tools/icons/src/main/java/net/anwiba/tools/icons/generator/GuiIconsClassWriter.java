@@ -21,21 +21,6 @@
  */
 package net.anwiba.tools.icons.generator;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.Writer;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.anwiba.commons.lang.functional.ResolvingException;
 import net.anwiba.commons.utilities.string.StringResolverBuilder;
 import net.anwiba.commons.utilities.string.StringUtilities;
@@ -43,6 +28,21 @@ import net.anwiba.tools.icons.configuration.IIconSizesConfiguration;
 import net.anwiba.tools.icons.configuration.IOutput;
 import net.anwiba.tools.icons.configuration.IconResource;
 import net.anwiba.tools.icons.schema.configuration.Class;
+
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.Writer;
+import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GuiIconsClassWriter implements Closeable {
 
@@ -212,7 +212,7 @@ public class GuiIconsClassWriter implements Closeable {
   public String resolve(final String string) {
     try {
       return new StringResolverBuilder()
-          .add("year", new SimpleDateFormat("yyyy").format(new Date())) //$NON-NLS-1$//$NON-NLS-2$
+          .add("year", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy")))
           .build()
           .resolve(string);
     } catch (final ResolvingException exception) {

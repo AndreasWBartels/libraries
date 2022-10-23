@@ -2,7 +2,7 @@
  * #%L
  *
  * %%
- * Copyright (C) 2007 - 2017 Andreas W. Bartels 
+ * Copyright (C) 2007 - 2017 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,18 +21,23 @@
  */
 package net.anwiba.database.swing.console.result;
 
+import net.anwiba.commons.model.IObjectModel;
+import net.anwiba.commons.model.ObjectModel;
+import net.anwiba.commons.swing.utilities.GuiUtilities;
+
 import java.sql.ResultSet;
 
 import javax.swing.table.AbstractTableModel;
-
-import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.swing.utilities.GuiUtilities;
+import javax.swing.table.TableModel;
 
 public final class ResultSetTableModel extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
   private final IObjectModel<String> statusModel;
   private ResultSetAdapter result;
+  private final IObjectModel<ResultSetAdapter> resultModel = new ObjectModel<>();
+  private final ResultSetMetaDataTableModel resultSetMetaDataTableModel =
+      new ResultSetMetaDataTableModel(this.resultModel);
 
   public ResultSetTableModel(final IObjectModel<String> statusModel, final IObjectModel<ResultSet> resultSetModel) {
     this.statusModel = statusModel;
@@ -44,6 +49,7 @@ public final class ResultSetTableModel extends AbstractTableModel {
   private void initialize(final ResultSet set) {
     synchronized (this) {
       this.result = ResultSetAdapter.create(this.statusModel, set);
+      this.resultModel.set(this.result);
     }
     GuiUtilities.invokeLater(() -> {
       fireTableStructureChanged();
@@ -90,5 +96,9 @@ public final class ResultSetTableModel extends AbstractTableModel {
     synchronized (this) {
       return this.result.getValueAt(rowIndex, columnIndex);
     }
+  }
+
+  public TableModel getResultSetMetaDataTableModel() {
+    return this.resultSetMetaDataTableModel;
   }
 }

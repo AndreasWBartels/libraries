@@ -27,8 +27,8 @@ import javax.swing.JPanel;
 
 import org.junit.jupiter.api.Test;
 
-import net.anwiba.commons.swing.object.DoubleField;
 import net.anwiba.commons.swing.object.IObjectField;
+import net.anwiba.commons.swing.object.numeric.DoubleField;
 
 public class DoubleFieldDemo extends AbstractObjectFieldDemo {
 

@@ -21,6 +21,7 @@
  */
 package net.anwiba.commons.lang.exception;
 
+import net.anwiba.commons.lang.functional.ISupplier;
 import net.anwiba.commons.lang.optional.Optional;
 
 public class WrappedException extends RuntimeException {
@@ -42,6 +43,18 @@ public class WrappedException extends RuntimeException {
           throw e;
         });
     return this;
+  }
+
+  public static WrappedException of(final Throwable throwable) {
+    throw new WrappedException(throwable);
+  }
+
+  public static <T> T wrap(final ISupplier<T, Exception> supplier) throws WrappedException {
+    try {
+      return supplier.supply();
+    } catch (Exception exception) {
+      throw WrappedException.of(exception);
+    }
   }
 
   public void throwAsRuntime() throws RuntimeException {

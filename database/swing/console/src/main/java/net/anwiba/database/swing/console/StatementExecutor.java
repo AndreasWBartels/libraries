@@ -21,23 +21,27 @@
  */
 package net.anwiba.database.swing.console;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Optional;
-
-import javax.swing.DefaultComboBoxModel;
-
-import net.anwiba.commons.lang.functional.IWatcher;
-import net.anwiba.commons.lang.object.ObjectUtilities;
+import net.anwiba.commons.jdbc.DatabaseUtilities;
+import net.anwiba.commons.lang.functional.IObserver;
 import net.anwiba.commons.logging.ILevel;
 import net.anwiba.commons.model.IBooleanModel;
+import net.anwiba.commons.model.IObjectListModel;
 import net.anwiba.commons.model.IObjectModel;
-import net.anwiba.commons.swing.utilities.GuiUtilities;
 import net.anwiba.commons.thread.cancel.ICanceler;
 import net.anwiba.commons.utilities.string.StringUtilities;
 import net.anwiba.database.swing.console.result.ResultReseter;
+
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class StatementExecutor {
 
@@ -47,27 +51,30 @@ public class StatementExecutor {
   private final IObjectModel<Statement> statementModel;
   private final IObjectModel<ResultSet> resultSetModel;
   private final IObjectModel<String> statusModel;
-  private final DefaultComboBoxModel<String> historyComboBoxModel;
+  private final Consumer<String> statementHistoryConsumer;
   private final IBooleanModel isDisconnectedModel;
   private final IBooleanModel isConnectedModel;
   private final ResultReseter resultReseter;
+  private final IObjectListModel<String> statementValuesModel;
 
   public StatementExecutor(
       final IObjectModel<Connection> connectionModel,
       final ResultReseter resultReseter,
       final IObjectModel<Statement> statementModel,
+      final IObjectListModel<String> statementValuesModel,
       final IObjectModel<ResultSet> resultSetModel,
       final IObjectModel<String> statusModel,
-      final DefaultComboBoxModel<String> historyComboBoxModel,
+      final Consumer<String> statementHistoryConsumer,
       final IBooleanModel isDisconnectedModel,
       final IBooleanModel isConnectedModel) {
     super();
     this.connectionModel = connectionModel;
     this.resultReseter = resultReseter;
     this.statementModel = statementModel;
+    this.statementValuesModel = statementValuesModel;
     this.resultSetModel = resultSetModel;
     this.statusModel = statusModel;
-    this.historyComboBoxModel = historyComboBoxModel;
+    this.statementHistoryConsumer = statementHistoryConsumer;
     this.isDisconnectedModel = isDisconnectedModel;
     this.isConnectedModel = isConnectedModel;
   }
@@ -80,52 +87,81 @@ public class StatementExecutor {
         return;
       }
       logger.log(ILevel.DEBUG, SqlConsoleMessages.executeStatement + string);
-      final boolean isClosed = this.connectionModel.get().isClosed();
+      final Connection connection = this.connectionModel.get();
+      final boolean isClosed = connection.isClosed();
       if (isClosed) {
         this.isConnectedModel.set(!isClosed);
         this.isDisconnectedModel.set(isClosed);
         this.statusModel.set(SqlConsoleMessages.connectionIsClosed);
         return;
       }
-      final Statement statement = createStatement();
-      try (IWatcher watcher = canceler.watcherFactory().create(() -> {
-        try {
-          statement.cancel();
-        } catch (SQLException e) {
-          // nothing to do
-        }
-      })) {
-        if (!statement.execute(clean(string))) {
-          updateHistoryComboBoyModel(string);
+      final PreparedStatement statement = createStatement(connection, clean(string));
+      addStatementValuesIfPossible(statement, this.statementValuesModel.toList());
+      statement.setFetchSize(100);
+      statement.setFetchDirection(ResultSet.FETCH_UNKNOWN);
+      try (IObserver observer = canceler.observer(DatabaseUtilities.silent(() -> statement.cancel()))) {
+        this.resultReseter.reset();
+        if (!statement.execute()) {
+          this.statementHistoryConsumer.accept(string);
           this.statusModel.set(SqlConsoleMessages.done);
           statement.close();
           return;
         }
       }
-      this.resultReseter.reset();
       this.statementModel.set(statement);
       final ResultSet resultSet = statement.getResultSet();
       this.resultSetModel.set(resultSet);
-      updateHistoryComboBoyModel(string);
+      this.statementHistoryConsumer.accept(string);
       this.statusModel.set(SqlConsoleMessages.done);
     } catch (final SQLException exception) {
+      this.resultReseter.reset();
       logger.log(ILevel.DEBUG, exception.getMessage(), exception);
       this.statusModel.set(exception.getMessage());
     }
   }
 
-  private void updateHistoryComboBoyModel(final String string) {
-    for (int i = this.historyComboBoxModel.getSize() - 1; i > -1; i--) {
-      if (ObjectUtilities.equals(this.historyComboBoxModel.getElementAt(i), string)) {
-        return;
-      }
+  private void addStatementValuesIfPossible(final PreparedStatement statement, final List<String> values)
+      throws SQLException {
+    final ParameterMetaData parameterMetaData = statement.getParameterMetaData();
+    if (parameterMetaData.getParameterCount() == 0 || values.size() < parameterMetaData.getParameterCount()) {
+      return;
     }
-    GuiUtilities.invokeLater(() -> {
-      if (historyComboBoxModel.getSize() > 30) {
-        historyComboBoxModel.removeElementAt(0);
-      }
-      historyComboBoxModel.addElement(string);
-    });
+    for (int i = 0; i < values.size(); i++) {
+      statement.setObject(i + 1, convertTo(values.get(i), getClassName(parameterMetaData, i)));
+    }
+  }
+
+  private String getClassName(final ParameterMetaData parameterMetaData, final int i) throws SQLException {
+    try {
+      return parameterMetaData.getParameterClassName(i + 1);
+    } catch (SQLException exception) {
+      logger.warning(exception.getMessage());
+      return "java.lang.String";
+    }
+  }
+
+  private Object convertTo(final String string, final String parameterClassName)
+      throws SQLException {
+    if (string == null || string.isEmpty()) {
+      return null;
+    }
+    try {
+      return switch (parameterClassName) {
+        case "java.lang.Short" -> Short.valueOf(string);
+        case "java.lang.Integer" -> Integer.valueOf(string);
+        case "java.lang.Long" -> Long.valueOf(string);
+        case "java.lang.Float" -> Float.valueOf(string);
+        case "java.lang.Double" -> Double.valueOf(string);
+        case "java.lang.BigDecimal" -> new BigDecimal(string);
+        case "java.lang.Boolean" -> Boolean.valueOf(string);
+        case "java.sql.Time" -> java.sql.Time.valueOf(string);
+        case "java.sql.Date" -> java.sql.Date.valueOf(string);
+        case "java.sql.Timestamp" -> java.sql.Timestamp.valueOf(string);
+        default -> string;
+      };
+    } catch (IllegalArgumentException exception) {
+      throw new SQLException("converting value '" + string + "' failed, " + exception.getMessage(), exception);
+    }
   }
 
   private String clean(final String string) {
@@ -136,22 +172,19 @@ public class StatementExecutor {
         .orElse(string);
   }
 
-  private Statement createStatement() throws SQLException {
-    if (this.connectionModel.get()
-        .getMetaData()
-        .supportsResultSetConcurrency(
-            ResultSet.TYPE_SCROLL_INSENSITIVE,
-            ResultSet.CONCUR_READ_ONLY)) {
-      return this.connectionModel.get().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+  private PreparedStatement createStatement(final Connection connection, final String string) throws SQLException {
+    final DatabaseMetaData metaData = connection.getMetaData();
+    if (metaData.supportsResultSetConcurrency(
+        ResultSet.TYPE_SCROLL_INSENSITIVE,
+        ResultSet.CONCUR_READ_ONLY)) {
+      return connection.prepareStatement(string, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     }
-    if (this.connectionModel.get()
-        .getMetaData()
-        .supportsResultSetConcurrency(
-            ResultSet.TYPE_SCROLL_SENSITIVE,
-            ResultSet.CONCUR_READ_ONLY)) {
-      return this.connectionModel.get().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    if (metaData.supportsResultSetConcurrency(
+        ResultSet.TYPE_SCROLL_SENSITIVE,
+        ResultSet.CONCUR_READ_ONLY)) {
+      return connection.prepareStatement(string, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
     }
-    return this.connectionModel.get().createStatement();
+    return connection.prepareStatement(string);
   }
 
 }

@@ -24,6 +24,7 @@ package net.anwiba.commons.utilities.string;
 import java.util.regex.Pattern;
 
 import net.anwiba.commons.lang.functional.ConversionException;
+import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.ResolvingException;
 import net.anwiba.commons.utilities.provider.IContextValueProvider;
 import net.anwiba.commons.utilities.regex.DoNothingStringConverter;
@@ -35,12 +36,15 @@ public class AbstractStringResolver implements IStringResolver {
   protected final IStringAppender errorHandler;
   private final IContextValueProvider<String, String, RuntimeException> provider;
   private final Pattern pattern;
+  private final IConverter<String, String, ConversionException> valueConverter;
 
   public AbstractStringResolver(
       final IStringAppender errorHandler,
+      final IConverter<String, String, ConversionException> valueConverter,
       final Pattern pattern,
       final IContextValueProvider<String, String, RuntimeException> contextValueProvider) {
     this.errorHandler = errorHandler;
+    this.valueConverter = valueConverter;
     this.pattern = pattern;
     this.provider = contextValueProvider;
   }
@@ -70,8 +74,7 @@ public class AbstractStringResolver implements IStringResolver {
           return pattern;
         }
       }, new DoNothingStringConverter());
-      return converter.convert(value, new StringAppender());
-
+      return converter.convert(valueConverter.convert(value), new StringAppender());
     } catch (final ConversionException exception) {
       throw new ResolvingException(exception.getLocalizedMessage(), exception);
     }

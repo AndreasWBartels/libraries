@@ -38,8 +38,8 @@ import net.anwiba.commons.lang.optional.Optional;
 import net.anwiba.commons.lang.parameter.IParameter;
 import net.anwiba.commons.lang.parameter.Parameter;
 import net.anwiba.commons.lang.parameter.ParametersBuilder;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.parser.UrlParser;
 import net.anwiba.commons.utilities.string.StringUtilities;
 
 public class RequestBuilder {
@@ -51,9 +51,8 @@ public class RequestBuilder {
   private final List<IParameter> headerParameters = new ArrayList<>();
   private IClosure<InputStream, IOException> inputStreamClosure;
   private long contentLenght;
-  private String encoding;
-  private String mimeType;
-  private String userAgent;
+  private String contentCharacterSetName;
+  private String contentMimeType;
   private IAuthentication authentication;
   private ILifeTime cacheTime;
 
@@ -84,6 +83,22 @@ public class RequestBuilder {
       return this;
     }
     this.authentication = new Authentication(userName, password);
+    return this;
+  }
+
+  public RequestBuilder preemptiveAuthentication(final String userName, final String password) {
+    if (StringUtilities.isNullOrTrimmedEmpty(userName) || StringUtilities.isNullOrTrimmedEmpty(password)) {
+      return this;
+    }
+    this.authentication = new Authentication(userName, password, Authentication.Mode.PREEMPTIVE);
+    return this;
+  }
+
+  public RequestBuilder forcedAuthentication(final String userName, final String password) {
+    if (StringUtilities.isNullOrTrimmedEmpty(userName) || StringUtilities.isNullOrTrimmedEmpty(password)) {
+      return this;
+    }
+    this.authentication = new Authentication(userName, password, Authentication.Mode.FORCED);
     return this;
   }
 
@@ -123,18 +138,13 @@ public class RequestBuilder {
     return this;
   }
 
-  public RequestBuilder contentEncoding(@SuppressWarnings("hiding") final String encoding) {
-    this.encoding = encoding;
+  public RequestBuilder contentCharacterSet(@SuppressWarnings("hiding") final String contentCharacterSetName) {
+    this.contentCharacterSetName = contentCharacterSetName;
     return this;
   }
 
-  public RequestBuilder mimeType(final String mimeTye) {
-    this.mimeType = mimeTye;
-    return this;
-  }
-
-  public RequestBuilder userAgent(@SuppressWarnings("hiding") final String userAgent) {
-    this.userAgent = userAgent;
+  public RequestBuilder contentMimeType(final String mimeType) {
+    this.contentMimeType = mimeType;
     return this;
   }
 
@@ -164,11 +174,10 @@ public class RequestBuilder {
         this.urlString,
         new ParametersBuilder().add(this.queryParameters).build(),
         new ParametersBuilder().add(this.headerParameters).build(),
-        this.userAgent,
         this.inputStreamClosure,
         this.contentLenght,
-        this.encoding,
-        this.mimeType,
+        this.contentCharacterSetName,
+        this.contentMimeType,
         this.cacheTime);
   }
 

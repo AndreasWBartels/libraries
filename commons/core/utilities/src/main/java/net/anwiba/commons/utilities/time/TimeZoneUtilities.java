@@ -21,11 +21,12 @@
  */
 package net.anwiba.commons.utilities.time;
 
-import java.util.TimeZone;
-
 import net.anwiba.commons.lang.optional.Optional;
 
-@SuppressWarnings("nls")
+import java.time.DateTimeException;
+import java.time.ZoneId;
+import java.util.TimeZone;
+
 public class TimeZoneUtilities {
 
   private static final int MIM_PER_HOUR = 60;
@@ -41,8 +42,10 @@ public class TimeZoneUtilities {
   }
 
   public static TimeZone getUserTimeZone() {
-    return Optional.of(System.getProperty("user.timezone")).convert(z -> TimeZone.getTimeZone(z)).getOr(
-        () -> TimeZone.getDefault());
+    return Optional.of(System.getProperty("user.timezone"))
+        .convert(z -> TimeZone.getTimeZone(z))
+        .getOr(
+            () -> TimeZone.getDefault());
   }
 
   public static void setTimeZoneToGmt_NNN() {
@@ -66,5 +69,16 @@ public class TimeZoneUtilities {
     final int min = (rawOffset / MILLISECONDS_PER_MIN) - (hours * MIM_PER_HOUR);
     final String string = String.valueOf(hours) + ":" + String.valueOf(min);
     return rawOffset < 0 ? string : "+" + string;
+  }
+
+  public static TimeZone get(final String id) {
+    try {
+      if (id == null || id.isBlank()) {
+        return TimeZone.getTimeZone("UTC");
+      }
+      return TimeZone.getTimeZone(ZoneId.of(id));
+    } catch (DateTimeException exception) {
+      return TimeZone.getTimeZone("UTC");
+    }
   }
 }

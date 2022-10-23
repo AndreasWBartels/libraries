@@ -31,9 +31,11 @@ public class ResultSetToResultsAdapter implements IResults {
 
   private final ResultSet resultSet;
   private IResult result = null;
+  private IResultSetValuesConverter converter;
 
-  public ResultSetToResultsAdapter(final ResultSet resultSet) {
+  public ResultSetToResultsAdapter(final ResultSet resultSet, IResultSetValuesConverter converter) {
     this.resultSet = resultSet;
+    this.converter = converter;
   }
 
   @Override
@@ -42,7 +44,7 @@ public class ResultSetToResultsAdapter implements IResults {
       return true;
     }
     try {
-      this.result = this.resultSet.next() ? new ResultSetToResultAdapter(this.resultSet) : null;
+      this.result = this.resultSet.next() ? new ResultSetToResultAdapter(this.resultSet, converter) : null;
       return this.result != null;
     } catch (final SQLRecoverableException exception) {
       if (exception.getMessage().contains("interrupted") || exception.getMessage().contains("Closed Connection")) {

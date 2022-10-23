@@ -21,12 +21,18 @@
  */
 package net.anwiba.commons.image.imagen;
 
+import java.awt.Dimension;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
+import java.util.List;
 
+import org.eclipse.imagen.Histogram;
+import org.eclipse.imagen.JAI;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.codec.SeekableStream;
@@ -36,10 +42,12 @@ import net.anwiba.commons.image.AbstractImageContainer;
 import net.anwiba.commons.image.IImageContainer;
 import net.anwiba.commons.image.IImageMetadata;
 import net.anwiba.commons.image.IImageMetadataAdjustor;
+import net.anwiba.commons.image.ImageUtilities;
 import net.anwiba.commons.image.operation.IImageOperation;
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.collection.ObjectList;
 import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.message.IMessageCollector;
 import net.anwiba.commons.thread.cancel.ICanceler;
 
@@ -50,7 +58,8 @@ class ImagenImageContainer extends AbstractImageContainer {
   public ImagenImageContainer(
       final RenderingHints hints,
       final IImageMetadata metadata,
-      final ISeekableStreamConnector seekableStreamConnector,IImageMetadataAdjustor metadataAdjustor) {
+      final ISeekableStreamConnector seekableStreamConnector,
+      final IImageMetadataAdjustor metadataAdjustor) {
     this(hints, metadata, new ObjectList<IImageOperation>(), seekableStreamConnector, metadataAdjustor);
   }
 
@@ -58,7 +67,8 @@ class ImagenImageContainer extends AbstractImageContainer {
       final RenderingHints hints,
       final IImageMetadata metadata,
       final IObjectList<IImageOperation> operations,
-      final ISeekableStreamConnector seekableStreamConnector,IImageMetadataAdjustor metadataAdjustor) {
+      final ISeekableStreamConnector seekableStreamConnector,
+      final IImageMetadataAdjustor metadataAdjustor) {
     super(hints, metadata, operations, metadataAdjustor);
     this.seekableStreamConnector = seekableStreamConnector;
   }
@@ -71,6 +81,7 @@ class ImagenImageContainer extends AbstractImageContainer {
     try (SeekableStream inputStream = this.seekableStreamConnector.connect()) {
       renderedOp = StreamDescriptor.create(inputStream, null, hints);
       final ColorModel colorModel = renderedOp.getColorModel();
+      boolean isIndexed = colorModel instanceof IndexColorModel;
       return new ImagenImageMetadata(
           renderedOp.getWidth(),
           renderedOp.getHeight(),
@@ -79,7 +90,10 @@ class ImagenImageContainer extends AbstractImageContainer {
           colorModel.getColorSpace().getType(),
           colorModel.getTransferType(),
           colorModel.getTransparency(),
-          colorModel instanceof IndexColorModel);
+          isIndexed,
+          isIndexed
+              ? ImageUtilities.getColors((IndexColorModel) colorModel)
+              : List.of());
     } finally {
       if (renderedOp != null) {
         renderedOp.dispose();
@@ -91,7 +105,8 @@ class ImagenImageContainer extends AbstractImageContainer {
   protected IImageContainer adapt(
       final RenderingHints hints,
       final IImageMetadata metadata,
-      final IObjectList<IImageOperation> operations,IImageMetadataAdjustor metadataAdjustor) {
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor) {
     return new ImagenImageContainer(hints, metadata, operations, this.seekableStreamConnector, metadataAdjustor);
   }
 
@@ -100,22 +115,106 @@ class ImagenImageContainer extends AbstractImageContainer {
       final IMessageCollector messageCollector,
       final ICanceler canceler,
       final RenderingHints hints,
-      final IObjectList<IImageOperation> imageOperations,
+      final IObjectList<IImageOperation> operations,
       final IImageMetadataAdjustor metadataAdjustor)
       throws CanceledException,
       IOException {
-    IImageMetadata metadata = read(canceler, hints);
+    return read(messageCollector,
+        canceler,
+        hints,
+        operations,
+        metadataAdjustor,
+        image -> image.getAsBufferedImage());
+  }
+
+  @Override
+  protected Number[][] read(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor,
+      final int x,
+      final int y,
+      final int width,
+      final int height)
+      throws CanceledException,
+      IOException {
+    final Raster raster = read(messageCollector,
+        canceler,
+        hints,
+        operations,
+        metadataAdjustor,
+        image -> ImageUtilities
+            .getIntersection(new Dimension(image.getWidth(), image.getHeight()), x, y, width, height)
+            .convert(intersection -> {
+              RenderedOp cropped = ImagenImageContainerUtilities
+                  .crop(hints, image, x, y, Math.max(width, 10), Math.max(height, 10));
+              if (cropped == null) {
+                return null;
+              }
+              if (cropped.getWidth() == 0 || cropped.getHeight() == 0) {
+                return image.getData(intersection);
+              }
+              return cropped.getData(intersection);
+            })
+            .getOr(() -> null));
+    if (raster == null) {
+      return null;
+    }
+    return ImageUtilities.getValues(raster);
+  }
+
+  private <O> O read(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor,
+      final IConverter<PlanarImage, O, IOException> converter)
+      throws CanceledException,
+      IOException {
     PlanarImage planarImage = null;
+    if (operations.isEmpty()) {
+      try (final SeekableStream inputStream = this.seekableStreamConnector.connect()) {
+        planarImage = StreamDescriptor.create(inputStream, null, hints);
+        return planarImage == null ? null : converter.convert(planarImage);
+      } finally {
+        if (planarImage != null) {
+          planarImage.dispose();
+        }
+      }
+    }
+    final IImageMetadata metadata = read(canceler, hints);
     try (final SeekableStream inputStream = this.seekableStreamConnector.connect()) {
-      RenderedOp renderedOp = StreamDescriptor.create(inputStream, null, hints);
+      final RenderedOp renderedOp = StreamDescriptor.create(inputStream, null, hints);
       planarImage = new PlanarImageOperatorFactory(metadataAdjustor)
-          .create((ImagenImageMetadata)metadata, imageOperations, hints)
+          .create((ImagenImageMetadata) metadata, operations, hints)
           .execute(canceler, renderedOp);
-      return planarImage == null ? null : planarImage.getAsBufferedImage();
+      return planarImage == null ? null : converter.convert(planarImage);
     } finally {
       if (planarImage != null) {
         planarImage.dispose();
       }
     }
   }
+
+  @Override
+  protected Histogram readHistogram(final IMessageCollector messageCollector,
+      final ICanceler canceler,
+      final RenderingHints hints,
+      final IObjectList<IImageOperation> operations,
+      final IImageMetadataAdjustor metadataAdjustor) throws CanceledException, IOException {
+    return read(messageCollector,
+        canceler,
+        hints,
+        operations,
+        metadataAdjustor,
+        image -> {
+          ParameterBlock pb = new ParameterBlock();
+          pb.addSource(image);
+          RenderedOp op = JAI.create("histogram", pb, null);
+          Histogram histogram = (Histogram) op.getProperty("histogram");
+          return histogram;
+        });
+  }
+  
 }

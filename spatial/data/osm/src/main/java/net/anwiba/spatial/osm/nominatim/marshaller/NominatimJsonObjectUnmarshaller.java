@@ -37,6 +37,6 @@ public class NominatimJsonObjectUnmarshaller<T>
 
   @Override
   protected boolean isErrorResponse(final ErrorResponse response) {
-    return response.get().get("place_id") == null;
+    return response.getError() != null || response.get().get("place_id") == null;
   }
 }

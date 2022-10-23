@@ -36,7 +36,8 @@ import javax.swing.SwingUtilities;
 
 import net.anwiba.commons.message.ExceptionMessage;
 import net.anwiba.commons.message.IMessage;
-import net.anwiba.commons.message.MessageBuilder;
+import net.anwiba.commons.message.IMessageBuilder;
+import net.anwiba.commons.message.Message;
 import net.anwiba.commons.message.MessageType;
 import net.anwiba.commons.model.IObjectModel;
 import net.anwiba.commons.model.ObjectModel;
@@ -47,7 +48,7 @@ import net.anwiba.commons.swing.utilities.GuiUtilities;
 
 public class MessageDialogLauncher {
 
-  private final MessageBuilder builder = new MessageBuilder();
+  private final IMessageBuilder builder = Message.builder();
   private String title = "Title"; //$NON-NLS-1$
   private IGuiIcon icon = GuiIcons.EMPTY_ICON;
   private DialogType dialogType = DialogType.CLOSE;
@@ -90,42 +91,42 @@ public class MessageDialogLauncher {
   }
 
   public MessageDialogLauncher text(final String text) {
-    this.builder.setText(text);
+    this.builder.text(text);
     return this;
   }
 
   public MessageDialogLauncher description(final String description) {
-    this.builder.setDescription(description);
+    this.builder.description(description);
     return this;
   }
 
   public MessageDialogLauncher throwable(final Throwable throwable) {
-    this.builder.setThrowable(throwable);
+    this.builder.throwable(throwable);
     return this;
   }
 
   public MessageDialogLauncher type(final MessageType messageType) {
-    this.builder.setType(messageType);
+    this.builder.type(messageType);
     return this;
   }
 
   public MessageDialogLauncher error() {
-    this.builder.setError();
+    this.builder.error();
     return this;
   }
 
   public MessageDialogLauncher info() {
-    this.builder.setInfo();
+    this.builder.info();
     return this;
   }
 
   public MessageDialogLauncher warning() {
-    this.builder.setWarning();
+    this.builder.warning();
     return this;
   }
 
   public MessageDialogLauncher message(final IMessage message) {
-    this.builder.setMessage(message);
+    this.builder.message(message);
     return this;
   }
 

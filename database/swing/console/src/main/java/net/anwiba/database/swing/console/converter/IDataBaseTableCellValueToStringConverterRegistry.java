@@ -29,9 +29,16 @@ import net.anwiba.commons.lang.object.IObjectToStringConverter;
 
 public interface IDataBaseTableCellValueToStringConverterRegistry {
 
-  void add(
+  public record DataBaseTableCellValueToStringConverter(IApplicable<IJdbcConnectionDescription> applicable,
+      Set<String> typeNames,
+      IObjectToStringConverter<Object> dataBaseTableCellValueToStringConverter) {};
+  
+  default void add(
       IApplicable<IJdbcConnectionDescription> applicable,
       Set<String> typeNames,
-      IObjectToStringConverter<Object> dataBaseTableCellValueToStringConverter);
+      IObjectToStringConverter<Object> dataBaseTableCellValueToStringConverter) {
+    add(new DataBaseTableCellValueToStringConverter(applicable, typeNames, dataBaseTableCellValueToStringConverter));
+  }
 
+  void add(DataBaseTableCellValueToStringConverter converter);
 }

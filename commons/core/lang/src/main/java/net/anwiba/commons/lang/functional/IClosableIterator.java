@@ -29,6 +29,48 @@ import net.anwiba.commons.lang.stream.Streams;
 
 public interface IClosableIterator<T, E extends Exception> extends ICloseable<E>, Iterable<T> {
 
+  static <T, E extends Exception> IClosableIterator<T, E> empty() {
+    return new IClosableIterator<>() {
+      @Override
+      public void close() throws E {
+        // nothing to do
+      }
+
+      @Override
+      public T next() throws E {
+        throw new NoSuchElementException();
+      }
+
+      @Override
+      public boolean hasNext() throws E {
+        return false;
+      }
+    };
+  }
+
+  static <T> IClosableIterator<T, RuntimeException> of(Iterator<T> iterator) {
+    return of(RuntimeException.class, iterator);
+  }
+
+  static <T ,E extends Exception> IClosableIterator<T, E> of(Class<E> exceptionClazz, Iterator<T> iterator) {
+    return new IClosableIterator<T, E>() {
+
+      @Override
+      public boolean hasNext() throws E {
+        return iterator.hasNext();
+      }
+
+      @Override
+      public T next() throws E {
+        return iterator.next();
+      }
+      
+      public void close() throws E {
+
+      }
+    };
+  }
+
   boolean hasNext() throws E;
 
   T next() throws E;
@@ -48,7 +90,6 @@ public interface IClosableIterator<T, E extends Exception> extends ICloseable<E>
           return iterator.hasNext();
         } catch (final Exception hasNextException) {
           this.exception = hasNextException;
-          exception.printStackTrace();
           return false;
         }
       }
@@ -73,5 +114,5 @@ public interface IClosableIterator<T, E extends Exception> extends ICloseable<E>
 
   default IStream<T, E> stream(Class<E> clazz) {
     return Streams.of(clazz, this);
-  }  
+  }
 }

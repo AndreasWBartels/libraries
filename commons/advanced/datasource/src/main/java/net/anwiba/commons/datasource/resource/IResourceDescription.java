@@ -25,7 +25,7 @@ package net.anwiba.commons.datasource.resource;
 import java.io.Serializable;
 
 import net.anwiba.commons.datasource.connection.IConnectionDescription;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.IAuthentication;
 
 public interface IResourceDescription extends Serializable {
 

@@ -21,18 +21,6 @@
  */
 package net.anwiba.spatial.ckan.request;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import net.anwiba.commons.http.Authentication;
 import net.anwiba.commons.http.IAuthentication;
 import net.anwiba.commons.http.IRequest;
@@ -50,6 +38,18 @@ import net.anwiba.spatial.ckan.request.sort.ISortOrderVisitor;
 import net.anwiba.spatial.ckan.request.time.Event;
 import net.anwiba.spatial.ckan.utilities.CkanUtilities;
 import net.anwiba.spatial.ckan.values.Envelope;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("nls")
 public class PackageRequestBuilder {
@@ -245,20 +245,20 @@ public class PackageRequestBuilder {
           // +spatial_geom:"Intersects(ENVELOPE(-180.0, -197.067608389, 46.937575538, 27.0033887294))"
 
           // https://solr.apache.org/guide/8_8/spatial-search.html
-          
+
           final RequestBuilder builder = RequestBuilder
               .get(CkanUtilities.getBaseUrl(this.url, "package_search"))
               .query("start", String.valueOf(this.start))
               .query("rows", String.valueOf(this.rows));
           If
               .isTrue(this.useDefaultSchema)
-              .excecute(() -> builder.query("use_default_schema", Boolean.valueOf(this.useDefaultSchema).toString()));
+              .execute(() -> builder.query("use_default_schema", Boolean.valueOf(this.useDefaultSchema).toString()));
           If
               .isTrue(!this.searchConditions.isEmpty())
-              .excecute(() -> builder.query("fq", toString(this.searchConditions.values())));
+              .execute(() -> builder.query("fq", toString(this.searchConditions.values())));
           Optional.of(this.query).convert(q -> builder.query("q", q));
           Optional.of(this.envelope).consume(a -> builder.query("ext_bbox", toString(a)));
-          If.isTrue(!this.fields.isEmpty()).excecute(() -> builder.query("fl", toString(this.fields)));
+          If.isTrue(!this.fields.isEmpty()).execute(() -> builder.query("fl", toString(this.fields)));
           Optional.of(this.sortOrder).consume(o -> builder.query("sort", toString(o)));
           Optional.of(this.key).convert(k -> builder.header("X-CKAN-API-Key", k));
           Optional.of(this.authentication).consume(a -> builder.authentication(a.getUsername(), a.getPassword()));
@@ -269,7 +269,7 @@ public class PackageRequestBuilder {
               RequestBuilder.get(CkanUtilities.getBaseUrl(this.url, "package_search")).query(this.parameters);
           If
               .isTrue(this.useDefaultSchema)
-              .excecute(() -> builder.query("use_default_schema", Boolean.valueOf(this.useDefaultSchema).toString()));
+              .execute(() -> builder.query("use_default_schema", Boolean.valueOf(this.useDefaultSchema).toString()));
           Optional.of(this.key).convert(k -> builder.header("X-CKAN-API-Key", k));
           Optional.of(this.authentication).consume(a -> builder.authentication(a.getUsername(), a.getPassword()));
           Optional.of(this.identifier).consume(a -> builder.query("id", this.identifier));

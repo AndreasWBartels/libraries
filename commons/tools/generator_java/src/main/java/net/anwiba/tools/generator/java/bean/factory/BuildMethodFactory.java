@@ -8,18 +8,21 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
 package net.anwiba.tools.generator.java.bean.factory;
+
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.IFactory;
 
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
@@ -32,8 +35,10 @@ import com.sun.codemodel.JMod;
 
 public final class BuildMethodFactory extends AbstractSourceFactory {
 
-  public BuildMethodFactory(final JCodeModel codeModel) {
-    super(codeModel);
+  public BuildMethodFactory(final JCodeModel codeModel,
+      final IFactory<String, Class<? extends java.lang.annotation.Annotation>,
+          CreationException> annotationClassfactory) {
+    super(codeModel, annotationClassfactory);
   }
 
   public void create(final JDefinedClass beanBuilder, final String name, final Iterable<JFieldVar> fields) {

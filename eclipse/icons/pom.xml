@@ -11,7 +11,7 @@
   <parent>
     <groupId>net.anwiba.eclipse</groupId>
     <artifactId>anwiba-eclipse-maven-default</artifactId>
-    <version>1.1.158</version>
+    <version>1.2.50</version>
   </parent>
 
   <scm>
@@ -25,13 +25,13 @@
     <dependency>
       <groupId>net.anwiba.eclipse</groupId>
       <artifactId>net.anwiba.eclipse.commons</artifactId>
-      <version>1.1.158</version>
+      <version>1.2.50</version>
     </dependency>
 
     <dependency>
       <groupId>net.anwiba.eclipse</groupId>
       <artifactId>net.anwiba.eclipse.libraries</artifactId>
-      <version>1.1.158</version>
+      <version>1.2.50</version>
     </dependency>
 
     <dependency>

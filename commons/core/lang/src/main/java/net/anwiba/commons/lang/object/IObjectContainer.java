@@ -21,6 +21,12 @@
  */
 package net.anwiba.commons.lang.object;
 
+import java.util.Objects;
+
 public interface IObjectContainer<T> extends IObjectReceiver<T>, IObjectProvider<T> {
-  // nothing to do
+
+  default boolean contaits(T value) {
+    return Objects.equals(get(), value);
+  }
+
 }

@@ -28,6 +28,8 @@ import java.util.NoSuchElementException;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IConverter;
 import net.anwiba.commons.lang.functional.IIterator;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public final class IteratorFlattingIterator<I, O, E extends Exception> implements IIterator<O, E> {
 
@@ -35,7 +37,7 @@ public final class IteratorFlattingIterator<I, O, E extends Exception> implement
   private Iterator<O> itemIterator = null;
   private final IAcceptor<I> acceptor;
   private final IConverter<I, Iterable<O>, E> converter;
-  private O item = null;
+  private IOptional<O, RuntimeException> item = null;
 
   public IteratorFlattingIterator(
       final IIterator<I, E> input,
@@ -52,7 +54,7 @@ public final class IteratorFlattingIterator<I, O, E extends Exception> implement
       return true;
     }
     if (_hasNext()) {
-      this.item = this.itemIterator.next();
+      this.item = Optional.of(this.itemIterator.next());
       return true;
     }
     return false;
@@ -75,7 +77,7 @@ public final class IteratorFlattingIterator<I, O, E extends Exception> implement
   public O next() throws E {
     try {
       if (hasNext()) {
-        return this.item;
+        return this.item.get();
       }
       throw new NoSuchElementException();
     } finally {

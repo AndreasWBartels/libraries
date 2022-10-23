@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -26,6 +26,22 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import net.anwiba.commons.http.HttpClientConnector;
+import net.anwiba.commons.http.HttpRequestExecutorFactoryBuilder;
+import net.anwiba.commons.http.IHttpRequestExecutorFactory;
+import net.anwiba.commons.image.codec.ImageCodec;
+import net.anwiba.commons.image.histogram.Histogram;
+import net.anwiba.commons.lang.exception.CanceledException;
+import net.anwiba.commons.lang.exception.CreationException;
+import net.anwiba.commons.lang.functional.ConversionException;
+import net.anwiba.commons.lang.random.RandomObjectGenerator;
+import net.anwiba.commons.reference.IResourceReference;
+import net.anwiba.commons.reference.IResourceReferenceFactory;
+import net.anwiba.commons.reference.ResourceReferenceFactory;
+import net.anwiba.commons.reference.ResourceReferenceHandler;
+import net.anwiba.commons.reference.utilities.IoUtilities;
+import net.anwiba.commons.thread.cancel.ICanceler;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,21 +67,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import net.anwiba.commons.http.HttpClientConnector;
-import net.anwiba.commons.http.HttpRequestExecutorFactoryBuilder;
-import net.anwiba.commons.http.IHttpRequestExecutorFactory;
-import net.anwiba.commons.image.codec.ImageCodec;
-import net.anwiba.commons.lang.exception.CanceledException;
-import net.anwiba.commons.lang.exception.CreationException;
-import net.anwiba.commons.lang.functional.ConversionException;
-import net.anwiba.commons.lang.random.RandomObjectGenerator;
-import net.anwiba.commons.reference.IResourceReference;
-import net.anwiba.commons.reference.IResourceReferenceFactory;
-import net.anwiba.commons.reference.ResourceReferenceFactory;
-import net.anwiba.commons.reference.ResourceReferenceHandler;
-import net.anwiba.commons.reference.utilities.IoUtilities;
-import net.anwiba.commons.thread.cancel.ICanceler;
 
 @TestMethodOrder(OrderAnnotation.class)
 public class ImageContainerTest {
@@ -113,6 +114,24 @@ public class ImageContainerTest {
         ImageCodec.PNG);
   }
 
+  @Test
+  @Order(11)
+  public void getValues() {
+    boolean hasAlpha = true;
+    BufferedImage bufferedImage = generate(hasAlpha, true);
+    IImageContainer container = this.imageContainerFactory.create(bufferedImage);
+    Number[][] values = container.getValues(2, 2, 2, 2);
+  }
+
+  @Test
+  @Order(12)
+  public void getHistorgram() {
+    boolean hasAlpha = true;
+    BufferedImage bufferedImage = generate(hasAlpha, true);
+    IImageContainer container = this.imageContainerFactory.create(bufferedImage);
+    Histogram histogram = container.getHistogram();
+  }
+
   @ParameterizedTest
   @ValueSource(strings = { "png", "gif", "tif", "bmp", "jpg" })
   @Order(2)
@@ -127,7 +146,7 @@ public class ImageContainerTest {
     IImageContainer container = this.imageReader.read(ICanceler.DummyCanceler, original);
     assertContainer(container, 1000, 1000);
 
-    if (!Set.of(ImageCodec.JPEG, ImageCodec.BMP).contains(format)) {
+    if (!Set.of(ImageCodec.JPEG, ImageCodec.BMP, ImageCodec.GIF).contains(format)) {
       IResourceReference copy = write(container, format);
       assertTrue(
           IoUtilities.contentEquals(this.resourceReferenceHandler.getFile(original),
@@ -485,3 +504,4 @@ public class ImageContainerTest {
     return image;
   }
 }
+

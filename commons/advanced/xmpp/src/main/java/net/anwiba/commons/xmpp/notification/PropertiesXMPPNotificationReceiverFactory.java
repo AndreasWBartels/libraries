@@ -51,9 +51,8 @@ public class PropertiesXMPPNotificationReceiverFactory implements INotificationR
 
   @Override
   public INotificationReceiver create() throws CreationException {
-    Properties properties;
     try {
-      properties = getXmppProperties();
+      final Properties properties = getXmppProperties();
       final String host = getRequiredProperty(properties, PROPERTY_XMPP_HOST);
       final String userName = getRequiredProperty(properties, PROPERTY_XMPP_USERNAME);
       final String password = getRequiredProperty(properties, PROPERTY_XMPP_PASSWORD);

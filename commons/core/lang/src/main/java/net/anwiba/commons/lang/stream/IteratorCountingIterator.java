@@ -27,6 +27,8 @@ import net.anwiba.commons.lang.counter.IntCounter;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
 import net.anwiba.commons.lang.functional.IIterator;
+import net.anwiba.commons.lang.optional.IOptional;
+import net.anwiba.commons.lang.optional.Optional;
 
 public class IteratorCountingIterator<I, O, E extends Exception> implements IIterator<O, E> {
 
@@ -34,7 +36,7 @@ public class IteratorCountingIterator<I, O, E extends Exception> implements IIte
   private final IIterator<I, E> iterator;
   private final IAcceptor<I> acceptor;
   private final IAggregator<Integer, I, O, E> aggegator;
-  private O item = null;
+  private IOptional<O, RuntimeException> item = null;
 
   public IteratorCountingIterator(
       final IIterator<I, E> input,
@@ -47,10 +49,13 @@ public class IteratorCountingIterator<I, O, E extends Exception> implements IIte
 
   @Override
   public boolean hasNext() throws E {
+    if (this.item != null) {
+      return true;
+    }
     while (this.iterator.hasNext()) {
       final I i = this.iterator.next();
-      if (this.acceptor.accept(i)
-          && (this.item = this.aggegator.aggregate(Integer.valueOf(this.counter.next()), i)) != null) {
+      if (this.acceptor.accept(i)) {
+        this.item = Optional.of(this.aggegator.aggregate(Integer.valueOf(this.counter.next()), i));
         return true;
       }
     }
@@ -60,8 +65,8 @@ public class IteratorCountingIterator<I, O, E extends Exception> implements IIte
   @Override
   public O next() throws E {
     try {
-      if (this.item != null || hasNext()) {
-        return this.item;
+      if (hasNext()) {
+        return this.item.get();
       }
       throw new NoSuchElementException();
     } finally {

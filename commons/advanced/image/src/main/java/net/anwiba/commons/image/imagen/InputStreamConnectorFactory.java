@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,11 +36,12 @@ import net.anwiba.commons.reference.IResourceReferenceHandler;
 import net.anwiba.commons.reference.IResourceReferenceVisitor;
 import net.anwiba.commons.reference.MemoryResourceReference;
 import net.anwiba.commons.reference.PathResourceReference;
-import net.anwiba.commons.reference.UriResourceReference;
-import net.anwiba.commons.reference.UrlResourceReference;
-import net.anwiba.commons.utilities.io.url.IUrl;
-import net.anwiba.commons.utilities.io.url.UrlBuilder;
-import net.anwiba.commons.utilities.io.url.parser.UrlParser;
+import net.anwiba.commons.reference.URIResourceReference;
+import net.anwiba.commons.reference.URLResourceReference;
+import net.anwiba.commons.reference.UniformResourceLocatorReference;
+import net.anwiba.commons.reference.url.IUrl;
+import net.anwiba.commons.reference.url.builder.UrlBuilder;
+import net.anwiba.commons.reference.url.parser.UrlParser;
 
 public class InputStreamConnectorFactory {
 
@@ -59,13 +60,18 @@ public class InputStreamConnectorFactory {
       return resourceReference.accept(new IResourceReferenceVisitor<SeekableStream, IOException>() {
 
         @Override
+        public SeekableStream visitUrlResource(final UniformResourceLocatorReference urlResourceReference) throws IOException  {
+          throw new UnsupportedOperationException();
+        }
+
+        @Override
         public SeekableStream visitFileResource(final FileResourceReference fileResourceReference)
             throws IOException {
           return new FileSeekableStream(fileResourceReference.getFile());
         }
 
         @Override
-        public SeekableStream visitUrlResource(final UrlResourceReference urlResourceReference) throws IOException {
+        public SeekableStream visitURLResource(final URLResourceReference urlResourceReference) throws IOException {
           if (InputStreamConnectorFactory.this.resourceReferenceHandler.isFileSystemResource(resourceReference)) {
             return openAsFileIfPossible(resourceReference);
           }
@@ -75,7 +81,7 @@ public class InputStreamConnectorFactory {
         }
 
         @Override
-        public SeekableStream visitUriResource(final UriResourceReference uriResourceReference) throws IOException {
+        public SeekableStream visitURIResource(final URIResourceReference uriResourceReference) throws IOException {
           if (InputStreamConnectorFactory.this.resourceReferenceHandler.isFileSystemResource(resourceReference)) {
             return openAsFileIfPossible(resourceReference);
           }

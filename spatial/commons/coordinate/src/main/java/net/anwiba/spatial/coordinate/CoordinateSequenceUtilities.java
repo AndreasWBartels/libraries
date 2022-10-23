@@ -434,4 +434,8 @@ public class CoordinateSequenceUtilities {
   private static double calculateGradient(final ICoordinate previous, final ICoordinate next) {
     return (next.getXValue() - previous.getXValue()) / (next.getYValue() - previous.getYValue());
   }
+
+  public static List<ICoordinate> calculateCrossPoints(ICoordinateSequence coordinateSequenceOfEnvelope, ICoordinate previous, ICoordinate coordinate) {
+    return List.of();
+  }
 }

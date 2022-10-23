@@ -22,13 +22,6 @@
 
 package net.anwiba.commons.lang.stream;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.IntFunction;
-import java.util.stream.Stream;
-
 import net.anwiba.commons.lang.collection.IObjectList;
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IAggregator;
@@ -41,9 +34,16 @@ import net.anwiba.commons.lang.functional.IIntAssimilator;
 import net.anwiba.commons.lang.functional.ISupplier;
 import net.anwiba.commons.lang.optional.IOptional;
 
-public interface IStream<T, E extends Exception> extends ICloseable<E> {
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
-  IStream<T, E> execute();
+public interface IStream<T, E extends Exception> extends ICloseable<E>, Iterable<T> {
 
   IStream<T, E> distinct();
 
@@ -57,6 +57,10 @@ public interface IStream<T, E extends Exception> extends ICloseable<E> {
 
   <O> IStream<O, E> instanceOf(Class<O> clazz);
 
+  IStream<T, E> foreachAsOptional(IConsumer<IOptional<T, E>, E> consumer);
+
+  IStream<T, E> sort(Comparator<T> comparator);
+
   IStream<T, E> foreach(IConsumer<T, E> consumer);
 
   IStream<T, E> foreach(IAssimilator<Integer, T, E> assimilator);
@@ -69,7 +73,7 @@ public interface IStream<T, E extends Exception> extends ICloseable<E> {
 
   IStream<T, E> failed(ISupplier<Iterable<T>, E> supplier);
 
-  void throwIfFailed() throws E;
+  IStream<T, E> throwIfFailed() throws E;
 
   <O> Collection<O> asCollection() throws E;
 
@@ -82,6 +86,10 @@ public interface IStream<T, E extends Exception> extends ICloseable<E> {
   <O> IObjectList<O> asObjectList() throws E;
 
   <O> Stream<O> asStream() throws E;
+
+  <O> Iterable<O> asIterable() throws E;
+
+  <O> Iterator<O> asIterator() throws E;
 
   IOptional<T, E> first();
 

@@ -23,10 +23,13 @@ package net.anwiba.commons.datasource.connection;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Set;
 
 import net.anwiba.commons.datasource.DataSourceType;
-import net.anwiba.commons.datasource.DataSourceVersion;
-import net.anwiba.commons.utilities.io.url.IAuthentication;
+import net.anwiba.commons.reference.url.IAuthentication;
+import net.anwiba.commons.utilities.property.IProperties;
+import net.anwiba.commons.utilities.property.Properties;
+import net.anwiba.commons.utilities.string.StringUtilities;
 
 public interface IConnectionDescription extends Serializable {
 
@@ -42,6 +45,17 @@ public interface IConnectionDescription extends Serializable {
 
   DataSourceType getDataSourceType();
 
-  DataSourceVersion getVersion();
+  default IProperties getProperties() {
+    return Properties.empty();
+  }
 
+  public static final Set<String> reserved = Set.of("schema", "table", "column");
+
+  public static boolean isProperty(final String name, final String value) {
+    if (StringUtilities.isNullOrTrimmedEmpty(name)
+        || StringUtilities.isNullOrTrimmedEmpty(value)) {
+      return false;
+    }
+    return !reserved.contains(name.toLowerCase());
+  }
 }

@@ -2,7 +2,7 @@
  * #%L
  * anwiba commons
  * %%
- * Copyright (C) 2007 - 2021 Andreas W. Bartels
+ * Copyright (C) 2007 - 2022 Andreas W. Bartels
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -45,7 +45,7 @@ public class DirectionAngle {
   private final DirectionOrientation orientation;
 
   private DirectionAngle(final Angle angle, final DirectionOrientation orientation) {
-    this.angle = angle;
+    this.angle = angle.modulo();
     this.orientation = orientation;
   }
 
@@ -90,7 +90,7 @@ public class DirectionAngle {
   }
 
   public DirectionAngle nonNegativ() {
-    return DirectionAngle.of(this.angle.nonNegativ(), this.orientation);
+    return DirectionAngle.of(this.angle.moduloPositive(), this.orientation);
   }
 
   public DirectionAngle add(final Angle angle) {

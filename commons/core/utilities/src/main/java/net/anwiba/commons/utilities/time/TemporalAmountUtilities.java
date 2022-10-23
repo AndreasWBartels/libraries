@@ -8,12 +8,12 @@
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -113,31 +113,25 @@ public class TemporalAmountUtilities {
   }
 
   public static TemporalAmount floor(final TemporalAmount value, final TemporalUnit unit) {
-    LocalDateTime time = toDateTime(value).withNano(0);
+    LocalDateTime time = floor(toDateTime(value), unit);
     if (ChronoUnit.SECONDS.getDuration().compareTo(unit.getDuration()) >= 0) {
       return Duration.between(ZERO_DATE_TIME, time);
     }
-    time = time.withSecond(0);
     if (ChronoUnit.MINUTES.getDuration().compareTo(unit.getDuration()) >= 0) {
       return Duration.between(ZERO_DATE_TIME, time);
     }
-    time = time.withMinute(0);
     if (ChronoUnit.HOURS.getDuration().compareTo(unit.getDuration()) >= 0) {
       return Duration.between(ZERO_DATE_TIME, time);
     }
-    time = time.withHour(0);
     if (ChronoUnit.DAYS.getDuration().compareTo(unit.getDuration()) >= 0) {
       return Period.between(ZERO_DATE_TIME.toLocalDate(), time.toLocalDate());
     }
-    time = time.withDayOfMonth(1);
     if (ChronoUnit.MONTHS.getDuration().compareTo(unit.getDuration()) >= 0) {
       return Period.between(ZERO_DATE_TIME.toLocalDate(), time.toLocalDate());
     }
-    time = time.withMonth(1);
     if (ChronoUnit.YEARS.getDuration().compareTo(unit.getDuration()) >= 0) {
       return Period.between(ZERO_DATE_TIME.toLocalDate(), time.toLocalDate());
     }
-    time = time.withYear(0);
     return Period.between(ZERO_DATE_TIME.toLocalDate(), time.toLocalDate());
   }
 
@@ -183,13 +177,15 @@ public class TemporalAmountUtilities {
   }
 
   public static TemporalAmount betweenNow(final LocalDateTime value, final TemporalUnit unit) {
-    return between(UserDateTimeUtilities.now(), value, unit);
+    return between(UserDateTimeUtilities.now().toLocalDateTime(), value, unit);
   }
 
   public static TemporalAmount between(final LocalDateTime from, final LocalDateTime until, final TemporalUnit unit) {
     if (unit.isDateBased()) {
+      //      return Period.between(from.toLocalDate(), until.toLocalDate());
       return Period.between(floor(from, unit).toLocalDate(), floor(until, unit).toLocalDate());
     }
+    //    return Duration.between(from, until);
     return Duration.between(floor(from, unit), floor(until, unit));
   }
 }

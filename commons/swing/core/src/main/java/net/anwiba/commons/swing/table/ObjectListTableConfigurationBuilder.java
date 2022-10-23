@@ -21,15 +21,6 @@
  */
 package net.anwiba.commons.swing.table;
 
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-
 import net.anwiba.commons.lang.functional.IAcceptor;
 import net.anwiba.commons.lang.functional.IFactory;
 import net.anwiba.commons.lang.primitive.IBooleanProvider;
@@ -38,6 +29,7 @@ import net.anwiba.commons.model.IObjectDistributor;
 import net.anwiba.commons.model.ISelectionModel;
 import net.anwiba.commons.swing.table.action.AbstractTableActionFactory;
 import net.anwiba.commons.swing.table.action.AddTableRowActionFactory;
+import net.anwiba.commons.swing.table.action.ClearTableActionFactory;
 import net.anwiba.commons.swing.table.action.EditTableActionFactory;
 import net.anwiba.commons.swing.table.action.ITableActionClosure;
 import net.anwiba.commons.swing.table.action.ITableActionConfiguration;
@@ -52,6 +44,15 @@ import net.anwiba.commons.swing.table.action.RemoveTableRowActionFactory;
 import net.anwiba.commons.swing.table.filter.IColumToStringConverter;
 import net.anwiba.commons.utilities.string.IStringSubstituter;
 import net.anwiba.commons.utilities.string.StringUtilities;
+
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 public class ObjectListTableConfigurationBuilder<T> {
 
@@ -217,6 +218,10 @@ public class ObjectListTableConfigurationBuilder<T> {
 
   public ObjectListTableConfigurationBuilder<T> addRemoveObjectsAction() {
     return addActionFactory(new RemoveTableRowActionFactory<T>());
+  }
+
+  public ObjectListTableConfigurationBuilder<T> addClearTableAction() {
+    return addActionFactory(new ClearTableActionFactory<T>());
   }
 
   public ObjectListTableConfigurationBuilder<T> addMoveObjectUpAction() {

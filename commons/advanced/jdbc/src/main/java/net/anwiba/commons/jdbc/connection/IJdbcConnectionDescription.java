@@ -21,9 +21,9 @@
  */
 package net.anwiba.commons.jdbc.connection;
 
-import java.util.Properties;
-
 import net.anwiba.commons.jdbc.software.IDatabaseSoftware;
+import net.anwiba.commons.utilities.property.IProperties;
+import net.anwiba.commons.utilities.property.Properties;
 
 public interface IJdbcConnectionDescription {
 
@@ -37,9 +37,9 @@ public interface IJdbcConnectionDescription {
 
   String getProtocol();
 
-  void addProperty(String key, String value);
-
-  Properties getProperties();
+  default IProperties getProperties() {
+    return Properties.empty();
+  }
 
   IDatabaseSoftware getDatabaseSoftware();
 }
