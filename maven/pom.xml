@@ -177,7 +177,7 @@
     <spatialite.jdbc.version>4.3.0.1a</spatialite.jdbc.version>
 
     <!-- PostgreSQL JDBC: https://jdbc.postgresql.org/documentation/changelog.html -->
-    <postgresql.version>42.5.0</postgresql.version>
+    <postgresql.version>42.5.1</postgresql.version>
     <net.postgis.version>2021.1.0</net.postgis.version>
 
     <!-- <com.h2database.version>jts-1.8.1-1.4.200</com.h2database.version> -->
